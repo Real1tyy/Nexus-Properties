@@ -1,39 +1,48 @@
-import { Notice, Plugin } from "obsidian";
+import { Plugin } from "obsidian";
 import { NexusPropertiesSettingsTab } from "./components";
 import { Indexer } from "./core/indexer";
+import { PropertiesManager } from "./core/properties-manager";
 import { SettingsStore } from "./core/settings-store";
 
 export default class NexusPropertiesPlugin extends Plugin {
 	settingsStore!: SettingsStore;
 	indexer!: Indexer;
+	propertiesManager!: PropertiesManager;
 
 	async onload() {
-		console.log("Loading Nexus Properties plugin");
-
-		// Initialize settings
 		this.settingsStore = new SettingsStore(this);
 		await this.settingsStore.loadSettings();
 
 		this.addSettingTab(new NexusPropertiesSettingsTab(this.app, this));
 
-		// Initialize indexer
+		this.initializePlugin();
+	}
+
+	private async initializePlugin() {
+		// Wait for Obsidian's workspace layout to be ready
+		await new Promise<void>((resolve) => this.app.workspace.onLayoutReady(resolve));
+
+		// Wait for metadata cache to be fully initialized
+		// @ts-expect-error - initialized property exists at runtime but not in type definitions
+		if (!this.app.metadataCache.initialized) {
+			await new Promise<void>((resolve) => {
+				// @ts-expect-error - initialized event exists at runtime but not in type definitions
+				this.app.metadataCache.once("initialized", resolve);
+			});
+		}
+
+		console.log("NexusProperties: Obsidian vault fully indexed, starting plugin...");
+
 		this.indexer = new Indexer(this.app, this.settingsStore.settings$);
 
-		// Subscribe to indexer events
-		this.indexer.events$.subscribe((_event) => {
-			// Property sync logic will be implemented here
-		});
+		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$.value);
+		this.propertiesManager.start(this.indexer.events$);
 
-		// Start indexing
 		await this.indexer.start();
-
-		new Notice("Nexus Properties: Plugin loaded");
 	}
 
 	async onunload() {
-		console.log("Unloading Nexus Properties plugin");
-
-		// Stop indexer
+		this.propertiesManager?.stop();
 		this.indexer?.stop();
 	}
 }
