@@ -7,13 +7,13 @@ import {
 	merge,
 	type Observable,
 	of,
+	BehaviorSubject as RxBehaviorSubject,
 	Subject,
 	type Subscription,
 } from "rxjs";
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
+import { SCAN_CONCURRENCY } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
-
-const SCAN_CONCURRENCY = 10;
 
 export interface FileRelationships {
 	filePath: string;
@@ -42,8 +42,10 @@ export class Indexer {
 	private vault: Vault;
 	private metadataCache: MetadataCache;
 	private scanEventsSubject = new Subject<IndexerEvent>();
+	private indexingCompleteSubject = new RxBehaviorSubject<boolean>(false);
 
 	public readonly events$: Observable<IndexerEvent>;
+	public readonly indexingComplete$: Observable<boolean>;
 
 	constructor(app: App, settingsStore: BehaviorSubject<NexusPropertiesSettings>) {
 		this.vault = app.vault;
@@ -51,10 +53,22 @@ export class Indexer {
 		this.settings = settingsStore.value;
 
 		this.settingsSubscription = settingsStore.subscribe((newSettings) => {
+			const relevantSettingsChanged =
+				this.settings.parentProp !== newSettings.parentProp ||
+				this.settings.childrenProp !== newSettings.childrenProp ||
+				this.settings.relatedProp !== newSettings.relatedProp ||
+				JSON.stringify(this.settings.directories) !== JSON.stringify(newSettings.directories);
+
 			this.settings = newSettings;
+
+			if (relevantSettingsChanged) {
+				this.indexingCompleteSubject.next(false);
+				this.scanAllFiles();
+			}
 		});
 
 		this.events$ = this.scanEventsSubject.asObservable();
+		this.indexingComplete$ = this.indexingCompleteSubject.asObservable();
 	}
 
 	async start(): Promise<void> {
@@ -72,12 +86,15 @@ export class Indexer {
 
 		this.settingsSubscription?.unsubscribe();
 		this.settingsSubscription = null;
+
+		this.indexingCompleteSubject.complete();
 	}
 
 	private async scanAllFiles(): Promise<void> {
 		const allFiles = this.vault.getMarkdownFiles();
+		const relevantFiles = allFiles.filter((file) => this.shouldIndexFile(file.path));
 
-		const events$ = from(allFiles).pipe(
+		const events$ = from(relevantFiles).pipe(
 			mergeMap(async (file) => {
 				try {
 					return await this.buildEvent(file);
@@ -98,6 +115,8 @@ export class Indexer {
 			}
 		} catch (error) {
 			console.error("❌ Error during file scanning:", error);
+		} finally {
+			this.indexingCompleteSubject.next(true);
 		}
 	}
 
@@ -112,8 +131,30 @@ export class Indexer {
 		return f instanceof TFile && f.extension === "md";
 	}
 
+	private shouldIndexFile(filePath: string): boolean {
+		const { directories } = this.settings;
+
+		// If directories contains "*", scan all files
+		if (directories.includes("*")) {
+			return true;
+		}
+
+		// Check if file path starts with any of the configured directories
+		return directories.some((dir) => {
+			// Normalize directory path (remove trailing slash if present)
+			const normalizedDir = dir.endsWith("/") ? dir.slice(0, -1) : dir;
+
+			// Check if file path starts with the directory path
+			return filePath === normalizedDir || filePath.startsWith(`${normalizedDir}/`);
+		});
+	}
+
 	private toRelevantFiles<T extends TAbstractFile>() {
-		return (source: Observable<T>) => source.pipe(filter(Indexer.isMarkdownFile));
+		return (source: Observable<T>) =>
+			source.pipe(
+				filter(Indexer.isMarkdownFile),
+				filter((f) => this.shouldIndexFile(f.path))
+			);
 	}
 
 	private debounceByPath<T>(ms: number, key: (x: T) => string) {
@@ -162,20 +203,10 @@ export class Indexer {
 	}
 
 	private async buildEvent(file: TFile): Promise<IndexerEvent | null> {
-		const cache = this.metadataCache.getFileCache(file);
-		if (!cache || !cache.frontmatter) {
-			return {
-				type: "file-changed",
-				filePath: file.path,
-				relationships: {
-					filePath: file.path,
-					mtime: file.stat.mtime,
-					frontmatter: {},
-				},
-			};
+		const frontmatter = this.metadataCache.getFileCache(file)?.frontmatter;
+		if (!frontmatter) {
+			return null;
 		}
-
-		const { frontmatter } = cache;
 		const relationships = this.extractRelationships(file, frontmatter);
 
 		return {

@@ -13,6 +13,9 @@ export const NexusPropertiesSettingsSchema = z.object({
 	allParentsProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_ALL_PARENTS_PROP),
 	allChildrenProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_ALL_CHILDREN_PROP),
 	allRelatedProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_ALL_RELATED_PROP),
+
+	// Directories to scan - ["*"] means scan all, otherwise only scan specified directories and subdirectories
+	directories: z.array(z.string()).default([...SETTINGS_DEFAULTS.DEFAULT_DIRECTORIES]),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

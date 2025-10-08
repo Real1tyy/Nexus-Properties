@@ -15,9 +15,115 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		containerEl.createEl("h1", { text: "Nexus Properties Settings" });
 
+		this.addDirectorySettings(containerEl);
 		this.addDirectRelationshipSettings(containerEl);
 		this.addComputedRelationshipSettings(containerEl);
 		this.addExampleSection(containerEl);
+	}
+
+	private addDirectorySettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("Directory scanning").setHeading();
+
+		const descEl = containerEl.createDiv("setting-item-description");
+		descEl.setText(
+			'Configure which directories to scan for files with relationships. Use "*" to scan all directories, or specify individual directories to limit scanning.'
+		);
+
+		// Show current directories
+		const directoriesContainer = containerEl.createDiv("directories-list");
+		directoriesContainer.style.marginBottom = "1em";
+
+		const renderDirectories = () => {
+			directoriesContainer.empty();
+
+			for (const dir of settings.directories) {
+				const dirSetting = new Setting(directoriesContainer).setName(dir).addButton((button) =>
+					button
+						.setButtonText("Remove")
+						.setWarning()
+						.onClick(async () => {
+							const newDirs = settings.directories.filter((d) => d !== dir);
+							// Prevent removing all directories
+							if (newDirs.length === 0) {
+								newDirs.push("*");
+							}
+							await this.plugin.settingsStore.updateSettings((s) => ({
+								...s,
+								directories: newDirs,
+							}));
+							this.display();
+						})
+				);
+
+				// Add special styling for "*" (scan all)
+				if (dir === "*") {
+					dirSetting.setDesc("Scan all directories");
+				} else {
+					dirSetting.setDesc(`Includes all subdirectories: ${dir}/**`);
+				}
+			}
+		};
+
+		renderDirectories();
+
+		// Add new directory
+		new Setting(containerEl)
+			.setName("Add directory")
+			.setDesc("Enter a directory path (e.g., 'Projects' or 'Notes/Work')")
+			.addText((text) => {
+				text.setPlaceholder("Directory path");
+				text.inputEl.id = "nexus-new-directory";
+			})
+			.addButton((button) =>
+				button
+					.setButtonText("Add")
+					.setCta()
+					.onClick(async () => {
+						const input = containerEl.querySelector("#nexus-new-directory") as HTMLInputElement;
+						const newDir = input.value.trim();
+
+						if (!newDir) {
+							return;
+						}
+
+						// If adding a specific directory, remove "*" if it exists
+						let newDirs = [...settings.directories];
+						if (newDir !== "*" && newDirs.includes("*")) {
+							newDirs = newDirs.filter((d) => d !== "*");
+						}
+
+						// Add the new directory if it doesn't exist
+						if (!newDirs.includes(newDir)) {
+							newDirs.push(newDir);
+						}
+
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							directories: newDirs,
+						}));
+
+						input.value = "";
+						this.display();
+					})
+			);
+
+		// Quick action: Reset to scan all
+		if (!settings.directories.includes("*")) {
+			new Setting(containerEl)
+				.setName("Reset to scan all directories")
+				.setDesc("Clear all specific directories and scan the entire vault")
+				.addButton((button) =>
+					button.setButtonText("Scan all").onClick(async () => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							directories: ["*"],
+						}));
+						this.display();
+					})
+				);
+		}
 	}
 
 	private addDirectRelationshipSettings(containerEl: HTMLElement): void {

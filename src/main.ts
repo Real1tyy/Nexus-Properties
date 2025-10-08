@@ -20,8 +20,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.indexer = new Indexer(this.app, this.settingsStore.settings$);
 
 		// Subscribe to indexer events
-		this.indexer.events$.subscribe((event) => {
-			console.log("[Nexus Properties] Indexer event:", event);
+		this.indexer.events$.subscribe((_event) => {
 			// Property sync logic will be implemented here
 		});
 
