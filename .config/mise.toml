@@ -1,0 +1,178 @@
+[env]
+# Dynamic plugin directory based on manifest.json id
+OBSIDIAN_VAULT_PATH = "/home/real1ty/Documents/SecondBrain/SecondBrain"
+# Make CI non-interactive for CI/headless environments
+CI = "1"
+
+[tools]
+node = { version = "22" }       # LTS 2025-08
+"npm:pnpm" = "latest"           # workspace package-manager
+"npm:typescript" = "latest"     # ts-node uses this too
+"npm:@biomejs/biome" = "latest" # formatter + linter in one
+"npm:vitest" = "latest"         # unit-test runner
+
+jq = "latest" # JSON parsing in shell scripts
+
+# Code Quality Tasks (using Biome directly)
+[tasks.check]
+description = "Check code quality (format + lint) using Biome"
+run = [
+    "echo '🔍 Running Biome check (format + lint)...'",
+    "pnpm run check",
+    "echo '✅ Biome check completed successfully!'",
+]
+
+[tasks.format]
+description = "Format code using Biome"
+run = [
+    "echo '🎨 Formatting code with Biome...'",
+    "pnpm run format:fix",
+    "echo '✅ Code formatting completed!'",
+]
+
+[tasks.lint]
+description = "Lint code using Biome"
+run = [
+    "echo '🔍 Linting code with Biome...'",
+    "pnpm run lint:fix",
+    "echo '✅ Linting completed!'",
+]
+
+[tasks.typecheck]
+description = "Typecheck project using TypeScript"
+run = [
+    "echo '🔍 Running TypeScript type checking...'",
+    "pnpm run typecheck",
+    "echo '✅ TypeScript type checking completed!'",
+]
+
+[tasks.test]
+description = "Run all tests using Vitest"
+run = [
+    "echo '🧪 Running all tests...'",
+    "pnpm run test",
+    "echo '✅ All tests completed!'",
+]
+
+[tasks.test-watch]
+description = "Run tests in watch mode using Vitest"
+run = ["echo '🧪 Running tests in watch mode...'", "pnpm run test:watch"]
+
+# CI Task - Main entry point for CI/CD
+[tasks.ci]
+description = "CI pipeline for standalone project"
+run = [
+    "echo '🚀 Starting CI Pipeline...'",
+    "echo '  → Running Biome check...'",
+    "pnpm run check:fix",
+    "echo '  → Running TypeScript check...'",
+    "pnpm run typecheck",
+    "echo '  → Running tests...'",
+    "pnpm run test",
+    "echo '  → Building project...'",
+    "pnpm run build",
+    "echo '✅ CI Pipeline completed successfully!'",
+]
+
+# Security & Maintenance
+[tasks.security]
+description = "Lightweight OSS licence & vuln scan"
+run = [
+    "echo '🔒 Running security audit...'",
+    "pnpm audit --audit-level=high || true",
+    "echo '✅ Security audit completed!'",
+]
+
+[tasks.clean]
+description = "Clean build artifacts and caches"
+run = [
+    "echo '🧹 Cleaning build artifacts and caches...'",
+    "rm -rf dist",
+    "rm -rf **/dist",
+    "rm -rf **/main.js",
+    "rm -rf node_modules/.cache",
+    "echo '✅ Cleaned build artifacts and caches'",
+]
+
+# Git Hooks Setup
+[tasks.setup-hooks]
+description = "Setup git pre-commit hooks"
+run = [
+    "echo '🪝 Setting up git pre-commit hooks...'",
+    "mise generate git-pre-commit --task=pre-commit --write",
+    "chmod +x .git/hooks/pre-commit",
+    "echo '✅ Pre-commit hooks installed and configured!'",
+]
+
+[tasks.pre-commit]
+description = "Pre-commit validation for standalone project"
+run = [
+    "echo '🔍 Running pre-commit checks...'",
+    "echo '  → Running Biome check...'",
+    "pnpm run check:fix",
+    "echo '  → Running TypeScript check...'",
+    "pnpm run typecheck",
+    "echo '  → Running tests...'",
+    "pnpm run test",
+    "echo '✅ All pre-commit checks passed!'",
+]
+
+# Development workflow tasks
+[tasks.fix]
+description = "Auto-fix all code quality issues"
+run = [
+    "echo '🔧 Auto-fixing code quality issues...'",
+    "pnpm run check:fix",
+    "echo '✅ Code quality issues fixed!'",
+]
+
+[tasks.validate]
+description = "Validate project without making changes"
+run = [
+    "echo '🔍 Validating project...'",
+    "pnpm run check",
+    "pnpm run typecheck",
+    "echo '✅ Project validation completed!'",
+]
+
+[tasks.build]
+description = "Build the project"
+run = [
+    "echo '🏗️ Building project...'",
+    "pnpm run build",
+    "echo '✅ Build completed successfully!'",
+]
+
+[tasks.build-plugin]
+description = "Build plugin and copy to Obsidian vault"
+run = [
+    "echo '🏗️ Building plugin and copying to vault...'",
+    "python3 scripts/dev-watcher.py --mode build",
+    "echo '✅ Plugin build and copy completed!'",
+]
+
+[tasks.dev-watch]
+description = "Start development mode with file watching and auto-copy to vault"
+run = [
+    "echo '👀 Starting development mode with file watching...'",
+    "python3 scripts/dev-watcher.py --mode watch",
+]
+
+[tasks.install]
+description = "Install dependencies for the project"
+run = [
+    "echo '📦 Installing dependencies...'",
+    "pnpm install",
+    "echo '✅ Dependencies installed successfully'",
+]
+
+# Project-specific tasks (no NX dependency)
+[tasks.dev-info]
+description = "Show project development info"
+run = [
+    "echo '📊 Project Info:'",
+    "echo '  → Node version:' $(node --version)",
+    "echo '  → pnpm version:' $(pnpm --version)",
+    "echo '  → TypeScript version:' $(npx tsc --version)",
+    "echo '  → Biome version:' $(npx biome --version)",
+]
