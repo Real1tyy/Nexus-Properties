@@ -67,12 +67,7 @@ export class PropertiesManager {
 		}
 
 		if (!(targetFile instanceof TFile)) {
-			console.warn(
-				`PropertiesManager: Target file not found: "${targetFilePath}"`,
-				`\n  Referenced by: ${fileToAdd}`,
-				`\n  Tried paths: ["${targetFilePath}", "${targetFilePath}.md"]`,
-				`\n  Available files: ${this.app.vault.getMarkdownFiles().length} total`
-			);
+			console.warn(`PropertiesManager: Target file not found: ${targetFilePath}`);
 			return;
 		}
 
