@@ -1,0 +1,212 @@
+import { type App, PluginSettingTab, Setting } from "obsidian";
+import type NexusPropertiesPlugin from "../main";
+
+export class NexusPropertiesSettingsTab extends PluginSettingTab {
+	plugin: NexusPropertiesPlugin;
+
+	constructor(app: App, plugin: NexusPropertiesPlugin) {
+		super(app, plugin);
+		this.plugin = plugin;
+	}
+
+	display(): void {
+		const { containerEl } = this;
+		containerEl.empty();
+
+		containerEl.createEl("h1", { text: "Nexus Properties Settings" });
+
+		this.addDirectRelationshipSettings(containerEl);
+		this.addComputedRelationshipSettings(containerEl);
+		this.addExampleSection(containerEl);
+	}
+
+	private addDirectRelationshipSettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("Direct relationship properties").setHeading();
+
+		containerEl
+			.createDiv("setting-item-description")
+			.setText(
+				"Configure property names for direct bidirectional relationships. When you set a relationship in one direction, the plugin automatically updates the reverse relationship."
+			);
+
+		new Setting(containerEl)
+			.setName("Parent property")
+			.setDesc("Property name for parent reference (bidirectional with children)")
+			.addText((text) =>
+				text
+					.setPlaceholder("parent")
+					.setValue(settings.parentProp)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							parentProp: value || "parent",
+						}));
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Children property")
+			.setDesc("Property name for children references (bidirectional with parent)")
+			.addText((text) =>
+				text
+					.setPlaceholder("children")
+					.setValue(settings.childrenProp)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							childrenProp: value || "children",
+						}));
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("Related property")
+			.setDesc("Property name for related files (bidirectional - automatically syncs between linked files)")
+			.addText((text) =>
+				text
+					.setPlaceholder("related")
+					.setValue(settings.relatedProp)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							relatedProp: value || "related",
+						}));
+					})
+			);
+	}
+
+	private addComputedRelationshipSettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("Computed recursive properties").setHeading();
+
+		containerEl
+			.createDiv("setting-item-description")
+			.setText(
+				"Configure property names for automatically computed recursive relationships. These properties are read-only and automatically maintained by the plugin."
+			);
+
+		new Setting(containerEl)
+			.setName("All parents property")
+			.setDesc("Property name for all recursive parents (automatically computed)")
+			.addText((text) =>
+				text
+					.setPlaceholder("allParents")
+					.setValue(settings.allParentsProp)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							allParentsProp: value || "allParents",
+						}));
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("All children property")
+			.setDesc("Property name for all recursive children (automatically computed)")
+			.addText((text) =>
+				text
+					.setPlaceholder("allChildren")
+					.setValue(settings.allChildrenProp)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							allChildrenProp: value || "allChildren",
+						}));
+					})
+			);
+
+		new Setting(containerEl)
+			.setName("All related property")
+			.setDesc("Property name for all related files including transitive relationships (automatically computed)")
+			.addText((text) =>
+				text
+					.setPlaceholder("allRelated")
+					.setValue(settings.allRelatedProp)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							allRelatedProp: value || "allRelated",
+						}));
+					})
+			);
+	}
+
+	private addExampleSection(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("How it works").setHeading();
+
+		const exampleContainer = containerEl.createDiv("settings-info-box");
+
+		exampleContainer.createEl("h3", { text: "Bidirectional sync example" });
+		exampleContainer.createEl("p", {
+			text: "When you add a child relationship in one file, the parent relationship is automatically created in the other file:",
+		});
+
+		const beforeAfter = exampleContainer.createDiv("example-grid");
+
+		const beforeSection = beforeAfter.createDiv("example-section");
+		beforeSection.createEl("h4", { text: "You write this in parent-note.md:" });
+		beforeSection.createEl("pre", {
+			text: `---
+${settings.childrenProp}:
+  - "[[child-note-1]]"
+  - "[[child-note-2]]"
+---`,
+			cls: "settings-info-box-example",
+		});
+
+		const afterSection = beforeAfter.createDiv("example-section");
+		afterSection.createEl("h4", { text: "Plugin automatically updates child-note-1.md:" });
+		afterSection.createEl("pre", {
+			text: `---
+${settings.parentProp}: "[[parent-note]]"
+---`,
+			cls: "settings-info-box-example",
+		});
+
+		exampleContainer.createEl("h3", { text: "Recursive tree computation" });
+		exampleContainer.createEl("p", {
+			text: "The plugin automatically computes all recursive relationships in the tree:",
+		});
+
+		const treeExample = exampleContainer.createDiv();
+		treeExample.createEl("h4", { text: "If you have this hierarchy:" });
+		treeExample.createEl("pre", {
+			text: `grandparent.md
+  ${settings.childrenProp}: ["[[parent.md]]"]
+
+parent.md
+  ${settings.parentProp}: "[[grandparent.md]]"
+  ${settings.childrenProp}: ["[[child.md]]"]
+
+child.md
+  ${settings.parentProp}: "[[parent.md]]"`,
+			cls: "settings-info-box-example",
+		});
+
+		treeExample.createEl("h4", { text: "Then child.md will automatically have:" });
+		treeExample.createEl("pre", {
+			text: `---
+${settings.parentProp}: "[[parent.md]]"
+${settings.allParentsProp}:
+  - "[[parent.md]]"
+  - "[[grandparent.md]]"
+---`,
+			cls: "settings-info-box-example",
+		});
+
+		const warningBox = exampleContainer.createDiv("setting-item-description");
+		warningBox.style.marginTop = "1em";
+		warningBox.style.padding = "1em";
+		warningBox.style.backgroundColor = "var(--background-secondary)";
+		warningBox.style.borderRadius = "4px";
+		warningBox.createEl("strong", { text: "⚠️ Important: " });
+		warningBox.appendText(
+			"The computed properties (allParents, allChildren, allRelated) are automatically managed by the plugin. Any manual edits to these properties will be overwritten."
+		);
+	}
+}
