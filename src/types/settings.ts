@@ -1,17 +1,18 @@
 import { z } from "zod";
+import { SETTINGS_DEFAULTS, SETTINGS_VERSION } from "./constants";
 
 export const NexusPropertiesSettingsSchema = z.object({
-	version: z.number().int().positive().default(1),
+	version: z.number().int().positive().default(SETTINGS_VERSION),
 
 	// Property names for direct relationships
-	parentProp: z.string().default("parent"),
-	childrenProp: z.string().default("children"),
-	relatedProp: z.string().default("related"),
+	parentProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_PARENT_PROP),
+	childrenProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_CHILDREN_PROP),
+	relatedProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_RELATED_PROP),
 
 	// Property names for computed recursive relationships
-	allParentsProp: z.string().default("allParents"),
-	allChildrenProp: z.string().default("allChildren"),
-	allRelatedProp: z.string().default("allRelated"),
+	allParentsProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_ALL_PARENTS_PROP),
+	allChildrenProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_ALL_CHILDREN_PROP),
+	allRelatedProp: z.string().default(SETTINGS_DEFAULTS.DEFAULT_ALL_RELATED_PROP),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;
