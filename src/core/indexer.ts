@@ -14,16 +14,17 @@ import {
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
+import { normalizeProperty } from "../utils/property-normalizer";
 
 export interface FileRelationships {
 	filePath: string;
 	mtime: number;
-	parent?: string | string[];
-	children?: string | string[];
-	related?: string | string[];
-	allParents?: string | string[];
-	allChildren?: string | string[];
-	allRelated?: string | string[];
+	parent: string[];
+	children: string[];
+	related: string[];
+	allParents: string[];
+	allChildren: string[];
+	allRelated: string[];
 	frontmatter: Record<string, unknown>;
 }
 
@@ -226,6 +227,12 @@ export class Indexer {
 		const relationships: FileRelationships = {
 			filePath: file.path,
 			mtime: file.stat.mtime,
+			parent: [],
+			children: [],
+			related: [],
+			allParents: [],
+			allChildren: [],
+			allRelated: [],
 			frontmatter,
 		};
 
@@ -233,8 +240,8 @@ export class Indexer {
 			const propName = config.getProp(this.settings);
 			const allPropName = config.getAllProp(this.settings);
 
-			const normalizedValue = this.normalizeProperty(frontmatter[propName]);
-			const normalizedAllValue = this.normalizeProperty(frontmatter[allPropName]);
+			const normalizedValue = normalizeProperty(frontmatter[propName], propName);
+			const normalizedAllValue = normalizeProperty(frontmatter[allPropName], allPropName);
 
 			switch (config.type) {
 				case "parent":
@@ -253,15 +260,5 @@ export class Indexer {
 		}
 
 		return relationships;
-	}
-
-	private normalizeProperty(value: unknown): string | string[] | undefined {
-		if (typeof value === "string") {
-			return value;
-		}
-		if (Array.isArray(value)) {
-			return value.filter((v) => typeof v === "string");
-		}
-		return undefined;
 	}
 }

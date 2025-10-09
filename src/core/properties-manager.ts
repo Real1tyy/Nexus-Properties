@@ -38,13 +38,13 @@ export class PropertiesManager {
 		const computedRelationships = new Map<string, string[]>();
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const relationshipValue = relationships[config.type];
-			const paths = parsePropertyLinks(relationshipValue);
+			const paths = relationships[config.type];
+			const parsedPaths = parsePropertyLinks(paths);
 			const propName = config.getProp(this.settings);
 
-			console.log(`  - ${config.type}: ${paths.length} items`);
+			console.log(`  - ${config.type}: ${parsedPaths.length} items`);
 
-			const allItems = await this.computeAllItems(paths, propName, currentFilePath);
+			const allItems = await this.computeAllItems(parsedPaths, propName, currentFilePath);
 			computedRelationships.set(config.getAllProp(this.settings), allItems);
 		}
 
@@ -58,11 +58,11 @@ export class PropertiesManager {
 		}
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const relationshipValue = relationships[config.type];
-			const paths = parsePropertyLinks(relationshipValue);
+			const paths = relationships[config.type];
+			const parsedPaths = parsePropertyLinks(paths);
 			const reversePropName = config.getReverseProp(this.settings);
 
-			for (const path of paths) {
+			for (const path of parsedPaths) {
 				await this.addToProperty(path, reversePropName, currentFilePath);
 			}
 		}
