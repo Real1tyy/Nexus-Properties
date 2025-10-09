@@ -3,6 +3,21 @@ import { describe, expect, it } from "vitest";
 import { addLinkToProperty, hasLinkInProperty, removeLinkFromProperty } from "../src/utils/property-utils";
 
 describe("addLinkToProperty", () => {
+	it("should add link to undefined property", () => {
+		const result = addLinkToProperty(undefined, "MyNote");
+		expect(result).toEqual(["[[MyNote]]"]);
+	});
+
+	it("should add link to single string value", () => {
+		const result = addLinkToProperty("[[Note1]]", "Note2");
+		expect(result).toEqual(["[[Note1]]", "[[Note2]]"]);
+	});
+
+	it("should not add duplicate to single string value", () => {
+		const result = addLinkToProperty("[[Note1]]", "Note1");
+		expect(result).toEqual(["[[Note1]]"]);
+	});
+
 	it("should add link to empty array", () => {
 		const result = addLinkToProperty([], "MyNote");
 		expect(result).toEqual(["[[MyNote]]"]);
@@ -42,6 +57,21 @@ describe("addLinkToProperty", () => {
 });
 
 describe("removeLinkFromProperty", () => {
+	it("should handle undefined property", () => {
+		const result = removeLinkFromProperty(undefined, "Note1");
+		expect(result).toEqual([]);
+	});
+
+	it("should remove from single string value", () => {
+		const result = removeLinkFromProperty("[[Note1]]", "Note1");
+		expect(result).toEqual([]);
+	});
+
+	it("should preserve single string when link not found", () => {
+		const result = removeLinkFromProperty("[[Note1]]", "Note2");
+		expect(result).toEqual(["[[Note1]]"]);
+	});
+
 	it("should remove link from array", () => {
 		const result = removeLinkFromProperty(["[[Note1]]", "[[Note2]]", "[[Note3]]"], "Note2");
 		expect(result).toEqual(["[[Note1]]", "[[Note3]]"]);
@@ -78,6 +108,18 @@ describe("removeLinkFromProperty", () => {
 });
 
 describe("hasLinkInProperty", () => {
+	it("should return false for undefined property", () => {
+		expect(hasLinkInProperty(undefined, "Note1")).toBe(false);
+	});
+
+	it("should return true for single string value match", () => {
+		expect(hasLinkInProperty("[[Note1]]", "Note1")).toBe(true);
+	});
+
+	it("should return false for single string value no match", () => {
+		expect(hasLinkInProperty("[[Note1]]", "Note2")).toBe(false);
+	});
+
 	it("should return true when link exists", () => {
 		expect(hasLinkInProperty(["[[Note1]]", "[[Note2]]", "[[Note3]]"], "Note2")).toBe(true);
 	});
@@ -127,8 +169,8 @@ describe("Integration tests", () => {
 		expect(removed).toEqual(["[[Note1]]"]);
 	});
 
-	it("should handle multiple add operations", () => {
-		let value: string[] = [];
+	it("should handle multiple add operations starting from undefined", () => {
+		let value: string[] | string | undefined;
 		value = addLinkToProperty(value, "Note1");
 		expect(value).toEqual(["[[Note1]]"]);
 
@@ -140,7 +182,7 @@ describe("Integration tests", () => {
 	});
 
 	it("should handle multiple remove operations", () => {
-		let value: string[] = ["[[Note1]]", "[[Note2]]", "[[Note3]]"];
+		let value: string[] | string | undefined = ["[[Note1]]", "[[Note2]]", "[[Note3]]"];
 
 		value = removeLinkFromProperty(value, "Note2");
 		expect(value).toEqual(["[[Note1]]", "[[Note3]]"]);
@@ -161,7 +203,7 @@ describe("Integration tests", () => {
 			{ op: "add", link: "Note3" },
 		];
 
-		let value: string[] = [];
+		let value: string[] | string | undefined;
 
 		for (const { op, link } of operations) {
 			if (op === "add") {
