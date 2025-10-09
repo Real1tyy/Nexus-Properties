@@ -1,6 +1,8 @@
 import { z } from "zod";
 import { SETTINGS_DEFAULTS, SETTINGS_VERSION } from "./constants";
 
+export type Frontmatter = Record<string, unknown>;
+
 export const NexusPropertiesSettingsSchema = z.object({
 	version: z.number().int().positive().default(SETTINGS_VERSION),
 

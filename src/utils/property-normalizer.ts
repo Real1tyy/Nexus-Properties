@@ -1,3 +1,5 @@
+import type { Frontmatter } from "../types/settings";
+
 /**
  * Normalizes frontmatter property values to an array of strings.
  * Handles various YAML formats and ensures consistent output.
@@ -96,10 +98,7 @@ export function normalizeProperty(value: unknown, propertyName?: string): string
  * //   "related" => []
  * // }
  */
-export function normalizeProperties(
-	frontmatter: Record<string, unknown>,
-	propertyNames: string[]
-): Map<string, string[]> {
+export function normalizeProperties(frontmatter: Frontmatter, propertyNames: string[]): Map<string, string[]> {
 	const result = new Map<string, string[]>();
 
 	for (const propName of propertyNames) {

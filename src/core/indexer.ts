@@ -12,7 +12,7 @@ import {
 } from "rxjs";
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
-import type { NexusPropertiesSettings } from "../types/settings";
+import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
 import { normalizeProperty } from "../utils/property-normalizer";
 
 export interface FileRelationships {
@@ -24,7 +24,7 @@ export interface FileRelationships {
 	allParents: string[];
 	allChildren: string[];
 	allRelated: string[];
-	frontmatter: Record<string, unknown>;
+	frontmatter: Frontmatter;
 }
 
 export type IndexerEventType = "file-changed" | "file-deleted";
@@ -32,7 +32,8 @@ export type IndexerEventType = "file-changed" | "file-deleted";
 export interface IndexerEvent {
 	type: IndexerEventType;
 	filePath: string;
-	relationships?: FileRelationships;
+	oldRelationships?: FileRelationships;
+	newRelationships?: FileRelationships;
 }
 
 type VaultEvent = "create" | "modify" | "delete" | "rename";
@@ -45,6 +46,7 @@ export class Indexer {
 	private vault: Vault;
 	private metadataCache: MetadataCache;
 	private scanEventsSubject = new Subject<IndexerEvent>();
+	private relationshipsCache = new Map<string, FileRelationships>();
 
 	public readonly events$: Observable<IndexerEvent>;
 
@@ -61,6 +63,8 @@ export class Indexer {
 	}
 
 	async start(): Promise<void> {
+		await this.buildInitialCache();
+
 		const fileSystemEvents$ = this.buildFileSystemEvents$();
 		this.fileSub = fileSystemEvents$.subscribe((event) => {
 			this.scanEventsSubject.next(event);
@@ -73,6 +77,21 @@ export class Indexer {
 
 		this.settingsSubscription?.unsubscribe();
 		this.settingsSubscription = null;
+
+		this.relationshipsCache.clear();
+	}
+
+	private async buildInitialCache(): Promise<void> {
+		const allFiles = this.vault.getMarkdownFiles();
+		const relevantFiles = allFiles.filter((file) => this.shouldIndexFile(file.path));
+
+		for (const file of relevantFiles) {
+			const frontmatter = this.metadataCache.getFileCache(file)?.frontmatter;
+			if (frontmatter) {
+				const relationships = this.extractRelationships(file, frontmatter);
+				this.relationshipsCache.set(file.path, relationships);
+			}
+		}
 	}
 
 	async scanAllFiles(): Promise<void> {
@@ -175,9 +194,13 @@ export class Indexer {
 		return intents$.pipe(
 			switchMap((intent) => {
 				if (intent.kind === "deleted") {
+					const oldRelationships = this.relationshipsCache.get(intent.path);
+					this.relationshipsCache.delete(intent.path);
+
 					return of<IndexerEvent>({
 						type: "file-deleted",
 						filePath: intent.path,
+						oldRelationships,
 					});
 				}
 				return from(this.buildEvent(intent.file)).pipe(filter((e): e is IndexerEvent => e !== null));
@@ -190,16 +213,22 @@ export class Indexer {
 		if (!frontmatter) {
 			return null;
 		}
-		const relationships = this.extractRelationships(file, frontmatter);
+
+		const oldRelationships = this.relationshipsCache.get(file.path);
+		const newRelationships = this.extractRelationships(file, frontmatter);
+
+		// Update cache with new relationships
+		this.relationshipsCache.set(file.path, newRelationships);
 
 		return {
 			type: "file-changed",
 			filePath: file.path,
-			relationships,
+			oldRelationships,
+			newRelationships,
 		};
 	}
 
-	private extractRelationships(file: TFile, frontmatter: Record<string, unknown>): FileRelationships {
+	extractRelationships(file: TFile, frontmatter: Frontmatter): FileRelationships {
 		const relationships: FileRelationships = {
 			filePath: file.path,
 			mtime: file.stat.mtime,

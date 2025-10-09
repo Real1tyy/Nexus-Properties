@@ -1,10 +1,10 @@
 import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
-import { filter } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { ensureMarkdownExtension, getFileByPath, removeMarkdownExtension } from "../utils/file-utils";
 import { formatWikiLink, parsePropertyLinks } from "../utils/link-parser";
+import { normalizeProperty } from "../utils/property-normalizer";
 import { addLinkToProperty } from "../utils/property-utils";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 
@@ -17,11 +17,13 @@ export class PropertiesManager {
 	) {}
 
 	start(events$: Observable<IndexerEvent>): void {
-		this.subscription = events$
-			.pipe(filter((event) => event.type === "file-changed" && event.relationships !== undefined))
-			.subscribe((event) => {
-				this.syncRelationships(event.relationships!);
-			});
+		this.subscription = events$.subscribe((event) => {
+			if (event.type === "file-deleted" && event.oldRelationships) {
+				this.handleFileDeletion(event.filePath, event.oldRelationships);
+			} else if (event.type === "file-changed" && event.oldRelationships && event.newRelationships) {
+				this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
+			}
+		});
 	}
 
 	stop(): void {
@@ -45,30 +47,7 @@ export class PropertiesManager {
 					return;
 				}
 
-				const relationships: FileRelationships = {
-					filePath: file.path,
-					mtime: file.stat.mtime,
-					parent: [],
-					children: [],
-					related: [],
-					allParents: [],
-					allChildren: [],
-					allRelated: [],
-					frontmatter,
-				};
-
-				// Extract relationships from frontmatter
-				for (const config of RELATIONSHIP_CONFIGS) {
-					const propName = config.getProp(this.settings);
-					const rawValue = frontmatter[propName];
-
-					if (rawValue) {
-						const paths = parsePropertyLinks(rawValue);
-						relationships[config.type] = paths;
-					}
-				}
-
-				// Sync relationships for this file
+				const relationships = indexer.extractRelationships(file, frontmatter);
 				await this.syncRelationships(relationships);
 			})
 		);
@@ -89,14 +68,13 @@ export class PropertiesManager {
 
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const paths = relationships[config.type];
-			const parsedPaths = parsePropertyLinks(paths);
 			const propName = config.getProp(this.settings);
 			const allPropName = config.getAllProp(this.settings);
 
 			const isPropertyDefined = propName in frontmatter;
 
 			if (isPropertyDefined) {
-				const allItems = await this.computeAllItems(parsedPaths, propName, currentFilePath);
+				const allItems = await this.computeAllItems(paths, propName, currentFilePath);
 				computedRelationships.set(allPropName, allItems);
 			} else {
 				propsToDelete.add(allPropName);
@@ -118,10 +96,9 @@ export class PropertiesManager {
 
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const paths = relationships[config.type];
-			const parsedPaths = parsePropertyLinks(paths);
 			const reversePropName = config.getReverseProp(this.settings);
 
-			for (const path of parsedPaths) {
+			for (const path of paths) {
 				await this.addToProperty(path, reversePropName, currentFilePath);
 			}
 		}
@@ -152,7 +129,7 @@ export class PropertiesManager {
 
 				if (itemFrontmatter?.[propertyName]) {
 					const propertyValue = itemFrontmatter[propertyName];
-					const nestedItems = parsePropertyLinks(propertyValue);
+					const nestedItems = normalizeProperty(propertyValue, propertyName);
 
 					await collectItems(nestedItems);
 				}
@@ -178,6 +155,96 @@ export class PropertiesManager {
 		await this.app.fileManager.processFrontMatter(targetFile, (fm) => {
 			const currentValue = fm[propertyName];
 			fm[propertyName] = addLinkToProperty(currentValue, linkPath);
+		});
+	}
+
+	private async handleFileDeletion(deletedFilePath: string, oldRelationships: FileRelationships): Promise<void> {
+		console.log(`🗑️ Handling deletion: ${deletedFilePath}`);
+
+		const deletedFileBaseName = removeMarkdownExtension(deletedFilePath);
+
+		for (const config of RELATIONSHIP_CONFIGS) {
+			const reversePropName = config.getReverseProp(this.settings);
+			const reverseAllPropName = config.getReverseAllProp(this.settings);
+
+			const directRefs = oldRelationships[config.type];
+			const allRefs = oldRelationships[config.allKey];
+
+			for (const referencedFilePath of directRefs) {
+				await this.removeFromProperty(referencedFilePath, reversePropName, deletedFileBaseName);
+			}
+
+			for (const referencedFilePath of allRefs) {
+				await this.removeFromProperty(referencedFilePath, reverseAllPropName, deletedFileBaseName);
+			}
+		}
+
+		console.log(`✅ Deletion handled: ${deletedFilePath}`);
+	}
+
+	private async handleFileModification(
+		filePath: string,
+		oldRelationships: FileRelationships,
+		newRelationships: FileRelationships
+	): Promise<void> {
+		console.log(`📝 Handling modification: ${filePath}`);
+
+		const currentFileBaseName = removeMarkdownExtension(filePath);
+
+		// For each relationship type, detect changes and update reverse properties
+		for (const config of RELATIONSHIP_CONFIGS) {
+			const reversePropName = config.getReverseProp(this.settings);
+
+			const oldLinks = new Set(oldRelationships[config.type]);
+			const newLinks = new Set(newRelationships[config.type]);
+
+			// Find added links
+			const addedLinks = [...newLinks].filter((link) => !oldLinks.has(link));
+
+			// Find removed links
+			const removedLinks = [...oldLinks].filter((link) => !newLinks.has(link));
+
+			// Add reverse property for newly added links
+			for (const addedLink of addedLinks) {
+				console.log(`  ➕ Adding ${reversePropName} to ${addedLink}`);
+				await this.addToProperty(addedLink, reversePropName, currentFileBaseName);
+			}
+
+			// Remove reverse property for removed links
+			for (const removedLink of removedLinks) {
+				console.log(`  ➖ Removing ${reversePropName} from ${removedLink}`);
+				await this.removeFromProperty(removedLink, reversePropName, currentFileBaseName);
+			}
+		}
+
+		console.log(`✅ Modification handled: ${filePath}`);
+	}
+
+	private async removeFromProperty(targetFilePath: string, propertyName: string, fileToRemove: string): Promise<void> {
+		const targetPathWithExt = ensureMarkdownExtension(targetFilePath);
+		const targetFile = getFileByPath(this.app, targetPathWithExt);
+
+		if (!targetFile) {
+			console.warn(`PropertiesManager: Target file not found: ${targetPathWithExt}`);
+			return;
+		}
+
+		const fileToRemoveBaseName = removeMarkdownExtension(fileToRemove);
+
+		await this.app.fileManager.processFrontMatter(targetFile, (fm) => {
+			const currentValue = fm[propertyName];
+
+			if (!currentValue) {
+				return;
+			}
+
+			const links = parsePropertyLinks(currentValue);
+			const filteredLinks = links.filter((link) => {
+				const linkBaseName = removeMarkdownExtension(link);
+				return linkBaseName !== fileToRemoveBaseName;
+			});
+
+			fm[propertyName] = filteredLinks.map((link) => formatWikiLink(removeMarkdownExtension(link)));
 		});
 	}
 }
