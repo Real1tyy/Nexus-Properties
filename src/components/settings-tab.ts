@@ -15,10 +15,51 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		containerEl.createEl("h1", { text: "Nexus Properties Settings" });
 
+		this.addRescanSection(containerEl);
 		this.addDirectorySettings(containerEl);
 		this.addDirectRelationshipSettings(containerEl);
 		this.addComputedRelationshipSettings(containerEl);
 		this.addExampleSection(containerEl);
+	}
+
+	private addRescanSection(containerEl: HTMLElement): void {
+		new Setting(containerEl).setName("Indexing").setHeading();
+
+		const descEl = containerEl.createDiv("setting-item-description");
+		descEl.setText(
+			"Manually index all files in your vault and assign relationship properties based on your configured settings. This process will scan all files in the configured directories and update their frontmatter with bidirectional and computed relationships."
+		);
+
+		new Setting(containerEl)
+			.setName("Index and assign properties to all files")
+			.setDesc(
+				"Scan all files in configured directories and update their relationship properties. This may take some time for large vaults."
+			)
+			.addButton((button) => {
+				button
+					.setButtonText("Rescan Everything")
+					.setCta()
+					.onClick(async () => {
+						button.setDisabled(true);
+						button.setButtonText("Rescanning...");
+
+						try {
+							await this.plugin.triggerFullRescan();
+							button.setButtonText("✓ Complete!");
+							setTimeout(() => {
+								button.setButtonText("Rescan Everything");
+								button.setDisabled(false);
+							}, 2000);
+						} catch (error) {
+							console.error("Error during rescan:", error);
+							button.setButtonText("✗ Error");
+							setTimeout(() => {
+								button.setButtonText("Rescan Everything");
+								button.setDisabled(false);
+							}, 2000);
+						}
+					});
+			});
 	}
 
 	private addDirectorySettings(containerEl: HTMLElement): void {

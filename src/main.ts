@@ -45,4 +45,13 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.propertiesManager?.stop();
 		this.indexer?.stop();
 	}
+
+	async triggerFullRescan(): Promise<void> {
+		if (!this.propertiesManager || !this.indexer) {
+			console.error("❌ Cannot trigger rescan: Plugin not fully initialized");
+			return;
+		}
+
+		await this.propertiesManager.rescanAndAssignPropertiesForAllFiles(this.indexer);
+	}
 }

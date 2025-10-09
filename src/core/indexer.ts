@@ -7,7 +7,6 @@ import {
 	merge,
 	type Observable,
 	of,
-	BehaviorSubject as RxBehaviorSubject,
 	Subject,
 	type Subscription,
 } from "rxjs";
@@ -46,10 +45,8 @@ export class Indexer {
 	private vault: Vault;
 	private metadataCache: MetadataCache;
 	private scanEventsSubject = new Subject<IndexerEvent>();
-	private indexingCompleteSubject = new RxBehaviorSubject<boolean>(false);
 
 	public readonly events$: Observable<IndexerEvent>;
-	public readonly indexingComplete$: Observable<boolean>;
 
 	constructor(app: App, settingsStore: BehaviorSubject<NexusPropertiesSettings>) {
 		this.vault = app.vault;
@@ -57,25 +54,10 @@ export class Indexer {
 		this.settings = settingsStore.value;
 
 		this.settingsSubscription = settingsStore.subscribe((newSettings) => {
-			const relevantSettingsChanged =
-				this.settings.parentProp !== newSettings.parentProp ||
-				this.settings.childrenProp !== newSettings.childrenProp ||
-				this.settings.relatedProp !== newSettings.relatedProp ||
-				this.settings.allParentsProp !== newSettings.allParentsProp ||
-				this.settings.allChildrenProp !== newSettings.allChildrenProp ||
-				this.settings.allRelatedProp !== newSettings.allRelatedProp ||
-				JSON.stringify(this.settings.directories) !== JSON.stringify(newSettings.directories);
-
 			this.settings = newSettings;
-
-			if (relevantSettingsChanged) {
-				this.indexingCompleteSubject.next(false);
-				this.scanAllFiles();
-			}
 		});
 
 		this.events$ = this.scanEventsSubject.asObservable();
-		this.indexingComplete$ = this.indexingCompleteSubject.asObservable();
 	}
 
 	async start(): Promise<void> {
@@ -83,8 +65,6 @@ export class Indexer {
 		this.fileSub = fileSystemEvents$.subscribe((event) => {
 			this.scanEventsSubject.next(event);
 		});
-
-		await this.scanAllFiles();
 	}
 
 	stop(): void {
@@ -93,11 +73,9 @@ export class Indexer {
 
 		this.settingsSubscription?.unsubscribe();
 		this.settingsSubscription = null;
-
-		this.indexingCompleteSubject.complete();
 	}
 
-	private async scanAllFiles(): Promise<void> {
+	async scanAllFiles(): Promise<void> {
 		const allFiles = this.vault.getMarkdownFiles();
 		const relevantFiles = allFiles.filter((file) => this.shouldIndexFile(file.path));
 
@@ -122,8 +100,6 @@ export class Indexer {
 			}
 		} catch (error) {
 			console.error("❌ Error during file scanning:", error);
-		} finally {
-			this.indexingCompleteSubject.next(true);
 		}
 	}
 
@@ -138,7 +114,7 @@ export class Indexer {
 		return f instanceof TFile && f.extension === "md";
 	}
 
-	private shouldIndexFile(filePath: string): boolean {
+	shouldIndexFile(filePath: string): boolean {
 		const { directories } = this.settings;
 
 		// If directories contains "*", scan all files

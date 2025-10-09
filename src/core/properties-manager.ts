@@ -6,7 +6,7 @@ import type { NexusPropertiesSettings } from "../types/settings";
 import { ensureMarkdownExtension, getFileByPath, removeMarkdownExtension } from "../utils/file-utils";
 import { formatWikiLink, parsePropertyLinks } from "../utils/link-parser";
 import { addLinkToProperty } from "../utils/property-utils";
-import type { FileRelationships, IndexerEvent } from "./indexer";
+import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 
 export class PropertiesManager {
 	private subscription: Subscription | null = null;
@@ -29,17 +29,78 @@ export class PropertiesManager {
 		this.subscription = null;
 	}
 
+	async rescanAndAssignPropertiesForAllFiles(indexer: Indexer): Promise<void> {
+		console.log("🔄 Starting full vault rescan and property assignment...");
+
+		const startTime = Date.now();
+		const allFiles = this.app.vault.getMarkdownFiles();
+		const relevantFiles = allFiles.filter((file) => indexer.shouldIndexFile(file.path));
+
+		console.log(`📁 Found ${relevantFiles.length} files to process (filtered from ${allFiles.length} total files)`);
+
+		const results = await Promise.allSettled(
+			relevantFiles.map(async (file) => {
+				const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+				if (!frontmatter) {
+					return;
+				}
+
+				const relationships: FileRelationships = {
+					filePath: file.path,
+					mtime: file.stat.mtime,
+					parent: [],
+					children: [],
+					related: [],
+					allParents: [],
+					allChildren: [],
+					allRelated: [],
+					frontmatter,
+				};
+
+				// Extract relationships from frontmatter
+				for (const config of RELATIONSHIP_CONFIGS) {
+					const propName = config.getProp(this.settings);
+					const rawValue = frontmatter[propName];
+
+					if (rawValue) {
+						const paths = parsePropertyLinks(rawValue);
+						relationships[config.type] = paths;
+					}
+				}
+
+				// Sync relationships for this file
+				await this.syncRelationships(relationships);
+			})
+		);
+
+		const errorCount = results.filter((r) => r.status === "rejected").length;
+		const successCount = results.filter((r) => r.status === "fulfilled").length;
+
+		const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+		console.log(`✅ Rescan complete! Processed ${successCount} files in ${duration}s (${errorCount} errors)`);
+	}
+
 	private async syncRelationships(relationships: FileRelationships): Promise<void> {
 		const currentFilePath = relationships.filePath;
+		const { frontmatter } = relationships;
 
 		const computedRelationships = new Map<string, string[]>();
+		const propsToDelete = new Set<string>();
 
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const paths = relationships[config.type];
 			const parsedPaths = parsePropertyLinks(paths);
 			const propName = config.getProp(this.settings);
-			const allItems = await this.computeAllItems(parsedPaths, propName, currentFilePath);
-			computedRelationships.set(config.getAllProp(this.settings), allItems);
+			const allPropName = config.getAllProp(this.settings);
+
+			const isPropertyDefined = propName in frontmatter;
+
+			if (isPropertyDefined) {
+				const allItems = await this.computeAllItems(parsedPaths, propName, currentFilePath);
+				computedRelationships.set(allPropName, allItems);
+			} else {
+				propsToDelete.add(allPropName);
+			}
 		}
 
 		const file = getFileByPath(this.app, currentFilePath);
@@ -47,6 +108,10 @@ export class PropertiesManager {
 			await this.app.fileManager.processFrontMatter(file, (fm) => {
 				for (const [allPropName, paths] of computedRelationships) {
 					fm[allPropName] = paths.map((path) => formatWikiLink(removeMarkdownExtension(path)));
+				}
+
+				for (const propName of propsToDelete) {
+					delete fm[propName];
 				}
 			});
 		}
@@ -94,8 +159,6 @@ export class PropertiesManager {
 			}
 		};
 		await collectItems(items);
-
-		console.log(`🎯 Computed ${allItems.length} total items for ${propertyName}: [${allItems.join(", ")}]`);
 		return allItems;
 	}
 
