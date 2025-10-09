@@ -12,7 +12,7 @@ import {
 	type Subscription,
 } from "rxjs";
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
-import { SCAN_CONCURRENCY } from "../types/constants";
+import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 
 export interface FileRelationships {
@@ -223,24 +223,36 @@ export class Indexer {
 	}
 
 	private extractRelationships(file: TFile, frontmatter: Record<string, unknown>): FileRelationships {
-		const parent = frontmatter[this.settings.parentProp];
-		const children = frontmatter[this.settings.childrenProp];
-		const related = frontmatter[this.settings.relatedProp];
-		const allParents = frontmatter[this.settings.allParentsProp];
-		const allChildren = frontmatter[this.settings.allChildrenProp];
-		const allRelated = frontmatter[this.settings.allRelatedProp];
-
-		return {
+		const relationships: FileRelationships = {
 			filePath: file.path,
 			mtime: file.stat.mtime,
-			parent: this.normalizeProperty(parent),
-			children: this.normalizeProperty(children),
-			related: this.normalizeProperty(related),
-			allParents: this.normalizeProperty(allParents),
-			allChildren: this.normalizeProperty(allChildren),
-			allRelated: this.normalizeProperty(allRelated),
 			frontmatter,
 		};
+
+		for (const config of RELATIONSHIP_CONFIGS) {
+			const propName = config.getProp(this.settings);
+			const allPropName = config.getAllProp(this.settings);
+
+			const normalizedValue = this.normalizeProperty(frontmatter[propName]);
+			const normalizedAllValue = this.normalizeProperty(frontmatter[allPropName]);
+
+			switch (config.type) {
+				case "parent":
+					relationships.parent = normalizedValue;
+					relationships.allParents = normalizedAllValue;
+					break;
+				case "children":
+					relationships.children = normalizedValue;
+					relationships.allChildren = normalizedAllValue;
+					break;
+				case "related":
+					relationships.related = normalizedValue;
+					relationships.allRelated = normalizedAllValue;
+					break;
+			}
+		}
+
+		return relationships;
 	}
 
 	private normalizeProperty(value: unknown): string | string[] | undefined {

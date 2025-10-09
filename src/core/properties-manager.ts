@@ -1,6 +1,7 @@
 import { type App, TFile } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { filter } from "rxjs/operators";
+import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { formatWikiLink, parsePropertyLinks } from "../utils/link-parser";
 import type { FileRelationships, IndexerEvent } from "./indexer";
@@ -34,39 +35,100 @@ export class PropertiesManager {
 		const currentFilePath = relationships.filePath;
 		console.log(`PropertiesManager: Syncing relationships for ${currentFilePath}`);
 
-		// Parse all relationship links
-		const parentPaths = parsePropertyLinks(relationships.parent);
-		const childPaths = parsePropertyLinks(relationships.children);
-		const relatedPaths = parsePropertyLinks(relationships.related);
+		const computedRelationships = new Map<string, string[]>();
 
-		console.log(`  - Parents: ${parentPaths.length}, Children: ${childPaths.length}, Related: ${relatedPaths.length}`);
+		for (const config of RELATIONSHIP_CONFIGS) {
+			const relationshipValue = relationships[config.type];
+			const paths = parsePropertyLinks(relationshipValue);
+			const propName = config.getProp(this.settings);
 
-		// Sync parent relationships (add current file to parent's children)
-		for (const parentPath of parentPaths) {
-			await this.addToProperty(parentPath, this.settings.childrenProp, currentFilePath);
+			console.log(`  - ${config.type}: ${paths.length} items`);
+
+			const allItems = await this.computeAllItems(paths, propName, currentFilePath);
+			computedRelationships.set(config.getAllProp(this.settings), allItems);
 		}
 
-		// Sync child relationships (add current file to child's parent)
-		for (const childPath of childPaths) {
-			await this.addToProperty(childPath, this.settings.parentProp, currentFilePath);
+		const file = this.getFileByPath(currentFilePath);
+		if (file) {
+			await this.app.fileManager.processFrontMatter(file, (fm) => {
+				for (const [allPropName, paths] of computedRelationships) {
+					fm[allPropName] = paths.map((path) => formatWikiLink(path.endsWith(".md") ? path.slice(0, -3) : path));
+				}
+			});
 		}
 
-		// Sync related relationships (bidirectional)
-		for (const relatedPath of relatedPaths) {
-			await this.addToProperty(relatedPath, this.settings.relatedProp, currentFilePath);
+		for (const config of RELATIONSHIP_CONFIGS) {
+			const relationshipValue = relationships[config.type];
+			const paths = parsePropertyLinks(relationshipValue);
+			const reversePropName = config.getReverseProp(this.settings);
+
+			for (const path of paths) {
+				await this.addToProperty(path, reversePropName, currentFilePath);
+			}
 		}
 	}
 
-	private async addToProperty(targetFilePath: string, propertyName: string, fileToAdd: string): Promise<void> {
-		// Resolve the target file - add .md extension if not present
-		let targetFile = this.app.vault.getAbstractFileByPath(targetFilePath);
+	private async computeAllItems(items: string[], propertyName: string, sourceFilePath: string): Promise<string[]> {
+		const normalizedSourcePath = this.normalizePath(sourceFilePath);
+		const visited = new Set<string>([normalizedSourcePath]);
+		const allItems: string[] = [];
 
-		// If not found, try with .md extension
-		if (!targetFile && !targetFilePath.endsWith(".md")) {
-			targetFile = this.app.vault.getAbstractFileByPath(`${targetFilePath}.md`);
+		const collectItems = async (itemsToProcess: string[]) => {
+			for (const itemPath of itemsToProcess) {
+				const actualPath = this.normalizePath(itemPath);
+
+				if (visited.has(actualPath)) {
+					continue;
+				}
+
+				visited.add(actualPath);
+				allItems.push(actualPath);
+
+				const itemFile = this.getFileByPath(actualPath);
+				if (!itemFile) {
+					console.warn(`PropertiesManager: File not found: ${actualPath}`);
+					continue;
+				}
+
+				const itemFrontmatter = this.app.metadataCache.getFileCache(itemFile)?.frontmatter;
+
+				if (itemFrontmatter?.[propertyName]) {
+					const propertyValue = itemFrontmatter[propertyName];
+					const nestedItems = parsePropertyLinks(propertyValue);
+
+					await collectItems(nestedItems);
+				}
+			}
+		};
+		await collectItems(items);
+
+		console.log(`🎯 Computed ${allItems.length} total items for ${propertyName}: [${allItems.join(", ")}]`);
+		return allItems;
+	}
+
+	private normalizePath(path: string): string {
+		if (path.endsWith(".md")) {
+			return path.slice(0, -3);
+		}
+		return path;
+	}
+
+	private getFileByPath(filePath: string): TFile | null {
+		// Try exact path first
+		let file = this.app.vault.getAbstractFileByPath(filePath);
+
+		// Try with .md extension
+		if (!file && !filePath.endsWith(".md")) {
+			file = this.app.vault.getAbstractFileByPath(`${filePath}.md`);
 		}
 
-		if (!(targetFile instanceof TFile)) {
+		return file instanceof TFile ? file : null;
+	}
+
+	private async addToProperty(targetFilePath: string, propertyName: string, fileToAdd: string): Promise<void> {
+		const targetFile = this.getFileByPath(targetFilePath);
+
+		if (!targetFile) {
 			console.warn(`PropertiesManager: Target file not found: ${targetFilePath}`);
 			return;
 		}
