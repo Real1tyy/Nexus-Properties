@@ -21,6 +21,9 @@ export interface FileRelationships {
 	parent?: string | string[];
 	children?: string | string[];
 	related?: string | string[];
+	allParents?: string | string[];
+	allChildren?: string | string[];
+	allRelated?: string | string[];
 	frontmatter: Record<string, unknown>;
 }
 
@@ -57,6 +60,9 @@ export class Indexer {
 				this.settings.parentProp !== newSettings.parentProp ||
 				this.settings.childrenProp !== newSettings.childrenProp ||
 				this.settings.relatedProp !== newSettings.relatedProp ||
+				this.settings.allParentsProp !== newSettings.allParentsProp ||
+				this.settings.allChildrenProp !== newSettings.allChildrenProp ||
+				this.settings.allRelatedProp !== newSettings.allRelatedProp ||
 				JSON.stringify(this.settings.directories) !== JSON.stringify(newSettings.directories);
 
 			this.settings = newSettings;
@@ -220,6 +226,9 @@ export class Indexer {
 		const parent = frontmatter[this.settings.parentProp];
 		const children = frontmatter[this.settings.childrenProp];
 		const related = frontmatter[this.settings.relatedProp];
+		const allParents = frontmatter[this.settings.allParentsProp];
+		const allChildren = frontmatter[this.settings.allChildrenProp];
+		const allRelated = frontmatter[this.settings.allRelatedProp];
 
 		return {
 			filePath: file.path,
@@ -227,6 +236,9 @@ export class Indexer {
 			parent: this.normalizeProperty(parent),
 			children: this.normalizeProperty(children),
 			related: this.normalizeProperty(related),
+			allParents: this.normalizeProperty(allParents),
+			allChildren: this.normalizeProperty(allChildren),
+			allRelated: this.normalizeProperty(allRelated),
 			frontmatter,
 		};
 	}
