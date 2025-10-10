@@ -1,5 +1,5 @@
-import { Plugin } from "obsidian";
-import { NexusPropertiesSettingsTab } from "./components";
+import { Notice, Plugin } from "obsidian";
+import { NexusPropertiesSettingsTab, RelationshipGraphModal } from "./components";
 import { Indexer } from "./core/indexer";
 import { PropertiesManager } from "./core/properties-manager";
 import { SettingsStore } from "./core/settings-store";
@@ -14,6 +14,20 @@ export default class NexusPropertiesPlugin extends Plugin {
 		await this.settingsStore.loadSettings();
 
 		this.addSettingTab(new NexusPropertiesSettingsTab(this.app, this));
+
+		// Add ribbon icon to toggle graph modal
+		this.addRibbonIcon("git-fork", "Open Relationship Graph", () => {
+			this.openRelationshipGraphModal();
+		});
+
+		// Add command to open graph modal
+		this.addCommand({
+			id: "open-relationship-graph",
+			name: "Open Relationship Graph",
+			callback: () => {
+				this.openRelationshipGraphModal();
+			},
+		});
 
 		this.initializePlugin();
 	}
@@ -51,5 +65,16 @@ export default class NexusPropertiesPlugin extends Plugin {
 		}
 
 		await this.propertiesManager.rescanAndAssignPropertiesForAllFiles(this.indexer);
+	}
+
+	private openRelationshipGraphModal(): void {
+		const activeFile = this.app.workspace.getActiveFile();
+
+		if (!activeFile) {
+			new Notice("No file is currently open.");
+			return;
+		}
+
+		new RelationshipGraphModal(this.app, this.indexer, activeFile).open();
 	}
 }

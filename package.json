@@ -40,6 +40,7 @@
 	},
 	"devDependencies": {
 		"@biomejs/biome": "^2.2.2",
+		"@types/cytoscape": "^3.31.0",
 		"@types/node": "^24.3.0",
 		"builtin-modules": "5.0.0",
 		"esbuild": "0.25.10",
@@ -52,6 +53,7 @@
 	},
 	"dependencies": {
 		"@real1ty-obsidian-plugins/utils": "^2.0.1",
+		"cytoscape": "^3.33.1",
 		"rxjs": "^7.8.2",
 		"zod": "^4.1.5"
 	}

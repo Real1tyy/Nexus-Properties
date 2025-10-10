@@ -14,6 +14,9 @@ importers:
       '@real1ty-obsidian-plugins/utils':
         specifier: ^2.0.1
         version: 2.0.1(@codemirror/state@6.5.2)(@codemirror/view@6.38.5)
+      cytoscape:
+        specifier: ^3.33.1
+        version: 3.33.1
       rxjs:
         specifier: ^7.8.2
         version: 7.8.2
@@ -24,6 +27,9 @@ importers:
       '@biomejs/biome':
         specifier: ^2.2.2
         version: 2.2.5
+      '@types/cytoscape':
+        specifier: ^3.31.0
+        version: 3.31.0
       '@types/node':
         specifier: ^24.3.0
         version: 24.7.0
@@ -425,6 +431,10 @@ packages:
   '@types/codemirror@5.60.8':
     resolution: {integrity: sha512-VjFgDF/eB+Aklcy15TtOTLQeMjTo07k7KAjql8OK5Dirr7a6sJY4T1uVBDuTVG9VEmn1uUsohOpYnVfgC6/jyw==}
 
+  '@types/cytoscape@3.31.0':
+    resolution: {integrity: sha512-EXHOHxqQjGxLDEh5cP4te6J0bi7LbCzmZkzsR6f703igUac8UGMdEohMyU3GHAayCTZrLQOMnaE/lqB2Ekh8Ww==}
+    deprecated: This is a stub types definition. cytoscape provides its own type definitions, so you do not need this installed.
+
   '@types/deep-eql@4.0.2':
     resolution: {integrity: sha512-c9h9dVVMigMPc4bwTvC5dxqtqJZwQPePsWjPlpSOnojbor6pGqdk541lfA7AqFQr5pB1BRdq0juY9db81BwyFw==}
 
@@ -510,6 +520,10 @@ packages:
   cssstyle@4.6.0:
     resolution: {integrity: sha512-2z+rWdzbbSZv6/rhtvzvqeZQHrBaqgogqt85sqFNbabZOuFbCVFb8kPeEtZjiKkbrm395irpNKiYeFeLiQnFPg==}
     engines: {node: '>=18'}
+
+  cytoscape@3.33.1:
+    resolution: {integrity: sha512-iJc4TwyANnOGR1OmWhsS9ayRS3s+XQ185FmuHObThD+5AeJCakAAbWv8KimMTt08xCCLNgneQwFp+JRJOr9qGQ==}
+    engines: {node: '>=0.10'}
 
   data-urls@5.0.0:
     resolution: {integrity: sha512-ZYP5VBHshaDAiVZxjbRVcFJpc+4xGgT0bK3vzy1HLN8jTO975HEbuYzZJcHoQEY5K1a0z8YayJkyVETa08eNTg==}
@@ -1221,6 +1235,10 @@ snapshots:
     dependencies:
       '@types/tern': 0.23.9
 
+  '@types/cytoscape@3.31.0':
+    dependencies:
+      cytoscape: 3.33.1
+
   '@types/deep-eql@4.0.2': {}
 
   '@types/estree@1.0.8': {}
@@ -1314,6 +1332,8 @@ snapshots:
     dependencies:
       '@asamuzakjp/css-color': 3.2.0
       rrweb-cssom: 0.8.0
+
+  cytoscape@3.33.1: {}
 
   data-urls@5.0.0:
     dependencies:

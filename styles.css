@@ -79,3 +79,69 @@
 .vertical-tab-content-container {
 	padding: 2em;
 }
+
+/* Relationship Graph Modal */
+.modal.nexus-graph-modal {
+	width: 95vw;
+	max-width: 95vw;
+	height: 95vh;
+}
+
+.nexus-graph-modal .modal-content {
+	height: 100%;
+	padding: 0;
+}
+
+.nexus-graph-modal-content {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	padding: 0;
+}
+
+.nexus-graph-modal-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1em 1.5em;
+	border-bottom: 2px solid var(--background-modifier-border);
+	background-color: var(--background-secondary);
+	flex-shrink: 0;
+}
+
+.nexus-graph-modal-header h2 {
+	margin: 0;
+	color: var(--text-normal);
+	font-size: 1.4em;
+	font-weight: 600;
+}
+
+.nexus-graph-close-button {
+	background: none;
+	border: none;
+	font-size: 2em;
+	line-height: 1;
+	cursor: pointer;
+	color: var(--text-muted);
+	padding: 0;
+	width: 40px;
+	height: 40px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	border-radius: 4px;
+	transition: all 0.2s;
+}
+
+.nexus-graph-close-button:hover {
+	background-color: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.nexus-graph-modal-container {
+	flex: 1;
+	width: 100%;
+	min-height: 0;
+	background-color: var(--background-primary);
+	position: relative;
+}
