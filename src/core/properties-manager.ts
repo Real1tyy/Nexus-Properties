@@ -17,6 +17,24 @@ interface FileContext {
 	cache: CachedMetadata | null;
 }
 
+interface RelationshipContext {
+	propName: string;
+	allPropName: string;
+	reversePropName: string;
+	reverseAllPropName: string;
+	paths: string[];
+	allPaths: string[];
+}
+
+interface RelationshipDiff {
+	oldPaths: string[];
+	newPaths: string[];
+	oldSet: Set<string>;
+	newSet: Set<string>;
+	addedLinks: string[];
+	removedLinks: string[];
+}
+
 export class PropertiesManager {
 	private subscription: Subscription | null = null;
 
@@ -52,6 +70,41 @@ export class PropertiesManager {
 			return null;
 		}
 		return await callback(context);
+	}
+
+	private getRelationshipContext(
+		config: (typeof RELATIONSHIP_CONFIGS)[number],
+		relationships: FileRelationships
+	): RelationshipContext {
+		return {
+			propName: config.getProp(this.settings),
+			allPropName: config.getAllProp(this.settings),
+			reversePropName: config.getReverseProp(this.settings),
+			reverseAllPropName: config.getReverseAllProp(this.settings),
+			paths: parsePropertyLinks(relationships[config.type]),
+			allPaths: parsePropertyLinks(relationships[config.allKey]),
+		};
+	}
+
+	private getRelationshipDiff(
+		config: (typeof RELATIONSHIP_CONFIGS)[number],
+		oldRelationships: FileRelationships,
+		newRelationships: FileRelationships
+	): RelationshipDiff & RelationshipContext {
+		const oldPaths = parsePropertyLinks(oldRelationships[config.type]);
+		const newPaths = parsePropertyLinks(newRelationships[config.type]);
+		const oldSet = new Set(oldPaths);
+		const newSet = new Set(newPaths);
+
+		return {
+			...this.getRelationshipContext(config, newRelationships),
+			oldPaths,
+			newPaths,
+			oldSet,
+			newSet,
+			addedLinks: [...newSet].filter((link) => !oldSet.has(link)),
+			removedLinks: [...oldSet].filter((link) => !newSet.has(link)),
+		};
 	}
 
 	start(events$: Observable<IndexerEvent>): void {
@@ -94,18 +147,14 @@ export class PropertiesManager {
 		const propsToDelete = new Set<string>();
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const rawLinks = relationships[config.type];
-			const propName = config.getProp(this.settings);
-			const allPropName = config.getAllProp(this.settings);
-
-			const isPropertyDefined = propName in frontmatter;
+			const ctx = this.getRelationshipContext(config, relationships);
+			const isPropertyDefined = ctx.propName in frontmatter;
 
 			if (isPropertyDefined) {
-				const paths = parsePropertyLinks(rawLinks);
-				const allItems = await this.computeAllItems(paths, propName, currentFilePath);
-				computedRelationships.set(allPropName, allItems);
+				const allItems = await this.computeAllItems(ctx.paths, ctx.propName, currentFilePath);
+				computedRelationships.set(ctx.allPropName, allItems);
 			} else {
-				propsToDelete.add(allPropName);
+				propsToDelete.add(ctx.allPropName);
 			}
 		}
 
@@ -122,12 +171,9 @@ export class PropertiesManager {
 		});
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const rawLinks = relationships[config.type];
-			const reversePropName = config.getReverseProp(this.settings);
-
-			const paths = parsePropertyLinks(rawLinks);
-			for (const path of paths) {
-				await this.addToProperty(path, reversePropName, currentFilePath);
+			const ctx = this.getRelationshipContext(config, relationships);
+			for (const path of ctx.paths) {
+				await this.addToProperty(path, ctx.reversePropName, currentFilePath);
 			}
 		}
 	}
@@ -175,27 +221,19 @@ export class PropertiesManager {
 	}
 
 	private async handleFileDeletion(deletedFilePath: string, oldRelationships: FileRelationships): Promise<void> {
-		console.log(`🗑️ Handling deletion: ${deletedFilePath} with old relationships: ${oldRelationships}`);
-
 		const deletedContext = this.getFileContext(deletedFilePath);
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const reversePropName = config.getReverseProp(this.settings);
-			const reverseAllPropName = config.getReverseAllProp(this.settings);
+			const ctx = this.getRelationshipContext(config, oldRelationships);
 
-			const directPaths = parsePropertyLinks(oldRelationships[config.type]);
-			const allPaths = parsePropertyLinks(oldRelationships[config.allKey]);
-
-			for (const referencedFilePath of directPaths) {
-				await this.removeFromProperty(referencedFilePath, reversePropName, deletedContext.baseName);
+			for (const referencedFilePath of ctx.paths) {
+				await this.removeFromProperty(referencedFilePath, ctx.reversePropName, deletedContext.baseName);
 			}
 
-			for (const referencedFilePath of allPaths) {
-				await this.removeFromProperty(referencedFilePath, reverseAllPropName, deletedContext.baseName);
+			for (const referencedFilePath of ctx.allPaths) {
+				await this.removeFromProperty(referencedFilePath, ctx.reverseAllPropName, deletedContext.baseName);
 			}
 		}
-
-		console.log(`✅ Deletion handled: ${deletedFilePath}`);
 	}
 
 	private async handleFileModification(
@@ -209,43 +247,25 @@ export class PropertiesManager {
 
 		const currentContext = this.getFileContext(filePath);
 
-		// For each relationship type, detect changes and update reverse properties
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const reversePropName = config.getReverseProp(this.settings);
-			const reverseAllPropName = config.getReverseAllProp(this.settings);
+			const diff = this.getRelationshipDiff(config, oldRelationships, newRelationships);
 
-			const oldPaths = parsePropertyLinks(oldRelationships[config.type]);
-			const newPaths = parsePropertyLinks(newRelationships[config.type]);
-
-			const oldLinks = new Set(oldPaths);
-			const newLinks = new Set(newPaths);
-
-			// Find added links
-			const addedLinks = [...newLinks].filter((link) => !oldLinks.has(link));
-
-			// Find removed links
-			const removedLinks = [...oldLinks].filter((link) => !newLinks.has(link));
-
-			// Add reverse property for newly added links
-			for (const addedLink of addedLinks) {
-				console.log(`  ➕ Adding ${reversePropName} to ${addedLink}`);
-				await this.addToProperty(addedLink, reversePropName, currentContext.baseName);
+			for (const addedLink of diff.addedLinks) {
+				await this.addToProperty(addedLink, diff.reversePropName, currentContext.baseName);
 			}
 
-			// Remove reverse property for removed links
-			for (const removedLink of removedLinks) {
-				console.log(`  ➖ Removing ${reversePropName} from ${removedLink}`);
-				await this.removeFromProperty(removedLink, reversePropName, currentContext.baseName);
-
-				// Handle transitive cleanup: remove orphaned descendants from all_children
-				await this.cleanupTransitiveRelationships(filePath, removedLink, newPaths, config, reverseAllPropName);
+			for (const removedLink of diff.removedLinks) {
+				await this.removeFromProperty(removedLink, diff.reversePropName, currentContext.baseName);
+				await this.cleanupTransitiveRelationships(
+					filePath,
+					removedLink,
+					diff.newPaths,
+					config,
+					diff.reverseAllPropName
+				);
 			}
 		}
-
-		// Update "all" properties for the modified file itself
 		await this.updateAllPropertiesForFile(filePath, oldRelationships, newRelationships);
-
-		console.log(`✅ Modification handled: ${filePath}`);
 	}
 
 	private async updateAllPropertiesForFile(
@@ -257,49 +277,37 @@ export class PropertiesManager {
 			const computedAllProperties = new Map<string, string[]>();
 
 			for (const config of RELATIONSHIP_CONFIGS) {
-				const propName = config.getProp(this.settings);
-				const allPropName = config.getAllProp(this.settings);
+				const diff = this.getRelationshipDiff(config, oldRelationships, newRelationships);
 
-				const oldPaths = parsePropertyLinks(oldRelationships[config.type]);
-				const newPaths = parsePropertyLinks(newRelationships[config.type]);
-
-				const oldLinks = new Set(oldPaths);
-				const newLinks = new Set(newPaths);
-
-				const addedLinks = [...newLinks].filter((link) => !oldLinks.has(link));
-				const removedLinks = [...oldLinks].filter((link) => !newLinks.has(link));
-
-				// Check if property is still defined in frontmatter
-				const isPropertyDefined = propName in newRelationships.frontmatter;
+				const isPropertyDefined = diff.propName in newRelationships.frontmatter;
 
 				if (!isPropertyDefined) {
 					continue;
 				}
 
-				if (removedLinks.length > 0) {
+				if (diff.removedLinks.length > 0) {
 					// If any links were removed, recompute the entire "all" property from scratch
-					console.log(`  🔄 Recomputing ${allPropName} due to removals`);
-					const allItems = await this.computeAllItems(newPaths, propName, filePath);
-					computedAllProperties.set(allPropName, allItems);
-				} else if (addedLinks.length > 0) {
+					console.log(`  🔄 Recomputing ${diff.allPropName} due to removals`);
+					const allItems = await this.computeAllItems(diff.newPaths, diff.propName, filePath);
+					computedAllProperties.set(diff.allPropName, allItems);
+				} else if (diff.addedLinks.length > 0) {
 					// If only additions, compute transitively for new links and merge with existing
-					console.log(`  ➕ Incrementally updating ${allPropName} with additions`);
+					console.log(`  ➕ Incrementally updating ${diff.allPropName} with additions`);
 
-					const existingAllItems = parsePropertyLinks(oldRelationships[config.allKey]);
-					const allItemsSet = new Set(existingAllItems);
+					const oldCtx = this.getRelationshipContext(config, oldRelationships);
+					const allItemsSet = new Set(oldCtx.allPaths);
 
-					for (const addedLink of addedLinks) {
-						const newTransitiveItems = await this.computeAllItems([addedLink], propName, filePath);
+					for (const addedLink of diff.addedLinks) {
+						const newTransitiveItems = await this.computeAllItems([addedLink], diff.propName, filePath);
 						for (const item of newTransitiveItems) {
 							allItemsSet.add(item);
 						}
 					}
 
-					computedAllProperties.set(allPropName, [...allItemsSet]);
+					computedAllProperties.set(diff.allPropName, [...allItemsSet]);
 				}
 			}
 
-			// Update the file's frontmatter with computed "all" properties
 			if (computedAllProperties.size > 0) {
 				await this.app.fileManager.processFrontMatter(context.file!, (fm) => {
 					for (const [allPropName, paths] of computedAllProperties) {
@@ -339,8 +347,6 @@ export class PropertiesManager {
 		config: (typeof RELATIONSHIP_CONFIGS)[number],
 		reverseAllPropName: string
 	): Promise<void> {
-		console.log(`  🧹 Cleaning up transitive relationships after removing ${removedLink} from ${currentFilePath}`);
-
 		const removedContext = this.getFileContext(removedLink);
 		if (!removedContext.file || !removedContext.frontmatter) {
 			console.warn(`PropertiesManager: Removed file not found: ${removedContext.pathWithExt}`);
