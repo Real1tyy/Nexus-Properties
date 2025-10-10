@@ -15,12 +15,12 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.addSettingTab(new NexusPropertiesSettingsTab(this.app, this));
 
-		// Add ribbon icon to toggle graph modal
-		this.addRibbonIcon("git-fork", "Open Relationship Graph", () => {
-			this.openRelationshipGraphModal();
-		});
+		if (this.settingsStore.currentSettings.showRibbonIcon) {
+			this.addRibbonIcon("git-fork", "Open Relationship Graph", () => {
+				this.openRelationshipGraphModal();
+			});
+		}
 
-		// Add command to open graph modal
 		this.addCommand({
 			id: "open-relationship-graph",
 			name: "Open Relationship Graph",

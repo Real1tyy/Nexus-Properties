@@ -18,6 +18,9 @@ export const NexusPropertiesSettingsSchema = z.object({
 
 	// Directories to scan - ["*"] means scan all, otherwise only scan specified directories and subdirectories
 	directories: z.array(z.string()).default([...SETTINGS_DEFAULTS.DEFAULT_DIRECTORIES]),
+
+	// UI settings
+	showRibbonIcon: z.boolean().default(true),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

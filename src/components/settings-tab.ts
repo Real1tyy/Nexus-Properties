@@ -15,11 +15,30 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		containerEl.createEl("h1", { text: "Nexus Properties Settings" });
 
+		this.addUserInterfaceSettings(containerEl);
 		this.addRescanSection(containerEl);
 		this.addDirectorySettings(containerEl);
 		this.addDirectRelationshipSettings(containerEl);
 		this.addComputedRelationshipSettings(containerEl);
 		this.addExampleSection(containerEl);
+	}
+
+	private addUserInterfaceSettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("User Interface").setHeading();
+
+		new Setting(containerEl)
+			.setName("Show ribbon icon")
+			.setDesc("Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.showRibbonIcon).onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						showRibbonIcon: value,
+					}));
+				})
+			);
 	}
 
 	private addRescanSection(containerEl: HTMLElement): void {
