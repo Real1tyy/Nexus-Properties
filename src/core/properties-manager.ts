@@ -150,7 +150,7 @@ export class PropertiesManager {
 	}
 
 	private async handleFileDeletion(deletedFilePath: string, oldRelationships: FileRelationships): Promise<void> {
-		console.log(`🗑️ Handling deletion: ${deletedFilePath}`);
+		console.log(`🗑️ Handling deletion: ${deletedFilePath} with old relationships: ${oldRelationships}`);
 
 		const deletedFileBaseName = removeMarkdownExtension(deletedFilePath);
 
@@ -178,7 +178,9 @@ export class PropertiesManager {
 		oldRelationships: FileRelationships,
 		newRelationships: FileRelationships
 	): Promise<void> {
-		console.log(`📝 Handling modification: ${filePath}`);
+		console.log(
+			`📝 Handling modification: ${filePath} with old relationships: ${oldRelationships} and new relationships: ${newRelationships}`
+		);
 
 		const currentFileBaseName = removeMarkdownExtension(filePath);
 
@@ -211,7 +213,76 @@ export class PropertiesManager {
 			}
 		}
 
+		// Update "all" properties for the modified file itself
+		await this.updateAllPropertiesForFile(filePath, oldRelationships, newRelationships);
+
 		console.log(`✅ Modification handled: ${filePath}`);
+	}
+
+	private async updateAllPropertiesForFile(
+		filePath: string,
+		oldRelationships: FileRelationships,
+		newRelationships: FileRelationships
+	): Promise<void> {
+		const file = getFileByPath(this.app, filePath);
+		if (!file) {
+			console.warn(`PropertiesManager: File not found for updating all properties: ${filePath}`);
+			return;
+		}
+
+		const computedAllProperties = new Map<string, string[]>();
+
+		for (const config of RELATIONSHIP_CONFIGS) {
+			const propName = config.getProp(this.settings);
+			const allPropName = config.getAllProp(this.settings);
+
+			const oldPaths = parsePropertyLinks(oldRelationships[config.type]);
+			const newPaths = parsePropertyLinks(newRelationships[config.type]);
+
+			const oldLinks = new Set(oldPaths);
+			const newLinks = new Set(newPaths);
+
+			const addedLinks = [...newLinks].filter((link) => !oldLinks.has(link));
+			const removedLinks = [...oldLinks].filter((link) => !newLinks.has(link));
+
+			// Check if property is still defined in frontmatter
+			const isPropertyDefined = propName in newRelationships.frontmatter;
+
+			if (!isPropertyDefined) {
+				continue;
+			}
+
+			if (removedLinks.length > 0) {
+				// If any links were removed, recompute the entire "all" property from scratch
+				console.log(`  🔄 Recomputing ${allPropName} due to removals`);
+				const allItems = await this.computeAllItems(newPaths, propName, filePath);
+				computedAllProperties.set(allPropName, allItems);
+			} else if (addedLinks.length > 0) {
+				// If only additions, compute transitively for new links and merge with existing
+				console.log(`  ➕ Incrementally updating ${allPropName} with additions`);
+
+				const existingAllItems = parsePropertyLinks(oldRelationships[config.allKey]);
+				const allItemsSet = new Set(existingAllItems);
+
+				for (const addedLink of addedLinks) {
+					const newTransitiveItems = await this.computeAllItems([addedLink], propName, filePath);
+					for (const item of newTransitiveItems) {
+						allItemsSet.add(item);
+					}
+				}
+
+				computedAllProperties.set(allPropName, [...allItemsSet]);
+			}
+		}
+
+		// Update the file's frontmatter with computed "all" properties
+		if (computedAllProperties.size > 0) {
+			await this.app.fileManager.processFrontMatter(file, (fm) => {
+				for (const [allPropName, paths] of computedAllProperties) {
+					fm[allPropName] = paths.map((path) => formatWikiLink(removeMarkdownExtension(path)));
+				}
+			});
+		}
 	}
 
 	private async removeFromProperty(targetFilePath: string, propertyName: string, fileToRemove: string): Promise<void> {
