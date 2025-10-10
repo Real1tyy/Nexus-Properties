@@ -187,6 +187,7 @@ export class PropertiesManager {
 		// For each relationship type, detect changes and update reverse properties
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const reversePropName = config.getReverseProp(this.settings);
+			const reverseAllPropName = config.getReverseAllProp(this.settings);
 
 			const oldPaths = parsePropertyLinks(oldRelationships[config.type]);
 			const newPaths = parsePropertyLinks(newRelationships[config.type]);
@@ -210,6 +211,9 @@ export class PropertiesManager {
 			for (const removedLink of removedLinks) {
 				console.log(`  ➖ Removing ${reversePropName} from ${removedLink}`);
 				await this.removeFromProperty(removedLink, reversePropName, currentFileBaseName);
+
+				// Handle transitive cleanup: remove orphaned descendants from all_children
+				await this.cleanupTransitiveRelationships(filePath, removedLink, newPaths, config, reverseAllPropName);
 			}
 		}
 
@@ -311,5 +315,168 @@ export class PropertiesManager {
 
 			fm[propertyName] = filteredLinks.map((link) => formatWikiLink(removeMarkdownExtension(link)));
 		});
+	}
+
+	private async cleanupTransitiveRelationships(
+		currentFilePath: string,
+		removedLink: string,
+		remainingLinks: string[],
+		config: (typeof RELATIONSHIP_CONFIGS)[number],
+		reverseAllPropName: string
+	): Promise<void> {
+		console.log(`  🧹 Cleaning up transitive relationships after removing ${removedLink} from ${currentFilePath}`);
+
+		const removedLinkPath = ensureMarkdownExtension(removedLink);
+		const removedFile = getFileByPath(this.app, removedLinkPath);
+
+		if (!removedFile) {
+			console.warn(`PropertiesManager: Removed file not found: ${removedLinkPath}`);
+			return;
+		}
+
+		const removedFrontmatter = this.app.metadataCache.getFileCache(removedFile)?.frontmatter;
+		if (!removedFrontmatter) {
+			return;
+		}
+
+		const allPropName = config.getAllProp(this.settings);
+		const severedChildren = parsePropertyLinks(removedFrontmatter[allPropName]);
+
+		if (severedChildren.length === 0) {
+			return;
+		}
+
+		const stillReachable = new Set<string>();
+
+		for (const remainingLink of remainingLinks) {
+			const remainingPath = ensureMarkdownExtension(remainingLink);
+			const remainingFile = getFileByPath(this.app, remainingPath);
+
+			if (!remainingFile) {
+				continue;
+			}
+
+			const remainingFrontmatter = this.app.metadataCache.getFileCache(remainingFile)?.frontmatter;
+			if (!remainingFrontmatter) {
+				continue;
+			}
+
+			const reachableChildren = parsePropertyLinks(remainingFrontmatter[allPropName]);
+			for (const child of reachableChildren) {
+				stillReachable.add(ensureMarkdownExtension(child));
+			}
+		}
+
+		const orphanedChildren = severedChildren.map(ensureMarkdownExtension).filter((child) => !stillReachable.has(child));
+
+		if (orphanedChildren.length === 0) {
+			return;
+		}
+
+		console.log(`    🔗 Found ${orphanedChildren.length} orphaned children to clean up`);
+
+		const currentFile = getFileByPath(this.app, currentFilePath);
+		if (!currentFile) {
+			return;
+		}
+
+		const currentFileBaseName = removeMarkdownExtension(currentFilePath);
+
+		await this.app.fileManager.processFrontMatter(currentFile, (fm) => {
+			const currentAllChildren = parsePropertyLinks(fm[allPropName]);
+			const filteredChildren = currentAllChildren.filter((child) => {
+				const childPath = ensureMarkdownExtension(child);
+				return !orphanedChildren.includes(childPath);
+			});
+
+			fm[allPropName] = filteredChildren.map((child) => formatWikiLink(removeMarkdownExtension(child)));
+		});
+
+		for (const orphanedChild of orphanedChildren) {
+			console.log(`    ❌ Removing ${currentFileBaseName} from ${reverseAllPropName} of ${orphanedChild}`);
+			await this.removeFromProperty(orphanedChild, reverseAllPropName, currentFileBaseName);
+		}
+
+		await this.propagateOrphanedChildrenUpstream(currentFilePath, orphanedChildren, config);
+	}
+
+	private async propagateOrphanedChildrenUpstream(
+		currentFilePath: string,
+		orphanedChildren: string[],
+		config: (typeof RELATIONSHIP_CONFIGS)[number]
+	): Promise<void> {
+		if (orphanedChildren.length === 0) {
+			return;
+		}
+
+		console.log(`    ⬆️ Propagating orphaned children removal upstream from ${currentFilePath}`);
+
+		const currentFile = getFileByPath(this.app, currentFilePath);
+		if (!currentFile) {
+			return;
+		}
+
+		const currentFrontmatter = this.app.metadataCache.getFileCache(currentFile)?.frontmatter;
+		if (!currentFrontmatter) {
+			return;
+		}
+
+		const reversePropName = config.getReverseProp(this.settings);
+		const reverseAllPropName = config.getReverseAllProp(this.settings);
+		const allPropName = config.getAllProp(this.settings);
+
+		const parentPaths = parsePropertyLinks(currentFrontmatter[reversePropName]);
+
+		if (parentPaths.length === 0) {
+			return;
+		}
+
+		for (const parentPath of parentPaths) {
+			const parentPathWithExt = ensureMarkdownExtension(parentPath);
+			const parentFile = getFileByPath(this.app, parentPathWithExt);
+
+			if (!parentFile) {
+				continue;
+			}
+
+			const parentFrontmatter = this.app.metadataCache.getFileCache(parentFile)?.frontmatter;
+			if (!parentFrontmatter) {
+				continue;
+			}
+
+			const parentAllChildren = parsePropertyLinks(parentFrontmatter[allPropName]);
+			const orphanedInParent: string[] = [];
+
+			for (const orphanedChild of orphanedChildren) {
+				const orphanedChildPath = ensureMarkdownExtension(orphanedChild);
+				if (parentAllChildren.some((child) => ensureMarkdownExtension(child) === orphanedChildPath)) {
+					orphanedInParent.push(orphanedChildPath);
+				}
+			}
+
+			if (orphanedInParent.length === 0) {
+				continue;
+			}
+
+			console.log(`      ⬆️ Removing ${orphanedInParent.length} orphaned children from parent ${parentPath}`);
+
+			await this.app.fileManager.processFrontMatter(parentFile, (fm) => {
+				const currentAllChildren = parsePropertyLinks(fm[allPropName]);
+				const filteredChildren = currentAllChildren.filter((child) => {
+					const childPath = ensureMarkdownExtension(child);
+					return !orphanedInParent.includes(childPath);
+				});
+
+				fm[allPropName] = filteredChildren.map((child) => formatWikiLink(removeMarkdownExtension(child)));
+			});
+
+			const parentBaseName = removeMarkdownExtension(parentPath);
+			for (const orphanedChild of orphanedInParent) {
+				console.log(`        ❌ Removing ${parentBaseName} from ${reverseAllPropName} of ${orphanedChild}`);
+				await this.removeFromProperty(orphanedChild, reverseAllPropName, parentBaseName);
+			}
+
+			await this.propagateOrphanedChildrenUpstream(parentPathWithExt, orphanedInParent, config);
+		}
 	}
 }
