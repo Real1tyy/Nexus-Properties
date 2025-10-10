@@ -287,13 +287,10 @@ export class PropertiesManager {
 
 				if (diff.removedLinks.length > 0) {
 					// If any links were removed, recompute the entire "all" property from scratch
-					console.log(`  🔄 Recomputing ${diff.allPropName} due to removals`);
 					const allItems = await this.computeAllItems(diff.newPaths, diff.propName, filePath);
 					computedAllProperties.set(diff.allPropName, allItems);
 				} else if (diff.addedLinks.length > 0) {
 					// If only additions, compute transitively for new links and merge with existing
-					console.log(`  ➕ Incrementally updating ${diff.allPropName} with additions`);
-
 					const oldCtx = this.getRelationshipContext(config, oldRelationships);
 					const allItemsSet = new Set(oldCtx.allPaths);
 
@@ -349,19 +346,13 @@ export class PropertiesManager {
 	): Promise<void> {
 		const removedContext = this.getFileContext(removedLink);
 		if (!removedContext.file || !removedContext.frontmatter) {
-			console.warn(`PropertiesManager: Removed file not found: ${removedContext.pathWithExt}`);
 			return;
 		}
 
 		const allPropName = config.getAllProp(this.settings);
 		const severedChildren = parsePropertyLinks(removedContext.frontmatter[allPropName]);
 
-		if (severedChildren.length === 0) {
-			return;
-		}
-
 		const stillReachable = new Set<string>();
-
 		for (const remainingLink of remainingLinks) {
 			const remainingContext = this.getFileContext(remainingLink);
 			if (!remainingContext.file || !remainingContext.frontmatter) {
@@ -378,97 +369,49 @@ export class PropertiesManager {
 			.map((child) => this.getFileContext(child).pathWithExt)
 			.filter((child) => !stillReachable.has(child));
 
-		if (orphanedChildren.length === 0) {
-			return;
-		}
-
-		console.log(`    🔗 Found ${orphanedChildren.length} orphaned children to clean up`);
-
-		await this.withFileContext(currentFilePath, async (current) => {
-			await this.app.fileManager.processFrontMatter(current.file!, (fm) => {
-				const currentAllChildren = parsePropertyLinks(fm[allPropName]);
-				const filteredChildren = currentAllChildren.filter((child) => {
-					const childContext = this.getFileContext(child);
-					return !orphanedChildren.includes(childContext.pathWithExt);
-				});
-
-				fm[allPropName] = filteredChildren.map((child) => formatWikiLink(this.getFileContext(child).baseName));
-			});
-
-			for (const orphanedChild of orphanedChildren) {
-				console.log(`    ❌ Removing ${current.baseName} from ${reverseAllPropName} of ${orphanedChild}`);
-				await this.removeFromProperty(orphanedChild, reverseAllPropName, current.baseName);
-			}
-
-			await this.propagateOrphanedChildrenUpstream(currentFilePath, orphanedChildren, config);
-		});
-	}
-
-	private async propagateOrphanedChildrenUpstream(
-		currentFilePath: string,
-		orphanedChildren: string[],
-		config: (typeof RELATIONSHIP_CONFIGS)[number]
-	): Promise<void> {
-		if (orphanedChildren.length === 0) {
-			return;
-		}
-
-		console.log(`    ⬆️ Propagating orphaned children removal upstream from ${currentFilePath}`);
-
 		const currentContext = this.getFileContext(currentFilePath);
-		if (!currentContext.file || !currentContext.frontmatter) {
-			return;
+		const affectedNodes: string[] = [currentFilePath];
+
+		if (currentContext.file && currentContext.frontmatter) {
+			const allParentPaths = parsePropertyLinks(currentContext.frontmatter[reverseAllPropName]);
+			affectedNodes.push(...allParentPaths.map((p) => this.getFileContext(p).pathWithExt));
 		}
 
-		const reversePropName = config.getReverseProp(this.settings);
-		const reverseAllPropName = config.getReverseAllProp(this.settings);
-		const allPropName = config.getAllProp(this.settings);
+		// Batch update: remove orphaned children from all affected nodes' all_children
+		for (const nodePath of affectedNodes) {
+			await this.withFileContext(nodePath, async (node) => {
+				await this.app.fileManager.processFrontMatter(node.file!, (fm) => {
+					const currentAllChildren = parsePropertyLinks(fm[allPropName]);
+					const filteredChildren = currentAllChildren.filter((child) => {
+						const childContext = this.getFileContext(child);
+						return !orphanedChildren.includes(childContext.pathWithExt);
+					});
 
-		const parentPaths = parsePropertyLinks(currentContext.frontmatter[reversePropName]);
-
-		if (parentPaths.length === 0) {
-			return;
-		}
-
-		for (const parentPath of parentPaths) {
-			const parentContext = this.getFileContext(parentPath);
-
-			if (!parentContext.file || !parentContext.frontmatter) {
-				continue;
-			}
-
-			const parentAllChildren = parsePropertyLinks(parentContext.frontmatter[allPropName]);
-			const orphanedInParent: string[] = [];
-
-			for (const orphanedChild of orphanedChildren) {
-				const orphanedContext = this.getFileContext(orphanedChild);
-				if (parentAllChildren.some((child) => this.getFileContext(child).pathWithExt === orphanedContext.pathWithExt)) {
-					orphanedInParent.push(orphanedContext.pathWithExt);
-				}
-			}
-
-			if (orphanedInParent.length === 0) {
-				continue;
-			}
-
-			console.log(`      ⬆️ Removing ${orphanedInParent.length} orphaned children from parent ${parentPath}`);
-
-			await this.app.fileManager.processFrontMatter(parentContext.file, (fm) => {
-				const currentAllChildren = parsePropertyLinks(fm[allPropName]);
-				const filteredChildren = currentAllChildren.filter((child) => {
-					const childContext = this.getFileContext(child);
-					return !orphanedInParent.includes(childContext.pathWithExt);
+					if (filteredChildren.length !== currentAllChildren.length) {
+						fm[allPropName] = filteredChildren.map((child) => formatWikiLink(this.getFileContext(child).baseName));
+					}
 				});
-
-				fm[allPropName] = filteredChildren.map((child) => formatWikiLink(this.getFileContext(child).baseName));
 			});
+		}
 
-			for (const orphanedChild of orphanedInParent) {
-				console.log(`        ❌ Removing ${parentContext.baseName} from ${reverseAllPropName} of ${orphanedChild}`);
-				await this.removeFromProperty(orphanedChild, reverseAllPropName, parentContext.baseName);
-			}
+		// Batch update: remove all affected nodes from orphaned children's all_parents
+		const affectedNodeBaseNames = affectedNodes.map((path) => this.getFileContext(path).baseName);
+		for (const orphanedChild of orphanedChildren) {
+			await this.withFileContext(orphanedChild, async (child) => {
+				await this.app.fileManager.processFrontMatter(child.file!, (fm) => {
+					const currentAllParents = parsePropertyLinks(fm[reverseAllPropName]);
+					const filteredParents = currentAllParents.filter((parent) => {
+						const parentContext = this.getFileContext(parent);
+						return !affectedNodeBaseNames.includes(parentContext.baseName);
+					});
 
-			await this.propagateOrphanedChildrenUpstream(parentContext.pathWithExt, orphanedInParent, config);
+					if (filteredParents.length !== currentAllParents.length) {
+						fm[reverseAllPropName] = filteredParents.map((parent) =>
+							formatWikiLink(this.getFileContext(parent).baseName)
+						);
+					}
+				});
+			});
 		}
 	}
 }
