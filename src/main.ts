@@ -31,8 +31,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 			});
 		}
 
-		console.log("NexusProperties: Obsidian vault fully indexed, starting plugin...");
-
 		this.indexer = new Indexer(this.app, this.settingsStore.settings$);
 
 		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$.value);

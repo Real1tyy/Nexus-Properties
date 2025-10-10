@@ -32,15 +32,10 @@ export class PropertiesManager {
 	}
 
 	async rescanAndAssignPropertiesForAllFiles(indexer: Indexer): Promise<void> {
-		console.log("🔄 Starting full vault rescan and property assignment...");
-
-		const startTime = Date.now();
 		const allFiles = this.app.vault.getMarkdownFiles();
 		const relevantFiles = allFiles.filter((file) => indexer.shouldIndexFile(file.path));
 
-		console.log(`📁 Found ${relevantFiles.length} files to process (filtered from ${allFiles.length} total files)`);
-
-		const results = await Promise.allSettled(
+		await Promise.all(
 			relevantFiles.map(async (file) => {
 				const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
 				if (!frontmatter) {
@@ -51,12 +46,6 @@ export class PropertiesManager {
 				await this.syncRelationships(relationships);
 			})
 		);
-
-		const errorCount = results.filter((r) => r.status === "rejected").length;
-		const successCount = results.filter((r) => r.status === "fulfilled").length;
-
-		const duration = ((Date.now() - startTime) / 1000).toFixed(2);
-		console.log(`✅ Rescan complete! Processed ${successCount} files in ${duration}s (${errorCount} errors)`);
 	}
 
 	private async syncRelationships(relationships: FileRelationships): Promise<void> {
@@ -67,13 +56,14 @@ export class PropertiesManager {
 		const propsToDelete = new Set<string>();
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const paths = relationships[config.type];
+			const rawLinks = relationships[config.type];
 			const propName = config.getProp(this.settings);
 			const allPropName = config.getAllProp(this.settings);
 
 			const isPropertyDefined = propName in frontmatter;
 
 			if (isPropertyDefined) {
+				const paths = parsePropertyLinks(rawLinks);
 				const allItems = await this.computeAllItems(paths, propName, currentFilePath);
 				computedRelationships.set(allPropName, allItems);
 			} else {
@@ -95,9 +85,10 @@ export class PropertiesManager {
 		}
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const paths = relationships[config.type];
+			const rawLinks = relationships[config.type];
 			const reversePropName = config.getReverseProp(this.settings);
 
+			const paths = parsePropertyLinks(rawLinks);
 			for (const path of paths) {
 				await this.addToProperty(path, reversePropName, currentFilePath);
 			}
@@ -167,14 +158,14 @@ export class PropertiesManager {
 			const reversePropName = config.getReverseProp(this.settings);
 			const reverseAllPropName = config.getReverseAllProp(this.settings);
 
-			const directRefs = oldRelationships[config.type];
-			const allRefs = oldRelationships[config.allKey];
+			const directPaths = parsePropertyLinks(oldRelationships[config.type]);
+			const allPaths = parsePropertyLinks(oldRelationships[config.allKey]);
 
-			for (const referencedFilePath of directRefs) {
+			for (const referencedFilePath of directPaths) {
 				await this.removeFromProperty(referencedFilePath, reversePropName, deletedFileBaseName);
 			}
 
-			for (const referencedFilePath of allRefs) {
+			for (const referencedFilePath of allPaths) {
 				await this.removeFromProperty(referencedFilePath, reverseAllPropName, deletedFileBaseName);
 			}
 		}
@@ -195,8 +186,11 @@ export class PropertiesManager {
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const reversePropName = config.getReverseProp(this.settings);
 
-			const oldLinks = new Set(oldRelationships[config.type]);
-			const newLinks = new Set(newRelationships[config.type]);
+			const oldPaths = parsePropertyLinks(oldRelationships[config.type]);
+			const newPaths = parsePropertyLinks(newRelationships[config.type]);
+
+			const oldLinks = new Set(oldPaths);
+			const newLinks = new Set(newPaths);
 
 			// Find added links
 			const addedLinks = [...newLinks].filter((link) => !oldLinks.has(link));
