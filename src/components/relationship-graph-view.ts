@@ -120,6 +120,16 @@ export class RelationshipGraphView extends ItemView {
 			})
 		);
 
+		// Register event listener for metadata changes (frontmatter updates)
+		this.registerEvent(
+			this.app.metadataCache.on("changed", (file) => {
+				// Only re-render if the changed file is the currently displayed file
+				if (this.currentFile && file.path === this.currentFile.path) {
+					this.updateGraph();
+				}
+			})
+		);
+
 		setTimeout(() => {
 			const activeFile = this.app.workspace.getActiveFile();
 			if (activeFile) {
@@ -488,9 +498,7 @@ export class RelationshipGraphView extends ItemView {
 		if (context.file && context.frontmatter) {
 			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
 
-			const allRelated = this.includeAllRelated
-				? [...rels.allRelated]
-				: [...rels.related];
+			const allRelated = this.includeAllRelated ? [...rels.allRelated] : [...rels.related];
 
 			for (const relatedWikiLink of allRelated) {
 				const relatedPath = extractFilePath(relatedWikiLink);
