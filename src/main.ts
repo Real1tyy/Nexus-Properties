@@ -20,7 +20,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.addCommand({
 			id: "toggle-relationship-graph",
-			name: "Toggle Relationship Graph",
+			name: "Show Relationship Graph",
 			callback: () => {
 				this.toggleRelationshipGraphView();
 			},
@@ -71,21 +71,9 @@ export default class NexusPropertiesPlugin extends Plugin {
 		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
 
 		if (existingLeaves.length > 0) {
+			// View exists, reveal/focus it
 			const firstLeaf = existingLeaves[0];
-
-			// Check if the graph view is currently active/focused
-			const activeView = workspace.getActiveViewOfType(RelationshipGraphView);
-			const isActive = activeView !== null && existingLeaves.some((leaf) => leaf.view === activeView);
-
-			if (isActive) {
-				// If it's active, close it
-				existingLeaves.forEach((leaf) => {
-					leaf.detach();
-				});
-			} else {
-				// If it exists but isn't active, reveal/focus it
-				workspace.revealLeaf(firstLeaf);
-			}
+			workspace.revealLeaf(firstLeaf);
 		} else {
 			// View doesn't exist, create it in the left sidebar
 			const leaf = workspace.getLeftLeaf(false);
