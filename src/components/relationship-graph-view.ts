@@ -76,11 +76,12 @@ export class RelationshipGraphView extends ItemView {
 			})
 		);
 
-		// Initialize with current active file
-		const activeFile = this.app.workspace.getActiveFile();
-		if (activeFile) {
-			this.onFileOpen(activeFile);
-		}
+		setTimeout(() => {
+			const activeFile = this.app.workspace.getActiveFile();
+			if (activeFile) {
+				this.onFileOpen(activeFile);
+			}
+		}, 100);
 	}
 
 	async onClose(): Promise<void> {

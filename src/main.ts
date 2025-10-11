@@ -71,10 +71,23 @@ export default class NexusPropertiesPlugin extends Plugin {
 		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
 
 		if (existingLeaves.length > 0) {
-			existingLeaves.forEach((leaf) => {
-				leaf.detach();
-			});
+			const firstLeaf = existingLeaves[0];
+
+			// Check if the graph view is currently active/focused
+			const activeView = workspace.getActiveViewOfType(RelationshipGraphView);
+			const isActive = activeView !== null && existingLeaves.some((leaf) => leaf.view === activeView);
+
+			if (isActive) {
+				// If it's active, close it
+				existingLeaves.forEach((leaf) => {
+					leaf.detach();
+				});
+			} else {
+				// If it exists but isn't active, reveal/focus it
+				workspace.revealLeaf(firstLeaf);
+			}
 		} else {
+			// View doesn't exist, create it in the left sidebar
 			const leaf = workspace.getLeftLeaf(false);
 			if (leaf) {
 				await leaf.setViewState({ type: VIEW_TYPE_RELATIONSHIP_GRAPH, active: true });
