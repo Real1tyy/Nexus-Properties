@@ -1,6 +1,7 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import { type App, Modal, Notice, TFile } from "obsidian";
-import type { Indexer } from "../core/indexer";
+import type { FileRelationships, Indexer } from "../core/indexer";
+import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
 
 export class RelationshipGraphModal extends Modal {
 	private cy: Core | null = null;
@@ -24,9 +25,7 @@ export class RelationshipGraphModal extends Modal {
 			return;
 		}
 
-		// Get file metadata
-		const cache = this.app.metadataCache.getFileCache(this.file);
-		const frontmatter = cache?.frontmatter;
+		const { frontmatter } = this.app.metadataCache.getFileCache(this.file) ?? {};
 
 		if (!frontmatter) {
 			new Notice("This file has no frontmatter properties.");
@@ -34,41 +33,20 @@ export class RelationshipGraphModal extends Modal {
 			return;
 		}
 
-		// Extract relationships
 		const relationships = this.indexer.extractRelationships(this.file, frontmatter);
-
-		// Build graph data
 		const { nodes, edges } = this.buildGraphData(this.file.path, relationships);
 
-		if (nodes.length === 0) {
-			new Notice("This file has no relationships to display.");
-			this.close();
-			return;
-		}
-
-		// Set modal to full-width and full-height
 		this.modalEl.addClass("nexus-graph-modal");
 		contentEl.addClass("nexus-graph-modal-content");
 
-		// Create header with close button
 		const header = contentEl.createEl("div", { cls: "nexus-graph-modal-header" });
 		header.createEl("h2", { text: `Relationship Graph: ${this.file.basename}` });
 
-		const closeButton = header.createEl("button", {
-			cls: "nexus-graph-close-button",
-			text: "×",
-		});
-		closeButton.addEventListener("click", () => this.close());
-
-		// Create graph container
 		this.graphContainerEl = contentEl.createEl("div", {
 			cls: "nexus-graph-modal-container",
 		});
 
-		// Initialize cytoscape
 		this.initializeCytoscape();
-
-		// Render the graph
 		this.renderGraph(nodes, edges);
 	}
 
@@ -85,23 +63,30 @@ export class RelationshipGraphModal extends Modal {
 	private initializeCytoscape(): void {
 		if (!this.graphContainerEl) return;
 
+		// Resolve CSS variables to actual colors for Cytoscape
+		const styles = getComputedStyle(document.body);
+		const accentColor = styles.getPropertyValue("--interactive-accent").trim() || "#7c3aed";
+		const accentHover = styles.getPropertyValue("--interactive-accent-hover").trim() || "#8b5cf6";
+		const textColor = styles.getPropertyValue("--text-normal").trim() || "#dcddde";
+		const borderColor = styles.getPropertyValue("--background-modifier-border").trim() || "#424242";
+
 		this.cy = cytoscape({
 			container: this.graphContainerEl,
 			style: [
 				{
 					selector: "node",
 					style: {
-						"background-color": "var(--interactive-accent)",
+						"background-color": accentColor,
 						label: "data(label)",
 						"text-valign": "center",
 						"text-halign": "center",
-						color: "var(--text-normal)",
+						color: textColor,
 						"font-size": "14px",
 						width: "100px",
 						height: "50px",
 						shape: "roundrectangle",
 						"border-width": "2px",
-						"border-color": "var(--background-modifier-border)",
+						"border-color": borderColor,
 						"text-wrap": "wrap",
 						"text-max-width": "90px",
 					},
@@ -109,8 +94,8 @@ export class RelationshipGraphModal extends Modal {
 				{
 					selector: "node[level = 0]",
 					style: {
-						"background-color": "var(--interactive-accent-hover)",
-						"border-color": "var(--interactive-accent)",
+						"background-color": accentHover,
+						"border-color": accentColor,
 						"border-width": "4px",
 						width: "130px",
 						height: "60px",
@@ -122,8 +107,8 @@ export class RelationshipGraphModal extends Modal {
 					selector: "edge",
 					style: {
 						width: 3,
-						"line-color": "var(--background-modifier-border)",
-						"target-arrow-color": "var(--background-modifier-border)",
+						"line-color": borderColor,
+						"target-arrow-color": borderColor,
 						"target-arrow-shape": "triangle",
 						"curve-style": "bezier",
 					},
@@ -131,22 +116,22 @@ export class RelationshipGraphModal extends Modal {
 				{
 					selector: "edge[type = 'parent']",
 					style: {
-						"line-color": "var(--color-red)",
-						"target-arrow-color": "var(--color-red)",
+						"line-color": "#e74c3c",
+						"target-arrow-color": "#e74c3c",
 					},
 				},
 				{
 					selector: "edge[type = 'child']",
 					style: {
-						"line-color": "var(--color-green)",
-						"target-arrow-color": "var(--color-green)",
+						"line-color": "#2ecc71",
+						"target-arrow-color": "#2ecc71",
 					},
 				},
 				{
 					selector: "edge[type = 'related']",
 					style: {
-						"line-color": "var(--color-blue)",
-						"target-arrow-color": "var(--color-blue)",
+						"line-color": "#3498db",
+						"target-arrow-color": "#3498db",
 						"line-style": "dashed",
 					},
 				},
@@ -192,37 +177,41 @@ export class RelationshipGraphModal extends Modal {
 
 	private buildGraphData(
 		rootPath: string,
-		_relationships: ReturnType<Indexer["extractRelationships"]>
+		relationships: FileRelationships
 	): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
-		const visited = new Set<string>();
+		const addedNodes = new Set<string>();
+		const processedNodes = new Set<string>();
 
-		// Helper function to get file name from path
-		const getFileName = (path: string): string => {
-			const name = path.split("/").pop() || path;
-			return name.replace(/\.md$/, "");
-		};
+		const addNode = (pathOrWikiLink: string, level: number): void => {
+			// Extract the actual file path (handles wiki links with aliases)
+			const filePath = extractFilePath(pathOrWikiLink);
 
-		// Helper function to add a node
-		const addNode = (path: string, level: number): void => {
-			if (visited.has(path)) return;
-			visited.add(path);
+			if (addedNodes.has(filePath)) return;
+			addedNodes.add(filePath);
+
+			// Extract the display name (alias if present, otherwise filename)
+			const displayName = extractDisplayName(pathOrWikiLink);
 
 			nodes.push({
 				data: {
-					id: path,
-					label: getFileName(path),
+					id: filePath,
+					label: displayName,
 					level: level,
 				},
 			});
 		};
 
 		// Helper function to recursively add relationships
-		const addRelationships = (path: string, currentLevel: number, maxDepth = 3): void => {
-			if (currentLevel > maxDepth) return;
+		const addRelationships = (filePath: string, currentLevel: number, maxDepth = 3): void => {
+			// Prevent infinite recursion on circular relationships
+			if (Math.abs(currentLevel) > maxDepth) return;
+			if (processedNodes.has(filePath)) return;
 
-			const file = this.app.vault.getAbstractFileByPath(path);
+			processedNodes.add(filePath);
+
+			const file = this.app.vault.getAbstractFileByPath(filePath);
 			if (!(file instanceof TFile)) return;
 
 			const cache = this.app.metadataCache.getFileCache(file);
@@ -232,51 +221,57 @@ export class RelationshipGraphModal extends Modal {
 			const rels = this.indexer.extractRelationships(file, frontmatter);
 
 			// Add parents (going up in hierarchy)
-			for (const parentPath of rels.allParents) {
-				if (!parentPath) continue;
-				const fullPath = parentPath.endsWith(".md") ? parentPath : `${parentPath}.md`;
+			for (const parentWikiLink of rels.allParents) {
+				if (!parentWikiLink) continue;
 
-				addNode(fullPath, currentLevel - 1);
+				// Extract the actual file path from the wiki link
+				const parentPath = extractFilePath(parentWikiLink);
+
+				addNode(parentWikiLink, currentLevel - 1);
 				edges.push({
 					data: {
-						source: fullPath,
-						target: path,
+						source: parentPath,
+						target: filePath,
 						type: "parent",
 					},
 				});
 
 				// Recursively add parent's relationships
-				addRelationships(fullPath, currentLevel - 1, maxDepth);
+				addRelationships(parentPath, currentLevel - 1, maxDepth);
 			}
 
 			// Add children (going down in hierarchy)
-			for (const childPath of rels.allChildren) {
-				if (!childPath) continue;
-				const fullPath = childPath.endsWith(".md") ? childPath : `${childPath}.md`;
+			for (const childWikiLink of rels.allChildren) {
+				if (!childWikiLink) continue;
 
-				addNode(fullPath, currentLevel + 1);
+				// Extract the actual file path from the wiki link
+				const childPath = extractFilePath(childWikiLink);
+
+				addNode(childWikiLink, currentLevel + 1);
 				edges.push({
 					data: {
-						source: path,
-						target: fullPath,
+						source: filePath,
+						target: childPath,
 						type: "child",
 					},
 				});
 
 				// Recursively add child's relationships
-				addRelationships(fullPath, currentLevel + 1, maxDepth);
+				addRelationships(childPath, currentLevel + 1, maxDepth);
 			}
 
 			// Add related (same level)
-			for (const relatedPath of rels.allRelated) {
-				if (!relatedPath) continue;
-				const fullPath = relatedPath.endsWith(".md") ? relatedPath : `${relatedPath}.md`;
+			for (const relatedWikiLink of rels.allRelated) {
+				if (!relatedWikiLink) continue;
 
-				addNode(fullPath, currentLevel);
+				// Extract the actual file path from the wiki link
+				const relatedPath = extractFilePath(relatedWikiLink);
+
+				addNode(relatedWikiLink, currentLevel);
 				edges.push({
 					data: {
-						source: path,
-						target: fullPath,
+						source: filePath,
+						target: relatedPath,
 						type: "related",
 					},
 				});
