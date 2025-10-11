@@ -136,8 +136,10 @@ describe("hasLinkInProperty", () => {
 		expect(hasLinkInProperty(["[[folder/Note1|Note1]]", "[[Note2]]"], "folder/Note1")).toBe(true);
 	});
 
-	it("should be case-sensitive", () => {
-		expect(hasLinkInProperty(["[[MyNote]]"], "mynote")).toBe(false);
+	it("should be case-insensitive (using normalized paths)", () => {
+		// After normalization, paths are compared case-insensitively
+		expect(hasLinkInProperty(["[[MyNote]]"], "mynote")).toBe(true);
+		expect(hasLinkInProperty(["[[folder/MyNote]]"], "Folder/mynote")).toBe(true);
 	});
 
 	it("should handle links with special characters", () => {

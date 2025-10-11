@@ -93,3 +93,28 @@ export class MetadataCache {
 	off = vi.fn();
 	getFileCache = vi.fn(() => null);
 }
+
+/**
+ * Normalizes a file path using Obsidian's path normalization rules.
+ * This is a simplified mock version that handles basic path normalization.
+ */
+export function normalizePath(path: string): string {
+	if (!path) return "";
+
+	// Convert backslashes to forward slashes
+	let normalized = path.replace(/\\/g, "/");
+
+	// Remove duplicate slashes
+	normalized = normalized.replace(/\/+/g, "/");
+
+	// Remove trailing slash
+	normalized = normalized.replace(/\/$/, "");
+
+	// Remove leading ./
+	normalized = normalized.replace(/^\.\//, "");
+
+	// Normalize to lowercase for case-insensitive comparison (Obsidian behavior)
+	normalized = normalized.toLowerCase();
+
+	return normalized;
+}
