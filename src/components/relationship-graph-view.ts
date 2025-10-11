@@ -15,7 +15,13 @@ export class RelationshipGraphView extends ItemView {
 	private headerEl: HTMLElement | null = null;
 	private currentFile: TFile | null = null;
 	private ignoreTopmostParent = false;
+	private renderRelated = false;
+	private includeAllRelated = false;
 	private toggleCheckbox: HTMLInputElement | null = null;
+	private relatedCheckbox: HTMLInputElement | null = null;
+	private includeAllCheckbox: HTMLInputElement | null = null;
+	private startFromCurrentContainer: HTMLElement | null = null;
+	private includeAllContainer: HTMLElement | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -47,14 +53,49 @@ export class RelationshipGraphView extends ItemView {
 		const titleEl = this.headerEl.createEl("h4", { text: "No file selected" });
 		titleEl.addClass("nexus-graph-view-title");
 
-		// Create toggle container
-		const toggleContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
+		// Create "Render Related" toggle container
+		const relatedToggleContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
 
-		this.toggleCheckbox = toggleContainer.createEl("input", { type: "checkbox" });
+		this.relatedCheckbox = relatedToggleContainer.createEl("input", { type: "checkbox" });
+		this.relatedCheckbox.addClass("nexus-graph-toggle-checkbox");
+		this.relatedCheckbox.checked = this.renderRelated;
+
+		relatedToggleContainer.createEl("label", {
+			text: "Render Related",
+			cls: "nexus-graph-toggle-label",
+		});
+
+		this.relatedCheckbox.addEventListener("change", () => {
+			this.renderRelated = this.relatedCheckbox?.checked ?? false;
+			this.updateToggleVisibility();
+			this.updateGraph();
+		});
+
+		// Create "Include all related" toggle container (only visible in related mode)
+		this.includeAllContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
+
+		this.includeAllCheckbox = this.includeAllContainer.createEl("input", { type: "checkbox" });
+		this.includeAllCheckbox.addClass("nexus-graph-toggle-checkbox");
+		this.includeAllCheckbox.checked = this.includeAllRelated;
+
+		this.includeAllContainer.createEl("label", {
+			text: "Include all related",
+			cls: "nexus-graph-toggle-label",
+		});
+
+		this.includeAllCheckbox.addEventListener("change", () => {
+			this.includeAllRelated = this.includeAllCheckbox?.checked ?? false;
+			this.updateGraph();
+		});
+
+		// Create "Start from current file" toggle container
+		this.startFromCurrentContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
+
+		this.toggleCheckbox = this.startFromCurrentContainer.createEl("input", { type: "checkbox" });
 		this.toggleCheckbox.addClass("nexus-graph-toggle-checkbox");
 		this.toggleCheckbox.checked = this.ignoreTopmostParent;
 
-		toggleContainer.createEl("label", {
+		this.startFromCurrentContainer.createEl("label", {
 			text: "Start from current file",
 			cls: "nexus-graph-toggle-label",
 		});
@@ -63,6 +104,9 @@ export class RelationshipGraphView extends ItemView {
 			this.ignoreTopmostParent = this.toggleCheckbox?.checked ?? false;
 			this.updateGraph();
 		});
+
+		// Set initial visibility
+		this.updateToggleVisibility();
 
 		// Create graph container
 		this.graphContainerEl = contentEl.createEl("div", {
@@ -90,6 +134,19 @@ export class RelationshipGraphView extends ItemView {
 		this.headerEl = null;
 		this.graphContainerEl = null;
 		this.toggleCheckbox = null;
+		this.relatedCheckbox = null;
+		this.includeAllCheckbox = null;
+		this.startFromCurrentContainer = null;
+		this.includeAllContainer = null;
+	}
+
+	private updateToggleVisibility(): void {
+		if (this.startFromCurrentContainer) {
+			this.startFromCurrentContainer.style.display = this.renderRelated ? "none" : "flex";
+		}
+		if (this.includeAllContainer) {
+			this.includeAllContainer.style.display = this.renderRelated ? "flex" : "none";
+		}
 	}
 
 	private onFileOpen(file: TFile | null): void {
@@ -145,8 +202,10 @@ export class RelationshipGraphView extends ItemView {
 			}
 		}
 
-		// Rebuild graph
-		const { nodes, edges } = this.buildGraphData(this.currentFile.path);
+		// Rebuild graph based on mode
+		const { nodes, edges } = this.renderRelated
+			? this.buildRelatedGraphData(this.currentFile.path)
+			: this.buildGraphData(this.currentFile.path);
 
 		this.destroyGraph();
 
@@ -347,23 +406,109 @@ export class RelationshipGraphView extends ItemView {
 
 		this.cy.add([...nodes, ...edges]);
 
-		// Use dagre top-down layout with constellation styling
-		this.cy
-			.layout({
-				name: "dagre",
-				rankDir: "TB", // Top to bottom hierarchy
-				align: undefined,
-				nodeSep: 80, // Horizontal spacing between nodes
-				rankSep: 120, // Vertical spacing between levels
-				edgeSep: 50, // Spacing between edges
-				ranker: "network-simplex",
-				animate: true,
-				animationDuration: 800,
-				animationEasing: "ease-out-cubic",
-				fit: true,
-				padding: 80,
-			} as any)
-			.run();
+		if (this.renderRelated) {
+			// Use concentric layout for constellation/nebula pattern
+			// Central star (source) in the middle, related nodes in outer orbit
+			this.cy
+				.layout({
+					name: "concentric",
+					fit: true,
+					padding: 120,
+					startAngle: (3 / 2) * Math.PI, // Start at top
+					sweep: undefined, // Full circle
+					clockwise: true,
+					equidistant: true,
+					minNodeSpacing: 100, // Prevent overlapping
+					concentric: (node: any) => {
+						// Source node gets highest concentric value (innermost)
+						return node.data("isSource") ? 2 : 1;
+					},
+					levelWidth: () => {
+						// All non-source nodes at same level
+						return 1;
+					},
+					animate: true,
+					animationDuration: 800,
+					animationEasing: "ease-out-cubic",
+				})
+				.run();
+		} else {
+			// Use dagre top-down layout for hierarchy
+			this.cy
+				.layout({
+					name: "dagre",
+					rankDir: "TB", // Top to bottom hierarchy
+					align: undefined,
+					nodeSep: 80, // Horizontal spacing between nodes
+					rankSep: 120, // Vertical spacing between levels
+					edgeSep: 50, // Spacing between edges
+					ranker: "network-simplex",
+					animate: true,
+					animationDuration: 800,
+					animationEasing: "ease-out-cubic",
+					fit: true,
+					padding: 80,
+				} as any)
+				.run();
+		}
+	}
+
+	private buildRelatedGraphData(sourcePath: string): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
+		const nodes: ElementDefinition[] = [];
+		const edges: ElementDefinition[] = [];
+		const processedNodes = new Set<string>();
+
+		const addNode = (pathOrWikiLink: string, isSource: boolean): void => {
+			const filePath = extractFilePath(pathOrWikiLink);
+			if (processedNodes.has(filePath)) return;
+
+			processedNodes.add(filePath);
+			const displayName = extractDisplayName(pathOrWikiLink);
+
+			const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
+			const estimatedHeight = 45;
+
+			nodes.push({
+				data: {
+					id: filePath,
+					label: displayName,
+					level: isSource ? 0 : 1,
+					isSource: isSource,
+					width: estimatedWidth,
+					height: estimatedHeight,
+				},
+			});
+		};
+
+		// Add central node (current file)
+		addNode(sourcePath, true);
+
+		// Get relationships for current file
+		const context = getFileContext(this.app, sourcePath);
+		if (context.file && context.frontmatter) {
+			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
+
+			const allRelated = this.includeAllRelated
+				? [...rels.allRelated]
+				: [...rels.related];
+
+			for (const relatedWikiLink of allRelated) {
+				const relatedPath = extractFilePath(relatedWikiLink);
+
+				if (!processedNodes.has(relatedPath)) {
+					addNode(relatedWikiLink, false);
+
+					edges.push({
+						data: {
+							source: sourcePath,
+							target: relatedPath,
+						},
+					});
+				}
+			}
+		}
+
+		return { nodes, edges };
 	}
 
 	private findTopmostParent(startPath: string, maxDepth = 50): string {
