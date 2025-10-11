@@ -93,6 +93,14 @@ export class RelationshipGraphModal extends Modal {
 					},
 				},
 				{
+					selector: "node[isSource = true]",
+					style: {
+						"background-color": "#fff3cd",
+						"border-color": "#ffc107",
+						"border-width": "3px",
+					},
+				},
+				{
 					selector: "edge",
 					style: {
 						width: 1.5,
@@ -100,20 +108,6 @@ export class RelationshipGraphModal extends Modal {
 						"target-arrow-color": "#e0e0e0",
 						"target-arrow-shape": "triangle",
 						"curve-style": "bezier",
-					},
-				},
-				{
-					selector: "edge[type = 'parent']",
-					style: {
-						"line-color": "#d0d0d0",
-						"target-arrow-color": "#d0d0d0",
-					},
-				},
-				{
-					selector: "edge[type = 'child']",
-					style: {
-						"line-color": "#d0d0d0",
-						"target-arrow-color": "#d0d0d0",
 					},
 				},
 			],
@@ -139,11 +133,14 @@ export class RelationshipGraphModal extends Modal {
 
 		this.cy.add([...nodes, ...edges]);
 
+		const rootNode = nodes.find((node) => node.data?.level === 0);
+		const rootId = rootNode?.data?.id || this.file.path;
+
 		this.cy
 			.layout({
 				name: "breadthfirst",
 				directed: true,
-				roots: [`#${CSS.escape(this.file.path)}`],
+				roots: [`#${CSS.escape(rootId)}`],
 				spacingFactor: 2,
 				animate: true,
 				animationDuration: 500,
@@ -153,15 +150,50 @@ export class RelationshipGraphModal extends Modal {
 			.run();
 	}
 
-	private buildGraphData(rootPath: string): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
+	private findTopmostParent(startPath: string, maxDepth = 50): string {
+		const visited = new Set<string>();
+		let topmostParent = startPath;
+		let maxLevel = 0;
+
+		const dfsUpwards = (filePath: string, currentLevel: number): void => {
+			if (currentLevel > maxDepth || visited.has(filePath)) return;
+			visited.add(filePath);
+
+			if (currentLevel > maxLevel) {
+				maxLevel = currentLevel;
+				topmostParent = filePath;
+			}
+
+			const context = getFileContext(this.app, filePath);
+			if (!context.file || !context.frontmatter) return;
+
+			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
+
+			for (const parentWikiLink of rels.parent) {
+				const parentPath = extractFilePath(parentWikiLink);
+
+				if (!visited.has(parentPath)) {
+					dfsUpwards(parentPath, currentLevel + 1);
+				}
+			}
+		};
+
+		dfsUpwards(startPath, 0);
+		return topmostParent;
+	}
+
+	private buildGraphData(sourcePath: string): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
-		const addedNodes = new Set<string>();
 		const processedNodes = new Set<string>();
 
-		const addNode = (pathOrWikiLink: string, level: number): void => {
+		const rootPath = this.findTopmostParent(sourcePath);
+
+		const addNode = (pathOrWikiLink: string, level: number, isSource: boolean): void => {
 			const filePath = extractFilePath(pathOrWikiLink);
-			addedNodes.add(filePath);
+			if (processedNodes.has(filePath)) return;
+
+			processedNodes.add(filePath);
 			const displayName = extractDisplayName(pathOrWikiLink);
 
 			nodes.push({
@@ -169,58 +201,40 @@ export class RelationshipGraphModal extends Modal {
 					id: filePath,
 					label: displayName,
 					level: level,
+					isSource: isSource,
 				},
 			});
 		};
 
-		const addRelationships = (filePath: string, currentLevel: number, maxDepth = 10): void => {
-			// Prevent infinite recursion on circular relationships
-			if (Math.abs(currentLevel) > maxDepth) return;
-			if (processedNodes.has(filePath)) return;
-
-			processedNodes.add(filePath);
+		const buildDownwards = (filePath: string, currentLevel: number, maxDepth = 50): void => {
+			if (currentLevel > maxDepth) return;
 
 			const context = getFileContext(this.app, filePath);
 			if (!context.file || !context.frontmatter) return;
 
 			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
 
-			for (const parentWikiLink of rels.allParents) {
-				const parentPath = extractFilePath(parentWikiLink);
-
-				addNode(parentWikiLink, currentLevel - 1);
-				edges.push({
-					data: {
-						source: parentPath,
-						target: filePath,
-						type: "parent",
-					},
-				});
-
-				// Recursively add parent's relationships
-				addRelationships(parentPath, currentLevel - 1, maxDepth);
-			}
-
-			// Add children (going down in hierarchy)
-			for (const childWikiLink of rels.allChildren) {
+			for (const childWikiLink of rels.children) {
 				const childPath = extractFilePath(childWikiLink);
 
-				addNode(childWikiLink, currentLevel + 1);
-				edges.push({
-					data: {
-						source: filePath,
-						target: childPath,
-						type: "child",
-					},
-				});
+				if (!processedNodes.has(childPath)) {
+					const isSource = childPath === sourcePath;
+					addNode(childWikiLink, currentLevel + 1, isSource);
 
-				// Recursively add child's relationships
-				addRelationships(childPath, currentLevel + 1, maxDepth);
+					edges.push({
+						data: {
+							source: filePath,
+							target: childPath,
+						},
+					});
+
+					buildDownwards(childPath, currentLevel + 1, maxDepth);
+				}
 			}
 		};
 
-		addNode(rootPath, 0);
-		addRelationships(rootPath, 0);
+		addNode(rootPath, 0, rootPath === sourcePath);
+		buildDownwards(rootPath, 0);
 
 		return { nodes, edges };
 	}
