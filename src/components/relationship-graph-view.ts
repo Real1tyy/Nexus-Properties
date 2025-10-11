@@ -1,8 +1,11 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
+import cytoscapeDagre from "cytoscape-dagre";
 import { type App, Modal, Notice, TFile } from "obsidian";
 import type { Indexer } from "../core/indexer";
 import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
+
+cytoscape.use(cytoscapeDagre);
 
 export class RelationshipGraphModal extends Modal {
 	private cy: Core | null = null;
@@ -65,49 +68,44 @@ export class RelationshipGraphModal extends Modal {
 				{
 					selector: "node",
 					style: {
-						"background-color": "#ffffff",
+						"background-color": "#2c3e50",
 						label: "data(label)",
 						"text-valign": "center",
 						"text-halign": "center",
-						color: "#000000",
-						"font-size": "14px",
-						width: "100px",
-						height: "50px",
+						color: "#ffffff",
+						"font-size": "13px",
+						"font-weight": "normal",
+						"min-width": "80px",
+						"min-height": "40px",
+						width: "data(width)",
+						height: "data(height)",
 						shape: "roundrectangle",
-						"border-width": "1px",
-						"border-color": "#cccccc",
-						"text-wrap": "wrap",
-						"text-max-width": "90px",
-					},
-				},
-				{
-					selector: "node[level = 0]",
-					style: {
-						"background-color": "#f0f0f0",
-						"border-color": "#999999",
 						"border-width": "2px",
-						width: "130px",
-						height: "60px",
-						"font-weight": "bold",
-						"font-size": "16px",
+						"border-color": "#1a252f",
+						"text-wrap": "wrap",
+						"text-max-width": "100px",
+						padding: "8px",
 					},
 				},
 				{
-					selector: "node[isSource = true]",
+					selector: "node[?isSource]",
 					style: {
-						"background-color": "#fff3cd",
-						"border-color": "#ffc107",
-						"border-width": "3px",
+						"background-color": "#e67e22",
+						"border-color": "#d35400",
+						"border-width": "4px",
+						"font-weight": "bold",
+						"font-size": "14px",
 					},
 				},
 				{
 					selector: "edge",
 					style: {
-						width: 1.5,
-						"line-color": "#e0e0e0",
-						"target-arrow-color": "#e0e0e0",
+						width: 2.5,
+						"line-color": "#7f8c8d",
+						"target-arrow-color": "#7f8c8d",
 						"target-arrow-shape": "triangle",
 						"curve-style": "bezier",
+						"arrow-scale": 1.5,
 					},
 				},
 			],
@@ -133,20 +131,21 @@ export class RelationshipGraphModal extends Modal {
 
 		this.cy.add([...nodes, ...edges]);
 
-		const rootNode = nodes.find((node) => node.data?.level === 0);
-		const rootId = rootNode?.data?.id || this.file.path;
-
 		this.cy
 			.layout({
-				name: "breadthfirst",
-				directed: true,
-				roots: [`#${CSS.escape(rootId)}`],
-				spacingFactor: 2,
+				name: "dagre",
+				rankDir: "TB",
+				align: "DL",
+				nodeSep: 60,
+				rankSep: 100,
+				edgeSep: 40,
+				ranker: "longest-path",
 				animate: true,
-				animationDuration: 500,
+				animationDuration: 600,
+				animationEasing: "ease-in-out",
 				fit: true,
-				padding: 50,
-			})
+				padding: 60,
+			} as any)
 			.run();
 	}
 
@@ -196,12 +195,17 @@ export class RelationshipGraphModal extends Modal {
 			processedNodes.add(filePath);
 			const displayName = extractDisplayName(pathOrWikiLink);
 
+			const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
+			const estimatedHeight = 45;
+
 			nodes.push({
 				data: {
 					id: filePath,
 					label: displayName,
 					level: level,
 					isSource: isSource,
+					width: estimatedWidth,
+					height: estimatedHeight,
 				},
 			});
 		};
