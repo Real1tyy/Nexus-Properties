@@ -198,6 +198,20 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Auto-link siblings")
+			.setDesc(
+				"Automatically mark nodes as related when they share the same parent (siblings are related to each other)"
+			)
+			.addToggle((toggle) =>
+				toggle.setValue(settings.autoLinkSiblings).onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						autoLinkSiblings: value,
+					}));
+				})
+			);
+
+		new Setting(containerEl)
 			.setName("Parent property")
 			.setDesc("Property name for parent reference (bidirectional with children)")
 			.addText((text) =>

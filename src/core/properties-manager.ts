@@ -46,6 +46,21 @@ export class PropertiesManager {
 				await this.syncRelationships(relationships);
 			})
 		);
+
+		// After syncing all relationships, link siblings if enabled
+		if (this.settings.autoLinkSiblings) {
+			await Promise.all(
+				relevantFiles.map(async (file) => {
+					const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+					if (!frontmatter) {
+						return;
+					}
+
+					const relationships = indexer.extractRelationships(file, frontmatter);
+					await this.linkSiblingsIfNeeded(relationships);
+				})
+			);
+		}
 	}
 
 	private async syncRelationships(relationships: FileRelationships): Promise<void> {
@@ -85,6 +100,109 @@ export class PropertiesManager {
 				await this.addToProperty(path, ctx.reversePropName, currentFilePath);
 			}
 		}
+	}
+
+	private async linkSiblingsIfNeeded(relationships: FileRelationships): Promise<void> {
+		const currentFilePath = relationships.filePath;
+		const currentContext = getFileContext(this.app, currentFilePath);
+		const siblings = new Set<string>();
+
+		// Parse parent wiki links to get file paths
+		const parentPaths = parsePropertyLinks(relationships.parent);
+
+		// Find all siblings by looking at each parent's children
+		for (const parentPath of parentPaths) {
+			const parentContext = getFileContext(this.app, parentPath);
+			if (!parentContext.file || !parentContext.frontmatter) {
+				continue;
+			}
+
+			// Get all children of this parent
+			const childrenLinks = parsePropertyLinks(parentContext.frontmatter[this.settings.childrenProp]);
+
+			for (const childLink of childrenLinks) {
+				const childContext = getFileContext(this.app, childLink);
+				// Exclude self from siblings
+				if (childContext.pathWithExt !== currentFilePath) {
+					siblings.add(childContext.pathWithExt);
+				}
+			}
+		}
+
+		// Add siblings to current file's related property
+		for (const siblingPath of siblings) {
+			await this.addToProperty(currentFilePath, this.settings.relatedProp, siblingPath);
+		}
+
+		// Add current file to each sibling's related property
+		for (const siblingPath of siblings) {
+			await this.addToProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
+		}
+	}
+
+	private async updateSiblingRelationships(
+		filePath: string,
+		oldRelationships: FileRelationships,
+		newRelationships: FileRelationships
+	): Promise<void> {
+		const currentContext = getFileContext(this.app, filePath);
+
+		// Get old and new siblings
+		const oldSiblings = await this.getSiblings(oldRelationships);
+		const newSiblings = await this.getSiblings(newRelationships);
+
+		// Find siblings that were removed (no longer share a parent)
+		const removedSiblings = oldSiblings.filter((s) => !newSiblings.includes(s));
+
+		// Find siblings that were added (now share a parent)
+		const addedSiblings = newSiblings.filter((s) => !oldSiblings.includes(s));
+
+		// Remove current file from old siblings' related property
+		for (const siblingPath of removedSiblings) {
+			await this.removeFromProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
+			await this.removeFromProperty(filePath, this.settings.relatedProp, siblingPath);
+		}
+
+		// Add current file to new siblings' related property
+		for (const siblingPath of addedSiblings) {
+			await this.addToProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
+			await this.addToProperty(filePath, this.settings.relatedProp, siblingPath);
+		}
+	}
+
+	private async getSiblings(relationships: FileRelationships): Promise<string[]> {
+		const siblings = new Set<string>();
+
+		// Parse parent wiki links to get file paths
+		const parentPaths = parsePropertyLinks(relationships.parent);
+
+		// Find all siblings by looking at each parent's children
+		for (const parentPath of parentPaths) {
+			const parentContext = getFileContext(this.app, parentPath);
+
+			if (!parentContext.file) {
+				continue;
+			}
+
+			// Get fresh frontmatter from metadata cache instead of using cached context
+			const freshFrontmatter = this.app.metadataCache.getFileCache(parentContext.file)?.frontmatter;
+			if (!freshFrontmatter) {
+				continue;
+			}
+
+			// Get all children of this parent
+			const childrenLinks = parsePropertyLinks(freshFrontmatter[this.settings.childrenProp]);
+
+			for (const childLink of childrenLinks) {
+				const childContext = getFileContext(this.app, childLink);
+				// Exclude self from siblings
+				if (childContext.pathWithExt !== relationships.filePath) {
+					siblings.add(childContext.pathWithExt);
+				}
+			}
+		}
+
+		return Array.from(siblings);
 	}
 
 	private async computeAllItems(items: string[], propertyName: string, sourceFilePath: string): Promise<string[]> {
@@ -150,10 +268,6 @@ export class PropertiesManager {
 		oldRelationships: FileRelationships,
 		newRelationships: FileRelationships
 	): Promise<void> {
-		console.log(
-			`📝 Handling modification: ${filePath} with old relationships: ${oldRelationships} and new relationships: ${newRelationships}`
-		);
-
 		const currentContext = getFileContext(this.app, filePath);
 
 		for (const config of RELATIONSHIP_CONFIGS) {
@@ -175,6 +289,10 @@ export class PropertiesManager {
 			}
 		}
 		await this.updateAllPropertiesForFile(filePath, oldRelationships, newRelationships);
+
+		if (this.settings.autoLinkSiblings) {
+			await this.updateSiblingRelationships(filePath, oldRelationships, newRelationships);
+		}
 	}
 
 	private async updateAllPropertiesForFile(

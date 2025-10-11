@@ -14,6 +14,7 @@ export const SETTINGS_DEFAULTS = {
 	DEFAULT_ALL_RELATED_PROP: "_AllRelated",
 
 	DEFAULT_DIRECTORIES: ["*"],
+	DEFAULT_AUTO_LINK_SIBLINGS: true,
 } as const;
 
 export const SCAN_CONCURRENCY = 10;
