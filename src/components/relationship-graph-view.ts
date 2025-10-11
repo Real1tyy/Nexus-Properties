@@ -135,11 +135,11 @@ export class RelationshipGraphModal extends Modal {
 			.layout({
 				name: "dagre",
 				rankDir: "TB",
-				align: "DL",
+				align: undefined,
 				nodeSep: 60,
 				rankSep: 100,
 				edgeSep: 40,
-				ranker: "longest-path",
+				ranker: "network-simplex",
 				animate: true,
 				animationDuration: 600,
 				animationEasing: "ease-in-out",
@@ -210,35 +210,41 @@ export class RelationshipGraphModal extends Modal {
 			});
 		};
 
-		const buildDownwards = (filePath: string, currentLevel: number, maxDepth = 50): void => {
-			if (currentLevel > maxDepth) return;
+		const buildDownwardsBFS = (): void => {
+			const queue: Array<{ path: string; level: number }> = [{ path: rootPath, level: 0 }];
+			addNode(rootPath, 0, rootPath === sourcePath);
 
-			const context = getFileContext(this.app, filePath);
-			if (!context.file || !context.frontmatter) return;
+			while (queue.length > 0) {
+				const { path: currentPath, level: currentLevel } = queue.shift()!;
 
-			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
+				if (currentLevel > 50) continue;
 
-			for (const childWikiLink of rels.children) {
-				const childPath = extractFilePath(childWikiLink);
+				const context = getFileContext(this.app, currentPath);
+				if (!context.file || !context.frontmatter) continue;
 
-				if (!processedNodes.has(childPath)) {
-					const isSource = childPath === sourcePath;
-					addNode(childWikiLink, currentLevel + 1, isSource);
+				const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
 
-					edges.push({
-						data: {
-							source: filePath,
-							target: childPath,
-						},
-					});
+				for (const childWikiLink of rels.children) {
+					const childPath = extractFilePath(childWikiLink);
 
-					buildDownwards(childPath, currentLevel + 1, maxDepth);
+					if (!processedNodes.has(childPath)) {
+						const isSource = childPath === sourcePath;
+						addNode(childWikiLink, currentLevel + 1, isSource);
+
+						edges.push({
+							data: {
+								source: currentPath,
+								target: childPath,
+							},
+						});
+
+						queue.push({ path: childPath, level: currentLevel + 1 });
+					}
 				}
 			}
 		};
 
-		addNode(rootPath, 0, rootPath === sourcePath);
-		buildDownwards(rootPath, 0);
+		buildDownwardsBFS();
 
 		return { nodes, edges };
 	}
