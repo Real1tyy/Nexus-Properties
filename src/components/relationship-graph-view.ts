@@ -239,7 +239,6 @@ export class RelationshipGraphView extends ItemView {
 			container: this.graphContainerEl,
 			minZoom: 0.3,
 			maxZoom: 3,
-			wheelSensitivity: 0.7,
 			style: [
 				// Base constellation "star" nodes
 				{
