@@ -1,5 +1,6 @@
-import { Notice, Plugin } from "obsidian";
-import { NexusPropertiesSettingsTab, RelationshipGraphModal } from "./components";
+import { Plugin } from "obsidian";
+import { NexusPropertiesSettingsTab } from "./components";
+import { RelationshipGraphView, VIEW_TYPE_RELATIONSHIP_GRAPH } from "./components/relationship-graph-view";
 import { Indexer } from "./core/indexer";
 import { PropertiesManager } from "./core/properties-manager";
 import { SettingsStore } from "./core/settings-store";
@@ -15,17 +16,13 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.addSettingTab(new NexusPropertiesSettingsTab(this.app, this));
 
-		if (this.settingsStore.currentSettings.showRibbonIcon) {
-			this.addRibbonIcon("git-fork", "Open Relationship Graph", () => {
-				this.openRelationshipGraphModal();
-			});
-		}
+		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer));
 
 		this.addCommand({
-			id: "open-relationship-graph",
-			name: "Open Relationship Graph",
+			id: "toggle-relationship-graph",
+			name: "Toggle Relationship Graph",
 			callback: () => {
-				this.openRelationshipGraphModal();
+				this.toggleRelationshipGraphView();
 			},
 		});
 
@@ -56,6 +53,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 	async onunload() {
 		this.propertiesManager?.stop();
 		this.indexer?.stop();
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
 	}
 
 	async triggerFullRescan(): Promise<void> {
@@ -67,14 +65,21 @@ export default class NexusPropertiesPlugin extends Plugin {
 		await this.propertiesManager.rescanAndAssignPropertiesForAllFiles(this.indexer);
 	}
 
-	private openRelationshipGraphModal(): void {
-		const activeFile = this.app.workspace.getActiveFile();
+	private async toggleRelationshipGraphView(): Promise<void> {
+		const { workspace } = this.app;
 
-		if (!activeFile) {
-			new Notice("No file is currently open.");
-			return;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+
+		if (existingLeaves.length > 0) {
+			existingLeaves.forEach((leaf) => {
+				leaf.detach();
+			});
+		} else {
+			const leaf = workspace.getLeftLeaf(false);
+			if (leaf) {
+				await leaf.setViewState({ type: VIEW_TYPE_RELATIONSHIP_GRAPH, active: true });
+				workspace.revealLeaf(leaf);
+			}
 		}
-
-		new RelationshipGraphModal(this.app, this.indexer, activeFile).open();
 	}
 }

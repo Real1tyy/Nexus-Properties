@@ -1,64 +1,167 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
-import { type App, Modal, Notice, TFile } from "obsidian";
+import { ItemView, TFile, type WorkspaceLeaf } from "obsidian";
 import type { Indexer } from "../core/indexer";
 import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
 
 cytoscape.use(cytoscapeDagre);
 
-export class RelationshipGraphModal extends Modal {
+export const VIEW_TYPE_RELATIONSHIP_GRAPH = "nexus-relationship-graph-view";
+
+export class RelationshipGraphView extends ItemView {
 	private cy: Core | null = null;
 	private graphContainerEl: HTMLElement | null = null;
+	private headerEl: HTMLElement | null = null;
+	private currentFile: TFile | null = null;
+	private ignoreTopmostParent = false;
+	private toggleCheckbox: HTMLInputElement | null = null;
 
 	constructor(
-		app: App,
-		private indexer: Indexer,
-		private file: TFile
+		leaf: WorkspaceLeaf,
+		private indexer: Indexer
 	) {
-		super(app);
+		super(leaf);
 	}
 
-	onOpen(): void {
+	getViewType(): string {
+		return VIEW_TYPE_RELATIONSHIP_GRAPH;
+	}
+
+	getDisplayText(): string {
+		return "Relationship Graph";
+	}
+
+	getIcon(): string {
+		return "git-fork";
+	}
+
+	async onOpen(): Promise<void> {
 		const { contentEl } = this;
-		if (!this.indexer.shouldIndexFile(this.file.path)) {
-			new Notice("This file is not in a configured directory for relationship tracking.");
-			this.close();
+		contentEl.empty();
+		contentEl.addClass("nexus-graph-view-content");
+
+		// Create header with controls
+		this.headerEl = contentEl.createEl("div", { cls: "nexus-graph-view-header" });
+
+		const titleEl = this.headerEl.createEl("h4", { text: "No file selected" });
+		titleEl.addClass("nexus-graph-view-title");
+
+		// Create toggle container
+		const toggleContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
+
+		this.toggleCheckbox = toggleContainer.createEl("input", { type: "checkbox" });
+		this.toggleCheckbox.addClass("nexus-graph-toggle-checkbox");
+		this.toggleCheckbox.checked = this.ignoreTopmostParent;
+
+		toggleContainer.createEl("label", {
+			text: "Start from current file",
+			cls: "nexus-graph-toggle-label",
+		});
+
+		this.toggleCheckbox.addEventListener("change", () => {
+			this.ignoreTopmostParent = this.toggleCheckbox?.checked ?? false;
+			this.updateGraph();
+		});
+
+		// Create graph container
+		this.graphContainerEl = contentEl.createEl("div", {
+			cls: "nexus-graph-view-container",
+		});
+
+		// Register event listener for active file changes
+		this.registerEvent(
+			this.app.workspace.on("file-open", (file) => {
+				this.onFileOpen(file);
+			})
+		);
+
+		// Initialize with current active file
+		const activeFile = this.app.workspace.getActiveFile();
+		if (activeFile) {
+			this.onFileOpen(activeFile);
+		}
+	}
+
+	async onClose(): Promise<void> {
+		this.destroyGraph();
+		this.currentFile = null;
+		this.headerEl = null;
+		this.graphContainerEl = null;
+		this.toggleCheckbox = null;
+	}
+
+	private onFileOpen(file: TFile | null): void {
+		if (!file) {
+			this.showEmptyState("No file selected");
 			return;
 		}
 
-		const { frontmatter } = this.app.metadataCache.getFileCache(this.file) ?? {};
+		if (!this.indexer.shouldIndexFile(file.path)) {
+			this.showEmptyState("This file is not in a configured directory for relationship tracking.");
+			return;
+		}
+
+		const { frontmatter } = this.app.metadataCache.getFileCache(file) ?? {};
 
 		if (!frontmatter) {
-			new Notice("This file has no frontmatter properties.");
-			this.close();
+			this.showEmptyState("This file has no frontmatter properties.");
 			return;
 		}
 
-		const { nodes, edges } = this.buildGraphData(this.file.path);
+		this.currentFile = file;
+		this.updateGraph();
+	}
 
-		this.modalEl.addClass("nexus-graph-modal");
-		contentEl.addClass("nexus-graph-modal-content");
+	private showEmptyState(message: string): void {
+		this.currentFile = null;
+		this.destroyGraph();
 
-		const header = contentEl.createEl("div", { cls: "nexus-graph-modal-header" });
-		header.createEl("h2", { text: `Relationship Graph: ${this.file.basename}` });
+		if (this.headerEl) {
+			const titleEl = this.headerEl.querySelector(".nexus-graph-view-title");
+			if (titleEl) {
+				titleEl.textContent = message;
+			}
+		}
 
-		this.graphContainerEl = contentEl.createEl("div", {
-			cls: "nexus-graph-modal-container",
-		});
+		if (this.graphContainerEl) {
+			this.graphContainerEl.empty();
+			this.graphContainerEl.createEl("div", {
+				text: message,
+				cls: "nexus-graph-empty-state",
+			});
+		}
+	}
+
+	private updateGraph(): void {
+		if (!this.currentFile) return;
+
+		// Update header title
+		if (this.headerEl) {
+			const titleEl = this.headerEl.querySelector(".nexus-graph-view-title");
+			if (titleEl) {
+				titleEl.textContent = `Relationship Graph: ${this.currentFile.basename}`;
+			}
+		}
+
+		// Rebuild graph
+		const { nodes, edges } = this.buildGraphData(this.currentFile.path);
+
+		this.destroyGraph();
+
+		if (this.graphContainerEl) {
+			this.graphContainerEl.empty();
+		}
 
 		this.initializeCytoscape();
 		this.renderGraph(nodes, edges);
 	}
 
-	onClose(): void {
+	private destroyGraph(): void {
 		if (this.cy) {
 			this.cy.destroy();
 			this.cy = null;
 		}
-		this.graphContainerEl = null;
-		const { contentEl } = this;
-		contentEl.empty();
 	}
 
 	private initializeCytoscape(): void {
@@ -66,7 +169,7 @@ export class RelationshipGraphModal extends Modal {
 			container: this.graphContainerEl,
 			minZoom: 0.3,
 			maxZoom: 3,
-			wheelSensitivity: 0.15,
+			wheelSensitivity: 0.3,
 			style: [
 				// Base constellation "star" nodes
 				{
@@ -212,7 +315,6 @@ export class RelationshipGraphModal extends Modal {
 
 			if (file instanceof TFile) {
 				this.app.workspace.getLeaf(false).openFile(file);
-				this.close();
 			}
 		});
 	}
@@ -300,7 +402,7 @@ export class RelationshipGraphModal extends Modal {
 		const edges: ElementDefinition[] = [];
 		const processedNodes = new Set<string>();
 
-		const rootPath = this.findTopmostParent(sourcePath);
+		const rootPath = this.ignoreTopmostParent ? sourcePath : this.findTopmostParent(sourcePath);
 
 		const addNode = (pathOrWikiLink: string, level: number, isSource: boolean): void => {
 			const filePath = extractFilePath(pathOrWikiLink);

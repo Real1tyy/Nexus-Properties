@@ -80,65 +80,56 @@
 	padding: 2em;
 }
 
-/* Relationship Graph Modal */
-.modal.nexus-graph-modal {
-	width: 95vw;
-	max-width: 95vw;
-	height: 95vh;
-}
-
-.nexus-graph-modal .modal-content {
-	height: 100%;
-	padding: 0;
-}
-
-.nexus-graph-modal-content {
+/* Relationship Graph View */
+.nexus-graph-view-content {
 	display: flex;
 	flex-direction: column;
 	height: 100%;
 	padding: 0;
+	overflow: hidden;
 }
 
-.nexus-graph-modal-header {
+.nexus-graph-view-header {
 	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	padding: 1em 1.5em;
+	flex-direction: column;
+	gap: 0.5em;
+	padding: 1em;
 	border-bottom: 2px solid var(--background-modifier-border);
 	background-color: var(--background-secondary);
 	flex-shrink: 0;
 }
 
-.nexus-graph-modal-header h2 {
+.nexus-graph-view-title {
 	margin: 0;
 	color: var(--text-normal);
-	font-size: 1.4em;
+	font-size: 1.1em;
 	font-weight: 600;
 }
 
-.nexus-graph-close-button {
-	background: none;
-	border: none;
-	font-size: 2em;
-	line-height: 1;
-	cursor: pointer;
-	color: var(--text-muted);
-	padding: 0;
-	width: 40px;
-	height: 40px;
+.nexus-graph-toggle-container {
 	display: flex;
 	align-items: center;
-	justify-content: center;
-	border-radius: 4px;
-	transition: all 0.2s;
+	gap: 0.5em;
+	font-size: 0.9em;
 }
 
-.nexus-graph-close-button:hover {
-	background-color: var(--background-modifier-hover);
+.nexus-graph-toggle-checkbox {
+	cursor: pointer;
+	width: 16px;
+	height: 16px;
+}
+
+.nexus-graph-toggle-label {
+	color: var(--text-muted);
+	cursor: pointer;
+	user-select: none;
+}
+
+.nexus-graph-toggle-label:hover {
 	color: var(--text-normal);
 }
 
-.nexus-graph-modal-container {
+.nexus-graph-view-container {
 	flex: 1;
 	width: 100%;
 	min-height: 0;
@@ -197,6 +188,17 @@
 	animation: starfield-twinkle 120s ease-in-out infinite;
 }
 
+.nexus-graph-empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	height: 100%;
+	color: var(--text-muted);
+	font-size: 0.95em;
+	padding: 2em;
+	text-align: center;
+}
+
 @keyframes starfield-twinkle {
 	0%,
 	100% {
@@ -234,7 +236,7 @@
 }
 
 /* Subtle vignette overlay */
-.nexus-graph-modal-container::before {
+.nexus-graph-view-container::before {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -247,7 +249,7 @@
 }
 
 /* Ensure Cytoscape renders above background */
-.nexus-graph-modal-container > div {
+.nexus-graph-view-container > div {
 	position: relative;
 	z-index: 2;
 }
