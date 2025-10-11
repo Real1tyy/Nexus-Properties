@@ -70,7 +70,7 @@ export class PropertiesManager {
 		await withFileContext(this.app, currentFilePath, async (context) => {
 			await this.app.fileManager.processFrontMatter(context.file!, (fm) => {
 				for (const [allPropName, paths] of computedRelationships) {
-					fm[allPropName] = paths.map((path) => formatWikiLink(getFileContext(this.app, path).baseName));
+					fm[allPropName] = paths.map((path) => formatWikiLink(path));
 				}
 
 				for (const propName of propsToDelete) {
@@ -217,7 +217,7 @@ export class PropertiesManager {
 			if (computedAllProperties.size > 0) {
 				await this.app.fileManager.processFrontMatter(context.file!, (fm) => {
 					for (const [allPropName, paths] of computedAllProperties) {
-						fm[allPropName] = paths.map((path) => formatWikiLink(getFileContext(this.app, path).baseName));
+						fm[allPropName] = paths.map((path) => formatWikiLink(path));
 					}
 				});
 			}
@@ -241,7 +241,7 @@ export class PropertiesManager {
 					return linkContext.baseName !== fileToRemoveContext.baseName;
 				});
 
-				fm[propertyName] = filteredLinks.map((link) => formatWikiLink(getFileContext(this.app, link).baseName));
+				fm[propertyName] = filteredLinks.map((path) => formatWikiLink(path));
 			});
 		});
 	}
@@ -297,7 +297,7 @@ export class PropertiesManager {
 					});
 
 					if (filteredChildren.length !== currentAllChildren.length) {
-						fm[allPropName] = filteredChildren.map((child) => formatWikiLink(getFileContext(this.app, child).baseName));
+						fm[allPropName] = filteredChildren.map((path) => formatWikiLink(path));
 					}
 				});
 			});
@@ -315,9 +315,7 @@ export class PropertiesManager {
 					});
 
 					if (filteredParents.length !== currentAllParents.length) {
-						fm[reverseAllPropName] = filteredParents.map((parent) =>
-							formatWikiLink(getFileContext(this.app, parent).baseName)
-						);
+						fm[reverseAllPropName] = filteredParents.map((path) => formatWikiLink(path));
 					}
 				});
 			});
