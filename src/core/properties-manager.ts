@@ -1,39 +1,12 @@
-import type { App, CachedMetadata, TFile } from "obsidian";
+import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { ensureMarkdownExtension, getFileByPath, removeMarkdownExtension } from "../utils/file-utils";
+import { getFileContext, withFileContext } from "../utils/file-context";
 import { formatWikiLink, parsePropertyLinks } from "../utils/link-parser";
-import { normalizeProperty } from "../utils/property-normalizer";
 import { addLinkToProperty } from "../utils/property-utils";
+import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
-
-interface FileContext {
-	path: string;
-	pathWithExt: string;
-	baseName: string;
-	file: TFile | null;
-	frontmatter: Record<string, any> | undefined;
-	cache: CachedMetadata | null;
-}
-
-interface RelationshipContext {
-	propName: string;
-	allPropName: string;
-	reversePropName: string;
-	reverseAllPropName: string;
-	paths: string[];
-	allPaths: string[];
-}
-
-interface RelationshipDiff {
-	oldPaths: string[];
-	newPaths: string[];
-	oldSet: Set<string>;
-	newSet: Set<string>;
-	addedLinks: string[];
-	removedLinks: string[];
-}
 
 export class PropertiesManager {
 	private subscription: Subscription | null = null;
@@ -42,70 +15,6 @@ export class PropertiesManager {
 		private app: App,
 		private settings: NexusPropertiesSettings
 	) {}
-
-	private getFileContext(path: string): FileContext {
-		const pathWithExt = ensureMarkdownExtension(path);
-		const baseName = removeMarkdownExtension(path);
-		const file = getFileByPath(this.app, pathWithExt);
-		const cache = file ? this.app.metadataCache.getFileCache(file) : null;
-		const frontmatter = cache?.frontmatter;
-
-		return {
-			path,
-			pathWithExt,
-			baseName,
-			file,
-			frontmatter,
-			cache,
-		};
-	}
-
-	private async withFileContext<T>(
-		path: string,
-		callback: (context: FileContext) => Promise<T> | T
-	): Promise<T | null> {
-		const context = this.getFileContext(path);
-		if (!context.file) {
-			console.warn(`PropertiesManager: File not found: ${context.pathWithExt}`);
-			return null;
-		}
-		return await callback(context);
-	}
-
-	private getRelationshipContext(
-		config: (typeof RELATIONSHIP_CONFIGS)[number],
-		relationships: FileRelationships
-	): RelationshipContext {
-		return {
-			propName: config.getProp(this.settings),
-			allPropName: config.getAllProp(this.settings),
-			reversePropName: config.getReverseProp(this.settings),
-			reverseAllPropName: config.getReverseAllProp(this.settings),
-			paths: parsePropertyLinks(relationships[config.type]),
-			allPaths: parsePropertyLinks(relationships[config.allKey]),
-		};
-	}
-
-	private getRelationshipDiff(
-		config: (typeof RELATIONSHIP_CONFIGS)[number],
-		oldRelationships: FileRelationships,
-		newRelationships: FileRelationships
-	): RelationshipDiff & RelationshipContext {
-		const oldPaths = parsePropertyLinks(oldRelationships[config.type]);
-		const newPaths = parsePropertyLinks(newRelationships[config.type]);
-		const oldSet = new Set(oldPaths);
-		const newSet = new Set(newPaths);
-
-		return {
-			...this.getRelationshipContext(config, newRelationships),
-			oldPaths,
-			newPaths,
-			oldSet,
-			newSet,
-			addedLinks: [...newSet].filter((link) => !oldSet.has(link)),
-			removedLinks: [...oldSet].filter((link) => !newSet.has(link)),
-		};
-	}
 
 	start(events$: Observable<IndexerEvent>): void {
 		this.subscription = events$.subscribe((event) => {
@@ -147,7 +56,7 @@ export class PropertiesManager {
 		const propsToDelete = new Set<string>();
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const ctx = this.getRelationshipContext(config, relationships);
+			const ctx = getRelationshipContext(config, relationships, this.settings);
 			const isPropertyDefined = ctx.propName in frontmatter;
 
 			if (isPropertyDefined) {
@@ -158,10 +67,10 @@ export class PropertiesManager {
 			}
 		}
 
-		await this.withFileContext(currentFilePath, async (context) => {
+		await withFileContext(this.app, currentFilePath, async (context) => {
 			await this.app.fileManager.processFrontMatter(context.file!, (fm) => {
 				for (const [allPropName, paths] of computedRelationships) {
-					fm[allPropName] = paths.map((path) => formatWikiLink(this.getFileContext(path).baseName));
+					fm[allPropName] = paths.map((path) => formatWikiLink(getFileContext(this.app, path).baseName));
 				}
 
 				for (const propName of propsToDelete) {
@@ -171,7 +80,7 @@ export class PropertiesManager {
 		});
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const ctx = this.getRelationshipContext(config, relationships);
+			const ctx = getRelationshipContext(config, relationships, this.settings);
 			for (const path of ctx.paths) {
 				await this.addToProperty(path, ctx.reversePropName, currentFilePath);
 			}
@@ -184,7 +93,7 @@ export class PropertiesManager {
 
 		const collectItems = async (itemsToProcess: string[]) => {
 			for (const itemPath of itemsToProcess) {
-				const context = this.getFileContext(itemPath);
+				const context = getFileContext(this.app, itemPath);
 
 				if (visited.has(context.pathWithExt)) {
 					continue;
@@ -194,13 +103,13 @@ export class PropertiesManager {
 				allItems.push(context.pathWithExt);
 
 				if (!context.file) {
-					console.warn(`PropertiesManager: File not found: ${context.pathWithExt}`);
+					console.warn(`File not found: ${context.pathWithExt}`);
 					continue;
 				}
 
 				if (context.frontmatter?.[propertyName]) {
 					const propertyValue = context.frontmatter[propertyName];
-					const nestedItems = normalizeProperty(propertyValue, propertyName);
+					const nestedItems = parsePropertyLinks(propertyValue);
 					await collectItems(nestedItems);
 				}
 			}
@@ -210,9 +119,9 @@ export class PropertiesManager {
 	}
 
 	private async addToProperty(targetFilePath: string, propertyName: string, fileToAdd: string): Promise<void> {
-		const fileToAddContext = this.getFileContext(fileToAdd);
+		const fileToAddContext = getFileContext(this.app, fileToAdd);
 
-		await this.withFileContext(targetFilePath, async (target) => {
+		await withFileContext(this.app, targetFilePath, async (target) => {
 			await this.app.fileManager.processFrontMatter(target.file!, (fm) => {
 				const currentValue = fm[propertyName];
 				fm[propertyName] = addLinkToProperty(currentValue, fileToAddContext.baseName);
@@ -221,10 +130,10 @@ export class PropertiesManager {
 	}
 
 	private async handleFileDeletion(deletedFilePath: string, oldRelationships: FileRelationships): Promise<void> {
-		const deletedContext = this.getFileContext(deletedFilePath);
+		const deletedContext = getFileContext(this.app, deletedFilePath);
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const ctx = this.getRelationshipContext(config, oldRelationships);
+			const ctx = getRelationshipContext(config, oldRelationships, this.settings);
 
 			for (const referencedFilePath of ctx.paths) {
 				await this.removeFromProperty(referencedFilePath, ctx.reversePropName, deletedContext.baseName);
@@ -245,10 +154,10 @@ export class PropertiesManager {
 			`📝 Handling modification: ${filePath} with old relationships: ${oldRelationships} and new relationships: ${newRelationships}`
 		);
 
-		const currentContext = this.getFileContext(filePath);
+		const currentContext = getFileContext(this.app, filePath);
 
 		for (const config of RELATIONSHIP_CONFIGS) {
-			const diff = this.getRelationshipDiff(config, oldRelationships, newRelationships);
+			const diff = getRelationshipDiff(config, oldRelationships, newRelationships, this.settings);
 
 			for (const addedLink of diff.addedLinks) {
 				await this.addToProperty(addedLink, diff.reversePropName, currentContext.baseName);
@@ -273,11 +182,11 @@ export class PropertiesManager {
 		oldRelationships: FileRelationships,
 		newRelationships: FileRelationships
 	): Promise<void> {
-		await this.withFileContext(filePath, async (context) => {
+		await withFileContext(this.app, filePath, async (context) => {
 			const computedAllProperties = new Map<string, string[]>();
 
 			for (const config of RELATIONSHIP_CONFIGS) {
-				const diff = this.getRelationshipDiff(config, oldRelationships, newRelationships);
+				const diff = getRelationshipDiff(config, oldRelationships, newRelationships, this.settings);
 
 				const isPropertyDefined = diff.propName in newRelationships.frontmatter;
 
@@ -291,7 +200,7 @@ export class PropertiesManager {
 					computedAllProperties.set(diff.allPropName, allItems);
 				} else if (diff.addedLinks.length > 0) {
 					// If only additions, compute transitively for new links and merge with existing
-					const oldCtx = this.getRelationshipContext(config, oldRelationships);
+					const oldCtx = getRelationshipContext(config, oldRelationships, this.settings);
 					const allItemsSet = new Set(oldCtx.allPaths);
 
 					for (const addedLink of diff.addedLinks) {
@@ -308,7 +217,7 @@ export class PropertiesManager {
 			if (computedAllProperties.size > 0) {
 				await this.app.fileManager.processFrontMatter(context.file!, (fm) => {
 					for (const [allPropName, paths] of computedAllProperties) {
-						fm[allPropName] = paths.map((path) => formatWikiLink(this.getFileContext(path).baseName));
+						fm[allPropName] = paths.map((path) => formatWikiLink(getFileContext(this.app, path).baseName));
 					}
 				});
 			}
@@ -316,9 +225,9 @@ export class PropertiesManager {
 	}
 
 	private async removeFromProperty(targetFilePath: string, propertyName: string, fileToRemove: string): Promise<void> {
-		const fileToRemoveContext = this.getFileContext(fileToRemove);
+		const fileToRemoveContext = getFileContext(this.app, fileToRemove);
 
-		await this.withFileContext(targetFilePath, async (target) => {
+		await withFileContext(this.app, targetFilePath, async (target) => {
 			await this.app.fileManager.processFrontMatter(target.file!, (fm) => {
 				const currentValue = fm[propertyName];
 
@@ -328,11 +237,11 @@ export class PropertiesManager {
 
 				const links = parsePropertyLinks(currentValue);
 				const filteredLinks = links.filter((link) => {
-					const linkContext = this.getFileContext(link);
+					const linkContext = getFileContext(this.app, link);
 					return linkContext.baseName !== fileToRemoveContext.baseName;
 				});
 
-				fm[propertyName] = filteredLinks.map((link) => formatWikiLink(this.getFileContext(link).baseName));
+				fm[propertyName] = filteredLinks.map((link) => formatWikiLink(getFileContext(this.app, link).baseName));
 			});
 		});
 	}
@@ -344,7 +253,7 @@ export class PropertiesManager {
 		config: (typeof RELATIONSHIP_CONFIGS)[number],
 		reverseAllPropName: string
 	): Promise<void> {
-		const removedContext = this.getFileContext(removedLink);
+		const removedContext = getFileContext(this.app, removedLink);
 		if (!removedContext.file || !removedContext.frontmatter) {
 			return;
 		}
@@ -354,60 +263,60 @@ export class PropertiesManager {
 
 		const stillReachable = new Set<string>();
 		for (const remainingLink of remainingLinks) {
-			const remainingContext = this.getFileContext(remainingLink);
+			const remainingContext = getFileContext(this.app, remainingLink);
 			if (!remainingContext.file || !remainingContext.frontmatter) {
 				continue;
 			}
 
 			const reachableChildren = parsePropertyLinks(remainingContext.frontmatter[allPropName]);
 			for (const child of reachableChildren) {
-				stillReachable.add(this.getFileContext(child).pathWithExt);
+				stillReachable.add(getFileContext(this.app, child).pathWithExt);
 			}
 		}
 
 		const orphanedChildren = severedChildren
-			.map((child) => this.getFileContext(child).pathWithExt)
+			.map((child) => getFileContext(this.app, child).pathWithExt)
 			.filter((child) => !stillReachable.has(child));
 
-		const currentContext = this.getFileContext(currentFilePath);
+		const currentContext = getFileContext(this.app, currentFilePath);
 		const affectedNodes: string[] = [currentFilePath];
 
 		if (currentContext.file && currentContext.frontmatter) {
 			const allParentPaths = parsePropertyLinks(currentContext.frontmatter[reverseAllPropName]);
-			affectedNodes.push(...allParentPaths.map((p) => this.getFileContext(p).pathWithExt));
+			affectedNodes.push(...allParentPaths.map((p) => getFileContext(this.app, p).pathWithExt));
 		}
 
 		// Batch update: remove orphaned children from all affected nodes' all_children
 		for (const nodePath of affectedNodes) {
-			await this.withFileContext(nodePath, async (node) => {
+			await withFileContext(this.app, nodePath, async (node) => {
 				await this.app.fileManager.processFrontMatter(node.file!, (fm) => {
 					const currentAllChildren = parsePropertyLinks(fm[allPropName]);
 					const filteredChildren = currentAllChildren.filter((child) => {
-						const childContext = this.getFileContext(child);
+						const childContext = getFileContext(this.app, child);
 						return !orphanedChildren.includes(childContext.pathWithExt);
 					});
 
 					if (filteredChildren.length !== currentAllChildren.length) {
-						fm[allPropName] = filteredChildren.map((child) => formatWikiLink(this.getFileContext(child).baseName));
+						fm[allPropName] = filteredChildren.map((child) => formatWikiLink(getFileContext(this.app, child).baseName));
 					}
 				});
 			});
 		}
 
 		// Batch update: remove all affected nodes from orphaned children's all_parents
-		const affectedNodeBaseNames = affectedNodes.map((path) => this.getFileContext(path).baseName);
+		const affectedNodeBaseNames = affectedNodes.map((path) => getFileContext(this.app, path).baseName);
 		for (const orphanedChild of orphanedChildren) {
-			await this.withFileContext(orphanedChild, async (child) => {
+			await withFileContext(this.app, orphanedChild, async (child) => {
 				await this.app.fileManager.processFrontMatter(child.file!, (fm) => {
 					const currentAllParents = parsePropertyLinks(fm[reverseAllPropName]);
 					const filteredParents = currentAllParents.filter((parent) => {
-						const parentContext = this.getFileContext(parent);
+						const parentContext = getFileContext(this.app, parent);
 						return !affectedNodeBaseNames.includes(parentContext.baseName);
 					});
 
 					if (filteredParents.length !== currentAllParents.length) {
 						fm[reverseAllPropName] = filteredParents.map((parent) =>
-							formatWikiLink(this.getFileContext(parent).baseName)
+							formatWikiLink(getFileContext(this.app, parent).baseName)
 						);
 					}
 				});

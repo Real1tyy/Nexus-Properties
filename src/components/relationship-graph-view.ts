@@ -1,6 +1,7 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import { type App, Modal, Notice, TFile } from "obsidian";
-import type { FileRelationships, Indexer } from "../core/indexer";
+import type { Indexer } from "../core/indexer";
+import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
 
 export class RelationshipGraphModal extends Modal {
@@ -17,8 +18,6 @@ export class RelationshipGraphModal extends Modal {
 
 	onOpen(): void {
 		const { contentEl } = this;
-
-		// Check if file should be indexed based on directory settings
 		if (!this.indexer.shouldIndexFile(this.file.path)) {
 			new Notice("This file is not in a configured directory for relationship tracking.");
 			this.close();
@@ -33,8 +32,7 @@ export class RelationshipGraphModal extends Modal {
 			return;
 		}
 
-		const relationships = this.indexer.extractRelationships(this.file, frontmatter);
-		const { nodes, edges } = this.buildGraphData(this.file.path, relationships);
+		const { nodes, edges } = this.buildGraphData(this.file.path);
 
 		this.modalEl.addClass("nexus-graph-modal");
 		contentEl.addClass("nexus-graph-modal-content");
@@ -175,23 +173,15 @@ export class RelationshipGraphModal extends Modal {
 			.run();
 	}
 
-	private buildGraphData(
-		rootPath: string,
-		relationships: FileRelationships
-	): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
+	private buildGraphData(rootPath: string): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
 		const addedNodes = new Set<string>();
 		const processedNodes = new Set<string>();
 
 		const addNode = (pathOrWikiLink: string, level: number): void => {
-			// Extract the actual file path (handles wiki links with aliases)
 			const filePath = extractFilePath(pathOrWikiLink);
-
-			if (addedNodes.has(filePath)) return;
 			addedNodes.add(filePath);
-
-			// Extract the display name (alias if present, otherwise filename)
 			const displayName = extractDisplayName(pathOrWikiLink);
 
 			nodes.push({
@@ -203,28 +193,19 @@ export class RelationshipGraphModal extends Modal {
 			});
 		};
 
-		// Helper function to recursively add relationships
-		const addRelationships = (filePath: string, currentLevel: number, maxDepth = 3): void => {
+		const addRelationships = (filePath: string, currentLevel: number, maxDepth = 10): void => {
 			// Prevent infinite recursion on circular relationships
 			if (Math.abs(currentLevel) > maxDepth) return;
 			if (processedNodes.has(filePath)) return;
 
 			processedNodes.add(filePath);
 
-			const file = this.app.vault.getAbstractFileByPath(filePath);
-			if (!(file instanceof TFile)) return;
+			const context = getFileContext(this.app, filePath);
+			if (!context.file || !context.frontmatter) return;
 
-			const cache = this.app.metadataCache.getFileCache(file);
-			const frontmatter = cache?.frontmatter;
-			if (!frontmatter) return;
+			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
 
-			const rels = this.indexer.extractRelationships(file, frontmatter);
-
-			// Add parents (going up in hierarchy)
 			for (const parentWikiLink of rels.allParents) {
-				if (!parentWikiLink) continue;
-
-				// Extract the actual file path from the wiki link
 				const parentPath = extractFilePath(parentWikiLink);
 
 				addNode(parentWikiLink, currentLevel - 1);
@@ -242,9 +223,6 @@ export class RelationshipGraphModal extends Modal {
 
 			// Add children (going down in hierarchy)
 			for (const childWikiLink of rels.allChildren) {
-				if (!childWikiLink) continue;
-
-				// Extract the actual file path from the wiki link
 				const childPath = extractFilePath(childWikiLink);
 
 				addNode(childWikiLink, currentLevel + 1);
@@ -280,10 +258,7 @@ export class RelationshipGraphModal extends Modal {
 			}
 		};
 
-		// Start with root node
 		addNode(rootPath, 0);
-
-		// Build the graph recursively
 		addRelationships(rootPath, 0);
 
 		return { nodes, edges };
