@@ -59,32 +59,23 @@ export class RelationshipGraphModal extends Modal {
 	}
 
 	private initializeCytoscape(): void {
-		if (!this.graphContainerEl) return;
-
-		// Resolve CSS variables to actual colors for Cytoscape
-		const styles = getComputedStyle(document.body);
-		const accentColor = styles.getPropertyValue("--interactive-accent").trim() || "#7c3aed";
-		const accentHover = styles.getPropertyValue("--interactive-accent-hover").trim() || "#8b5cf6";
-		const textColor = styles.getPropertyValue("--text-normal").trim() || "#dcddde";
-		const borderColor = styles.getPropertyValue("--background-modifier-border").trim() || "#424242";
-
 		this.cy = cytoscape({
 			container: this.graphContainerEl,
 			style: [
 				{
 					selector: "node",
 					style: {
-						"background-color": accentColor,
+						"background-color": "#ffffff",
 						label: "data(label)",
 						"text-valign": "center",
 						"text-halign": "center",
-						color: textColor,
+						color: "#000000",
 						"font-size": "14px",
 						width: "100px",
 						height: "50px",
 						shape: "roundrectangle",
-						"border-width": "2px",
-						"border-color": borderColor,
+						"border-width": "1px",
+						"border-color": "#cccccc",
 						"text-wrap": "wrap",
 						"text-max-width": "90px",
 					},
@@ -92,9 +83,9 @@ export class RelationshipGraphModal extends Modal {
 				{
 					selector: "node[level = 0]",
 					style: {
-						"background-color": accentHover,
-						"border-color": accentColor,
-						"border-width": "4px",
+						"background-color": "#f0f0f0",
+						"border-color": "#999999",
+						"border-width": "2px",
 						width: "130px",
 						height: "60px",
 						"font-weight": "bold",
@@ -104,9 +95,9 @@ export class RelationshipGraphModal extends Modal {
 				{
 					selector: "edge",
 					style: {
-						width: 3,
-						"line-color": borderColor,
-						"target-arrow-color": borderColor,
+						width: 1.5,
+						"line-color": "#e0e0e0",
+						"target-arrow-color": "#e0e0e0",
 						"target-arrow-shape": "triangle",
 						"curve-style": "bezier",
 					},
@@ -114,23 +105,15 @@ export class RelationshipGraphModal extends Modal {
 				{
 					selector: "edge[type = 'parent']",
 					style: {
-						"line-color": "#e74c3c",
-						"target-arrow-color": "#e74c3c",
+						"line-color": "#d0d0d0",
+						"target-arrow-color": "#d0d0d0",
 					},
 				},
 				{
 					selector: "edge[type = 'child']",
 					style: {
-						"line-color": "#2ecc71",
-						"target-arrow-color": "#2ecc71",
-					},
-				},
-				{
-					selector: "edge[type = 'related']",
-					style: {
-						"line-color": "#3498db",
-						"target-arrow-color": "#3498db",
-						"line-style": "dashed",
+						"line-color": "#d0d0d0",
+						"target-arrow-color": "#d0d0d0",
 					},
 				},
 			],
@@ -146,7 +129,6 @@ export class RelationshipGraphModal extends Modal {
 			const file = this.app.vault.getAbstractFileByPath(filePath);
 
 			if (file instanceof TFile) {
-				this.close();
 				this.app.workspace.getLeaf(false).openFile(file);
 			}
 		});
@@ -155,10 +137,8 @@ export class RelationshipGraphModal extends Modal {
 	private renderGraph(nodes: ElementDefinition[], edges: ElementDefinition[]): void {
 		if (!this.cy) return;
 
-		// Add elements to graph
 		this.cy.add([...nodes, ...edges]);
 
-		// Apply hierarchical layout
 		this.cy
 			.layout({
 				name: "breadthfirst",
@@ -236,25 +216,6 @@ export class RelationshipGraphModal extends Modal {
 
 				// Recursively add child's relationships
 				addRelationships(childPath, currentLevel + 1, maxDepth);
-			}
-
-			// Add related (same level)
-			for (const relatedWikiLink of rels.allRelated) {
-				if (!relatedWikiLink) continue;
-
-				// Extract the actual file path from the wiki link
-				const relatedPath = extractFilePath(relatedWikiLink);
-
-				addNode(relatedWikiLink, currentLevel);
-				edges.push({
-					data: {
-						source: filePath,
-						target: relatedPath,
-						type: "related",
-					},
-				});
-
-				// Don't recursively add related relationships to avoid cluttering
 			}
 		};
 
