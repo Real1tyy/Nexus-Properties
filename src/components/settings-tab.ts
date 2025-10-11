@@ -19,7 +19,6 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		this.addRescanSection(containerEl);
 		this.addDirectorySettings(containerEl);
 		this.addDirectRelationshipSettings(containerEl);
-		this.addComputedRelationshipSettings(containerEl);
 		this.addExampleSection(containerEl);
 	}
 
@@ -257,63 +256,6 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			);
 	}
 
-	private addComputedRelationshipSettings(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
-
-		new Setting(containerEl).setName("Computed recursive properties").setHeading();
-
-		containerEl
-			.createDiv("setting-item-description")
-			.setText(
-				"Configure property names for automatically computed recursive relationships. These properties are read-only and automatically maintained by the plugin."
-			);
-
-		new Setting(containerEl)
-			.setName("All parents property")
-			.setDesc("Property name for all recursive parents (automatically computed)")
-			.addText((text) =>
-				text
-					.setPlaceholder("allParents")
-					.setValue(settings.allParentsProp)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							allParentsProp: value || "allParents",
-						}));
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("All children property")
-			.setDesc("Property name for all recursive children (automatically computed)")
-			.addText((text) =>
-				text
-					.setPlaceholder("allChildren")
-					.setValue(settings.allChildrenProp)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							allChildrenProp: value || "allChildren",
-						}));
-					})
-			);
-
-		new Setting(containerEl)
-			.setName("All related property")
-			.setDesc("Property name for all related files including transitive relationships (automatically computed)")
-			.addText((text) =>
-				text
-					.setPlaceholder("allRelated")
-					.setValue(settings.allRelatedProp)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							allRelatedProp: value || "allRelated",
-						}));
-					})
-			);
-	}
-
 	private addExampleSection(containerEl: HTMLElement): void {
 		const settings = this.plugin.settingsStore.currentSettings;
 
@@ -372,21 +314,18 @@ child.md
 		treeExample.createEl("pre", {
 			text: `---
 ${settings.parentProp}: "[[parent.md]]"
-${settings.allParentsProp}:
-  - "[[parent.md]]"
-  - "[[grandparent.md]]"
 ---`,
 			cls: "settings-info-box-example",
 		});
 
-		const warningBox = exampleContainer.createDiv("setting-item-description");
-		warningBox.style.marginTop = "1em";
-		warningBox.style.padding = "1em";
-		warningBox.style.backgroundColor = "var(--background-secondary)";
-		warningBox.style.borderRadius = "4px";
-		warningBox.createEl("strong", { text: "⚠️ Important: " });
-		warningBox.appendText(
-			"The computed properties (allParents, allChildren, allRelated) are automatically managed by the plugin. Any manual edits to these properties will be overwritten."
+		const infoBox = exampleContainer.createDiv("setting-item-description");
+		infoBox.style.marginTop = "1em";
+		infoBox.style.padding = "1em";
+		infoBox.style.backgroundColor = "var(--background-secondary)";
+		infoBox.style.borderRadius = "4px";
+		infoBox.createEl("strong", { text: "ℹ️ Note: " });
+		infoBox.appendText(
+			"All recursive relationships (like all parents, all children, all related) are computed dynamically in the graph view and are not stored in frontmatter."
 		);
 	}
 }

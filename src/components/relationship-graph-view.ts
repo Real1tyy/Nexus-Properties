@@ -497,7 +497,9 @@ export class RelationshipGraphView extends ItemView {
 		if (context.file && context.frontmatter) {
 			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
 
-			const allRelated = this.includeAllRelated ? [...rels.allRelated] : [...rels.related];
+			const allRelated = this.includeAllRelated
+				? this.computeAllRelatedRecursively(sourcePath, rels.related)
+				: [...rels.related];
 
 			for (const relatedWikiLink of allRelated) {
 				const relatedPath = extractFilePath(relatedWikiLink);
@@ -516,6 +518,35 @@ export class RelationshipGraphView extends ItemView {
 		}
 
 		return { nodes, edges };
+	}
+
+	private computeAllRelatedRecursively(sourceFilePath: string, directRelated: string[]): string[] {
+		const visited = new Set<string>([sourceFilePath]);
+		const allRelated: string[] = [];
+
+		const collectRelated = (relatedItems: string[]): void => {
+			for (const relatedWikiLink of relatedItems) {
+				const relatedPath = extractFilePath(relatedWikiLink);
+				const relatedContext = getFileContext(this.app, relatedPath);
+
+				if (visited.has(relatedContext.pathWithExt)) {
+					continue;
+				}
+
+				visited.add(relatedContext.pathWithExt);
+				allRelated.push(relatedWikiLink);
+
+				if (!relatedContext.file || !relatedContext.frontmatter) {
+					continue;
+				}
+
+				const nestedRels = this.indexer.extractRelationships(relatedContext.file, relatedContext.frontmatter);
+				collectRelated(nestedRels.related);
+			}
+		};
+
+		collectRelated(directRelated);
+		return allRelated;
 	}
 
 	private findTopmostParent(startPath: string, maxDepth = 50): string {

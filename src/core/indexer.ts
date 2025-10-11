@@ -21,9 +21,6 @@ export interface FileRelationships {
 	parent: string[];
 	children: string[];
 	related: string[];
-	allParents: string[];
-	allChildren: string[];
-	allRelated: string[];
 	frontmatter: Frontmatter;
 }
 
@@ -235,31 +232,22 @@ export class Indexer {
 			parent: [],
 			children: [],
 			related: [],
-			allParents: [],
-			allChildren: [],
-			allRelated: [],
 			frontmatter,
 		};
 
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const propName = config.getProp(this.settings);
-			const allPropName = config.getAllProp(this.settings);
-
 			const normalizedValue = normalizeProperty(frontmatter[propName], propName);
-			const normalizedAllValue = normalizeProperty(frontmatter[allPropName], allPropName);
 
 			switch (config.type) {
 				case "parent":
 					relationships.parent = normalizedValue;
-					relationships.allParents = normalizedAllValue;
 					break;
 				case "children":
 					relationships.children = normalizedValue;
-					relationships.allChildren = normalizedAllValue;
 					break;
 				case "related":
 					relationships.related = normalizedValue;
-					relationships.allRelated = normalizedAllValue;
 					break;
 			}
 		}

@@ -5,11 +5,8 @@ import { parsePropertyLinks } from "./link-parser";
 
 export interface RelationshipContext {
 	propName: string;
-	allPropName: string;
 	reversePropName: string;
-	reverseAllPropName: string;
 	paths: string[];
-	allPaths: string[];
 }
 
 export interface RelationshipDiff {
@@ -23,7 +20,6 @@ export interface RelationshipDiff {
 
 /**
  * Creates a relationship context containing property names and paths for a given relationship configuration.
- * This includes both direct and transitive (all_*) relationship properties.
  */
 export function getRelationshipContext(
 	config: (typeof RELATIONSHIP_CONFIGS)[number],
@@ -32,11 +28,8 @@ export function getRelationshipContext(
 ): RelationshipContext {
 	return {
 		propName: config.getProp(settings),
-		allPropName: config.getAllProp(settings),
 		reversePropName: config.getReverseProp(settings),
-		reverseAllPropName: config.getReverseAllProp(settings),
 		paths: parsePropertyLinks(relationships[config.type]),
-		allPaths: parsePropertyLinks(relationships[config.allKey]),
 	};
 }
 
