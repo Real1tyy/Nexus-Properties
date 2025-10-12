@@ -29,6 +29,12 @@ export class RelationshipGraphView extends ItemView {
 	private resizeDebounceTimer: number | null = null;
 	private isEnlarged = false;
 	private originalWidth: number | null = null;
+	private isZoomMode = false;
+	// Track the currently focused node in zoom mode (used for state tracking)
+	private focusedNodeId: string | null = null;
+	private exitZoomCheckbox: HTMLInputElement | null = null;
+	private exitZoomContainer: HTMLElement | null = null;
+	private previewOverlay: HTMLElement | null = null;
 
 	constructor(
 		leaf: any,
@@ -62,8 +68,11 @@ export class RelationshipGraphView extends ItemView {
 		const titleEl = this.headerEl.createEl("h4", { text: "No file selected" });
 		titleEl.addClass("nexus-graph-view-title");
 
+		// Create controls container for all checkboxes
+		const controlsContainer = this.headerEl.createEl("div", { cls: "nexus-graph-controls-container" });
+
 		// Create "Render Related" toggle container
-		const relatedToggleContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
+		const relatedToggleContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
 
 		this.relatedCheckbox = relatedToggleContainer.createEl("input", { type: "checkbox" });
 		this.relatedCheckbox.addClass("nexus-graph-toggle-checkbox");
@@ -81,7 +90,7 @@ export class RelationshipGraphView extends ItemView {
 		});
 
 		// Create "Include all related" toggle container (only visible in related mode)
-		this.includeAllContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
+		this.includeAllContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
 
 		this.includeAllCheckbox = this.includeAllContainer.createEl("input", { type: "checkbox" });
 		this.includeAllCheckbox.addClass("nexus-graph-toggle-checkbox");
@@ -98,7 +107,7 @@ export class RelationshipGraphView extends ItemView {
 		});
 
 		// Create "Start from current file" toggle container
-		this.startFromCurrentContainer = this.headerEl.createEl("div", { cls: "nexus-graph-toggle-container" });
+		this.startFromCurrentContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
 
 		this.toggleCheckbox = this.startFromCurrentContainer.createEl("input", { type: "checkbox" });
 		this.toggleCheckbox.addClass("nexus-graph-toggle-checkbox");
@@ -148,6 +157,14 @@ export class RelationshipGraphView extends ItemView {
 
 		// Set up resize observer with debouncing
 		this.setupResizeObserver();
+
+		// Register ESC key to exit zoom mode
+		this.registerDomEvent(document, "keydown", (evt: KeyboardEvent) => {
+			if (evt.key === "Escape" && this.isZoomMode) {
+				evt.preventDefault();
+				this.exitZoomMode();
+			}
+		});
 	}
 
 	private setupResizeObserver(): void {
@@ -198,6 +215,9 @@ export class RelationshipGraphView extends ItemView {
 		this.includeAllCheckbox = null;
 		this.startFromCurrentContainer = null;
 		this.includeAllContainer = null;
+		this.exitZoomCheckbox = null;
+		this.exitZoomContainer = null;
+		this.previewOverlay = null;
 	}
 
 	toggleEnlargement(): void {
@@ -302,10 +322,15 @@ export class RelationshipGraphView extends ItemView {
 			}
 		}
 
-		// Rebuild graph based on mode
-		const { nodes, edges } = this.renderRelated
-			? this.buildRelatedGraphData(this.currentFile.path)
-			: this.buildGraphData(this.currentFile.path);
+		// Rebuild graph based on mode (but not for zoom mode - zoom mode just focuses on existing graph)
+		let nodes: ElementDefinition[];
+		let edges: ElementDefinition[];
+
+		if (this.renderRelated) {
+			({ nodes, edges } = this.buildRelatedGraphData(this.currentFile.path));
+		} else {
+			({ nodes, edges } = this.buildGraphData(this.currentFile.path));
+		}
 
 		this.destroyGraph();
 
@@ -485,15 +510,41 @@ export class RelationshipGraphView extends ItemView {
 			}
 		});
 
-		// Click handler to open files
+		// Click handler to enter zoom mode and focus on node
 		this.cy.on("tap", "node", (evt) => {
 			const node = evt.target;
 			const filePath = node.id();
 			const file = this.app.vault.getAbstractFileByPath(filePath);
+			const originalEvent = evt.originalEvent as MouseEvent;
 
 			if (file instanceof TFile) {
-				this.app.workspace.getLeaf(false).openFile(file);
+				// Ctrl+click (or Cmd+click on Mac) opens file in new tab
+				if (originalEvent && (originalEvent.ctrlKey || originalEvent.metaKey)) {
+					this.app.workspace.getLeaf("tab").openFile(file);
+					return;
+				}
+
+				if (this.isZoomMode) {
+					// In zoom mode, focus on the clicked node
+					this.focusOnNode(filePath);
+				} else {
+					// Enter zoom mode by clicking on node
+					this.enterZoomMode(filePath);
+				}
 			}
+		});
+
+		// Edge click handler for zoom mode navigation
+		this.cy.on("tap", "edge", (evt) => {
+			if (!this.isZoomMode) return;
+
+			const edge = evt.target;
+			const targetId = edge.data("target");
+			const sourceId = edge.data("source");
+
+			// If target is already focused, navigate to source instead (bidirectional navigation)
+			const nodeToFocus = targetId === this.focusedNodeId ? sourceId : targetId;
+			this.focusOnNode(nodeToFocus);
 		});
 
 		// Right-click handler for context menu
@@ -767,5 +818,162 @@ export class RelationshipGraphView extends ItemView {
 		buildDownwardsBFS();
 
 		return { nodes, edges };
+	}
+
+	private enterZoomMode(filePath: string): void {
+		this.isZoomMode = true;
+		this.focusOnNode(filePath);
+	}
+
+	private exitZoomMode(): void {
+		this.isZoomMode = false;
+		this.focusedNodeId = null;
+		this.hidePreviewOverlay();
+		if (this.exitZoomCheckbox) {
+			this.exitZoomCheckbox.checked = false;
+		}
+		// Reset zoom to show full graph
+		if (this.cy) {
+			this.cy.fit();
+			this.cy.center();
+		}
+	}
+
+	private focusOnNode(filePath: string): void {
+		this.focusedNodeId = filePath;
+		const file = this.app.vault.getAbstractFileByPath(filePath);
+
+		if (!(file instanceof TFile)) return;
+
+		// Zoom to the focused node on the existing graph with stronger zoom
+		if (this.cy) {
+			// Use filter instead of selector to avoid escaping issues with complex file paths
+			const node = this.cy.nodes().filter((n) => n.id() === filePath);
+			if (node.length > 0) {
+				this.cy.animate(
+					{
+						zoom: 2.5,
+						center: {
+							eles: node,
+						},
+					},
+					{
+						duration: 500,
+						easing: "ease-out-cubic",
+					}
+				);
+			}
+		}
+
+		// Show the preview overlay at the top
+		this.showPreviewOverlay(file);
+	}
+
+	private async showPreviewOverlay(file: TFile): Promise<void> {
+		if (!this.graphContainerEl) return;
+
+		// Remove existing overlay if any
+		this.hidePreviewOverlay();
+
+		// Create preview overlay
+		this.previewOverlay = this.graphContainerEl.createEl("div", {
+			cls: "nexus-graph-zoom-preview",
+		});
+
+		// Exit zoom mode checkbox (top right)
+		this.exitZoomContainer = this.previewOverlay.createEl("div", {
+			cls: "nexus-graph-exit-zoom-container",
+		});
+
+		this.exitZoomCheckbox = this.exitZoomContainer.createEl("input", { type: "checkbox" });
+		this.exitZoomCheckbox.addClass("nexus-graph-toggle-checkbox");
+		this.exitZoomCheckbox.checked = false;
+
+		this.exitZoomContainer.createEl("label", {
+			text: "Exit Zoom Mode",
+			cls: "nexus-graph-toggle-label",
+		});
+
+		this.exitZoomCheckbox.addEventListener("change", () => {
+			if (this.exitZoomCheckbox?.checked) {
+				this.exitZoomMode();
+			}
+		});
+
+		// Header section
+		const headerSection = this.previewOverlay.createEl("div", {
+			cls: "nexus-graph-zoom-preview-header",
+		});
+
+		// File name
+		headerSection.createEl("h2", {
+			text: file.basename,
+			cls: "nexus-graph-zoom-preview-title",
+		});
+
+		// Frontmatter section
+		const cache = this.app.metadataCache.getFileCache(file);
+		const frontmatter = cache?.frontmatter;
+
+		if (frontmatter) {
+			const fmSection = this.previewOverlay.createEl("div", {
+				cls: "nexus-graph-zoom-preview-frontmatter",
+			});
+
+			for (const [key, value] of Object.entries(frontmatter)) {
+				// Skip internal Obsidian properties
+				if (key === "position") continue;
+
+				const propEl = fmSection.createEl("div", {
+					cls: "nexus-graph-zoom-preview-property",
+				});
+
+				propEl.createEl("span", {
+					text: key,
+					cls: "nexus-graph-zoom-preview-property-key",
+				});
+
+				propEl.createEl("span", {
+					text: this.formatPropertyValue(value),
+					cls: "nexus-graph-zoom-preview-property-value",
+				});
+			}
+		}
+
+		// Content section (scrollable)
+		const contentSection = this.previewOverlay.createEl("div", {
+			cls: "nexus-graph-zoom-preview-content",
+		});
+
+		const content = await this.app.vault.read(file);
+		// Remove frontmatter from content display
+		const contentWithoutFrontmatter = content.replace(/^---\n[\s\S]*?\n---\n/, "");
+
+		contentSection.createEl("div", {
+			text: contentWithoutFrontmatter || "(No content)",
+			cls: "nexus-graph-zoom-preview-content-text",
+		});
+	}
+
+	private hidePreviewOverlay(): void {
+		if (this.previewOverlay) {
+			this.previewOverlay.remove();
+			this.previewOverlay = null;
+		}
+		this.exitZoomCheckbox = null;
+		this.exitZoomContainer = null;
+	}
+
+	private formatPropertyValue(value: unknown): string {
+		if (value === null || value === undefined) {
+			return "";
+		}
+		if (Array.isArray(value)) {
+			return value.join(", ");
+		}
+		if (typeof value === "object") {
+			return JSON.stringify(value);
+		}
+		return String(value);
 	}
 }
