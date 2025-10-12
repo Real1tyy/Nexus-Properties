@@ -1,4 +1,4 @@
-import { type App, Menu, Modal, Notice, TFile } from "obsidian";
+import { type App, confirm, Menu, Notice, TFile } from "obsidian";
 import { NodeEditModal } from "./node-edit-modal";
 import { NodePreviewModal } from "./node-preview-modal";
 
@@ -101,18 +101,8 @@ export class NodeContextMenu {
 		}
 	}
 
-	private confirmDeletion(fileName: string): Promise<boolean> {
-		return new Promise((resolve) => {
-			const modal = new ConfirmationModal(
-				this.app,
-				`Delete "${fileName}"?`,
-				"This action cannot be undone.",
-				(confirmed) => {
-					resolve(confirmed);
-				}
-			);
-			modal.open();
-		});
+	private async confirmDeletion(fileName: string): Promise<boolean> {
+		return await confirm(`Delete "${fileName}"?`, "This action cannot be undone.");
 	}
 
 	private async updateFileFrontmatter(file: TFile, updatedFrontmatter: Record<string, unknown>): Promise<void> {
@@ -134,50 +124,5 @@ export class NodeContextMenu {
 			console.error("Failed to update frontmatter:", error);
 			new Notice("Failed to update frontmatter");
 		}
-	}
-}
-
-class ConfirmationModal extends Modal {
-	private title: string;
-	private message: string;
-	private onConfirm: (confirmed: boolean) => void;
-
-	constructor(app: App, title: string, message: string, onConfirm: (confirmed: boolean) => void) {
-		super(app);
-		this.title = title;
-		this.message = message;
-		this.onConfirm = onConfirm;
-	}
-
-	onOpen(): void {
-		const { contentEl } = this;
-		contentEl.empty();
-
-		contentEl.createEl("h2", { text: this.title });
-		contentEl.createEl("p", { text: this.message });
-
-		const buttonContainer = contentEl.createDiv("modal-button-container");
-
-		const confirmButton = buttonContainer.createEl("button", {
-			text: "Delete",
-			cls: "mod-warning",
-		});
-		confirmButton.addEventListener("click", () => {
-			this.onConfirm(true);
-			this.close();
-		});
-
-		const cancelButton = buttonContainer.createEl("button", {
-			text: "Cancel",
-		});
-		cancelButton.addEventListener("click", () => {
-			this.onConfirm(false);
-			this.close();
-		});
-	}
-
-	onClose(): void {
-		const { contentEl } = this;
-		contentEl.empty();
 	}
 }

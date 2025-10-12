@@ -16,8 +16,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.addSettingTab(new NexusPropertiesSettingsTab(this.app, this));
 
-		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer));
-
 		this.addCommand({
 			id: "toggle-relationship-graph",
 			name: "Show Relationship Graph",
@@ -43,6 +41,9 @@ export default class NexusPropertiesPlugin extends Plugin {
 		}
 
 		this.indexer = new Indexer(this.app, this.settingsStore.settings$);
+
+		// Register view AFTER indexer is initialized
+		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer));
 
 		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$.value);
 		this.propertiesManager.start(this.indexer.events$);

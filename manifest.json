@@ -2,7 +2,7 @@
 	"id": "nexus-properties",
 	"name": "Nexus Properties",
 	"version": "1.0.0",
-	"minAppVersion": "0.15.0",
+	"minAppVersion": "1.6.0",
 	"description": "Automated property management plugin that syncs parent-child and related relationships bidirectionally with recursive tree properties.",
 	"author": "Real1tyy",
 	"authorUrl": "https://github.com/Real1tyy",
