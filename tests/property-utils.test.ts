@@ -219,6 +219,80 @@ describe("Integration tests", () => {
 	});
 });
 
+describe("Duplicate prevention and cycle detection", () => {
+	it("should prevent duplicate parent-child relationships", () => {
+		// Scenario: Adding the same child multiple times
+		let parentProperty: string[] | undefined;
+		parentProperty = addLinkToProperty(parentProperty, "Child1");
+		expect(parentProperty).toEqual(["[[Child1]]"]);
+
+		// Try to add the same child again
+		parentProperty = addLinkToProperty(parentProperty, "Child1");
+		expect(parentProperty).toEqual(["[[Child1]]"]); // Still just one entry
+
+		// Try with different casing
+		parentProperty = addLinkToProperty(parentProperty, "child1");
+		expect(parentProperty).toEqual(["[[Child1]]"]); // Still just one entry (case-insensitive)
+	});
+
+	it("should prevent duplicate sibling relationships", () => {
+		// Scenario: Related property with duplicate siblings
+		let relatedProperty: string[] | undefined;
+		relatedProperty = addLinkToProperty(relatedProperty, "Sibling1");
+		relatedProperty = addLinkToProperty(relatedProperty, "Sibling2");
+		expect(relatedProperty).toEqual(["[[Sibling1]]", "[[Sibling2]]"]);
+
+		// Try to add duplicate
+		relatedProperty = addLinkToProperty(relatedProperty, "Sibling1");
+		expect(relatedProperty).toEqual(["[[Sibling1]]", "[[Sibling2]]"]); // No duplicate
+	});
+
+	it("should prevent self-referential cycles", () => {
+		// Scenario: A file trying to reference itself
+		let parentProperty: string[] | undefined;
+		parentProperty = addLinkToProperty(parentProperty, "MyFile");
+
+		// Try to add the same file again (cycle)
+		parentProperty = addLinkToProperty(parentProperty, "MyFile");
+		expect(parentProperty).toEqual(["[[MyFile]]"]); // Only one entry, no cycle
+	});
+
+	it("should prevent duplicates with path variations", () => {
+		let property: string[] | undefined;
+		property = addLinkToProperty(property, "folder/subfolder/note");
+
+		// Try with different path separators (handled by normalizePath)
+		property = addLinkToProperty(property, "folder/subfolder/note");
+		expect(property).toEqual(["[[folder/subfolder/note|note]]"]);
+
+		// Try with different casing
+		property = addLinkToProperty(property, "Folder/SubFolder/Note");
+		expect(property).toEqual(["[[folder/subfolder/note|note]]"]); // Still just one
+	});
+
+	it("should prevent duplicates when property contains aliases", () => {
+		const initial = ["[[Projects/2024/MyProject|MyProject]]"];
+		const result = addLinkToProperty(initial, "projects/2024/myproject"); // Different case
+		expect(result).toEqual(["[[Projects/2024/MyProject|MyProject]]"]); // No duplicate added
+	});
+
+	it("should correctly handle removing duplicate entries in batch operations", () => {
+		// Simulate a batch operation where we might add the same link multiple times
+		let property: string[] | undefined;
+		const linksToAdd = ["Note1", "Note2", "Note1", "Note3", "note1"]; // Duplicates present
+
+		for (const link of linksToAdd) {
+			property = addLinkToProperty(property, link);
+		}
+
+		// Should only have 3 unique entries (Note1, Note2, Note3)
+		expect(property?.length).toBe(3);
+		expect(hasLinkInProperty(property, "Note1")).toBe(true);
+		expect(hasLinkInProperty(property, "Note2")).toBe(true);
+		expect(hasLinkInProperty(property, "Note3")).toBe(true);
+	});
+});
+
 describe("Property-based tests", () => {
 	it("should always return an array", () => {
 		fc.assert(

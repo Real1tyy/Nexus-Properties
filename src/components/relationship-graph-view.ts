@@ -1,6 +1,6 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
-import { ItemView, TFile, type WorkspaceLeaf } from "obsidian";
+import { ItemView, TFile } from "obsidian";
 import type { Indexer } from "../core/indexer";
 import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
@@ -22,12 +22,10 @@ export class RelationshipGraphView extends ItemView {
 	private includeAllCheckbox: HTMLInputElement | null = null;
 	private startFromCurrentContainer: HTMLElement | null = null;
 	private includeAllContainer: HTMLElement | null = null;
+	private indexer!: Indexer;
 
-	constructor(
-		leaf: WorkspaceLeaf,
-		private indexer: Indexer
-	) {
-		super(leaf);
+	setIndexer(indexer: Indexer): void {
+		this.indexer = indexer;
 	}
 
 	getViewType(): string {
@@ -162,6 +160,11 @@ export class RelationshipGraphView extends ItemView {
 	private onFileOpen(file: TFile | null): void {
 		if (!file) {
 			this.showEmptyState("No file selected");
+			return;
+		}
+
+		if (!this.indexer) {
+			this.showEmptyState("Plugin is still initializing. Please wait...");
 			return;
 		}
 
