@@ -47,7 +47,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		await this.indexer.start();
 
-		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer));
+		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer, this));
 	}
 
 	async onunload() {

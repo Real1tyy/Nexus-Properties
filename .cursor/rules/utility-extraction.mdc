@@ -1,0 +1,207 @@
+---
+alwaysApply: true
+description: Always extract non-business-logic functions to utils and test them
+---
+
+# Utility Function Extraction Rule
+
+**CRITICAL: ANY function that is NOT directly related to business logic MUST be extracted to `src/utils/` with comprehensive unit tests.**
+
+## Core Principle
+
+**If a function can exist without knowing about your business domain, it MUST be in utils.**
+
+## ✅ Functions That MUST Be Extracted to Utils
+
+### Value Checking & Validation
+```typescript
+// ❌ WRONG: In component class
+private isEmptyValue(value: unknown): boolean { ... }
+private isValidEmail(email: string): boolean { ... }
+private hasValue(val: any): boolean { ... }
+
+// ✅ CORRECT: In src/utils/value-check-utils.ts
+export function isEmptyValue(value: unknown): boolean { ... }
+export function isValidEmail(email: string): boolean { ... }
+export function hasValue(val: any): boolean { ... }
+```
+
+### String Manipulation
+```typescript
+// ❌ WRONG: In business logic
+private sanitizeFileName(name: string): string { ... }
+private truncateText(text: string, maxLength: number): string { ... }
+
+// ✅ CORRECT: In src/utils/string-utils.ts
+export function sanitizeFileName(name: string): string { ... }
+export function truncateText(text: string, maxLength: number): string { ... }
+```
+
+### Date/Time Operations
+```typescript
+// ❌ WRONG: In component
+private formatDate(date: Date): string { ... }
+private parseDateTime(str: string): Date { ... }
+
+// ✅ CORRECT: In src/utils/date-utils.ts
+export function formatDate(date: Date): string { ... }
+export function parseDateTime(str: string): Date { ... }
+```
+
+### Array/Object Manipulation
+```typescript
+// ❌ WRONG: In service class
+private removeDuplicates<T>(arr: T[]): T[] { ... }
+private groupBy<T>(arr: T[], key: keyof T): Record<string, T[]> { ... }
+
+// ✅ CORRECT: In src/utils/array-utils.ts or src/utils/collection-utils.ts
+export function removeDuplicates<T>(arr: T[]): T[] { ... }
+export function groupBy<T>(arr: T[], key: keyof T): Record<string, T[]> { ... }
+```
+
+### File Operations
+```typescript
+// ❌ WRONG: Scattered across components
+private getFileExtension(path: string): string { ... }
+private joinPaths(...parts: string[]): string { ... }
+
+// ✅ CORRECT: In src/utils/file-utils.ts
+export function getFileExtension(path: string): string { ... }
+export function joinPaths(...parts: string[]): string { ... }
+```
+
+### DOM Helpers
+```typescript
+// ❌ WRONG: In view class
+private createButton(text: string, onClick: () => void): HTMLElement { ... }
+
+// ✅ CORRECT: In src/utils/dom-utils.ts
+export function createButton(text: string, onClick: () => void): HTMLElement { ... }
+```
+
+## 🚫 Functions That Stay in Business Logic
+
+- Event handlers specific to the component
+- State management for the component
+- API calls specific to the domain
+- Workflow orchestration
+- Component lifecycle methods
+- Methods that directly manipulate component state
+
+## Implementation Checklist
+
+For EVERY utility function:
+
+1. **Extract to appropriate utils file**
+   - Create new file if needed: `src/utils/[domain]-utils.ts`
+   - Use clear, descriptive names
+   - Add proper TypeScript types
+
+2. **Write comprehensive unit tests**
+   - Create test file: `tests/[domain]-utils.test.ts`
+   - Test happy paths
+   - Test edge cases
+   - Test error conditions
+   - Aim for 100% coverage
+
+3. **Export from utils**
+   - Ensure function is exported
+   - Use named exports, not default exports
+
+4. **Import in business logic**
+   - Use absolute imports where possible
+   - Import only what you need
+
+## Testing Requirements
+
+```typescript
+// tests/value-check-utils.test.ts
+import { describe, expect, it } from "vitest";
+import { isEmptyValue } from "../src/utils/value-check-utils";
+
+describe("isEmptyValue", () => {
+  describe("null and undefined", () => {
+    it("should return true for null", () => {
+      expect(isEmptyValue(null)).toBe(true);
+    });
+
+    it("should return true for undefined", () => {
+      expect(isEmptyValue(undefined)).toBe(true);
+    });
+  });
+
+  describe("strings", () => {
+    it("should return true for empty string", () => {
+      expect(isEmptyValue("")).toBe(true);
+    });
+
+    it("should return true for whitespace-only string", () => {
+      expect(isEmptyValue("   ")).toBe(true);
+    });
+
+    it("should return false for non-empty string", () => {
+      expect(isEmptyValue("hello")).toBe(false);
+    });
+  });
+
+  describe("arrays", () => {
+    it("should return true for empty array", () => {
+      expect(isEmptyValue([])).toBe(true);
+    });
+
+    it("should return false for non-empty array", () => {
+      expect(isEmptyValue([1])).toBe(false);
+    });
+  });
+
+  describe("edge cases", () => {
+    it("should handle zero as not empty", () => {
+      expect(isEmptyValue(0)).toBe(false);
+    });
+
+    it("should handle false as not empty", () => {
+      expect(isEmptyValue(false)).toBe(false);
+    });
+  });
+});
+```
+
+## Detection Questions
+
+Before writing any helper function, ask:
+
+1. **Domain Independence**: Can this function work without knowing about my app's domain?
+2. **Reusability**: Could this function be useful in other projects?
+3. **Business Logic**: Does this function contain business rules or just technical logic?
+4. **Pure Function**: Does this function only depend on its inputs?
+
+If you answered "Yes" to questions 1-2 or "No" to question 3, **EXTRACT IT TO UTILS**.
+
+## Examples from This Project
+
+### ✅ Recently Extracted
+- `isEmptyValue()` - Moved from `NodePreviewModal` to `src/utils/value-check-utils.ts`
+- Full test coverage with 16 test cases
+
+### 🔍 Look For These Patterns
+- Private methods with `is`, `has`, `check` prefixes
+- Private methods with `format`, `parse`, `convert` in the name
+- Private methods that don't reference `this`
+- Private methods that could be `static`
+
+## Zero Tolerance
+
+- **NEVER write utility functions in component/service classes**
+- **NEVER skip unit tests for utility functions**
+- **ALWAYS check if a similar util already exists before creating new ones**
+- **ALWAYS extract utilities BEFORE writing business logic**
+
+## Benefits
+
+- **Reusability**: Write once, use everywhere
+- **Testability**: Easier to test pure functions in isolation
+- **Maintainability**: Single source of truth for common operations
+- **DRY**: Avoid code duplication across the codebase
+- **Quality**: Comprehensive test coverage ensures reliability
+
+**Remember: If it's not business logic, it belongs in utils. No exceptions.**

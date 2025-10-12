@@ -16,6 +16,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		containerEl.createEl("h1", { text: "Nexus Properties Settings" });
 
 		this.addUserInterfaceSettings(containerEl);
+		this.addPreviewSettings(containerEl);
 		this.addRescanSection(containerEl);
 		this.addDirectorySettings(containerEl);
 		this.addDirectRelationshipSettings(containerEl);
@@ -35,6 +36,36 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					await this.plugin.settingsStore.updateSettings((s) => ({
 						...s,
 						showRibbonIcon: value,
+					}));
+				})
+			);
+	}
+
+	private addPreviewSettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("Preview Settings").setHeading();
+
+		new Setting(containerEl)
+			.setName("Hide empty properties")
+			.setDesc("Hide properties with empty, null, or undefined values in the node preview modal")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.hideEmptyProperties).onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						hideEmptyProperties: value,
+					}));
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Hide underscore properties")
+			.setDesc("Hide properties that start with an underscore (_) in the node preview modal")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.hideUnderscoreProperties).onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						hideUnderscoreProperties: value,
 					}));
 				})
 			);

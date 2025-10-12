@@ -2,8 +2,10 @@ import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { ItemView, TFile } from "obsidian";
 import type { Indexer } from "../core/indexer";
+import type NexusPropertiesPlugin from "../main";
 import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
+import { NodeContextMenu } from "./node-context-menu";
 
 cytoscape.use(cytoscapeDagre);
 
@@ -22,12 +24,15 @@ export class RelationshipGraphView extends ItemView {
 	private includeAllCheckbox: HTMLInputElement | null = null;
 	private startFromCurrentContainer: HTMLElement | null = null;
 	private includeAllContainer: HTMLElement | null = null;
+	private contextMenu: NodeContextMenu;
 
 	constructor(
 		leaf: any,
 		private readonly indexer: Indexer,
+		private readonly plugin: NexusPropertiesPlugin
 	) {
 		super(leaf);
+		this.contextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
 	}
 
 	getViewType(): string {
@@ -408,6 +413,17 @@ export class RelationshipGraphView extends ItemView {
 
 			if (file instanceof TFile) {
 				this.app.workspace.getLeaf(false).openFile(file);
+			}
+		});
+
+		// Right-click handler for context menu
+		this.cy.on("cxttap", "node", (evt) => {
+			const node = evt.target;
+			const filePath = node.id();
+			const originalEvent = evt.originalEvent as MouseEvent;
+
+			if (this.contextMenu) {
+				this.contextMenu.show(originalEvent, filePath);
 			}
 		});
 	}
