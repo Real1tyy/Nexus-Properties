@@ -1,6 +1,6 @@
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
-import { ItemView, TFile, type WorkspaceLeaf } from "obsidian";
+import { ItemView, TFile } from "obsidian";
 import type { Indexer } from "../core/indexer";
 import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
@@ -26,8 +26,8 @@ export class RelationshipGraphView extends ItemView {
 	private contextMenu: NodeContextMenu;
 
 	constructor(
-		leaf: WorkspaceLeaf,
-		private indexer: Indexer
+		leaf: any,
+		private readonly indexer: Indexer,
 	) {
 		super(leaf);
 		this.contextMenu = new NodeContextMenu(this.app);
@@ -165,6 +165,11 @@ export class RelationshipGraphView extends ItemView {
 	private onFileOpen(file: TFile | null): void {
 		if (!file) {
 			this.showEmptyState("No file selected");
+			return;
+		}
+
+		if (!this.indexer) {
+			this.showEmptyState("Plugin is still initializing. Please wait...");
 			return;
 		}
 
@@ -377,6 +382,25 @@ export class RelationshipGraphView extends ItemView {
 		this.cy.on("mouseout", "node", () => {
 			if (!this.cy) return;
 			this.cy.elements().removeClass("dim highlighted");
+		});
+
+		// Hover handler for preview popover
+		this.cy.on("mouseover", "node", (evt) => {
+			const node = evt.target;
+			const filePath = node.id();
+			const file = this.app.vault.getAbstractFileByPath(filePath);
+
+			if (file instanceof TFile) {
+				// Trigger Obsidian's hover preview
+				this.app.workspace.trigger("hover-link", {
+					event: evt.originalEvent,
+					source: VIEW_TYPE_RELATIONSHIP_GRAPH,
+					hoverParent: this,
+					targetEl: this.graphContainerEl,
+					linktext: file.path,
+					sourcePath: this.currentFile?.path || "",
+				});
+			}
 		});
 
 		// Click handler to open files
