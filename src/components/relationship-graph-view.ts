@@ -22,10 +22,12 @@ export class RelationshipGraphView extends ItemView {
 	private includeAllCheckbox: HTMLInputElement | null = null;
 	private startFromCurrentContainer: HTMLElement | null = null;
 	private includeAllContainer: HTMLElement | null = null;
-	private indexer!: Indexer;
 
-	setIndexer(indexer: Indexer): void {
-		this.indexer = indexer;
+	constructor(
+		leaf: any,
+		private readonly indexer: Indexer,
+	) {
+		super(leaf);
 	}
 
 	getViewType(): string {
