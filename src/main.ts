@@ -42,15 +42,12 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.indexer = new Indexer(this.app, this.settingsStore.settings$);
 
-		// Register view AFTER indexer is initialized
-		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer));
-
 		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$.value);
 		this.propertiesManager.start(this.indexer.events$);
 
 		await this.indexer.start();
 
-		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer));
+		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer, this));
 	}
 
 	async onunload() {

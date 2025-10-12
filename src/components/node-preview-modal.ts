@@ -1,13 +1,24 @@
 import { type App, Modal, type TFile } from "obsidian";
+import type { Subscription } from "rxjs";
+import type { SettingsStore } from "../core/settings-store";
+import type { NexusPropertiesSettings } from "../types/settings";
 import { formatValue, parseWikiLink } from "../utils/frontmatter-value-utils";
+import { isEmptyValue } from "../utils/value-check-utils";
 
 export class NodePreviewModal extends Modal {
 	private file: TFile;
 	private frontmatter: Record<string, unknown> = {};
+	private settings: NexusPropertiesSettings;
+	private settingsSubscription?: Subscription;
 
-	constructor(app: App, file: TFile) {
+	constructor(
+		app: App,
+		file: TFile,
+		private settingsStore: SettingsStore
+	) {
 		super(app);
 		this.file = file;
+		this.settings = settingsStore.currentSettings;
 	}
 
 	async onOpen(): Promise<void> {
@@ -16,6 +27,11 @@ export class NodePreviewModal extends Modal {
 
 		await this.loadFrontmatter();
 		this.renderPreview();
+
+		this.settingsSubscription = this.settingsStore.settings$.subscribe((newSettings) => {
+			this.settings = newSettings;
+			this.renderPreview();
+		});
 	}
 
 	private async loadFrontmatter(): Promise<void> {
@@ -66,6 +82,14 @@ export class NodePreviewModal extends Modal {
 		const grid = section.createDiv("node-preview-props-grid");
 
 		for (const [key, value] of Object.entries(this.frontmatter)) {
+			if (this.settings.hideUnderscoreProperties && key.startsWith("_")) {
+				continue;
+			}
+
+			if (this.settings.hideEmptyProperties && isEmptyValue(value)) {
+				continue;
+			}
+
 			this.renderProperty(grid, key, value);
 		}
 	}
@@ -141,5 +165,8 @@ export class NodePreviewModal extends Modal {
 	onClose(): void {
 		const { contentEl } = this;
 		contentEl.empty();
+
+		// Unsubscribe from settings changes
+		this.settingsSubscription?.unsubscribe();
 	}
 }

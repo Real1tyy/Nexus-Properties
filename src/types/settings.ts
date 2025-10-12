@@ -19,6 +19,10 @@ export const NexusPropertiesSettingsSchema = z.object({
 
 	// UI settings
 	showRibbonIcon: z.boolean().default(true),
+
+	// Preview settings
+	hideEmptyProperties: z.boolean().default(SETTINGS_DEFAULTS.DEFAULT_HIDE_EMPTY_PROPERTIES),
+	hideUnderscoreProperties: z.boolean().default(SETTINGS_DEFAULTS.DEFAULT_HIDE_UNDERSCORE_PROPERTIES),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

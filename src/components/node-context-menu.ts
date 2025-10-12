@@ -1,12 +1,15 @@
-import { type App, confirm, Menu, Notice, TFile } from "obsidian";
+import { type App, Menu, Modal, Notice, Setting, TFile } from "obsidian";
+import type { SettingsStore } from "../core/settings-store";
 import { NodeEditModal } from "./node-edit-modal";
 import { NodePreviewModal } from "./node-preview-modal";
 
 export class NodeContextMenu {
 	private app: App;
+	private settingsStore: SettingsStore;
 
-	constructor(app: App) {
+	constructor(app: App, settingsStore: SettingsStore) {
 		this.app = app;
+		this.settingsStore = settingsStore;
 	}
 
 	show(e: MouseEvent, filePath: string): void {
@@ -34,17 +37,6 @@ export class NodeContextMenu {
 
 		menu.addItem((item) => {
 			item
-				.setTitle("Open file")
-				.setIcon("file-text")
-				.onClick(() => {
-					this.openFile(filePath);
-				});
-		});
-
-		menu.addSeparator();
-
-		menu.addItem((item) => {
-			item
 				.setTitle("Delete")
 				.setIcon("trash")
 				.onClick(() => {
@@ -62,7 +54,7 @@ export class NodeContextMenu {
 			return;
 		}
 
-		new NodePreviewModal(this.app, file).open();
+		new NodePreviewModal(this.app, file, this.settingsStore).open();
 	}
 
 	private openEdit(filePath: string): void {
@@ -77,10 +69,6 @@ export class NodeContextMenu {
 		}).open();
 	}
 
-	private openFile(filePath: string): void {
-		this.app.workspace.openLinkText(filePath, "", false);
-	}
-
 	private async deleteFile(filePath: string): Promise<void> {
 		const file = this.app.vault.getAbstractFileByPath(filePath);
 		if (!(file instanceof TFile)) {
@@ -89,7 +77,7 @@ export class NodeContextMenu {
 		}
 
 		// Confirm deletion
-		const confirmed = await this.confirmDeletion(file.basename);
+		const confirmed = await this.confirmDialog(`Delete "${file.basename}"?`, "This action cannot be undone.");
 		if (!confirmed) return;
 
 		try {
@@ -101,8 +89,32 @@ export class NodeContextMenu {
 		}
 	}
 
-	private async confirmDeletion(fileName: string): Promise<boolean> {
-		return await confirm(`Delete "${fileName}"?`, "This action cannot be undone.");
+	private confirmDialog(title: string, message: string): Promise<boolean> {
+		return new Promise((resolve) => {
+			const modal = new Modal(this.app);
+			modal.titleEl.setText(title);
+			modal.contentEl.createEl("p", { text: message });
+
+			new Setting(modal.contentEl)
+				.addButton((btn) =>
+					btn.setButtonText("Cancel").onClick(() => {
+						modal.close();
+						resolve(false);
+					})
+				)
+				.addButton((btn) =>
+					btn
+						.setButtonText("Delete")
+						.setCta()
+						.setWarning()
+						.onClick(() => {
+							modal.close();
+							resolve(true);
+						})
+				);
+
+			modal.open();
+		});
 	}
 
 	private async updateFileFrontmatter(file: TFile, updatedFrontmatter: Record<string, unknown>): Promise<void> {

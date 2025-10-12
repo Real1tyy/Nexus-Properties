@@ -2,6 +2,7 @@ import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { ItemView, TFile } from "obsidian";
 import type { Indexer } from "../core/indexer";
+import type NexusPropertiesPlugin from "../main";
 import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
 import { NodeContextMenu } from "./node-context-menu";
@@ -27,10 +28,11 @@ export class RelationshipGraphView extends ItemView {
 
 	constructor(
 		leaf: any,
-		private readonly indexer: Indexer
+		private readonly indexer: Indexer,
+		private readonly plugin: NexusPropertiesPlugin
 	) {
 		super(leaf);
-		this.contextMenu = new NodeContextMenu(this.app);
+		this.contextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
 	}
 
 	getViewType(): string {
