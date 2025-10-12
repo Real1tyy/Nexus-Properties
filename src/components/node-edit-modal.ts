@@ -1,4 +1,5 @@
 import { type App, Modal, type TFile } from "obsidian";
+import { parseValue, serializeValue } from "../utils/frontmatter-value-utils";
 
 interface PropertyRow {
 	key: string;
@@ -70,7 +71,7 @@ export class NodeEditModal extends Modal {
 
 		// Load existing properties
 		for (const [key, value] of Object.entries(this.originalFrontmatter)) {
-			const stringValue = this.serializeValue(value);
+			const stringValue = serializeValue(value);
 			this.addPropertyRow(key, stringValue);
 		}
 
@@ -144,76 +145,12 @@ export class NodeEditModal extends Modal {
 				const key = keyInput.value.trim();
 				const rawValue = valueInput.value;
 
-				// Parse the value to handle arrays, numbers, booleans, etc.
-				updatedFrontmatter[key] = this.parseValue(rawValue);
+				updatedFrontmatter[key] = parseValue(rawValue);
 			}
 		}
 
 		this.onSave(updatedFrontmatter);
 		this.close();
-	}
-
-	private serializeValue(value: unknown): string {
-		if (value === null || value === undefined) {
-			return "";
-		}
-
-		if (Array.isArray(value)) {
-			// For arrays, join with ", " for editing
-			return value.map((item) => this.serializeValue(item)).join(", ");
-		}
-
-		if (typeof value === "object") {
-			return JSON.stringify(value);
-		}
-
-		return String(value);
-	}
-
-	private parseValue(rawValue: string): unknown {
-		const trimmed = rawValue.trim();
-
-		if (trimmed === "") {
-			return "";
-		}
-
-		// Try to parse as boolean
-		if (trimmed.toLowerCase() === "true") {
-			return true;
-		}
-		if (trimmed.toLowerCase() === "false") {
-			return false;
-		}
-
-		// Try to parse as number
-		if (/^-?\d+(\.\d+)?$/.test(trimmed)) {
-			const num = Number(trimmed);
-			if (!Number.isNaN(num)) {
-				return num;
-			}
-		}
-
-		// Try to parse as array (comma-separated values)
-		if (trimmed.includes(",")) {
-			const items = trimmed.split(",").map((item) => item.trim());
-
-			// Check if all items are non-empty
-			if (items.every((item) => item.length > 0)) {
-				return items;
-			}
-		}
-
-		// Try to parse as JSON object/array
-		if ((trimmed.startsWith("{") && trimmed.endsWith("}")) || (trimmed.startsWith("[") && trimmed.endsWith("]"))) {
-			try {
-				return JSON.parse(trimmed);
-			} catch {
-				// If parsing fails, return as string
-			}
-		}
-
-		// Default: return as string
-		return trimmed;
 	}
 
 	onClose(): void {

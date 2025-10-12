@@ -27,7 +27,7 @@ export class RelationshipGraphView extends ItemView {
 
 	constructor(
 		leaf: any,
-		private readonly indexer: Indexer,
+		private readonly indexer: Indexer
 	) {
 		super(leaf);
 		this.contextMenu = new NodeContextMenu(this.app);

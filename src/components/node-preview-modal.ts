@@ -1,4 +1,5 @@
 import { type App, Modal, type TFile } from "obsidian";
+import { formatValue, parseWikiLink } from "../utils/frontmatter-value-utils";
 
 export class NodePreviewModal extends Modal {
 	private file: TFile;
@@ -116,24 +117,16 @@ export class NodePreviewModal extends Modal {
 
 	private renderSingleValue(container: HTMLElement, value: unknown): void {
 		if (typeof value === "string") {
-			// Check if it's a wiki link format [[path]] or [[path|alias]]
-			const wikiLinkMatch = value.match(/^\[\[([^\]]+)\]\]$/);
-			if (wikiLinkMatch) {
-				const innerContent = wikiLinkMatch[1];
-				const pipeIndex = innerContent.indexOf("|");
-
-				const linkPath = pipeIndex !== -1 ? innerContent.substring(0, pipeIndex).trim() : innerContent.trim();
-
-				const displayText = pipeIndex !== -1 ? innerContent.substring(pipeIndex + 1).trim() : linkPath;
-
+			const wikiLink = parseWikiLink(value);
+			if (wikiLink) {
 				const link = container.createEl("a", {
-					text: displayText,
+					text: wikiLink.displayText,
 					cls: "node-preview-prop-link",
 				});
 
 				link.onclick = (e) => {
 					e.preventDefault();
-					this.app.workspace.openLinkText(linkPath, this.file.path, false);
+					this.app.workspace.openLinkText(wikiLink.linkPath, this.file.path, false);
 					this.close();
 				};
 				return;
@@ -141,24 +134,8 @@ export class NodePreviewModal extends Modal {
 		}
 
 		// Default: display as text
-		const text = this.formatValue(value);
+		const text = formatValue(value);
 		container.createEl("span", { text, cls: "node-preview-prop-text" });
-	}
-
-	private formatValue(value: unknown): string {
-		if (typeof value === "boolean") {
-			return value ? "Yes" : "No";
-		}
-
-		if (typeof value === "number") {
-			return value.toString();
-		}
-
-		if (typeof value === "object" && value !== null) {
-			return JSON.stringify(value, null, 2);
-		}
-
-		return String(value);
 	}
 
 	onClose(): void {
