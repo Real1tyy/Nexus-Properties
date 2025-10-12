@@ -1,3 +1,5 @@
+export { GraphHeader } from "./graph-header";
+export { GraphZoomPreview } from "./graph-zoom-preview";
 export { NodeContextMenu } from "./node-context-menu";
 export { NodeEditModal } from "./node-edit-modal";
 export { NodePreviewModal } from "./node-preview-modal";

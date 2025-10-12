@@ -91,8 +91,9 @@
 
 .nexus-graph-view-header {
 	display: flex;
-	flex-direction: column;
-	gap: 0.5em;
+	flex-direction: row;
+	align-items: center;
+	gap: 1em;
 	padding: 1em;
 	border-bottom: 2px solid var(--background-modifier-border);
 	background-color: var(--background-secondary);
@@ -104,6 +105,16 @@
 	color: var(--text-normal);
 	font-size: 1.1em;
 	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.nexus-graph-controls-container {
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 1em;
+	flex-wrap: wrap;
+	flex: 1;
 }
 
 .nexus-graph-toggle-container {

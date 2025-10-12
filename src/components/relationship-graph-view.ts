@@ -5,6 +5,8 @@ import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
 import { getFileContext } from "../utils/file-context";
 import { extractDisplayName, extractFilePath } from "../utils/file-name-extractor";
+import { GraphHeader } from "./graph-header";
+import { GraphZoomPreview } from "./graph-zoom-preview";
 import { NodeContextMenu } from "./node-context-menu";
 
 cytoscape.use(cytoscapeDagre);
@@ -14,16 +16,11 @@ export const VIEW_TYPE_RELATIONSHIP_GRAPH = "nexus-relationship-graph-view";
 export class RelationshipGraphView extends ItemView {
 	private cy: Core | null = null;
 	private graphContainerEl: HTMLElement | null = null;
-	private headerEl: HTMLElement | null = null;
+	private header: GraphHeader | null = null;
 	private currentFile: TFile | null = null;
 	private ignoreTopmostParent = false;
 	private renderRelated = false;
 	private includeAllRelated = false;
-	private toggleCheckbox: HTMLInputElement | null = null;
-	private relatedCheckbox: HTMLInputElement | null = null;
-	private includeAllCheckbox: HTMLInputElement | null = null;
-	private startFromCurrentContainer: HTMLElement | null = null;
-	private includeAllContainer: HTMLElement | null = null;
 	private contextMenu: NodeContextMenu;
 	private resizeObserver: ResizeObserver | null = null;
 	private resizeDebounceTimer: number | null = null;
@@ -32,9 +29,7 @@ export class RelationshipGraphView extends ItemView {
 	private isZoomMode = false;
 	// Track the currently focused node in zoom mode (used for state tracking)
 	private focusedNodeId: string | null = null;
-	private exitZoomCheckbox: HTMLInputElement | null = null;
-	private exitZoomContainer: HTMLElement | null = null;
-	private previewOverlay: HTMLElement | null = null;
+	private zoomPreview: GraphZoomPreview | null = null;
 
 	constructor(
 		leaf: any,
@@ -62,69 +57,24 @@ export class RelationshipGraphView extends ItemView {
 		contentEl.empty();
 		contentEl.addClass("nexus-graph-view-content");
 
-		// Create header with controls
-		this.headerEl = contentEl.createEl("div", { cls: "nexus-graph-view-header" });
-
-		const titleEl = this.headerEl.createEl("h4", { text: "No file selected" });
-		titleEl.addClass("nexus-graph-view-title");
-
-		// Create controls container for all checkboxes
-		const controlsContainer = this.headerEl.createEl("div", { cls: "nexus-graph-controls-container" });
-
-		// Create "Render Related" toggle container
-		const relatedToggleContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
-
-		this.relatedCheckbox = relatedToggleContainer.createEl("input", { type: "checkbox" });
-		this.relatedCheckbox.addClass("nexus-graph-toggle-checkbox");
-		this.relatedCheckbox.checked = this.renderRelated;
-
-		relatedToggleContainer.createEl("label", {
-			text: "Render Related",
-			cls: "nexus-graph-toggle-label",
+		this.header = new GraphHeader(contentEl, {
+			currentFileName: "No file selected",
+			renderRelated: this.renderRelated,
+			includeAllRelated: this.includeAllRelated,
+			startFromCurrent: this.ignoreTopmostParent,
+			onRenderRelatedChange: (value) => {
+				this.renderRelated = value;
+				this.updateGraph();
+			},
+			onIncludeAllRelatedChange: (value) => {
+				this.includeAllRelated = value;
+				this.updateGraph();
+			},
+			onStartFromCurrentChange: (value) => {
+				this.ignoreTopmostParent = value;
+				this.updateGraph();
+			},
 		});
-
-		this.relatedCheckbox.addEventListener("change", () => {
-			this.renderRelated = this.relatedCheckbox?.checked ?? false;
-			this.updateToggleVisibility();
-			this.updateGraph();
-		});
-
-		// Create "Include all related" toggle container (only visible in related mode)
-		this.includeAllContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
-
-		this.includeAllCheckbox = this.includeAllContainer.createEl("input", { type: "checkbox" });
-		this.includeAllCheckbox.addClass("nexus-graph-toggle-checkbox");
-		this.includeAllCheckbox.checked = this.includeAllRelated;
-
-		this.includeAllContainer.createEl("label", {
-			text: "Include all related",
-			cls: "nexus-graph-toggle-label",
-		});
-
-		this.includeAllCheckbox.addEventListener("change", () => {
-			this.includeAllRelated = this.includeAllCheckbox?.checked ?? false;
-			this.updateGraph();
-		});
-
-		// Create "Start from current file" toggle container
-		this.startFromCurrentContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
-
-		this.toggleCheckbox = this.startFromCurrentContainer.createEl("input", { type: "checkbox" });
-		this.toggleCheckbox.addClass("nexus-graph-toggle-checkbox");
-		this.toggleCheckbox.checked = this.ignoreTopmostParent;
-
-		this.startFromCurrentContainer.createEl("label", {
-			text: "Start from current file",
-			cls: "nexus-graph-toggle-label",
-		});
-
-		this.toggleCheckbox.addEventListener("change", () => {
-			this.ignoreTopmostParent = this.toggleCheckbox?.checked ?? false;
-			this.updateGraph();
-		});
-
-		// Set initial visibility
-		this.updateToggleVisibility();
 
 		// Create graph container
 		this.graphContainerEl = contentEl.createEl("div", {
@@ -207,17 +157,19 @@ export class RelationshipGraphView extends ItemView {
 		}
 
 		this.destroyGraph();
+
+		if (this.header) {
+			this.header.destroy();
+			this.header = null;
+		}
+
+		if (this.zoomPreview) {
+			this.zoomPreview.destroy();
+			this.zoomPreview = null;
+		}
+
 		this.currentFile = null;
-		this.headerEl = null;
 		this.graphContainerEl = null;
-		this.toggleCheckbox = null;
-		this.relatedCheckbox = null;
-		this.includeAllCheckbox = null;
-		this.startFromCurrentContainer = null;
-		this.includeAllContainer = null;
-		this.exitZoomCheckbox = null;
-		this.exitZoomContainer = null;
-		this.previewOverlay = null;
 	}
 
 	toggleEnlargement(): void {
@@ -255,15 +207,6 @@ export class RelationshipGraphView extends ItemView {
 		window.dispatchEvent(new Event("resize"));
 	}
 
-	private updateToggleVisibility(): void {
-		if (this.startFromCurrentContainer) {
-			this.startFromCurrentContainer.style.display = this.renderRelated ? "none" : "flex";
-		}
-		if (this.includeAllContainer) {
-			this.includeAllContainer.style.display = this.renderRelated ? "flex" : "none";
-		}
-	}
-
 	private onFileOpen(file: TFile | null): void {
 		if (!file) {
 			this.showEmptyState("No file selected");
@@ -295,11 +238,8 @@ export class RelationshipGraphView extends ItemView {
 		this.currentFile = null;
 		this.destroyGraph();
 
-		if (this.headerEl) {
-			const titleEl = this.headerEl.querySelector(".nexus-graph-view-title");
-			if (titleEl) {
-				titleEl.textContent = message;
-			}
+		if (this.header) {
+			this.header.update({ currentFileName: message });
 		}
 
 		if (this.graphContainerEl) {
@@ -315,11 +255,8 @@ export class RelationshipGraphView extends ItemView {
 		if (!this.currentFile) return;
 
 		// Update header title
-		if (this.headerEl) {
-			const titleEl = this.headerEl.querySelector(".nexus-graph-view-title");
-			if (titleEl) {
-				titleEl.textContent = `Relationship Graph: ${this.currentFile.basename}`;
-			}
+		if (this.header) {
+			this.header.updateTitle(this.currentFile.basename);
 		}
 
 		// Rebuild graph based on mode (but not for zoom mode - zoom mode just focuses on existing graph)
@@ -829,9 +766,6 @@ export class RelationshipGraphView extends ItemView {
 		this.isZoomMode = false;
 		this.focusedNodeId = null;
 		this.hidePreviewOverlay();
-		if (this.exitZoomCheckbox) {
-			this.exitZoomCheckbox.checked = false;
-		}
 		// Reset zoom to show full graph
 		if (this.cy) {
 			this.cy.fit();
@@ -875,105 +809,16 @@ export class RelationshipGraphView extends ItemView {
 		// Remove existing overlay if any
 		this.hidePreviewOverlay();
 
-		// Create preview overlay
-		this.previewOverlay = this.graphContainerEl.createEl("div", {
-			cls: "nexus-graph-zoom-preview",
-		});
-
-		// Exit zoom mode checkbox (top right)
-		this.exitZoomContainer = this.previewOverlay.createEl("div", {
-			cls: "nexus-graph-exit-zoom-container",
-		});
-
-		this.exitZoomCheckbox = this.exitZoomContainer.createEl("input", { type: "checkbox" });
-		this.exitZoomCheckbox.addClass("nexus-graph-toggle-checkbox");
-		this.exitZoomCheckbox.checked = false;
-
-		this.exitZoomContainer.createEl("label", {
-			text: "Exit Zoom Mode",
-			cls: "nexus-graph-toggle-label",
-		});
-
-		this.exitZoomCheckbox.addEventListener("change", () => {
-			if (this.exitZoomCheckbox?.checked) {
-				this.exitZoomMode();
-			}
-		});
-
-		// Header section
-		const headerSection = this.previewOverlay.createEl("div", {
-			cls: "nexus-graph-zoom-preview-header",
-		});
-
-		// File name
-		headerSection.createEl("h2", {
-			text: file.basename,
-			cls: "nexus-graph-zoom-preview-title",
-		});
-
-		// Frontmatter section
-		const cache = this.app.metadataCache.getFileCache(file);
-		const frontmatter = cache?.frontmatter;
-
-		if (frontmatter) {
-			const fmSection = this.previewOverlay.createEl("div", {
-				cls: "nexus-graph-zoom-preview-frontmatter",
-			});
-
-			for (const [key, value] of Object.entries(frontmatter)) {
-				// Skip internal Obsidian properties
-				if (key === "position") continue;
-
-				const propEl = fmSection.createEl("div", {
-					cls: "nexus-graph-zoom-preview-property",
-				});
-
-				propEl.createEl("span", {
-					text: key,
-					cls: "nexus-graph-zoom-preview-property-key",
-				});
-
-				propEl.createEl("span", {
-					text: this.formatPropertyValue(value),
-					cls: "nexus-graph-zoom-preview-property-value",
-				});
-			}
-		}
-
-		// Content section (scrollable)
-		const contentSection = this.previewOverlay.createEl("div", {
-			cls: "nexus-graph-zoom-preview-content",
-		});
-
-		const content = await this.app.vault.read(file);
-		// Remove frontmatter from content display
-		const contentWithoutFrontmatter = content.replace(/^---\n[\s\S]*?\n---\n/, "");
-
-		contentSection.createEl("div", {
-			text: contentWithoutFrontmatter || "(No content)",
-			cls: "nexus-graph-zoom-preview-content-text",
+		this.zoomPreview = new GraphZoomPreview(this.graphContainerEl, this.app, {
+			file,
+			onExit: () => this.exitZoomMode(),
 		});
 	}
 
 	private hidePreviewOverlay(): void {
-		if (this.previewOverlay) {
-			this.previewOverlay.remove();
-			this.previewOverlay = null;
+		if (this.zoomPreview) {
+			this.zoomPreview.destroy();
+			this.zoomPreview = null;
 		}
-		this.exitZoomCheckbox = null;
-		this.exitZoomContainer = null;
-	}
-
-	private formatPropertyValue(value: unknown): string {
-		if (value === null || value === undefined) {
-			return "";
-		}
-		if (Array.isArray(value)) {
-			return value.join(", ");
-		}
-		if (typeof value === "object") {
-			return JSON.stringify(value);
-		}
-		return String(value);
 	}
 }

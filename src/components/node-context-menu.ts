@@ -17,6 +17,15 @@ export class NodeContextMenu {
 
 		menu.addItem((item) => {
 			item
+				.setTitle("Open")
+				.setIcon("file")
+				.onClick(() => {
+					this.openFile(filePath);
+				});
+		});
+
+		menu.addItem((item) => {
+			item
 				.setTitle("Preview")
 				.setIcon("eye")
 				.onClick(() => {
@@ -45,6 +54,16 @@ export class NodeContextMenu {
 		});
 
 		menu.showAtMouseEvent(e);
+	}
+
+	private openFile(filePath: string): void {
+		const file = this.app.vault.getAbstractFileByPath(filePath);
+		if (!(file instanceof TFile)) {
+			new Notice(`File not found: ${filePath}`);
+			return;
+		}
+
+		this.app.workspace.getLeaf(false).openFile(file);
 	}
 
 	private openPreview(filePath: string): void {
