@@ -379,6 +379,25 @@ export class RelationshipGraphView extends ItemView {
 			this.cy.elements().removeClass("dim highlighted");
 		});
 
+		// Hover handler for preview popover
+		this.cy.on("mouseover", "node", (evt) => {
+			const node = evt.target;
+			const filePath = node.id();
+			const file = this.app.vault.getAbstractFileByPath(filePath);
+
+			if (file instanceof TFile) {
+				// Trigger Obsidian's hover preview
+				this.app.workspace.trigger("hover-link", {
+					event: evt.originalEvent,
+					source: VIEW_TYPE_RELATIONSHIP_GRAPH,
+					hoverParent: this,
+					targetEl: this.graphContainerEl,
+					linktext: file.path,
+					sourcePath: this.currentFile?.path || "",
+				});
+			}
+		});
+
 		// Click handler to open files
 		this.cy.on("tap", "node", (evt) => {
 			const node = evt.target;
