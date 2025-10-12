@@ -23,6 +23,13 @@ export const NexusPropertiesSettingsSchema = z.object({
 	// Preview settings
 	hideEmptyProperties: z.boolean().default(SETTINGS_DEFAULTS.DEFAULT_HIDE_EMPTY_PROPERTIES),
 	hideUnderscoreProperties: z.boolean().default(SETTINGS_DEFAULTS.DEFAULT_HIDE_UNDERSCORE_PROPERTIES),
+
+	// Graph settings
+	graphEnlargedWidthPercent: z
+		.number()
+		.min(50)
+		.max(100)
+		.default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ENLARGED_WIDTH_PERCENT),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

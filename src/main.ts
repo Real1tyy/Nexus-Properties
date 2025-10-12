@@ -24,6 +24,14 @@ export default class NexusPropertiesPlugin extends Plugin {
 			},
 		});
 
+		this.addCommand({
+			id: "enlarge-relationship-graph",
+			name: "Enlarge Graph",
+			callback: () => {
+				this.toggleGraphEnlargement();
+			},
+		});
+
 		this.initializePlugin();
 	}
 
@@ -80,6 +88,18 @@ export default class NexusPropertiesPlugin extends Plugin {
 			if (leaf) {
 				await leaf.setViewState({ type: VIEW_TYPE_RELATIONSHIP_GRAPH, active: true });
 				workspace.revealLeaf(leaf);
+			}
+		}
+	}
+
+	private toggleGraphEnlargement(): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+
+		if (existingLeaves.length > 0) {
+			const graphView = existingLeaves[0].view;
+			if (graphView instanceof RelationshipGraphView) {
+				graphView.toggleEnlargement();
 			}
 		}
 	}

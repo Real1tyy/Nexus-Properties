@@ -39,6 +39,22 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					}));
 				})
 			);
+
+		new Setting(containerEl)
+			.setName("Graph enlarged width")
+			.setDesc("Percentage of window width when graph is enlarged (50-100%)")
+			.addSlider((slider) =>
+				slider
+					.setLimits(50, 100, 1)
+					.setValue(settings.graphEnlargedWidthPercent)
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							graphEnlargedWidthPercent: value,
+						}));
+					})
+			);
 	}
 
 	private addPreviewSettings(containerEl: HTMLElement): void {

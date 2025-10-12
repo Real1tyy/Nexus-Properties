@@ -25,6 +25,10 @@ export class RelationshipGraphView extends ItemView {
 	private startFromCurrentContainer: HTMLElement | null = null;
 	private includeAllContainer: HTMLElement | null = null;
 	private contextMenu: NodeContextMenu;
+	private resizeObserver: ResizeObserver | null = null;
+	private resizeDebounceTimer: number | null = null;
+	private isEnlarged = false;
+	private originalWidth: number | null = null;
 
 	constructor(
 		leaf: any,
@@ -141,9 +145,50 @@ export class RelationshipGraphView extends ItemView {
 				this.onFileOpen(activeFile);
 			}
 		}, 100);
+
+		// Set up resize observer with debouncing
+		this.setupResizeObserver();
+	}
+
+	private setupResizeObserver(): void {
+		if (!this.graphContainerEl) return;
+
+		this.resizeObserver = new ResizeObserver(() => {
+			// Clear previous timer
+			if (this.resizeDebounceTimer !== null) {
+				window.clearTimeout(this.resizeDebounceTimer);
+			}
+
+			// Set new timer to re-render after 1 second of no resize
+			this.resizeDebounceTimer = window.setTimeout(() => {
+				this.handleResize();
+			}, 300);
+		});
+
+		this.resizeObserver.observe(this.graphContainerEl);
+	}
+
+	private handleResize(): void {
+		if (!this.cy || !this.currentFile) return;
+
+		// Re-fit and re-center the graph
+		this.cy.fit();
+		this.cy.center();
 	}
 
 	async onClose(): Promise<void> {
+		// Clean up resize observer
+		if (this.resizeObserver) {
+			this.resizeObserver.disconnect();
+			this.resizeObserver = null;
+		}
+
+		// Clean up resize debounce timer
+		if (this.resizeDebounceTimer !== null) {
+			window.clearTimeout(this.resizeDebounceTimer);
+			this.resizeDebounceTimer = null;
+		}
+
 		this.destroyGraph();
 		this.currentFile = null;
 		this.headerEl = null;
@@ -153,6 +198,41 @@ export class RelationshipGraphView extends ItemView {
 		this.includeAllCheckbox = null;
 		this.startFromCurrentContainer = null;
 		this.includeAllContainer = null;
+	}
+
+	toggleEnlargement(): void {
+		// Find the current view's leaf
+		const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+		if (leaves.length === 0) return;
+
+		// Access the DOM element through the view's content element
+		const viewContainerEl = this.contentEl.closest(".workspace-leaf");
+		if (!viewContainerEl) return;
+
+		const splitContainer = viewContainerEl.closest(".workspace-split.mod-left-split, .workspace-split.mod-right-split");
+		if (!splitContainer || !(splitContainer instanceof HTMLElement)) return;
+
+		if (this.isEnlarged) {
+			// Restore original width
+			if (this.originalWidth !== null) {
+				splitContainer.style.width = `${this.originalWidth}px`;
+			}
+			this.isEnlarged = false;
+			this.originalWidth = null;
+		} else {
+			// Store original width and enlarge
+			this.originalWidth = splitContainer.clientWidth;
+
+			const settings = this.plugin.settingsStore.settings$.value;
+			const windowWidth = window.innerWidth;
+			const targetWidth = (windowWidth * settings.graphEnlargedWidthPercent) / 100;
+
+			splitContainer.style.width = `${targetWidth}px`;
+			this.isEnlarged = true;
+		}
+
+		// Trigger a resize event to update the graph
+		window.dispatchEvent(new Event("resize"));
 	}
 
 	private updateToggleVisibility(): void {
