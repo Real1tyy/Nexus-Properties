@@ -566,11 +566,34 @@
 	background-color: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 6px;
-	padding: 0.5em 0.75em;
+	padding: 0.65em 0.85em;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 	font-size: 0.85em;
 	max-width: 300px;
 	pointer-events: auto;
+}
+
+.nexus-property-tooltip-title {
+	margin-bottom: 0.5em;
+}
+
+.nexus-property-tooltip-title-link {
+	color: var(--text-normal);
+	font-size: 1.1em;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.nexus-property-tooltip-title-link:hover {
+	color: var(--link-color);
+}
+
+.nexus-property-tooltip-separator {
+	height: 1px;
+	background-color: var(--background-modifier-border);
+	margin: 0.5em -0.85em 0.65em -0.85em;
 }
 
 .nexus-property-tooltip-item {

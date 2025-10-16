@@ -925,10 +925,6 @@ export class RelationshipGraphView extends ItemView {
 			})
 			.filter((prop): prop is { key: string; value: unknown } => prop !== null);
 
-		if (propertyData.length === 0) {
-			return;
-		}
-
 		// Create tooltip element
 		this.hidePropertyTooltip();
 		this.propertyTooltip = document.createElement("div");
@@ -947,6 +943,28 @@ export class RelationshipGraphView extends ItemView {
 			// Hide immediately when leaving the tooltip
 			this.hidePropertyTooltip();
 		});
+
+		// Add clickable title at the top
+		const displayName = extractDisplayName(filePath);
+		const titleEl = this.propertyTooltip.createEl("div", {
+			cls: "nexus-property-tooltip-title",
+		});
+
+		const titleLink = titleEl.createEl("a", {
+			text: displayName,
+			cls: "nexus-property-tooltip-title-link",
+		});
+
+		titleLink.addEventListener("click", (e) => {
+			e.preventDefault();
+			e.stopPropagation();
+			this.openFile(filePath, e);
+		});
+
+		// Add separator if there are properties
+		if (propertyData.length > 0) {
+			this.propertyTooltip.createDiv("nexus-property-tooltip-separator");
+		}
 
 		for (const { key, value } of propertyData) {
 			const propEl = this.propertyTooltip.createDiv("nexus-property-tooltip-item");
