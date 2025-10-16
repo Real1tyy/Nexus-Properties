@@ -2,14 +2,15 @@ import { type App, Modal, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { formatValue, parseWikiLink } from "../utils/frontmatter-value-utils";
 import { isEmptyValue } from "../utils/value-check-utils";
+import { PropertyRenderer } from "./property-renderer";
 
 export class NodePreviewModal extends Modal {
 	private file: TFile;
 	private frontmatter: Record<string, unknown> = {};
 	private settings: NexusPropertiesSettings;
 	private settingsSubscription?: Subscription;
+	private propertyRenderer: PropertyRenderer;
 
 	constructor(
 		app: App,
@@ -19,6 +20,20 @@ export class NodePreviewModal extends Modal {
 		super(app);
 		this.file = file;
 		this.settings = settingsStore.currentSettings;
+		this.propertyRenderer = new PropertyRenderer(
+			this.app,
+			this.file,
+			{
+				containerClass: "node-preview-prop-item",
+				keyClass: "node-preview-prop-key",
+				valueClass: "node-preview-prop-value",
+				linkClass: "node-preview-prop-link",
+				textClass: "node-preview-prop-text",
+				emptyClass: "node-preview-prop-empty",
+				separatorClass: "node-preview-prop-separator",
+			},
+			() => this.close()
+		);
 	}
 
 	async onOpen(): Promise<void> {
@@ -90,76 +105,8 @@ export class NodePreviewModal extends Modal {
 				continue;
 			}
 
-			this.renderProperty(grid, key, value);
+			this.propertyRenderer.renderProperty(grid, key, value);
 		}
-	}
-
-	private renderProperty(container: HTMLElement, key: string, value: unknown): void {
-		const propItem = container.createDiv("node-preview-prop-item");
-
-		propItem.createEl("div", {
-			text: key,
-			cls: "node-preview-prop-key",
-		});
-
-		const valueEl = propItem.createEl("div", {
-			cls: "node-preview-prop-value",
-		});
-
-		this.renderPropertyValue(valueEl, value);
-	}
-
-	private renderPropertyValue(container: HTMLElement, value: unknown): void {
-		if (value === null || value === undefined) {
-			container.createEl("span", {
-				text: "—",
-				cls: "node-preview-prop-empty",
-			});
-			return;
-		}
-
-		if (Array.isArray(value)) {
-			if (value.length === 0) {
-				container.createEl("span", {
-					text: "[ ]",
-					cls: "node-preview-prop-empty",
-				});
-				return;
-			}
-
-			for (let i = 0; i < value.length; i++) {
-				if (i > 0) {
-					container.createEl("span", { text: ", ", cls: "node-preview-prop-separator" });
-				}
-				this.renderSingleValue(container, value[i]);
-			}
-			return;
-		}
-
-		this.renderSingleValue(container, value);
-	}
-
-	private renderSingleValue(container: HTMLElement, value: unknown): void {
-		if (typeof value === "string") {
-			const wikiLink = parseWikiLink(value);
-			if (wikiLink) {
-				const link = container.createEl("a", {
-					text: wikiLink.displayText,
-					cls: "node-preview-prop-link",
-				});
-
-				link.onclick = (e) => {
-					e.preventDefault();
-					this.app.workspace.openLinkText(wikiLink.linkPath, this.file.path, false);
-					this.close();
-				};
-				return;
-			}
-		}
-
-		// Default: display as text
-		const text = formatValue(value);
-		container.createEl("span", { text, cls: "node-preview-prop-text" });
 	}
 
 	onClose(): void {

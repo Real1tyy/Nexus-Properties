@@ -16,6 +16,7 @@ export const VIEW_TYPE_RELATIONSHIP_GRAPH = "nexus-relationship-graph-view";
 export class RelationshipGraphView extends ItemView {
 	private cy: Core | null = null;
 	private graphContainerEl: HTMLElement | null = null;
+	private previewWrapperEl: HTMLElement | null = null;
 	private header: GraphHeader | null = null;
 	private currentFile: TFile | null = null;
 	private ignoreTopmostParent = false;
@@ -30,6 +31,10 @@ export class RelationshipGraphView extends ItemView {
 	// Track the currently focused node in zoom mode (used for state tracking)
 	private focusedNodeId: string | null = null;
 	private zoomPreview: GraphZoomPreview | null = null;
+	private isUpdating = false;
+	// Persistent toggle states for preview
+	private previewHideFrontmatter = false;
+	private previewHideContent = false;
 
 	constructor(
 		leaf: any,
@@ -74,6 +79,12 @@ export class RelationshipGraphView extends ItemView {
 				this.ignoreTopmostParent = value;
 				this.updateGraph();
 			},
+		});
+
+		// Create a wrapper for zoom preview (sits between header and graph)
+		// This container will hold the zoom preview when active
+		this.previewWrapperEl = contentEl.createEl("div", {
+			cls: "nexus-graph-zoom-preview-wrapper",
 		});
 
 		// Create graph container
@@ -136,7 +147,7 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	private handleResize(): void {
-		if (!this.cy || !this.currentFile) return;
+		if (!this.cy || !this.currentFile || this.isUpdating) return;
 
 		// Re-fit and re-center the graph
 		this.cy.fit();
@@ -170,6 +181,7 @@ export class RelationshipGraphView extends ItemView {
 
 		this.currentFile = null;
 		this.graphContainerEl = null;
+		this.previewWrapperEl = null;
 	}
 
 	toggleEnlargement(): void {
@@ -252,41 +264,57 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	private updateGraph(): void {
-		if (!this.currentFile) return;
+		if (!this.currentFile || this.isUpdating) return;
 
-		// Update header title
-		if (this.header) {
-			this.header.updateTitle(this.currentFile.basename);
+		this.isUpdating = true;
+
+		try {
+			// Update header title
+			if (this.header) {
+				this.header.updateTitle(this.currentFile.basename);
+			}
+
+			// Rebuild graph based on mode (but not for zoom mode - zoom mode just focuses on existing graph)
+			let nodes: ElementDefinition[];
+			let edges: ElementDefinition[];
+
+			if (this.renderRelated) {
+				({ nodes, edges } = this.buildRelatedGraphData(this.currentFile.path));
+			} else {
+				({ nodes, edges } = this.buildGraphData(this.currentFile.path));
+			}
+
+			this.destroyGraph();
+
+			if (this.graphContainerEl) {
+				this.graphContainerEl.empty();
+			}
+
+			this.initializeCytoscape();
+			this.renderGraph(nodes, edges);
+		} finally {
+			this.isUpdating = false;
 		}
-
-		// Rebuild graph based on mode (but not for zoom mode - zoom mode just focuses on existing graph)
-		let nodes: ElementDefinition[];
-		let edges: ElementDefinition[];
-
-		if (this.renderRelated) {
-			({ nodes, edges } = this.buildRelatedGraphData(this.currentFile.path));
-		} else {
-			({ nodes, edges } = this.buildGraphData(this.currentFile.path));
-		}
-
-		this.destroyGraph();
-
-		if (this.graphContainerEl) {
-			this.graphContainerEl.empty();
-		}
-
-		this.initializeCytoscape();
-		this.renderGraph(nodes, edges);
 	}
 
 	private destroyGraph(): void {
 		if (this.cy) {
+			// Stop all ongoing animations before destroying
+			this.cy.stop();
+			// Remove all event handlers
+			this.cy.removeAllListeners();
 			this.cy.destroy();
 			this.cy = null;
 		}
 	}
 
 	private initializeCytoscape(): void {
+		// Ensure container is valid and attached to DOM
+		if (!this.graphContainerEl || !this.graphContainerEl.isConnected) {
+			console.error("Cannot initialize Cytoscape: container is not attached to DOM");
+			return;
+		}
+
 		this.cy = cytoscape({
 			container: this.graphContainerEl,
 			minZoom: 0.3,
@@ -503,6 +531,10 @@ export class RelationshipGraphView extends ItemView {
 			if (Math.random() < 0.4) {
 				node.addClass("glow");
 				const pulse = (): void => {
+					// Check if cy still exists and node is still in the graph before animating
+					if (!this.cy || !node.cy() || this.isUpdating) {
+						return;
+					}
 					node.animate({ style: { "overlay-opacity": 0.35 } }, { duration: 1500, easing: "ease-in-out" }).animate(
 						{ style: { "overlay-opacity": 0.12 } },
 						{
@@ -767,7 +799,7 @@ export class RelationshipGraphView extends ItemView {
 		this.focusedNodeId = null;
 		this.hidePreviewOverlay();
 		// Reset zoom to show full graph
-		if (this.cy) {
+		if (this.cy && !this.isUpdating) {
 			this.cy.fit();
 			this.cy.center();
 		}
@@ -780,7 +812,7 @@ export class RelationshipGraphView extends ItemView {
 		if (!(file instanceof TFile)) return;
 
 		// Zoom to the focused node on the existing graph with stronger zoom
-		if (this.cy) {
+		if (this.cy && !this.isUpdating) {
 			// Use filter instead of selector to avoid escaping issues with complex file paths
 			const node = this.cy.nodes().filter((n) => n.id() === filePath);
 			if (node.length > 0) {
@@ -804,14 +836,22 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	private async showPreviewOverlay(file: TFile): Promise<void> {
-		if (!this.graphContainerEl) return;
+		if (!this.previewWrapperEl) return;
 
 		// Remove existing overlay if any
 		this.hidePreviewOverlay();
 
-		this.zoomPreview = new GraphZoomPreview(this.graphContainerEl, this.app, {
+		// Create preview in the wrapper element (between header and graph)
+		this.zoomPreview = new GraphZoomPreview(this.previewWrapperEl, this.app, {
 			file,
 			onExit: () => this.exitZoomMode(),
+			settingsStore: this.plugin.settingsStore,
+			initialHideFrontmatter: this.previewHideFrontmatter,
+			initialHideContent: this.previewHideContent,
+			onToggleStatesChange: (hideFrontmatter, hideContent) => {
+				this.previewHideFrontmatter = hideFrontmatter;
+				this.previewHideContent = hideContent;
+			},
 		});
 	}
 

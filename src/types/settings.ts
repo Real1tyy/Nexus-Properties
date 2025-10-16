@@ -30,6 +30,7 @@ export const NexusPropertiesSettingsSchema = z.object({
 		.min(50)
 		.max(100)
 		.default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ENLARGED_WIDTH_PERCENT),
+	graphZoomPreviewHeight: z.number().min(100).max(700).default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ZOOM_PREVIEW_HEIGHT),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

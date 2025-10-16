@@ -140,6 +140,14 @@
 	color: var(--text-normal);
 }
 
+/* Wrapper for zoom preview - sits between header and graph */
+.nexus-graph-zoom-preview-wrapper {
+	width: 100%;
+	flex-shrink: 0;
+	position: relative;
+	z-index: 10;
+}
+
 .nexus-graph-view-container {
 	flex: 1;
 	width: 100%;
@@ -329,42 +337,46 @@
 	background-color: var(--background-modifier-error-hover);
 }
 
-/* Exit Zoom Mode Toggle */
-.nexus-graph-exit-zoom-container {
-	position: absolute;
-	top: 1em;
-	right: 1em;
-	background-color: var(--background-primary);
-	padding: 0.5em 1em;
-	border-radius: 6px;
-	border: 1px solid var(--background-modifier-border);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-	z-index: 101;
+/* Toggle containers */
+.nexus-graph-toggle-container {
 	display: flex;
 	align-items: center;
 	gap: 0.5em;
-	font-size: 0.9em;
+	padding: 0.4em 0.8em;
+	background-color: var(--background-primary);
+	border-radius: 6px;
+	border: 1px solid var(--background-modifier-border);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+	font-size: 0.85em;
 	cursor: pointer;
 	transition: all 0.2s ease;
+	user-select: none;
 }
 
-.nexus-graph-exit-zoom-container:hover {
+.nexus-graph-toggle-container:hover {
 	background-color: var(--background-secondary);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
+.nexus-graph-toggle-container:active {
+	transform: scale(0.98);
+}
+
+/* Make label not selectable and clickable */
+.nexus-graph-toggle-container .nexus-graph-toggle-label {
+	cursor: pointer;
+	user-select: none;
+}
+
 /* Zoom Mode Preview Overlay */
 .nexus-graph-zoom-preview {
-	position: absolute;
-	top: 0;
-	left: 0;
-	right: 0;
-	max-height: 40%;
-	min-height: 200px;
+	position: relative;
+	width: 100%;
+	max-height: 280px;
+	min-height: 180px;
 	background: linear-gradient(to bottom, var(--background-primary) 0%, var(--background-primary) 85%, transparent 100%);
 	border-bottom: 2px solid var(--background-modifier-border);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-	z-index: 100;
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
@@ -383,31 +395,50 @@
 	}
 }
 
-.nexus-graph-zoom-preview-header {
-	padding: 1.5em 2em 1em 2em;
+/* Controls container - header and toggles in flexbox */
+.nexus-graph-zoom-preview-controls {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	padding: 1em 1.5em;
 	border-bottom: 1px solid var(--background-modifier-border);
 	flex-shrink: 0;
+	gap: 1em;
 }
 
 .nexus-graph-zoom-preview-title {
 	margin: 0;
 	color: var(--text-normal);
-	font-size: 1.8em;
+	font-size: 1.3em;
 	font-weight: 700;
 	letter-spacing: -0.02em;
 	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.nexus-graph-zoom-preview-title:hover {
+	color: var(--interactive-accent);
+}
+
+/* Toggles container - right side */
+.nexus-graph-zoom-preview-toggles {
+	display: flex;
+	gap: 0.75em;
+	align-items: center;
 }
 
 .nexus-graph-zoom-preview-frontmatter {
-	padding: 1em 2em;
+	padding: 0.7em 1.4em;
 	display: grid;
-	grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-	gap: 0.75em;
+	grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+	gap: 0.5em;
 	border-bottom: 1px solid var(--background-modifier-border);
 	background-color: var(--background-secondary-alt);
 	flex-shrink: 0;
-	max-height: 150px;
+	max-height: 105px;
 	overflow-y: auto;
+	font-size: 0.9em;
 }
 
 .nexus-graph-zoom-preview-property {
@@ -432,6 +463,40 @@
 	font-size: 0.9em;
 	color: var(--text-normal);
 	word-break: break-word;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 0.25em;
+}
+
+.nexus-graph-zoom-preview-property-link {
+	color: var(--link-color);
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.2s ease;
+}
+
+.nexus-graph-zoom-preview-property-link:hover {
+	color: var(--link-color-hover);
+	text-decoration: underline;
+}
+
+.nexus-graph-zoom-preview-property-text {
+	color: var(--text-normal);
+}
+
+.nexus-graph-zoom-preview-property-empty {
+	color: var(--text-faint);
+	font-style: italic;
+}
+
+.nexus-graph-zoom-preview-property-separator {
+	color: var(--text-muted);
+}
+
+.nexus-graph-zoom-preview-empty {
+	color: var(--text-muted);
+	font-style: italic;
+	padding: 0.5em 0;
 }
 
 .nexus-graph-zoom-preview-content {

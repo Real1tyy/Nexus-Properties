@@ -55,6 +55,22 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 						}));
 					})
 			);
+
+		new Setting(containerEl)
+			.setName("Zoom preview height")
+			.setDesc("Maximum height in pixels for the zoom preview panel (150-500px)")
+			.addSlider((slider) =>
+				slider
+					.setLimits(120, 700, 10)
+					.setValue(settings.graphZoomPreviewHeight)
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							graphZoomPreviewHeight: value,
+						}));
+					})
+			);
 	}
 
 	private addPreviewSettings(containerEl: HTMLElement): void {
