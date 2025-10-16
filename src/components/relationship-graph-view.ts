@@ -5,6 +5,7 @@ import type { Subscription } from "rxjs";
 import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
 import { extractDisplayName, extractFilePath, getFileContext } from "../utils/file";
+import { FilterEvaluator } from "../utils/filters";
 import { formatValueForNode } from "../utils/frontmatter-value";
 import { GraphHeader } from "./graph-header";
 import { GraphZoomPreview } from "./graph-zoom-preview";
@@ -33,6 +34,7 @@ export class RelationshipGraphView extends ItemView {
 	private focusedNodeId: string | null = null;
 	private zoomPreview: GraphZoomPreview | null = null;
 	private isUpdating = false;
+	private filterEvaluator!: FilterEvaluator;
 	// Persistent toggle states for preview
 	private previewHideFrontmatter = false;
 	private previewHideContent = false;
@@ -95,6 +97,9 @@ export class RelationshipGraphView extends ItemView {
 		this.graphContainerEl = contentEl.createEl("div", {
 			cls: "nexus-graph-view-container",
 		});
+
+		// Initialize filter evaluator bound to live settings
+		this.filterEvaluator = new FilterEvaluator(this.plugin.settingsStore.settings$);
 
 		// Register event listener for active file changes
 		this.registerEvent(
@@ -302,6 +307,9 @@ export class RelationshipGraphView extends ItemView {
 			} else {
 				({ nodes, edges } = this.buildGraphData(this.currentFile.path));
 			}
+
+			// Apply filtering of nodes and edges based on frontmatter
+			({ nodes, edges } = this.applyGraphFilters(nodes, edges));
 
 			this.destroyGraph();
 
@@ -826,6 +834,37 @@ export class RelationshipGraphView extends ItemView {
 		buildDownwardsBFS();
 
 		return { nodes, edges };
+	}
+
+	private applyGraphFilters(
+		nodes: ElementDefinition[],
+		edges: ElementDefinition[]
+	): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
+		const keepNodeIds = new Set<string>();
+
+		for (const n of nodes) {
+			const id = n.data?.id as string | undefined;
+			if (!id) continue;
+
+			if (n.data?.isSource) {
+				keepNodeIds.add(id);
+				continue;
+			}
+
+			const context = getFileContext(this.app, id);
+			const fm = context.frontmatter ?? {};
+			const matchesAllFilters = this.filterEvaluator.evaluateFilters(fm);
+			if (matchesAllFilters) {
+				keepNodeIds.add(id);
+			}
+		}
+
+		const filteredNodes = nodes.filter((n) => keepNodeIds.has(n.data?.id as string));
+		const filteredEdges = edges.filter(
+			(e) => keepNodeIds.has(e.data?.source as string) && keepNodeIds.has(e.data?.target as string)
+		);
+
+		return { nodes: filteredNodes, edges: filteredEdges };
 	}
 
 	private enterZoomMode(filePath: string): void {
