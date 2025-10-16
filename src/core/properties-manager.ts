@@ -51,39 +51,11 @@ export class PropertiesManager {
 	}
 
 	private async linkSiblingsIfNeeded(relationships: FileRelationships): Promise<void> {
-		const currentFilePath = relationships.filePath;
-		const currentContext = getFileContext(this.app, currentFilePath);
-		const siblings = new Set<string>();
+		const currentContext = getFileContext(this.app, relationships.filePath);
+		const siblings = this.getSiblings(relationships);
 
-		// Parse parent wiki links to get file paths
-		const parentPaths = parsePropertyLinks(relationships.parent);
-
-		// Find all siblings by looking at each parent's children
-		for (const parentPath of parentPaths) {
-			const parentContext = getFileContext(this.app, parentPath);
-			if (!parentContext.file || !parentContext.frontmatter) {
-				continue;
-			}
-
-			// Get all children of this parent
-			const childrenLinks = parsePropertyLinks(parentContext.frontmatter[this.settings.childrenProp]);
-
-			for (const childLink of childrenLinks) {
-				const childContext = getFileContext(this.app, childLink);
-				// Exclude self from siblings
-				if (childContext.pathWithExt !== currentFilePath) {
-					siblings.add(childContext.pathWithExt);
-				}
-			}
-		}
-
-		// Add siblings to current file's related property
 		for (const siblingPath of siblings) {
-			await this.addToProperty(currentFilePath, this.settings.relatedProp, siblingPath);
-		}
-
-		// Add current file to each sibling's related property
-		for (const siblingPath of siblings) {
+			await this.addToProperty(relationships.filePath, this.settings.relatedProp, siblingPath);
 			await this.addToProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
 		}
 	}
@@ -95,30 +67,26 @@ export class PropertiesManager {
 	): Promise<void> {
 		const currentContext = getFileContext(this.app, filePath);
 
-		// Get old and new siblings
-		const oldSiblings = await this.getSiblings(oldRelationships);
-		const newSiblings = await this.getSiblings(newRelationships);
+		const oldSiblings = this.getSiblings(oldRelationships);
+		const newSiblings = this.getSiblings(newRelationships);
+		const oldSet = new Set(oldSiblings);
+		const newSet = new Set(newSiblings);
 
-		// Find siblings that were removed (no longer share a parent)
-		const removedSiblings = oldSiblings.filter((s) => !newSiblings.includes(s));
+		const removedSiblings = oldSiblings.filter((s) => !newSet.has(s));
+		const addedSiblings = newSiblings.filter((s) => !oldSet.has(s));
 
-		// Find siblings that were added (now share a parent)
-		const addedSiblings = newSiblings.filter((s) => !oldSiblings.includes(s));
-
-		// Remove current file from old siblings' related property
 		for (const siblingPath of removedSiblings) {
 			await this.removeFromProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
 			await this.removeFromProperty(filePath, this.settings.relatedProp, siblingPath);
 		}
 
-		// Add current file to new siblings' related property
 		for (const siblingPath of addedSiblings) {
 			await this.addToProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
 			await this.addToProperty(filePath, this.settings.relatedProp, siblingPath);
 		}
 	}
 
-	private async getSiblings(relationships: FileRelationships): Promise<string[]> {
+	private getSiblings(relationships: FileRelationships): string[] {
 		const parentPaths = parsePropertyLinks(relationships.parent);
 
 		const allSiblings = parentPaths
