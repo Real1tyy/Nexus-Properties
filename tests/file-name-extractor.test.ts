@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { extractDisplayName, extractFilePath } from "../src/utils/file-name-extractor";
+import { extractDisplayName, extractFilePath } from "../src/utils/file";
 
 describe("extractDisplayName", () => {
 	describe("Wiki links with aliases", () => {
