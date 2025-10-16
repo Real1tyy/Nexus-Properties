@@ -254,3 +254,122 @@ export function normalizeProperties(frontmatter: Frontmatter, propertyNames: str
 
 	return result;
 }
+
+// ============================================================================
+// String Utilities
+// ============================================================================
+
+/**
+ * Truncates a string to a maximum length, adding ellipsis if needed.
+ */
+export function truncateString(text: string, maxLength: number): string {
+	return text.length > maxLength ? `${text.substring(0, maxLength)}...` : text;
+}
+
+/**
+ * Removes wiki link syntax from a string for cleaner display.
+ * Converts [[Link|Alias]] to just "Link" or [[Link]] to "Link".
+ */
+export function removeWikiLinks(text: string): string {
+	return text.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, "$1");
+}
+
+// ============================================================================
+// Array Formatting Utilities
+// ============================================================================
+
+/**
+ * Formats an array as a compact comma-separated string with smart truncation.
+ * Shows "item1, item2, +3" if the full list would exceed maxLength.
+ */
+export function formatArrayCompact(items: string[], maxLength: number): string {
+	if (items.length === 0) {
+		return "";
+	}
+
+	// Single item - just truncate it
+	if (items.length === 1) {
+		return truncateString(items[0], maxLength);
+	}
+
+	const joined = items.join(", ");
+
+	// Fits within limit - return as is
+	if (joined.length <= maxLength) {
+		return joined;
+	}
+
+	// Too long - show first few items + count
+	let result = "";
+	let count = 0;
+
+	for (const item of items) {
+		const testResult = result ? `${result}, ${item}` : item;
+
+		if (testResult.length > maxLength - 5) {
+			const remaining = items.length - count;
+			return `${result}${remaining > 0 ? `, +${remaining}` : ""}`;
+		}
+
+		result = testResult;
+		count++;
+	}
+
+	return result;
+}
+
+// ============================================================================
+// Node Display Formatting
+// ============================================================================
+
+/**
+ * Formats a frontmatter value for compact display inside graph nodes.
+ * Truncates long values and handles arrays gracefully.
+ *
+ * @param value - The frontmatter value to format
+ * @param maxLength - Maximum length before truncation (default: 20)
+ * @returns Formatted string suitable for node display
+ *
+ * @example
+ * formatValueForNode("completed") // "completed"
+ * formatValueForNode("A very long string that exceeds the limit") // "A very long string..."
+ * formatValueForNode(["tag1", "tag2", "tag3"]) // "tag1, tag2, tag3"
+ * formatValueForNode(["tag1", "tag2", "tag3", "tag4", "tag5"], 15) // "tag1, tag2, +3"
+ * formatValueForNode(true) // "Yes"
+ * formatValueForNode(42) // "42"
+ */
+export function formatValueForNode(value: unknown, maxLength = 20): string {
+	if (isEmptyValue(value)) {
+		return "";
+	}
+
+	// Booleans: reuse formatValue logic
+	if (typeof value === "boolean") {
+		return value ? "Yes" : "No";
+	}
+
+	// Numbers: reuse formatValue logic
+	if (typeof value === "number") {
+		return value.toString();
+	}
+
+	// Arrays: extract strings and format compactly
+	if (Array.isArray(value)) {
+		const stringValues = value.filter((item): item is string => typeof item === "string");
+		return formatArrayCompact(stringValues, maxLength);
+	}
+
+	// Strings: clean wiki links and truncate
+	if (typeof value === "string") {
+		const cleaned = removeWikiLinks(value);
+		return truncateString(cleaned, maxLength);
+	}
+
+	// Objects: stringify and truncate
+	if (typeof value === "object" && value !== null) {
+		const jsonStr = JSON.stringify(value);
+		return truncateString(jsonStr, maxLength);
+	}
+
+	return String(value);
+}

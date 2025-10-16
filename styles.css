@@ -555,3 +555,54 @@
 .nexus-graph-zoom-preview-content::-webkit-scrollbar-thumb:hover {
 	background: var(--text-faint);
 }
+
+/* Property Tooltip */
+.nexus-property-tooltip {
+	position: fixed;
+	z-index: 1000;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	padding: 0.5em 0.75em;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	font-size: 0.85em;
+	max-width: 300px;
+	pointer-events: auto;
+}
+
+.nexus-property-tooltip-item {
+	display: flex;
+	gap: 0.5em;
+	margin-bottom: 0.25em;
+}
+
+.nexus-property-tooltip-item:last-child {
+	margin-bottom: 0;
+}
+
+.nexus-property-tooltip-key {
+	color: var(--text-muted);
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.nexus-property-tooltip-value {
+	color: var(--text-normal);
+	word-break: break-word;
+}
+
+.nexus-property-link {
+	color: var(--link-color);
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.nexus-property-link:hover {
+	color: var(--link-color-hover);
+	text-decoration: underline;
+}
+
+.nexus-property-separator {
+	color: var(--text-muted);
+}
