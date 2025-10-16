@@ -119,38 +119,21 @@ export class PropertiesManager {
 	}
 
 	private async getSiblings(relationships: FileRelationships): Promise<string[]> {
-		const siblings = new Set<string>();
-
-		// Parse parent wiki links to get file paths
 		const parentPaths = parsePropertyLinks(relationships.parent);
 
-		// Find all siblings by looking at each parent's children
-		for (const parentPath of parentPaths) {
-			const parentContext = getFileContext(this.app, parentPath);
+		const allSiblings = parentPaths
+			.map((parentPath) => getFileContext(this.app, parentPath))
+			.filter((parentContext) => parentContext.file)
+			.flatMap((parentContext) => {
+				const freshFrontmatter = this.app.metadataCache.getFileCache(parentContext.file!)?.frontmatter;
+				if (!freshFrontmatter) return [];
 
-			if (!parentContext.file) {
-				continue;
-			}
+				return parsePropertyLinks(freshFrontmatter[this.settings.childrenProp]);
+			})
+			.map((childLink) => getFileContext(this.app, childLink).pathWithExt)
+			.filter((path) => path !== relationships.filePath);
 
-			// Get fresh frontmatter from metadata cache instead of using cached context
-			const freshFrontmatter = this.app.metadataCache.getFileCache(parentContext.file)?.frontmatter;
-			if (!freshFrontmatter) {
-				continue;
-			}
-
-			// Get all children of this parent
-			const childrenLinks = parsePropertyLinks(freshFrontmatter[this.settings.childrenProp]);
-
-			for (const childLink of childrenLinks) {
-				const childContext = getFileContext(this.app, childLink);
-				// Exclude self from siblings
-				if (childContext.pathWithExt !== relationships.filePath) {
-					siblings.add(childContext.pathWithExt);
-				}
-			}
-		}
-
-		return Array.from(siblings);
+		return [...new Set(allSiblings)];
 	}
 
 	private async addToProperty(targetFilePath: string, propertyName: string, fileToAdd: string): Promise<void> {
