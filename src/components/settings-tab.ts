@@ -17,6 +17,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		this.addUserInterfaceSettings(containerEl);
 		this.addPreviewSettings(containerEl);
+		this.addFilteringSettings(containerEl);
 		this.addRescanSection(containerEl);
 		this.addDirectorySettings(containerEl);
 		this.addDirectRelationshipSettings(containerEl);
@@ -101,6 +102,64 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					}));
 				})
 			);
+	}
+
+	private addFilteringSettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("Graph filtering").setHeading();
+
+		const desc = containerEl.createDiv();
+		desc.createEl("p", {
+			text: "Hide nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false; use 'fm' to access frontmatter.",
+		});
+
+		const examples = [
+			"fm.Status === 'Archived'",
+			"fm.private === true",
+			"Array.isArray(fm.tags) && fm.tags.includes('hidden')",
+		];
+
+		const examplesContainer = desc.createDiv("settings-info-box");
+		examplesContainer.createEl("strong", { text: "Examples:" });
+		const ul = examplesContainer.createEl("ul");
+		examples.forEach((ex) => {
+			const li = ul.createEl("li");
+			const code = li.createEl("code", { text: ex });
+			code.addClass("settings-info-box-example");
+		});
+
+		new Setting(containerEl)
+			.setName("Filter expressions")
+			.setDesc(
+				"One per line. Changes apply on blur or Ctrl/Cmd+Enter. Nodes matching all expressions are removed from the graph."
+			)
+			.addTextArea((text) => {
+				text.setPlaceholder("fm.Status === 'Archived'\nfm.private === true");
+				text.setValue((settings.filterExpressions ?? []).join("\n"));
+
+				const commit = async (value: string) => {
+					const expressions = value
+						.split("\n")
+						.map((s) => s.trim())
+						.filter((s) => s.length > 0);
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						filterExpressions: expressions,
+					}));
+				};
+
+				text.inputEl.addEventListener("blur", () => void commit(text.inputEl.value));
+				text.inputEl.addEventListener("keydown", (e: KeyboardEvent) => {
+					if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+						e.preventDefault();
+						void commit(text.inputEl.value);
+					}
+				});
+
+				text.inputEl.rows = 5;
+				text.inputEl.addClass("settings-info-box-example");
+			});
 	}
 
 	private addRescanSection(containerEl: HTMLElement): void {
