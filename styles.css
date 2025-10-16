@@ -110,7 +110,7 @@
 .nexus-graph-view-header {
 	display: flex;
 	flex-direction: row;
-	align-items: center;
+	align-items: flex-start;
 	gap: 1em;
 	padding: 1em;
 	border-bottom: 2px solid var(--background-modifier-border);
@@ -123,16 +123,19 @@
 	color: var(--text-normal);
 	font-size: 1.1em;
 	font-weight: 600;
-	flex-shrink: 0;
+	flex: 1;
+	min-width: 0;
+	overflow-wrap: break-word;
+	word-wrap: break-word;
+	word-break: break-word;
 }
 
 .nexus-graph-controls-container {
 	display: flex;
-	flex-direction: row;
-	align-items: center;
-	gap: 1em;
-	flex-wrap: wrap;
-	flex: 1;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 0.5em;
+	flex-shrink: 0;
 }
 
 .nexus-graph-toggle-container {
@@ -554,4 +557,78 @@
 .nexus-graph-zoom-preview-frontmatter::-webkit-scrollbar-thumb:hover,
 .nexus-graph-zoom-preview-content::-webkit-scrollbar-thumb:hover {
 	background: var(--text-faint);
+}
+
+/* Property Tooltip */
+.nexus-property-tooltip {
+	position: fixed;
+	z-index: 1000;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	padding: 0.65em 0.85em;
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+	font-size: 0.85em;
+	max-width: 300px;
+	pointer-events: auto;
+}
+
+.nexus-property-tooltip-title {
+	margin-bottom: 0.5em;
+}
+
+.nexus-property-tooltip-title-link {
+	color: var(--text-normal);
+	font-size: 1.1em;
+	font-weight: 600;
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.nexus-property-tooltip-title-link:hover {
+	color: var(--link-color);
+}
+
+.nexus-property-tooltip-separator {
+	height: 1px;
+	background-color: var(--background-modifier-border);
+	margin: 0.5em -0.85em 0.65em -0.85em;
+}
+
+.nexus-property-tooltip-item {
+	display: flex;
+	gap: 0.5em;
+	margin-bottom: 0.25em;
+}
+
+.nexus-property-tooltip-item:last-child {
+	margin-bottom: 0;
+}
+
+.nexus-property-tooltip-key {
+	color: var(--text-muted);
+	font-weight: 600;
+	flex-shrink: 0;
+}
+
+.nexus-property-tooltip-value {
+	color: var(--text-normal);
+	word-break: break-word;
+}
+
+.nexus-property-link {
+	color: var(--link-color);
+	text-decoration: none;
+	cursor: pointer;
+	transition: color 0.2s;
+}
+
+.nexus-property-link:hover {
+	color: var(--link-color-hover);
+	text-decoration: underline;
+}
+
+.nexus-property-separator {
+	color: var(--text-muted);
 }

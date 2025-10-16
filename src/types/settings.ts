@@ -34,6 +34,7 @@ export const NexusPropertiesSettingsSchema = z.object({
 
 	// Graph filtering settings
 	filterExpressions: z.array(z.string()).default([]),
+	displayNodeProperties: z.array(z.string()).default([...SETTINGS_DEFAULTS.DEFAULT_DISPLAY_NODE_PROPERTIES]),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

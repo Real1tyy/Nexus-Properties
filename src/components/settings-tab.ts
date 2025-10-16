@@ -16,6 +16,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		containerEl.createEl("h1", { text: "Nexus Properties Settings" });
 
 		this.addUserInterfaceSettings(containerEl);
+		this.addGraphSettings(containerEl);
 		this.addPreviewSettings(containerEl);
 		this.addFilteringSettings(containerEl);
 		this.addRescanSection(containerEl);
@@ -40,6 +41,12 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					}));
 				})
 			);
+	}
+
+	private addGraphSettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("Graph Display").setHeading();
 
 		new Setting(containerEl)
 			.setName("Graph enlarged width")
@@ -72,6 +79,27 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 						}));
 					})
 			);
+
+		new Setting(containerEl)
+			.setName("Display properties in nodes")
+			.setDesc("Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)")
+			.addText((text) => {
+				text
+					.setPlaceholder("e.g., status, priority")
+					.setValue(settings.displayNodeProperties.join(", "))
+					.onChange(async (value) => {
+						const properties = value
+							.split(",")
+							.map((p) => p.trim())
+							.filter((p) => p.length > 0);
+
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							displayNodeProperties: properties,
+						}));
+					});
+				text.inputEl.addClass("nexus-property-input");
+			});
 	}
 
 	private addPreviewSettings(containerEl: HTMLElement): void {

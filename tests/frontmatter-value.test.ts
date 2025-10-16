@@ -1,13 +1,17 @@
 import * as fc from "fast-check";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import {
+	formatArrayCompact,
 	formatValue,
+	formatValueForNode,
 	isEmptyValue,
 	normalizeProperties,
 	normalizeProperty,
 	parseValue,
 	parseWikiLink,
+	removeWikiLinks,
 	serializeValue,
+	truncateString,
 } from "../src/utils/frontmatter-value";
 
 // ============================================================================
@@ -788,6 +792,174 @@ describe("normalizeProperties", () => {
 					}
 				})
 			);
+		});
+	});
+});
+
+// ============================================================================
+// String Utility Tests
+// ============================================================================
+
+describe("truncateString", () => {
+	it("should not truncate strings shorter than maxLength", () => {
+		expect(truncateString("short", 10)).toBe("short");
+		expect(truncateString("exactly10!", 10)).toBe("exactly10!");
+	});
+
+	it("should truncate strings longer than maxLength", () => {
+		expect(truncateString("this is a very long string", 10)).toBe("this is a ...");
+	});
+
+	it("should handle empty strings", () => {
+		expect(truncateString("", 10)).toBe("");
+	});
+
+	it("should handle maxLength of 0", () => {
+		expect(truncateString("text", 0)).toBe("...");
+	});
+});
+
+describe("removeWikiLinks", () => {
+	it("should remove simple wiki links", () => {
+		expect(removeWikiLinks("[[Link]]")).toBe("Link");
+	});
+
+	it("should remove wiki links with aliases", () => {
+		expect(removeWikiLinks("[[Link|Alias]]")).toBe("Link");
+	});
+
+	it("should handle multiple wiki links", () => {
+		expect(removeWikiLinks("[[Link1]] and [[Link2|Alias]]")).toBe("Link1 and Link2");
+	});
+
+	it("should handle text without wiki links", () => {
+		expect(removeWikiLinks("plain text")).toBe("plain text");
+	});
+
+	it("should handle nested paths in wiki links", () => {
+		expect(removeWikiLinks("[[folder/subfolder/file]]")).toBe("folder/subfolder/file");
+	});
+
+	it("should handle empty strings", () => {
+		expect(removeWikiLinks("")).toBe("");
+	});
+});
+
+describe("formatArrayCompact", () => {
+	it("should return empty string for empty array", () => {
+		expect(formatArrayCompact([], 20)).toBe("");
+	});
+
+	it("should return single item without truncation if it fits", () => {
+		expect(formatArrayCompact(["item"], 20)).toBe("item");
+	});
+
+	it("should truncate single long item", () => {
+		expect(formatArrayCompact(["this is a very long item"], 10)).toBe("this is a ...");
+	});
+
+	it("should join multiple items if they fit", () => {
+		expect(formatArrayCompact(["a", "b", "c"], 20)).toBe("a, b, c");
+	});
+
+	it("should show +count when items exceed maxLength", () => {
+		const result = formatArrayCompact(["tag1", "tag2", "tag3", "tag4", "tag5"], 15);
+		expect(result).toMatch(/\+\d+$/); // Should end with +N
+		expect(result.length).toBeLessThanOrEqual(15);
+	});
+
+	it("should handle exact fit without truncation", () => {
+		expect(formatArrayCompact(["abc", "def"], 8)).toBe("abc, def");
+	});
+});
+
+// ============================================================================
+// Node Display Formatting Tests
+// ============================================================================
+
+describe("formatValueForNode", () => {
+	describe("empty values", () => {
+		it("should return empty string for null/undefined", () => {
+			expect(formatValueForNode(null)).toBe("");
+			expect(formatValueForNode(undefined)).toBe("");
+		});
+
+		it("should return empty string for empty string", () => {
+			expect(formatValueForNode("")).toBe("");
+			expect(formatValueForNode("   ")).toBe("");
+		});
+
+		it("should return empty string for empty array", () => {
+			expect(formatValueForNode([])).toBe("");
+		});
+	});
+
+	describe("booleans", () => {
+		it("should format true as Yes", () => {
+			expect(formatValueForNode(true)).toBe("Yes");
+		});
+
+		it("should format false as No", () => {
+			expect(formatValueForNode(false)).toBe("No");
+		});
+	});
+
+	describe("numbers", () => {
+		it("should format numbers as strings", () => {
+			expect(formatValueForNode(42)).toBe("42");
+			expect(formatValueForNode(0)).toBe("0");
+			expect(formatValueForNode(-10.5)).toBe("-10.5");
+		});
+	});
+
+	describe("strings", () => {
+		it("should remove wiki links", () => {
+			expect(formatValueForNode("[[Link]]")).toBe("Link");
+			expect(formatValueForNode("[[Link|Alias]]")).toBe("Link");
+		});
+
+		it("should truncate long strings", () => {
+			const result = formatValueForNode("this is a very long string that exceeds limit", 10);
+			expect(result).toBe("this is a ...");
+		});
+
+		it("should not truncate short strings", () => {
+			expect(formatValueForNode("short", 20)).toBe("short");
+		});
+	});
+
+	describe("arrays", () => {
+		it("should format array of strings", () => {
+			expect(formatValueForNode(["a", "b", "c"])).toBe("a, b, c");
+		});
+
+		it("should filter out non-string values", () => {
+			expect(formatValueForNode(["a", 42, "b", null, "c"])).toBe("a, b, c");
+		});
+
+		it("should truncate long arrays", () => {
+			const result = formatValueForNode(["tag1", "tag2", "tag3", "tag4", "tag5"], 15);
+			expect(result).toMatch(/\+\d+$/);
+		});
+
+		it("should return empty for array of non-strings", () => {
+			expect(formatValueForNode([1, 2, 3])).toBe("");
+		});
+	});
+
+	describe("objects", () => {
+		it("should stringify and truncate objects", () => {
+			const obj = { key1: "value1", key2: "value2", key3: "value3" };
+			const result = formatValueForNode(obj, 20);
+			expect(result).toContain("{");
+			expect(result.length).toBeLessThanOrEqual(23); // 20 + "..."
+		});
+	});
+
+	describe("custom maxLength", () => {
+		it("should respect custom maxLength parameter", () => {
+			const result = formatValueForNode("this is a test string", 8);
+			expect(result).toBe("this is ...");
 		});
 	});
 });
