@@ -1,7 +1,7 @@
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { isEmptyValue } from "../utils/value-check-utils";
+import { isEmptyValue } from "../utils/frontmatter-value";
 import { PropertyRenderer } from "./property-renderer";
 
 export interface GraphZoomPreviewProps {

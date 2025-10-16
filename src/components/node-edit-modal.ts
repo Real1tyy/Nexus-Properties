@@ -1,5 +1,5 @@
 import { type App, Modal, type TFile } from "obsidian";
-import { parseValue, serializeValue } from "../utils/frontmatter-value-utils";
+import { parseValue, serializeValue } from "../utils/frontmatter-value";
 
 interface PropertyRow {
 	key: string;

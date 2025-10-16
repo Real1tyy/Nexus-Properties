@@ -1,5 +1,5 @@
 import type { App, TFile } from "obsidian";
-import { formatValue, parseWikiLink } from "../utils/frontmatter-value-utils";
+import { formatValue, parseWikiLink } from "../utils/frontmatter-value";
 
 export interface PropertyRendererOptions {
 	containerClass: string;

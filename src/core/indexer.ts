@@ -13,7 +13,7 @@ import {
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { normalizeProperty } from "../utils/property-normalizer";
+import { normalizeProperty } from "../utils/frontmatter-value";
 
 export interface FileRelationships {
 	filePath: string;

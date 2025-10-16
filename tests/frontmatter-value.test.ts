@@ -1,6 +1,327 @@
 import * as fc from "fast-check";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { normalizeProperties, normalizeProperty } from "../src/utils/property-normalizer";
+import {
+	formatValue,
+	isEmptyValue,
+	normalizeProperties,
+	normalizeProperty,
+	parseValue,
+	parseWikiLink,
+	serializeValue,
+} from "../src/utils/frontmatter-value";
+
+// ============================================================================
+// isEmptyValue Tests
+// ============================================================================
+
+describe("isEmptyValue", () => {
+	describe("null and undefined", () => {
+		it("should return true for null", () => {
+			expect(isEmptyValue(null)).toBe(true);
+		});
+
+		it("should return true for undefined", () => {
+			expect(isEmptyValue(undefined)).toBe(true);
+		});
+	});
+
+	describe("strings", () => {
+		it("should return true for empty string", () => {
+			expect(isEmptyValue("")).toBe(true);
+		});
+
+		it("should return true for whitespace-only string", () => {
+			expect(isEmptyValue("   ")).toBe(true);
+			expect(isEmptyValue("\t")).toBe(true);
+			expect(isEmptyValue("\n")).toBe(true);
+			expect(isEmptyValue(" \t\n ")).toBe(true);
+		});
+
+		it("should return false for non-empty string", () => {
+			expect(isEmptyValue("hello")).toBe(false);
+			expect(isEmptyValue("0")).toBe(false);
+			expect(isEmptyValue(" a ")).toBe(false);
+		});
+	});
+
+	describe("arrays", () => {
+		it("should return true for empty array", () => {
+			expect(isEmptyValue([])).toBe(true);
+		});
+
+		it("should return false for non-empty array", () => {
+			expect(isEmptyValue([1])).toBe(false);
+			expect(isEmptyValue([null])).toBe(false);
+			expect(isEmptyValue([""])).toBe(false);
+			expect(isEmptyValue([undefined])).toBe(false);
+		});
+	});
+
+	describe("other types", () => {
+		it("should return false for numbers", () => {
+			expect(isEmptyValue(0)).toBe(false);
+			expect(isEmptyValue(1)).toBe(false);
+			expect(isEmptyValue(-1)).toBe(false);
+			expect(isEmptyValue(3.14)).toBe(false);
+		});
+
+		it("should return false for booleans", () => {
+			expect(isEmptyValue(false)).toBe(false);
+			expect(isEmptyValue(true)).toBe(false);
+		});
+
+		it("should return false for objects", () => {
+			expect(isEmptyValue({})).toBe(false);
+			expect(isEmptyValue({ key: "value" })).toBe(false);
+		});
+
+		it("should return false for functions", () => {
+			expect(isEmptyValue(() => {})).toBe(false);
+		});
+
+		it("should return false for symbols", () => {
+			expect(isEmptyValue(Symbol("test"))).toBe(false);
+		});
+	});
+
+	describe("edge cases", () => {
+		it("should handle empty object (not empty)", () => {
+			expect(isEmptyValue({})).toBe(false);
+		});
+
+		it("should handle string with only spaces", () => {
+			expect(isEmptyValue("     ")).toBe(true);
+		});
+
+		it("should handle zero as not empty", () => {
+			expect(isEmptyValue(0)).toBe(false);
+		});
+
+		it("should handle false as not empty", () => {
+			expect(isEmptyValue(false)).toBe(false);
+		});
+	});
+});
+
+// ============================================================================
+// serializeValue Tests
+// ============================================================================
+
+describe("serializeValue", () => {
+	it("should return empty string for null", () => {
+		expect(serializeValue(null)).toBe("");
+	});
+
+	it("should return empty string for undefined", () => {
+		expect(serializeValue(undefined)).toBe("");
+	});
+
+	it("should serialize string values", () => {
+		expect(serializeValue("hello")).toBe("hello");
+	});
+
+	it("should serialize number values", () => {
+		expect(serializeValue(42)).toBe("42");
+		expect(serializeValue(3.14)).toBe("3.14");
+	});
+
+	it("should serialize boolean values", () => {
+		expect(serializeValue(true)).toBe("true");
+		expect(serializeValue(false)).toBe("false");
+	});
+
+	it("should serialize arrays with comma separation", () => {
+		expect(serializeValue(["tag1", "tag2", "tag3"])).toBe("tag1, tag2, tag3");
+	});
+
+	it("should serialize nested arrays", () => {
+		expect(serializeValue([1, 2, 3])).toBe("1, 2, 3");
+	});
+
+	it("should serialize objects as JSON", () => {
+		const obj = { key: "value", nested: { prop: 123 } };
+		expect(serializeValue(obj)).toBe(JSON.stringify(obj));
+	});
+
+	it("should handle mixed array types", () => {
+		expect(serializeValue(["text", 123, true])).toBe("text, 123, true");
+	});
+});
+
+// ============================================================================
+// parseValue Tests
+// ============================================================================
+
+describe("parseValue", () => {
+	it("should return empty string for empty input", () => {
+		expect(parseValue("")).toBe("");
+		expect(parseValue("   ")).toBe("");
+	});
+
+	it("should parse boolean true", () => {
+		expect(parseValue("true")).toBe(true);
+		expect(parseValue("True")).toBe(true);
+		expect(parseValue("TRUE")).toBe(true);
+	});
+
+	it("should parse boolean false", () => {
+		expect(parseValue("false")).toBe(false);
+		expect(parseValue("False")).toBe(false);
+		expect(parseValue("FALSE")).toBe(false);
+	});
+
+	it("should parse positive integers", () => {
+		expect(parseValue("42")).toBe(42);
+		expect(parseValue("0")).toBe(0);
+	});
+
+	it("should parse negative integers", () => {
+		expect(parseValue("-42")).toBe(-42);
+	});
+
+	it("should parse decimal numbers", () => {
+		expect(parseValue("3.14")).toBe(3.14);
+		expect(parseValue("-2.5")).toBe(-2.5);
+	});
+
+	it("should parse comma-separated arrays", () => {
+		expect(parseValue("tag1, tag2, tag3")).toEqual(["tag1", "tag2", "tag3"]);
+	});
+
+	it("should handle arrays with extra whitespace", () => {
+		expect(parseValue("  tag1  ,  tag2  ,  tag3  ")).toEqual(["tag1", "tag2", "tag3"]);
+	});
+
+	it("should not parse arrays with empty items", () => {
+		expect(parseValue("tag1, , tag3")).toBe("tag1, , tag3");
+	});
+
+	it("should parse JSON objects", () => {
+		const jsonStr = '{"key": "value", "num": 123}';
+		expect(parseValue(jsonStr)).toEqual({ key: "value", num: 123 });
+	});
+
+	it("should parse JSON arrays", () => {
+		const jsonStr = '["item1", "item2", 123]';
+		expect(parseValue(jsonStr)).toEqual(["item1", "item2", 123]);
+	});
+
+	it("should return string for invalid JSON", () => {
+		expect(parseValue("{invalid json}")).toBe("{invalid json}");
+		expect(parseValue("[invalid]")).toBe("[invalid]");
+	});
+
+	it("should return plain strings", () => {
+		expect(parseValue("just a string")).toBe("just a string");
+		expect(parseValue("[[wiki link]]")).toBe("[[wiki link]]");
+	});
+
+	it("should handle strings that look like numbers but have extra chars", () => {
+		expect(parseValue("42px")).toBe("42px");
+		expect(parseValue("3.14.159")).toBe("3.14.159");
+	});
+});
+
+// ============================================================================
+// formatValue Tests
+// ============================================================================
+
+describe("formatValue", () => {
+	it("should format boolean true as 'Yes'", () => {
+		expect(formatValue(true)).toBe("Yes");
+	});
+
+	it("should format boolean false as 'No'", () => {
+		expect(formatValue(false)).toBe("No");
+	});
+
+	it("should format numbers as strings", () => {
+		expect(formatValue(42)).toBe("42");
+		expect(formatValue(3.14)).toBe("3.14");
+	});
+
+	it("should format objects as pretty JSON", () => {
+		const obj = { key: "value" };
+		expect(formatValue(obj)).toBe(JSON.stringify(obj, null, 2));
+	});
+
+	it("should format null as string", () => {
+		expect(formatValue(null)).toBe("null");
+	});
+
+	it("should format strings as-is", () => {
+		expect(formatValue("hello")).toBe("hello");
+	});
+
+	it("should format arrays as JSON", () => {
+		const arr = ["a", "b", "c"];
+		expect(formatValue(arr)).toBe(JSON.stringify(arr, null, 2));
+	});
+});
+
+// ============================================================================
+// parseWikiLink Tests
+// ============================================================================
+
+describe("parseWikiLink", () => {
+	it("should parse simple wiki link", () => {
+		const result = parseWikiLink("[[My Note]]");
+		expect(result).toEqual({
+			linkPath: "My Note",
+			displayText: "My Note",
+		});
+	});
+
+	it("should parse wiki link with alias", () => {
+		const result = parseWikiLink("[[path/to/note|Display Name]]");
+		expect(result).toEqual({
+			linkPath: "path/to/note",
+			displayText: "Display Name",
+		});
+	});
+
+	it("should handle wiki link with path", () => {
+		const result = parseWikiLink("[[folder/subfolder/note]]");
+		expect(result).toEqual({
+			linkPath: "folder/subfolder/note",
+			displayText: "folder/subfolder/note",
+		});
+	});
+
+	it("should return null for non-wiki-link strings", () => {
+		expect(parseWikiLink("plain text")).toBeNull();
+		expect(parseWikiLink("[[incomplete")).toBeNull();
+		expect(parseWikiLink("incomplete]]")).toBeNull();
+	});
+
+	it("should handle wiki links with whitespace", () => {
+		const result = parseWikiLink("[[  My Note  |  Display  ]]");
+		expect(result).toEqual({
+			linkPath: "My Note",
+			displayText: "Display",
+		});
+	});
+
+	it("should handle empty wiki links", () => {
+		const result = parseWikiLink("[[]]");
+		expect(result).toEqual({
+			linkPath: "",
+			displayText: "",
+		});
+	});
+
+	it("should handle multiple pipes (takes first)", () => {
+		const result = parseWikiLink("[[path|alias|extra]]");
+		expect(result).toEqual({
+			linkPath: "path",
+			displayText: "alias|extra",
+		});
+	});
+});
+
+// ============================================================================
+// normalizeProperty Tests
+// ============================================================================
 
 describe("normalizeProperty", () => {
 	beforeEach(() => {
@@ -204,9 +525,9 @@ describe("normalizeProperty", () => {
 			fc.assert(
 				fc.property(fc.anything(), (value) => {
 					const result = normalizeProperty(value);
-					result.forEach((item) => {
+					for (const item of result) {
 						expect(typeof item).toBe("string");
-					});
+					}
 				})
 			);
 		});
@@ -215,9 +536,9 @@ describe("normalizeProperty", () => {
 			fc.assert(
 				fc.property(fc.anything(), (value) => {
 					const result = normalizeProperty(value);
-					result.forEach((item) => {
+					for (const item of result) {
 						expect(item.trim()).not.toBe("");
-					});
+					}
 				})
 			);
 		});
@@ -389,6 +710,10 @@ describe("normalizeProperty", () => {
 	});
 });
 
+// ============================================================================
+// normalizeProperties Tests
+// ============================================================================
+
 describe("normalizeProperties", () => {
 	it("should normalize multiple properties from frontmatter", () => {
 		const frontmatter = {
@@ -442,9 +767,9 @@ describe("normalizeProperties", () => {
 					// Map deduplicates keys, so check unique property names
 					const uniquePropNames = [...new Set(propNames)];
 					expect(result.size).toBe(uniquePropNames.length);
-					uniquePropNames.forEach((name) => {
+					for (const name of uniquePropNames) {
 						expect(result.has(name)).toBe(true);
-					});
+					}
 				})
 			);
 		});
@@ -454,13 +779,13 @@ describe("normalizeProperties", () => {
 				fc.property(fc.dictionary(fc.string(), fc.anything()), fc.array(fc.string()), (frontmatter, propNames) => {
 					vi.spyOn(console, "warn").mockImplementation(() => {});
 					const result = normalizeProperties(frontmatter, propNames);
-					result.forEach((value) => {
+					for (const value of result.values()) {
 						expect(Array.isArray(value)).toBe(true);
-						value.forEach((item) => {
+						for (const item of value) {
 							expect(typeof item).toBe("string");
 							expect(item.trim()).not.toBe("");
-						});
-					});
+						}
+					}
 				})
 			);
 		});
