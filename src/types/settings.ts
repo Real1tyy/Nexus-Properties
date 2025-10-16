@@ -33,7 +33,7 @@ export const NexusPropertiesSettingsSchema = z.object({
 	graphZoomPreviewHeight: z.number().min(100).max(700).default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ZOOM_PREVIEW_HEIGHT),
 
 	// Graph filtering settings
-	filterExpressions: z.array(z.string()).default(SETTINGS_DEFAULTS.DEFAULT_FILTER_EXPRESSIONS),
+	filterExpressions: z.array(z.string()).default([]),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

@@ -111,13 +111,13 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		const desc = containerEl.createDiv();
 		desc.createEl("p", {
-			text: "Hide nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false; use 'fm' to access frontmatter.",
+			text: "Show only nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false; use 'fm' to access frontmatter. The source node is always shown.",
 		});
 
 		const examples = [
-			"fm.Status === 'Archived'",
-			"fm.private === true",
-			"Array.isArray(fm.tags) && fm.tags.includes('hidden')",
+			"fm.Status === 'Active'",
+			"fm.type === 'project'",
+			"Array.isArray(fm.tags) && fm.tags.includes('important')",
 		];
 
 		const examplesContainer = desc.createDiv("settings-info-box");
@@ -132,10 +132,10 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		new Setting(containerEl)
 			.setName("Filter expressions")
 			.setDesc(
-				"One per line. Changes apply on blur or Ctrl/Cmd+Enter. Nodes matching all expressions are removed from the graph."
+				"One per line. Changes apply on blur or Ctrl/Cmd+Enter. Only nodes matching all expressions are shown in the graph."
 			)
 			.addTextArea((text) => {
-				text.setPlaceholder("fm.Status === 'Archived'\nfm.private === true");
+				text.setPlaceholder("fm.Status === 'Active'\nfm.type === 'project'");
 				text.setValue((settings.filterExpressions ?? []).join("\n"));
 
 				const commit = async (value: string) => {

@@ -32,7 +32,7 @@ export class RelationshipGraphView extends ItemView {
 	private focusedNodeId: string | null = null;
 	private zoomPreview: GraphZoomPreview | null = null;
 	private isUpdating = false;
-	private filterEvaluator: FilterEvaluator | null = null;
+	private filterEvaluator!: FilterEvaluator;
 	// Persistent toggle states for preview
 	private previewHideFrontmatter = false;
 	private previewHideContent = false;
@@ -800,20 +800,21 @@ export class RelationshipGraphView extends ItemView {
 		nodes: ElementDefinition[],
 		edges: ElementDefinition[]
 	): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
-		if (!this.filterEvaluator) {
-			return { nodes, edges };
-		}
-
 		const keepNodeIds = new Set<string>();
 
 		for (const n of nodes) {
 			const id = n.data?.id as string | undefined;
 			if (!id) continue;
+
+			if (n.data?.isSource) {
+				keepNodeIds.add(id);
+				continue;
+			}
+
 			const context = getFileContext(this.app, id);
 			const fm = context.frontmatter ?? {};
 			const matchesAllFilters = this.filterEvaluator.evaluateFilters(fm);
-			// We hide nodes that MATCH all filters; keep the rest
-			if (!matchesAllFilters) {
+			if (matchesAllFilters) {
 				keepNodeIds.add(id);
 			}
 		}
