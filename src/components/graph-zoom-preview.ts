@@ -50,8 +50,10 @@ export class GraphZoomPreview {
 		this.previewOverlay = this.containerEl.createEl("div", {
 			cls: "nexus-graph-zoom-preview",
 		});
-		// Apply custom height from settings
-		this.previewOverlay.style.maxHeight = `${this.settings.graphZoomPreviewHeight}px`;
+		// Apply custom height from settings using CSS variable
+		this.previewOverlay.setCssProps({
+			"--zoom-preview-max-height": `${this.settings.graphZoomPreviewHeight}px`,
+		});
 		this.render();
 	}
 
@@ -171,7 +173,7 @@ export class GraphZoomPreview {
 
 		// Apply initial visibility state
 		if (this.props.initialHideFrontmatter) {
-			this.frontmatterSection.style.display = "none";
+			this.frontmatterSection.addClass("nexus-hidden");
 		}
 
 		if (Object.keys(frontmatter).length > 0) {
@@ -207,7 +209,7 @@ export class GraphZoomPreview {
 
 		// Apply initial visibility state
 		if (this.props.initialHideContent) {
-			this.contentSection.style.display = "none";
+			this.contentSection.addClass("nexus-hidden");
 		}
 
 		const content = await this.app.vault.read(this.props.file);
@@ -239,7 +241,7 @@ export class GraphZoomPreview {
 		if (!this.frontmatterSection) return;
 
 		const isHidden = this.hideFrontmatterCheckbox?.checked ?? false;
-		this.frontmatterSection.style.display = isHidden ? "none" : "";
+		this.frontmatterSection.toggleClass("nexus-hidden", isHidden);
 
 		// If both are hidden, show both
 		if (isHidden && this.hideContentCheckbox?.checked) {
@@ -247,7 +249,7 @@ export class GraphZoomPreview {
 				this.hideContentCheckbox.checked = false;
 			}
 			if (this.contentSection) {
-				this.contentSection.style.display = "";
+				this.contentSection.removeClass("nexus-hidden");
 			}
 		}
 
@@ -262,7 +264,7 @@ export class GraphZoomPreview {
 		if (!this.contentSection) return;
 
 		const isHidden = this.hideContentCheckbox?.checked ?? false;
-		this.contentSection.style.display = isHidden ? "none" : "";
+		this.contentSection.toggleClass("nexus-hidden", isHidden);
 
 		// If both are hidden, show both
 		if (isHidden && this.hideFrontmatterCheckbox?.checked) {
@@ -270,7 +272,7 @@ export class GraphZoomPreview {
 				this.hideFrontmatterCheckbox.checked = false;
 			}
 			if (this.frontmatterSection) {
-				this.frontmatterSection.style.display = "";
+				this.frontmatterSection.removeClass("nexus-hidden");
 			}
 		}
 

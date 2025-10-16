@@ -94,10 +94,10 @@ export class GraphHeader {
 
 	private updateVisibility(): void {
 		if (this.startFromCurrentContainer) {
-			this.startFromCurrentContainer.style.display = this.props.renderRelated ? "none" : "flex";
+			this.startFromCurrentContainer.toggleClass("nexus-hidden", this.props.renderRelated);
 		}
 		if (this.includeAllContainer) {
-			this.includeAllContainer.style.display = this.props.renderRelated ? "flex" : "none";
+			this.includeAllContainer.toggleClass("nexus-hidden", !this.props.renderRelated);
 		}
 	}
 

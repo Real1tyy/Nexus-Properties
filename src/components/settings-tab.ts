@@ -155,7 +155,6 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		// Show current directories
 		const directoriesContainer = containerEl.createDiv("directories-list");
-		directoriesContainer.style.marginBottom = "1em";
 
 		const renderDirectories = () => {
 			directoriesContainer.empty();
@@ -381,11 +380,7 @@ ${settings.parentProp}: "[[parent.md]]"
 			cls: "settings-info-box-example",
 		});
 
-		const infoBox = exampleContainer.createDiv("setting-item-description");
-		infoBox.style.marginTop = "1em";
-		infoBox.style.padding = "1em";
-		infoBox.style.backgroundColor = "var(--background-secondary)";
-		infoBox.style.borderRadius = "4px";
+		const infoBox = exampleContainer.createDiv("settings-info-note");
 		infoBox.createEl("strong", { text: "ℹ️ Note: " });
 		infoBox.appendText(
 			"All recursive relationships (like all parents, all children, all related) are computed dynamically in the graph view and are not stored in frontmatter."

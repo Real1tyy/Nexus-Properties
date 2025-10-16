@@ -75,9 +75,27 @@
 	line-height: 1.4;
 }
 
+/* Directories list container */
+.directories-list {
+	margin-bottom: 1em;
+}
+
+/* Settings info note box */
+.settings-info-note {
+	margin-top: 1em;
+	padding: 1em;
+	background-color: var(--background-secondary);
+	border-radius: 4px;
+}
+
 /* Settings container spacing */
 .vertical-tab-content-container {
 	padding: 2em;
+}
+
+/* Utility classes */
+.nexus-hidden {
+	display: none !important;
 }
 
 /* Relationship Graph View */
@@ -372,7 +390,7 @@
 .nexus-graph-zoom-preview {
 	position: relative;
 	width: 100%;
-	max-height: 280px;
+	max-height: var(--zoom-preview-max-height, 280px);
 	min-height: 180px;
 	background: linear-gradient(to bottom, var(--background-primary) 0%, var(--background-primary) 85%, transparent 100%);
 	border-bottom: 2px solid var(--background-modifier-border);
