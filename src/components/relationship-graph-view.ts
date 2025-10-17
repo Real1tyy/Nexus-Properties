@@ -654,6 +654,9 @@ export class RelationshipGraphView extends ItemView {
 
 		this.cy.add([...nodes, ...edges]);
 
+		const settings = this.plugin.settingsStore.settings$.value;
+		const animationDuration = settings.graphAnimationDuration;
+
 		if (this.renderRelated) {
 			// Use concentric layout for constellation/nebula pattern
 			// Central star (source) in the middle, related nodes in outer orbit
@@ -674,14 +677,26 @@ export class RelationshipGraphView extends ItemView {
 					// All non-source nodes at same level
 					return 1;
 				},
-				animate: true,
-				animationDuration: 800,
+				animate: animationDuration > 0,
+				animationDuration: animationDuration,
 				animationEasing: "ease-out-cubic",
 			});
 
 			// Ensure final view is centered once layout completes
-			this.cy.one("layoutstop", () => this.ensureCentered());
+			if (animationDuration > 0) {
+				this.cy.one("layoutstop", () => this.ensureCentered());
+			}
 			layout.run();
+
+			// For instant layouts (no animation), center immediately
+			if (animationDuration === 0) {
+				setTimeout(() => {
+					if (!this.cy) return;
+					this.cy.resize();
+					this.cy.fit();
+					this.cy.center();
+				}, 0);
+			}
 		} else {
 			// Use dagre top-down layout for hierarchy
 			const layout = this.cy.layout({
@@ -692,16 +707,28 @@ export class RelationshipGraphView extends ItemView {
 				rankSep: 120, // Vertical spacing between levels
 				edgeSep: 50, // Spacing between edges
 				ranker: "network-simplex",
-				animate: true,
-				animationDuration: 800,
+				animate: animationDuration > 0,
+				animationDuration: animationDuration,
 				animationEasing: "ease-out-cubic",
 				fit: true,
 				padding: 80,
 			} as any);
 
 			// Ensure final view is centered once layout completes
-			this.cy.one("layoutstop", () => this.ensureCentered());
+			if (animationDuration > 0) {
+				this.cy.one("layoutstop", () => this.ensureCentered());
+			}
 			layout.run();
+
+			// For instant layouts (no animation), center immediately
+			if (animationDuration === 0) {
+				setTimeout(() => {
+					if (!this.cy) return;
+					this.cy.resize();
+					this.cy.fit();
+					this.cy.center();
+				}, 0);
+			}
 		}
 	}
 
