@@ -42,6 +42,8 @@ export class RelationshipGraphView extends ItemView {
 	private settingsSubscription: Subscription | null = null;
 	private propertyTooltip: HTMLElement | null = null;
 	private hideTooltipTimer: number | null = null;
+	// When exiting zoom, suppress the next resize-driven fit/center to avoid double snap
+	private suppressNextResizeFit = false;
 	// Search functionality
 	private graphSearch: GraphSearch | null = null;
 	private searchQuery = "";
@@ -182,6 +184,12 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	private handleResize(): void {
+		// Skip one resize-fit if we're already handling a programmatic fit on exit
+		if (this.suppressNextResizeFit) {
+			this.suppressNextResizeFit = false;
+			return;
+		}
+
 		if (!this.cy || !this.currentFile || this.isUpdating) return;
 
 		// Re-fit and re-center the graph
@@ -921,11 +929,21 @@ export class RelationshipGraphView extends ItemView {
 	private exitZoomMode(): void {
 		this.isZoomMode = false;
 		this.focusedNodeId = null;
+		// Stop any ongoing animations before resetting view
+		if (this.cy) {
+			this.cy.stop();
+		}
 		this.hidePreviewOverlay();
-		// Reset zoom to show full graph
+		// Reset zoom to show full graph exactly once. We suppress the next resize-driven
+		// fit since removing the preview changes layout and triggers a resize.
 		if (this.cy && !this.isUpdating) {
-			this.cy.fit();
-			this.cy.center();
+			this.suppressNextResizeFit = true;
+			// Defer until after DOM reflow so container size is final
+			requestAnimationFrame(() => {
+				if (!this.cy) return;
+				this.cy.fit();
+				this.cy.center();
+			});
 		}
 	}
 
