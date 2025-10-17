@@ -163,6 +163,11 @@ export class RelationshipGraphView extends ItemView {
 				this.updateGraph();
 			}
 		});
+
+		// Initialize preview hide states from settings for new sessions
+		const current = this.plugin.settingsStore.settings$.value;
+		this.previewHideFrontmatter = current.zoomHideFrontmatterByDefault;
+		this.previewHideContent = current.zoomHideContentByDefault;
 	}
 
 	private setupResizeObserver(): void {
@@ -975,6 +980,20 @@ export class RelationshipGraphView extends ItemView {
 
 		// Show the preview overlay at the top
 		this.showPreviewOverlay(file);
+	}
+
+	public toggleHideContent(): void {
+		this.previewHideContent = !this.previewHideContent;
+		if (this.zoomPreview) {
+			this.zoomPreview.setHideContent(this.previewHideContent);
+		}
+	}
+
+	public toggleHideFrontmatter(): void {
+		this.previewHideFrontmatter = !this.previewHideFrontmatter;
+		if (this.zoomPreview) {
+			this.zoomPreview.setHideFrontmatter(this.previewHideFrontmatter);
+		}
 	}
 
 	private async showPreviewOverlay(file: TFile): Promise<void> {

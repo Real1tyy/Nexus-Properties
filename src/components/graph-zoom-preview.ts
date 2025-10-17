@@ -283,6 +283,18 @@ export class GraphZoomPreview {
 		);
 	}
 
+	public setHideFrontmatter(hidden: boolean): void {
+		if (!this.frontmatterSection || !this.hideFrontmatterCheckbox) return;
+		this.hideFrontmatterCheckbox.checked = hidden;
+		this.frontmatterSection.toggleClass("nexus-hidden", hidden);
+	}
+
+	public setHideContent(hidden: boolean): void {
+		if (!this.contentSection || !this.hideContentCheckbox) return;
+		this.hideContentCheckbox.checked = hidden;
+		this.contentSection.toggleClass("nexus-hidden", hidden);
+	}
+
 	destroy(): void {
 		this.markdownComponent.unload();
 		this.previewOverlay.remove();

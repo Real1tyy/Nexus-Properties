@@ -17,9 +17,19 @@ export const SETTINGS_DEFAULTS = {
 	DEFAULT_GRAPH_ENLARGED_WIDTH_PERCENT: 75,
 	DEFAULT_GRAPH_ZOOM_PREVIEW_HEIGHT: 280,
 	DEFAULT_DISPLAY_NODE_PROPERTIES: [],
+
+	// Zoom preview defaults
+	DEFAULT_ZOOM_HIDE_FRONTMATTER: false,
+	DEFAULT_ZOOM_HIDE_CONTENT: false,
 } as const;
 
 export const SCAN_CONCURRENCY = 10;
+
+export const COMMAND_IDS = {
+	HIDE_CONTENT: "hideContent",
+	HIDE_FOCUS_NODE_CONTENT: "hideFocusNodeContent",
+	HIDE_FOCUS_NODE_FRONTMATTER: "hideFocusNodeFromMatter",
+} as const;
 
 export type RelationshipType = "parent" | "children" | "related";
 

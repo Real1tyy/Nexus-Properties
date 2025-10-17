@@ -130,6 +130,30 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					}));
 				})
 			);
+
+		new Setting(containerEl)
+			.setName("Zoom: hide frontmatter by default")
+			.setDesc("When entering zoom preview, frontmatter starts hidden by default")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.zoomHideFrontmatterByDefault).onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						zoomHideFrontmatterByDefault: value,
+					}));
+				})
+			);
+
+		new Setting(containerEl)
+			.setName("Zoom: hide content by default")
+			.setDesc("When entering zoom preview, file content starts hidden by default")
+			.addToggle((toggle) =>
+				toggle.setValue(settings.zoomHideContentByDefault).onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						zoomHideContentByDefault: value,
+					}));
+				})
+			);
 	}
 
 	private addFilteringSettings(containerEl: HTMLElement): void {

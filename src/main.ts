@@ -1,9 +1,10 @@
-import { Plugin } from "obsidian";
+import { Notice, Plugin } from "obsidian";
 import { NexusPropertiesSettingsTab } from "./components";
 import { RelationshipGraphView, VIEW_TYPE_RELATIONSHIP_GRAPH } from "./components/relationship-graph-view";
 import { Indexer } from "./core/indexer";
 import { PropertiesManager } from "./core/properties-manager";
 import { SettingsStore } from "./core/settings-store";
+import { COMMAND_IDS } from "./types/constants";
 
 export default class NexusPropertiesPlugin extends Plugin {
 	settingsStore!: SettingsStore;
@@ -37,6 +38,31 @@ export default class NexusPropertiesPlugin extends Plugin {
 			name: "Toggle Graph Search",
 			callback: () => {
 				this.toggleGraphSearch();
+			},
+		});
+
+		// Content/frontmatter visibility commands
+		this.addCommand({
+			id: COMMAND_IDS.HIDE_CONTENT,
+			name: "Toggle Content (Zoom Preview)",
+			callback: () => {
+				this.toggleHideContent();
+			},
+		});
+
+		this.addCommand({
+			id: COMMAND_IDS.HIDE_FOCUS_NODE_CONTENT,
+			name: "Toggle Focus Content (Zoom Preview)",
+			callback: () => {
+				this.toggleHideContent();
+			},
+		});
+
+		this.addCommand({
+			id: COMMAND_IDS.HIDE_FOCUS_NODE_FRONTMATTER,
+			name: "Toggle Focus Frontmatter (Zoom Preview)",
+			callback: () => {
+				this.toggleHideFrontmatter();
 			},
 		});
 
@@ -122,5 +148,35 @@ export default class NexusPropertiesPlugin extends Plugin {
 				graphView.toggleSearch();
 			}
 		}
+	}
+
+	private toggleHideContent(): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+
+		if (existingLeaves.length > 0) {
+			const graphView = existingLeaves[0].view;
+			if (graphView instanceof RelationshipGraphView) {
+				graphView.toggleHideContent();
+				return;
+			}
+		}
+
+		new Notice("Open the Relationship Graph to toggle content visibility");
+	}
+
+	private toggleHideFrontmatter(): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+
+		if (existingLeaves.length > 0) {
+			const graphView = existingLeaves[0].view;
+			if (graphView instanceof RelationshipGraphView) {
+				graphView.toggleHideFrontmatter();
+				return;
+			}
+		}
+
+		new Notice("Open the Relationship Graph to toggle frontmatter visibility");
 	}
 }
