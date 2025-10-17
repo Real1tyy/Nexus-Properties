@@ -145,6 +145,11 @@ export class RelationshipGraphView extends ItemView {
 		// Set up resize observer with debouncing
 		this.setupResizeObserver();
 
+		// Also react to global window resizes
+		this.registerDomEvent(window, "resize", () => {
+			this.handleResize();
+		});
+
 		// Register ESC key to exit zoom mode or hide search
 		this.registerDomEvent(document, "keydown", (evt: KeyboardEvent) => {
 			if (evt.key === "Escape") {
@@ -184,17 +189,22 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	private handleResize(): void {
-		// Skip one resize-fit if we're already handling a programmatic fit on exit
+		if (!this.cy) return;
+
+		const skipFitOnce = this.suppressNextResizeFit;
 		if (this.suppressNextResizeFit) {
+			// Only skip fit/center once, but still refresh viewport size
 			this.suppressNextResizeFit = false;
-			return;
 		}
 
-		if (!this.cy || !this.currentFile || this.isUpdating) return;
+		// Always notify cytoscape of size changes
+		this.cy.resize();
 
-		// Re-fit and re-center the graph
-		this.cy.fit();
-		this.cy.center();
+		// Fit and center when appropriate (not during updates or zoom mode)
+		if (!skipFitOnce && this.currentFile && !this.isUpdating && !this.isZoomMode) {
+			this.cy.fit();
+			this.cy.center();
+		}
 	}
 
 	async onClose(): Promise<void> {
@@ -275,6 +285,8 @@ export class RelationshipGraphView extends ItemView {
 
 		// Trigger a resize event to update the graph
 		window.dispatchEvent(new Event("resize"));
+		// Additionally refresh viewport immediately to avoid missed events
+		this.handleResize();
 	}
 
 	toggleSearch(): void {
@@ -363,6 +375,12 @@ export class RelationshipGraphView extends ItemView {
 
 			this.initializeCytoscape();
 			this.renderGraph(nodes, edges);
+			// Ensure viewport aligns with container right after initial render
+			if (this.cy) {
+				this.cy.resize();
+				this.cy.fit();
+				this.cy.center();
+			}
 		} finally {
 			this.isUpdating = false;
 		}
@@ -941,6 +959,8 @@ export class RelationshipGraphView extends ItemView {
 			// Defer until after DOM reflow so container size is final
 			requestAnimationFrame(() => {
 				if (!this.cy) return;
+				// Ensure container dimensions are accounted for, then fit once
+				this.cy.resize();
 				this.cy.fit();
 				this.cy.center();
 			});
