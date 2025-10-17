@@ -161,6 +161,37 @@
 	color: var(--text-normal);
 }
 
+/* Search Container */
+.nexus-graph-search-container {
+	padding: 0.75em 1em;
+	background-color: var(--background-secondary);
+	border-bottom: 2px solid var(--background-modifier-border);
+	flex-shrink: 0;
+	animation: slideDown 0.2s ease-out;
+}
+
+.nexus-graph-search-input {
+	width: 100%;
+	padding: 0.65em 1em;
+	background-color: var(--background-primary);
+	border: 2px solid var(--background-modifier-border);
+	border-radius: 6px;
+	color: var(--text-normal);
+	font-family: var(--font-text);
+	font-size: 0.95em;
+	transition: border-color 0.2s ease;
+}
+
+.nexus-graph-search-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
+}
+
+.nexus-graph-search-input::placeholder {
+	color: var(--text-faint);
+}
+
 /* Wrapper for zoom preview - sits between header and graph */
 .nexus-graph-zoom-preview-wrapper {
 	width: 100%;

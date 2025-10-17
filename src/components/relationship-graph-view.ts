@@ -8,6 +8,7 @@ import { extractDisplayName, extractFilePath, getFileContext } from "../utils/fi
 import { FilterEvaluator } from "../utils/filters";
 import { formatValueForNode } from "../utils/frontmatter-value";
 import { GraphHeader } from "./graph-header";
+import { GraphSearch } from "./graph-search";
 import { GraphZoomPreview } from "./graph-zoom-preview";
 import { NodeContextMenu } from "./node-context-menu";
 
@@ -43,6 +44,9 @@ export class RelationshipGraphView extends ItemView {
 	private hideTooltipTimer: number | null = null;
 	// When exiting zoom, suppress the next resize-driven fit/center to avoid double snap
 	private suppressNextResizeFit = false;
+	// Search functionality
+	private graphSearch: GraphSearch | null = null;
+	private searchQuery = "";
 
 	constructor(
 		leaf: any,
@@ -89,6 +93,17 @@ export class RelationshipGraphView extends ItemView {
 			},
 		});
 
+		// Create search component (sits between header and preview)
+		this.graphSearch = new GraphSearch(contentEl, {
+			onSearchChange: (query) => {
+				this.searchQuery = query;
+				this.updateGraph();
+			},
+			onClose: () => {
+				this.searchQuery = "";
+			},
+		});
+
 		// Create a wrapper for zoom preview (sits between header and graph)
 		// This container will hold the zoom preview when active
 		this.previewWrapperEl = contentEl.createEl("div", {
@@ -130,11 +145,16 @@ export class RelationshipGraphView extends ItemView {
 		// Set up resize observer with debouncing
 		this.setupResizeObserver();
 
-		// Register ESC key to exit zoom mode
+		// Register ESC key to exit zoom mode or hide search
 		this.registerDomEvent(document, "keydown", (evt: KeyboardEvent) => {
-			if (evt.key === "Escape" && this.isZoomMode) {
-				evt.preventDefault();
-				this.exitZoomMode();
+			if (evt.key === "Escape") {
+				if (this.graphSearch?.isVisible()) {
+					evt.preventDefault();
+					this.graphSearch.hide();
+				} else if (this.isZoomMode) {
+					evt.preventDefault();
+					this.exitZoomMode();
+				}
 			}
 		});
 
@@ -199,6 +219,12 @@ export class RelationshipGraphView extends ItemView {
 		// Clean up tooltip
 		this.hidePropertyTooltip();
 
+		// Clean up search component
+		if (this.graphSearch) {
+			this.graphSearch.destroy();
+			this.graphSearch = null;
+		}
+
 		this.destroyGraph();
 
 		if (this.header) {
@@ -249,6 +275,16 @@ export class RelationshipGraphView extends ItemView {
 
 		// Trigger a resize event to update the graph
 		window.dispatchEvent(new Event("resize"));
+	}
+
+	toggleSearch(): void {
+		if (!this.graphSearch) return;
+
+		if (this.graphSearch.isVisible()) {
+			this.graphSearch.hide();
+		} else {
+			this.graphSearch.show();
+		}
 	}
 
 	private onFileOpen(file: TFile | null): void {
@@ -854,11 +890,21 @@ export class RelationshipGraphView extends ItemView {
 			const id = n.data?.id as string | undefined;
 			if (!id) continue;
 
+			// Always keep source node
 			if (n.data?.isSource) {
 				keepNodeIds.add(id);
 				continue;
 			}
 
+			// Apply search filter if active
+			if (this.searchQuery) {
+				const nodeName = ((n.data?.label as string) || "").toLowerCase();
+				if (!nodeName.includes(this.searchQuery)) {
+					continue;
+				}
+			}
+
+			// Apply frontmatter filters
 			const context = getFileContext(this.app, id);
 			const fm = context.frontmatter ?? {};
 			const matchesAllFilters = this.filterEvaluator.evaluateFilters(fm);
