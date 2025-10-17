@@ -75,7 +75,7 @@ export class GraphHeader {
 		this.toggleCheckbox.checked = this.props.startFromCurrent;
 
 		this.startFromCurrentContainer.createEl("label", {
-			text: "Start from current file",
+			text: "Current file only",
 			cls: "nexus-graph-toggle-label",
 		});
 
