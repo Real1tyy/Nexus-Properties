@@ -81,6 +81,22 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
+			.setName("Graph animation duration")
+			.setDesc("Duration of graph layout animations in milliseconds (0-3000ms). Set to 0 for instant layout.")
+			.addSlider((slider) =>
+				slider
+					.setLimits(0, 2000, 50)
+					.setValue(settings.graphAnimationDuration)
+					.setDynamicTooltip()
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							graphAnimationDuration: value,
+						}));
+					})
+			);
+
+		new Setting(containerEl)
 			.setName("Display properties in nodes")
 			.setDesc("Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)")
 			.addText((text) => {
