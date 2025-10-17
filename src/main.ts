@@ -32,6 +32,14 @@ export default class NexusPropertiesPlugin extends Plugin {
 			},
 		});
 
+		this.addCommand({
+			id: "toggle-graph-search",
+			name: "Toggle Graph Search",
+			callback: () => {
+				this.toggleGraphSearch();
+			},
+		});
+
 		this.initializePlugin();
 	}
 
@@ -100,6 +108,18 @@ export default class NexusPropertiesPlugin extends Plugin {
 			const graphView = existingLeaves[0].view;
 			if (graphView instanceof RelationshipGraphView) {
 				graphView.toggleEnlargement();
+			}
+		}
+	}
+
+	private toggleGraphSearch(): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+
+		if (existingLeaves.length > 0) {
+			const graphView = existingLeaves[0].view;
+			if (graphView instanceof RelationshipGraphView) {
+				graphView.toggleSearch();
 			}
 		}
 	}
