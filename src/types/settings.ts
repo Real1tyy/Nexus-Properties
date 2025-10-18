@@ -30,7 +30,8 @@ export const NexusPropertiesSettingsSchema = z.object({
 		.min(50)
 		.max(100)
 		.default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ENLARGED_WIDTH_PERCENT),
-	graphZoomPreviewHeight: z.number().min(100).max(700).default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ZOOM_PREVIEW_HEIGHT),
+	graphZoomPreviewHeight: z.number().min(120).max(700).default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ZOOM_PREVIEW_HEIGHT),
+	graphAnimationDuration: z.number().min(0).max(2000).default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ANIMATION_DURATION),
 
 	// Zoom preview behavior
 	zoomHideFrontmatterByDefault: z.boolean().default(SETTINGS_DEFAULTS.DEFAULT_ZOOM_HIDE_FRONTMATTER),

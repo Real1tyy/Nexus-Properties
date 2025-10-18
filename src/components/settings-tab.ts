@@ -1,12 +1,16 @@
 import { type App, PluginSettingTab, Setting } from "obsidian";
 import type NexusPropertiesPlugin from "../main";
+import type { NexusPropertiesSettingsSchema } from "../types/settings";
+import { SettingsUIBuilder } from "../utils/settings-ui-builder";
 
 export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	plugin: NexusPropertiesPlugin;
+	private uiBuilder: SettingsUIBuilder<typeof NexusPropertiesSettingsSchema>;
 
 	constructor(app: App, plugin: NexusPropertiesPlugin) {
 		super(app, plugin);
 		this.plugin = plugin;
+		this.uiBuilder = new SettingsUIBuilder(this.plugin.settingsStore);
 	}
 
 	display(): void {
@@ -26,25 +30,17 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	}
 
 	private addUserInterfaceSettings(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
-
 		new Setting(containerEl).setName("User Interface").setHeading();
 
-		new Setting(containerEl)
-			.setName("Show ribbon icon")
-			.setDesc("Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.")
-			.addToggle((toggle) =>
-				toggle.setValue(settings.showRibbonIcon).onChange(async (value) => {
-					await this.plugin.settingsStore.updateSettings((s) => ({
-						...s,
-						showRibbonIcon: value,
-					}));
-				})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "showRibbonIcon",
+			name: "Show ribbon icon",
+			desc: "Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.",
+		});
 	}
 
 	private addGraphSettings(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
+		const { currentSettings: settings } = this.plugin.settingsStore;
 
 		new Setting(containerEl).setName("Graph Display").setHeading();
 
@@ -81,84 +77,58 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Display properties in nodes")
-			.setDesc("Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)")
-			.addText((text) => {
-				text
-					.setPlaceholder("e.g., status, priority")
-					.setValue(settings.displayNodeProperties.join(", "))
+			.setName("Graph animation duration")
+			.setDesc("Duration of graph layout animations in milliseconds (0-3000ms). Set to 0 for instant layout.")
+			.addSlider((slider) =>
+				slider
+					.setLimits(0, 2000, 50)
+					.setValue(settings.graphAnimationDuration)
+					.setDynamicTooltip()
 					.onChange(async (value) => {
-						const properties = value
-							.split(",")
-							.map((p) => p.trim())
-							.filter((p) => p.length > 0);
-
 						await this.plugin.settingsStore.updateSettings((s) => ({
 							...s,
-							displayNodeProperties: properties,
+							graphAnimationDuration: value,
 						}));
-					});
-				text.inputEl.addClass("nexus-property-input");
-			});
+					})
+			);
+
+		this.uiBuilder.auto(containerEl, {
+			key: "displayNodeProperties",
+			name: "Display properties in nodes",
+			desc: "Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)",
+			placeholder: "e.g., status, priority",
+		});
 	}
 
 	private addPreviewSettings(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
-
 		new Setting(containerEl).setName("Preview Settings").setHeading();
 
-		new Setting(containerEl)
-			.setName("Hide empty properties")
-			.setDesc("Hide properties with empty, null, or undefined values in the node preview modal")
-			.addToggle((toggle) =>
-				toggle.setValue(settings.hideEmptyProperties).onChange(async (value) => {
-					await this.plugin.settingsStore.updateSettings((s) => ({
-						...s,
-						hideEmptyProperties: value,
-					}));
-				})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "hideEmptyProperties",
+			name: "Hide empty properties",
+			desc: "Hide properties with empty, null, or undefined values in the node preview modal",
+		});
 
-		new Setting(containerEl)
-			.setName("Hide underscore properties")
-			.setDesc("Hide properties that start with an underscore (_) in the node preview modal")
-			.addToggle((toggle) =>
-				toggle.setValue(settings.hideUnderscoreProperties).onChange(async (value) => {
-					await this.plugin.settingsStore.updateSettings((s) => ({
-						...s,
-						hideUnderscoreProperties: value,
-					}));
-				})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "hideUnderscoreProperties",
+			name: "Hide underscore properties",
+			desc: "Hide properties that start with an underscore (_) in the node preview modal",
+		});
 
-		new Setting(containerEl)
-			.setName("Zoom: hide frontmatter by default")
-			.setDesc("When entering zoom preview, frontmatter starts hidden by default")
-			.addToggle((toggle) =>
-				toggle.setValue(settings.zoomHideFrontmatterByDefault).onChange(async (value) => {
-					await this.plugin.settingsStore.updateSettings((s) => ({
-						...s,
-						zoomHideFrontmatterByDefault: value,
-					}));
-				})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "zoomHideFrontmatterByDefault",
+			name: "Zoom: hide frontmatter by default",
+			desc: "When entering zoom preview, frontmatter starts hidden by default",
+		});
 
-		new Setting(containerEl)
-			.setName("Zoom: hide content by default")
-			.setDesc("When entering zoom preview, file content starts hidden by default")
-			.addToggle((toggle) =>
-				toggle.setValue(settings.zoomHideContentByDefault).onChange(async (value) => {
-					await this.plugin.settingsStore.updateSettings((s) => ({
-						...s,
-						zoomHideContentByDefault: value,
-					}));
-				})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "zoomHideContentByDefault",
+			name: "Zoom: hide content by default",
+			desc: "When entering zoom preview, file content starts hidden by default",
+		});
 	}
 
 	private addFilteringSettings(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
-
 		new Setting(containerEl).setName("Graph filtering").setHeading();
 
 		const desc = containerEl.createDiv();
@@ -175,43 +145,19 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		const examplesContainer = desc.createDiv("settings-info-box");
 		examplesContainer.createEl("strong", { text: "Examples:" });
 		const ul = examplesContainer.createEl("ul");
-		examples.forEach((ex) => {
+		for (const ex of examples) {
 			const li = ul.createEl("li");
 			const code = li.createEl("code", { text: ex });
 			code.addClass("settings-info-box-example");
+		}
+
+		this.uiBuilder.auto(containerEl, {
+			key: "filterExpressions",
+			name: "Filter expressions",
+			desc: "One per line. Changes apply on blur or Ctrl/Cmd+Enter. Only nodes matching all expressions are shown in the graph.",
+			placeholder: "fm.Status === 'Active'\nfm.type === 'project'",
+			multiline: true,
 		});
-
-		new Setting(containerEl)
-			.setName("Filter expressions")
-			.setDesc(
-				"One per line. Changes apply on blur or Ctrl/Cmd+Enter. Only nodes matching all expressions are shown in the graph."
-			)
-			.addTextArea((text) => {
-				text.setPlaceholder("fm.Status === 'Active'\nfm.type === 'project'");
-				text.setValue((settings.filterExpressions ?? []).join("\n"));
-
-				const commit = async (value: string) => {
-					const expressions = value
-						.split("\n")
-						.map((s) => s.trim())
-						.filter((s) => s.length > 0);
-					await this.plugin.settingsStore.updateSettings((s) => ({
-						...s,
-						filterExpressions: expressions,
-					}));
-				};
-
-				text.inputEl.addEventListener("blur", () => void commit(text.inputEl.value));
-				text.inputEl.addEventListener("keydown", (e: KeyboardEvent) => {
-					if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
-						e.preventDefault();
-						void commit(text.inputEl.value);
-					}
-				});
-
-				text.inputEl.rows = 5;
-				text.inputEl.addClass("settings-info-box-example");
-			});
 	}
 
 	private addRescanSection(containerEl: HTMLElement): void {
@@ -255,7 +201,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	}
 
 	private addDirectorySettings(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
+		const { currentSettings: settings } = this.plugin.settingsStore;
 
 		new Setting(containerEl).setName("Directory scanning").setHeading();
 
@@ -359,8 +305,6 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	}
 
 	private addDirectRelationshipSettings(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
-
 		new Setting(containerEl).setName("Direct relationship properties").setHeading();
 
 		containerEl
@@ -369,68 +313,36 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 				"Configure property names for direct bidirectional relationships. When you set a relationship in one direction, the plugin automatically updates the reverse relationship."
 			);
 
-		new Setting(containerEl)
-			.setName("Auto-link siblings")
-			.setDesc(
-				"Automatically mark nodes as related when they share the same parent (siblings are related to each other)"
-			)
-			.addToggle((toggle) =>
-				toggle.setValue(settings.autoLinkSiblings).onChange(async (value) => {
-					await this.plugin.settingsStore.updateSettings((s) => ({
-						...s,
-						autoLinkSiblings: value,
-					}));
-				})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "autoLinkSiblings",
+			name: "Auto-link siblings",
+			desc: "Automatically mark nodes as related when they share the same parent (siblings are related to each other)",
+		});
 
-		new Setting(containerEl)
-			.setName("Parent property")
-			.setDesc("Property name for parent reference (bidirectional with children)")
-			.addText((text) =>
-				text
-					.setPlaceholder("parent")
-					.setValue(settings.parentProp)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							parentProp: value || "parent",
-						}));
-					})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "parentProp",
+			name: "Parent property",
+			desc: "Property name for parent reference (bidirectional with children)",
+			placeholder: "parent",
+		});
 
-		new Setting(containerEl)
-			.setName("Children property")
-			.setDesc("Property name for children references (bidirectional with parent)")
-			.addText((text) =>
-				text
-					.setPlaceholder("children")
-					.setValue(settings.childrenProp)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							childrenProp: value || "children",
-						}));
-					})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "childrenProp",
+			name: "Children property",
+			desc: "Property name for children references (bidirectional with parent)",
+			placeholder: "children",
+		});
 
-		new Setting(containerEl)
-			.setName("Related property")
-			.setDesc("Property name for related files (bidirectional - automatically syncs between linked files)")
-			.addText((text) =>
-				text
-					.setPlaceholder("related")
-					.setValue(settings.relatedProp)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							relatedProp: value || "related",
-						}));
-					})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "relatedProp",
+			name: "Related property",
+			desc: "Property name for related files (bidirectional - automatically syncs between linked files)",
+			placeholder: "related",
+		});
 	}
 
 	private addExampleSection(containerEl: HTMLElement): void {
-		const settings = this.plugin.settingsStore.currentSettings;
+		const { currentSettings: settings } = this.plugin.settingsStore;
 
 		new Setting(containerEl).setName("How it works").setHeading();
 

@@ -145,6 +145,11 @@ export class RelationshipGraphView extends ItemView {
 		// Set up resize observer with debouncing
 		this.setupResizeObserver();
 
+		// Also react to global window resizes
+		this.registerDomEvent(window, "resize", () => {
+			this.handleResize();
+		});
+
 		// Register ESC key to exit zoom mode or hide search
 		this.registerDomEvent(document, "keydown", (evt: KeyboardEvent) => {
 			if (evt.key === "Escape") {
@@ -168,6 +173,15 @@ export class RelationshipGraphView extends ItemView {
 		const current = this.plugin.settingsStore.settings$.value;
 		this.previewHideFrontmatter = current.zoomHideFrontmatterByDefault;
 		this.previewHideContent = current.zoomHideContentByDefault;
+
+		// When this view becomes the active leaf, ensure the graph is centered
+		this.registerEvent(
+			this.app.workspace.on("active-leaf-change", (leaf) => {
+				if (leaf === this.leaf && this.cy && !this.isUpdating) {
+					this.ensureCentered();
+				}
+			})
+		);
 	}
 
 	private setupResizeObserver(): void {
@@ -189,17 +203,21 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	private handleResize(): void {
-		// Skip one resize-fit if we're already handling a programmatic fit on exit
+		if (!this.cy) return;
+
+		const skipFitOnce = this.suppressNextResizeFit;
 		if (this.suppressNextResizeFit) {
+			// Only skip fit/center once, but still refresh viewport size
 			this.suppressNextResizeFit = false;
-			return;
 		}
 
-		if (!this.cy || !this.currentFile || this.isUpdating) return;
+		// Always notify cytoscape of size changes
+		this.cy.resize();
 
-		// Re-fit and re-center the graph
-		this.cy.fit();
-		this.cy.center();
+		// Re-fit and re-center the graph using the shared helper (unless suppressed)
+		if (!skipFitOnce) {
+			this.ensureCentered();
+		}
 	}
 
 	async onClose(): Promise<void> {
@@ -280,6 +298,8 @@ export class RelationshipGraphView extends ItemView {
 
 		// Trigger a resize event to update the graph
 		window.dispatchEvent(new Event("resize"));
+		// Additionally refresh viewport immediately to avoid missed events
+		this.handleResize();
 	}
 
 	toggleSearch(): void {
@@ -368,6 +388,12 @@ export class RelationshipGraphView extends ItemView {
 
 			this.initializeCytoscape();
 			this.renderGraph(nodes, edges);
+			// Ensure viewport aligns with container right after initial render
+			if (this.cy) {
+				this.cy.resize();
+				this.cy.fit();
+				this.cy.center();
+			}
 		} finally {
 			this.isUpdating = false;
 		}
@@ -651,51 +677,111 @@ export class RelationshipGraphView extends ItemView {
 
 		this.cy.add([...nodes, ...edges]);
 
+		const settings = this.plugin.settingsStore.settings$.value;
+		const animationDuration = settings.graphAnimationDuration;
+
 		if (this.renderRelated) {
 			// Use concentric layout for constellation/nebula pattern
 			// Central star (source) in the middle, related nodes in outer orbit
-			this.cy
-				.layout({
-					name: "concentric",
-					fit: true,
-					padding: 120,
-					startAngle: (3 / 2) * Math.PI, // Start at top
-					sweep: undefined, // Full circle
-					clockwise: true,
-					equidistant: true,
-					minNodeSpacing: 100, // Prevent overlapping
-					concentric: (node: any) => {
-						// Source node gets highest concentric value (innermost)
-						return node.data("isSource") ? 2 : 1;
-					},
-					levelWidth: () => {
-						// All non-source nodes at same level
-						return 1;
-					},
-					animate: true,
-					animationDuration: 800,
-					animationEasing: "ease-out-cubic",
-				})
-				.run();
+			const layout = this.cy.layout({
+				name: "concentric",
+				fit: true,
+				padding: 120,
+				startAngle: (3 / 2) * Math.PI, // Start at top
+				sweep: undefined, // Full circle
+				clockwise: true,
+				equidistant: true,
+				minNodeSpacing: 100, // Prevent overlapping
+				concentric: (node: any) => {
+					// Source node gets highest concentric value (innermost)
+					return node.data("isSource") ? 2 : 1;
+				},
+				levelWidth: () => {
+					// All non-source nodes at same level
+					return 1;
+				},
+				animate: animationDuration > 0,
+				animationDuration: animationDuration,
+				animationEasing: "ease-out-cubic",
+			});
+
+			// Ensure final view is centered once layout completes
+			if (animationDuration > 0) {
+				this.cy.one("layoutstop", () => this.ensureCentered());
+			}
+			layout.run();
+
+			// For instant layouts (no animation), center immediately
+			if (animationDuration === 0) {
+				setTimeout(() => {
+					if (!this.cy) return;
+					this.cy.resize();
+					this.cy.fit();
+					this.cy.center();
+				}, 0);
+			}
 		} else {
 			// Use dagre top-down layout for hierarchy
-			this.cy
-				.layout({
-					name: "dagre",
-					rankDir: "TB", // Top to bottom hierarchy
-					align: undefined,
-					nodeSep: 80, // Horizontal spacing between nodes
-					rankSep: 120, // Vertical spacing between levels
-					edgeSep: 50, // Spacing between edges
-					ranker: "network-simplex",
-					animate: true,
-					animationDuration: 800,
-					animationEasing: "ease-out-cubic",
-					fit: true,
-					padding: 80,
-				} as any)
-				.run();
+			const layout = this.cy.layout({
+				name: "dagre",
+				rankDir: "TB", // Top to bottom hierarchy
+				align: undefined,
+				nodeSep: 80, // Horizontal spacing between nodes
+				rankSep: 120, // Vertical spacing between levels
+				edgeSep: 50, // Spacing between edges
+				ranker: "network-simplex",
+				animate: animationDuration > 0,
+				animationDuration: animationDuration,
+				animationEasing: "ease-out-cubic",
+				fit: true,
+				padding: 80,
+			} as any);
+
+			// Ensure final view is centered once layout completes
+			if (animationDuration > 0) {
+				this.cy.one("layoutstop", () => this.ensureCentered());
+			}
+			layout.run();
+
+			// For instant layouts (no animation), center immediately
+			if (animationDuration === 0) {
+				setTimeout(() => {
+					if (!this.cy) return;
+					this.cy.resize();
+					this.cy.fit();
+					this.cy.center();
+				}, 0);
+			}
 		}
+	}
+
+	// Ensure the graph is centered/fit in its container, and handle zoom-mode centering
+	private ensureCentered(): void {
+		if (!this.cy || this.isUpdating) return;
+
+		// Ensure Cytoscape recalculates viewport in case container size changed while hidden
+		try {
+			this.cy.resize();
+		} catch {
+			// ignore
+		}
+
+		// Defer to next frame to allow any DOM/layout changes to settle
+		requestAnimationFrame(() => {
+			if (!this.cy) return;
+			if (this.isZoomMode && this.focusedNodeId) {
+				const node = this.cy.nodes().filter((n) => n.id() === this.focusedNodeId);
+				if (node.length > 0) {
+					// Center on the focused node without changing zoom level
+					(this.cy as any).center(node);
+					return;
+				}
+			}
+
+			// Fit entire graph and ensure it's centered in view
+			this.cy.fit();
+			this.cy.center();
+		});
 	}
 
 	private buildRelatedGraphData(sourcePath: string): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
@@ -946,6 +1032,8 @@ export class RelationshipGraphView extends ItemView {
 			// Defer until after DOM reflow so container size is final
 			requestAnimationFrame(() => {
 				if (!this.cy) return;
+				// Ensure container dimensions are accounted for, then fit once
+				this.cy.resize();
 				this.cy.fit();
 				this.cy.center();
 			});
