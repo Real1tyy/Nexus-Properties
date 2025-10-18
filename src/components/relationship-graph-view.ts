@@ -169,6 +169,11 @@ export class RelationshipGraphView extends ItemView {
 			}
 		});
 
+		// Initialize preview hide states from settings for new sessions
+		const current = this.plugin.settingsStore.settings$.value;
+		this.previewHideFrontmatter = current.zoomHideFrontmatterByDefault;
+		this.previewHideContent = current.zoomHideContentByDefault;
+
 		// When this view becomes the active leaf, ensure the graph is centered
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", (leaf) => {
@@ -1063,6 +1068,20 @@ export class RelationshipGraphView extends ItemView {
 
 		// Show the preview overlay at the top
 		this.showPreviewOverlay(file);
+	}
+
+	public toggleHideContent(): void {
+		this.previewHideContent = !this.previewHideContent;
+		if (this.zoomPreview) {
+			this.zoomPreview.setHideContent(this.previewHideContent);
+		}
+	}
+
+	public toggleHideFrontmatter(): void {
+		this.previewHideFrontmatter = !this.previewHideFrontmatter;
+		if (this.zoomPreview) {
+			this.zoomPreview.setHideFrontmatter(this.previewHideFrontmatter);
+		}
 	}
 
 	private async showPreviewOverlay(file: TFile): Promise<void> {

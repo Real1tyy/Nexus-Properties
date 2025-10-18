@@ -1,4 +1,4 @@
-import { Plugin } from "obsidian";
+import { Notice, Plugin } from "obsidian";
 import { NexusPropertiesSettingsTab } from "./components";
 import { RelationshipGraphView, VIEW_TYPE_RELATIONSHIP_GRAPH } from "./components/relationship-graph-view";
 import { Indexer } from "./core/indexer";
@@ -19,25 +19,36 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.addCommand({
 			id: "toggle-relationship-graph",
 			name: "Show Relationship Graph",
-			callback: () => {
-				this.toggleRelationshipGraphView();
-			},
+			callback: () => this.toggleRelationshipGraphView(),
 		});
 
 		this.addCommand({
 			id: "enlarge-relationship-graph",
 			name: "Enlarge Graph",
-			callback: () => {
-				this.toggleGraphEnlargement();
-			},
+			callback: () => this.executeGraphViewMethod("toggleEnlargement"),
 		});
 
 		this.addCommand({
 			id: "toggle-graph-search",
 			name: "Toggle Graph Search",
-			callback: () => {
-				this.toggleGraphSearch();
-			},
+			callback: () => this.executeGraphViewMethod("toggleSearch"),
+		});
+
+		this.addCommand({
+			id: "hide-focus-node-content",
+			name: "Toggle Focus Content (Zoom Preview)",
+			callback: () =>
+				this.executeGraphViewMethod("toggleHideContent", "Open the Relationship Graph to toggle content visibility"),
+		});
+
+		this.addCommand({
+			id: "hide-focus-node-frontmatter",
+			name: "Toggle Focus Frontmatter (Zoom Preview)",
+			callback: () =>
+				this.executeGraphViewMethod(
+					"toggleHideFrontmatter",
+					"Open the Relationship Graph to toggle frontmatter visibility"
+				),
 		});
 
 		this.initializePlugin();
@@ -100,27 +111,23 @@ export default class NexusPropertiesPlugin extends Plugin {
 		}
 	}
 
-	private toggleGraphEnlargement(): void {
+	private executeGraphViewMethod(methodName: string, noticeMessage?: string): void {
 		const { workspace } = this.app;
 		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
 
 		if (existingLeaves.length > 0) {
 			const graphView = existingLeaves[0].view;
 			if (graphView instanceof RelationshipGraphView) {
-				graphView.toggleEnlargement();
+				const method = graphView[methodName as keyof RelationshipGraphView];
+				if (typeof method === "function") {
+					(method as () => void).call(graphView);
+				}
+				return;
 			}
 		}
-	}
 
-	private toggleGraphSearch(): void {
-		const { workspace } = this.app;
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
-
-		if (existingLeaves.length > 0) {
-			const graphView = existingLeaves[0].view;
-			if (graphView instanceof RelationshipGraphView) {
-				graphView.toggleSearch();
-			}
+		if (noticeMessage) {
+			new Notice(noticeMessage);
 		}
 	}
 }
