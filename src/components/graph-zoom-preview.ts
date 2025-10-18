@@ -1,4 +1,5 @@
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
+import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { isEmptyValue } from "../utils/frontmatter-value";
@@ -24,6 +25,8 @@ export class GraphZoomPreview {
 	private settings: NexusPropertiesSettings;
 	private propertyRenderer: PropertyRenderer;
 	private markdownComponent: Component;
+	private settingsSubscription: Subscription | null = null;
+	private bodyContainer: HTMLElement | null = null;
 
 	constructor(
 		private containerEl: HTMLElement,
@@ -54,6 +57,25 @@ export class GraphZoomPreview {
 		this.previewOverlay.setCssProps({
 			"--zoom-preview-max-height": `${this.settings.graphZoomPreviewHeight}px`,
 		});
+
+		// Subscribe to settings changes to update preview reactively
+		this.settingsSubscription = this.props.settingsStore.settings$.subscribe((settings) => {
+			this.settings = settings;
+			// Update height CSS variable
+			this.previewOverlay.setCssProps({
+				"--zoom-preview-max-height": `${settings.graphZoomPreviewHeight}px`,
+			});
+			// Update checkbox states from settings
+			if (this.hideFrontmatterCheckbox) {
+				this.hideFrontmatterCheckbox.checked = settings.zoomHideFrontmatterByDefault;
+				this.toggleFrontmatterVisibility();
+			}
+			if (this.hideContentCheckbox) {
+				this.hideContentCheckbox.checked = settings.zoomHideContentByDefault;
+				this.toggleContentVisibility();
+			}
+		});
+
 		this.render();
 	}
 
@@ -162,12 +184,16 @@ export class GraphZoomPreview {
 			}
 		});
 
+		this.bodyContainer = this.previewOverlay.createEl("div", {
+			cls: "nexus-graph-zoom-preview-body",
+		});
+
 		// Frontmatter section
 		const cache = this.app.metadataCache.getFileCache(this.props.file);
 		// biome-ignore lint/correctness/noUnusedVariables: Using rest operator to exclude position
 		const { position, ...frontmatter } = cache?.frontmatter ?? {};
 
-		this.frontmatterSection = this.previewOverlay.createEl("div", {
+		this.frontmatterSection = this.bodyContainer.createEl("div", {
 			cls: "nexus-graph-zoom-preview-frontmatter",
 		});
 
@@ -203,7 +229,7 @@ export class GraphZoomPreview {
 		}
 
 		// Content section (scrollable)
-		this.contentSection = this.previewOverlay.createEl("div", {
+		this.contentSection = this.bodyContainer.createEl("div", {
 			cls: "nexus-graph-zoom-preview-content",
 		});
 
@@ -235,6 +261,8 @@ export class GraphZoomPreview {
 				cls: "nexus-graph-zoom-preview-empty",
 			});
 		}
+
+		this.updateBodyVisibility();
 	}
 
 	private toggleFrontmatterVisibility(): void {
@@ -243,15 +271,7 @@ export class GraphZoomPreview {
 		const isHidden = this.hideFrontmatterCheckbox?.checked ?? false;
 		this.frontmatterSection.toggleClass("nexus-hidden", isHidden);
 
-		// If both are hidden, show both
-		if (isHidden && this.hideContentCheckbox?.checked) {
-			if (this.hideContentCheckbox) {
-				this.hideContentCheckbox.checked = false;
-			}
-			if (this.contentSection) {
-				this.contentSection.removeClass("nexus-hidden");
-			}
-		}
+		this.updateBodyVisibility();
 
 		// Notify parent of state change
 		this.props.onToggleStatesChange?.(
@@ -266,15 +286,7 @@ export class GraphZoomPreview {
 		const isHidden = this.hideContentCheckbox?.checked ?? false;
 		this.contentSection.toggleClass("nexus-hidden", isHidden);
 
-		// If both are hidden, show both
-		if (isHidden && this.hideFrontmatterCheckbox?.checked) {
-			if (this.hideFrontmatterCheckbox) {
-				this.hideFrontmatterCheckbox.checked = false;
-			}
-			if (this.frontmatterSection) {
-				this.frontmatterSection.removeClass("nexus-hidden");
-			}
-		}
+		this.updateBodyVisibility();
 
 		// Notify parent of state change
 		this.props.onToggleStatesChange?.(
@@ -283,19 +295,34 @@ export class GraphZoomPreview {
 		);
 	}
 
+	private updateBodyVisibility(): void {
+		if (!this.bodyContainer) return;
+
+		const bothHidden = (this.hideFrontmatterCheckbox?.checked ?? false) && (this.hideContentCheckbox?.checked ?? false);
+
+		this.bodyContainer.toggleClass("nexus-hidden", bothHidden);
+	}
+
 	public setHideFrontmatter(hidden: boolean): void {
 		if (!this.frontmatterSection || !this.hideFrontmatterCheckbox) return;
 		this.hideFrontmatterCheckbox.checked = hidden;
 		this.frontmatterSection.toggleClass("nexus-hidden", hidden);
+		this.updateBodyVisibility();
 	}
 
 	public setHideContent(hidden: boolean): void {
 		if (!this.contentSection || !this.hideContentCheckbox) return;
 		this.hideContentCheckbox.checked = hidden;
 		this.contentSection.toggleClass("nexus-hidden", hidden);
+		this.updateBodyVisibility();
 	}
 
 	destroy(): void {
+		if (this.settingsSubscription) {
+			this.settingsSubscription.unsubscribe();
+			this.settingsSubscription = null;
+		}
+
 		this.markdownComponent.unload();
 		this.previewOverlay.remove();
 		this.controlsContainer = null;
@@ -304,5 +331,6 @@ export class GraphZoomPreview {
 		this.hideContentCheckbox = null;
 		this.frontmatterSection = null;
 		this.contentSection = null;
+		this.bodyContainer = null;
 	}
 }
