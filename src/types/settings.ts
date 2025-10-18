@@ -51,6 +51,9 @@ export const NexusPropertiesSettingsSchema = z.object({
 	zoomHideFrontmatterByDefault: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_ZOOM_HIDE_FRONTMATTER),
 	zoomHideContentByDefault: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_ZOOM_HIDE_CONTENT),
 
+	// Tooltip settings
+	showGraphTooltips: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_GRAPH_TOOLTIPS),
+
 	// Graph filtering settings
 	filterExpressions: z.array(z.string()).optional().default([]),
 	displayNodeProperties: z

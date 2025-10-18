@@ -98,6 +98,12 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			desc: "Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)",
 			placeholder: "e.g., status, priority",
 		});
+
+		this.uiBuilder.auto(containerEl, {
+			key: "showGraphTooltips",
+			name: "Show node tooltips",
+			desc: "Display property tooltips when hovering over nodes in the graph. Can also be toggled with a hotkey.",
+		});
 	}
 
 	private addPreviewSettings(containerEl: HTMLElement): void {

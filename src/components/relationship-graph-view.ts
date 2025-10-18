@@ -1117,6 +1117,11 @@ export class RelationshipGraphView extends ItemView {
 	private showPropertyTooltip(filePath: string, evt: any): void {
 		const settings = this.plugin.settingsStore.settings$.value;
 
+		// Don't show tooltip if setting is disabled
+		if (!settings.showGraphTooltips) {
+			return;
+		}
+
 		if (settings.displayNodeProperties.length === 0) {
 			return;
 		}
