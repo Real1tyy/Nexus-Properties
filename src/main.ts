@@ -36,14 +36,14 @@ export default class NexusPropertiesPlugin extends Plugin {
 		});
 
 		this.addCommand({
-			id: COMMAND_IDS.HIDE_FOCUS_NODE_CONTENT,
+			id: "hide-focus-node-content",
 			name: "Toggle Focus Content (Zoom Preview)",
 			callback: () =>
 				this.executeGraphViewMethod("toggleHideContent", "Open the Relationship Graph to toggle content visibility"),
 		});
 
 		this.addCommand({
-			id: COMMAND_IDS.HIDE_FOCUS_NODE_FRONTMATTER,
+			id: "hide-focus-node-frontmatter",
 			name: "Toggle Focus Frontmatter (Zoom Preview)",
 			callback: () =>
 				this.executeGraphViewMethod(

@@ -25,11 +25,6 @@ export const SETTINGS_DEFAULTS = {
 
 export const SCAN_CONCURRENCY = 10;
 
-export const COMMAND_IDS = {
-	HIDE_FOCUS_NODE_CONTENT: "hideFocusNodeContent",
-	HIDE_FOCUS_NODE_FRONTMATTER: "hideFocusNodeFromMatter",
-} as const;
-
 export type RelationshipType = "parent" | "children" | "related";
 
 export interface RelationshipConfig {
