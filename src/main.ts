@@ -4,7 +4,6 @@ import { RelationshipGraphView, VIEW_TYPE_RELATIONSHIP_GRAPH } from "./component
 import { Indexer } from "./core/indexer";
 import { PropertiesManager } from "./core/properties-manager";
 import { SettingsStore } from "./core/settings-store";
-import { COMMAND_IDS } from "./types/constants";
 
 export default class NexusPropertiesPlugin extends Plugin {
 	settingsStore!: SettingsStore;
