@@ -49,7 +49,9 @@ export class GraphHeader {
 		});
 
 		this.relatedCheckbox.addEventListener("change", () => {
-			this.props.onRenderRelatedChange(this.relatedCheckbox?.checked ?? false);
+			const isChecked = this.relatedCheckbox?.checked ?? false;
+			this.props.renderRelated = isChecked;
+			this.props.onRenderRelatedChange(isChecked);
 			this.updateVisibility();
 		});
 
@@ -60,7 +62,7 @@ export class GraphHeader {
 		this.includeAllCheckbox.checked = this.props.includeAllRelated;
 
 		this.includeAllContainer.createEl("label", {
-			text: "Include all related",
+			text: "All Related",
 			cls: "nexus-graph-toggle-label",
 		});
 
@@ -75,7 +77,7 @@ export class GraphHeader {
 		this.toggleCheckbox.checked = this.props.startFromCurrent;
 
 		this.startFromCurrentContainer.createEl("label", {
-			text: "Start from current file",
+			text: "Current file only",
 			cls: "nexus-graph-toggle-label",
 		});
 
