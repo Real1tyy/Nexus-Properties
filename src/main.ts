@@ -20,50 +20,36 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.addCommand({
 			id: "toggle-relationship-graph",
 			name: "Show Relationship Graph",
-			callback: () => {
-				this.toggleRelationshipGraphView();
-			},
+			callback: () => this.toggleRelationshipGraphView(),
 		});
 
 		this.addCommand({
 			id: "enlarge-relationship-graph",
 			name: "Enlarge Graph",
-			callback: () => {
-				this.toggleGraphEnlargement();
-			},
+			callback: () => this.executeGraphViewMethod("toggleEnlargement"),
 		});
 
 		this.addCommand({
 			id: "toggle-graph-search",
 			name: "Toggle Graph Search",
-			callback: () => {
-				this.toggleGraphSearch();
-			},
-		});
-
-		// Content/frontmatter visibility commands
-		this.addCommand({
-			id: COMMAND_IDS.HIDE_CONTENT,
-			name: "Toggle Content (Zoom Preview)",
-			callback: () => {
-				this.toggleHideContent();
-			},
+			callback: () => this.executeGraphViewMethod("toggleSearch"),
 		});
 
 		this.addCommand({
 			id: COMMAND_IDS.HIDE_FOCUS_NODE_CONTENT,
 			name: "Toggle Focus Content (Zoom Preview)",
-			callback: () => {
-				this.toggleHideContent();
-			},
+			callback: () =>
+				this.executeGraphViewMethod("toggleHideContent", "Open the Relationship Graph to toggle content visibility"),
 		});
 
 		this.addCommand({
 			id: COMMAND_IDS.HIDE_FOCUS_NODE_FRONTMATTER,
 			name: "Toggle Focus Frontmatter (Zoom Preview)",
-			callback: () => {
-				this.toggleHideFrontmatter();
-			},
+			callback: () =>
+				this.executeGraphViewMethod(
+					"toggleHideFrontmatter",
+					"Open the Relationship Graph to toggle frontmatter visibility"
+				),
 		});
 
 		this.initializePlugin();
@@ -126,57 +112,23 @@ export default class NexusPropertiesPlugin extends Plugin {
 		}
 	}
 
-	private toggleGraphEnlargement(): void {
+	private executeGraphViewMethod(methodName: string, noticeMessage?: string): void {
 		const { workspace } = this.app;
 		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
 
 		if (existingLeaves.length > 0) {
 			const graphView = existingLeaves[0].view;
 			if (graphView instanceof RelationshipGraphView) {
-				graphView.toggleEnlargement();
-			}
-		}
-	}
-
-	private toggleGraphSearch(): void {
-		const { workspace } = this.app;
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
-
-		if (existingLeaves.length > 0) {
-			const graphView = existingLeaves[0].view;
-			if (graphView instanceof RelationshipGraphView) {
-				graphView.toggleSearch();
-			}
-		}
-	}
-
-	private toggleHideContent(): void {
-		const { workspace } = this.app;
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
-
-		if (existingLeaves.length > 0) {
-			const graphView = existingLeaves[0].view;
-			if (graphView instanceof RelationshipGraphView) {
-				graphView.toggleHideContent();
+				const method = graphView[methodName as keyof RelationshipGraphView];
+				if (typeof method === "function") {
+					(method as () => void).call(graphView);
+				}
 				return;
 			}
 		}
 
-		new Notice("Open the Relationship Graph to toggle content visibility");
-	}
-
-	private toggleHideFrontmatter(): void {
-		const { workspace } = this.app;
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
-
-		if (existingLeaves.length > 0) {
-			const graphView = existingLeaves[0].view;
-			if (graphView instanceof RelationshipGraphView) {
-				graphView.toggleHideFrontmatter();
-				return;
-			}
+		if (noticeMessage) {
+			new Notice(noticeMessage);
 		}
-
-		new Notice("Open the Relationship Graph to toggle frontmatter visibility");
 	}
 }
