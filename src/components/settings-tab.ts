@@ -1,5 +1,6 @@
 import { type App, PluginSettingTab, Setting } from "obsidian";
 import type NexusPropertiesPlugin from "../main";
+import { SETTINGS_DEFAULTS } from "../types/constants";
 import type { NexusPropertiesSettingsSchema } from "../types/settings";
 import { SettingsUIBuilder } from "../utils/settings-ui-builder";
 
@@ -22,6 +23,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		this.addUserInterfaceSettings(containerEl);
 		this.addGraphSettings(containerEl);
 		this.addPreviewSettings(containerEl);
+		this.addColorSettings(containerEl);
 		this.addFilteringSettings(containerEl);
 		this.addRescanSection(containerEl);
 		this.addDirectorySettings(containerEl);
@@ -131,6 +133,244 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			key: "zoomHideContentByDefault",
 			name: "Zoom: hide content by default",
 			desc: "When entering zoom preview, file content starts hidden by default",
+		});
+	}
+
+	private addColorSettings(containerEl: HTMLElement): void {
+		const settings = this.plugin.settingsStore.currentSettings;
+
+		new Setting(containerEl).setName("Node colors").setHeading();
+
+		// Default color setting with color picker
+		new Setting(containerEl)
+			.setName("Default node color")
+			.setDesc("Default color for nodes when no color rules match")
+			.addColorPicker((colorPicker) => {
+				colorPicker.setValue(settings.defaultNodeColor);
+				colorPicker.onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						defaultNodeColor: value || SETTINGS_DEFAULTS.DEFAULT_NODE_COLOR,
+					}));
+				});
+			});
+
+		// Color rules section
+		const colorRulesContainer = containerEl.createDiv();
+
+		const desc = colorRulesContainer.createDiv();
+		desc.createEl("p", {
+			text: "Define color rules based on frontmatter properties. Rules are evaluated in order - the first matching rule determines the node color.",
+		});
+
+		// Examples section
+		const examplesContainer = desc.createDiv("settings-info-box");
+
+		examplesContainer.createEl("strong", { text: "Example color rules:" });
+		const examplesList = examplesContainer.createEl("ul");
+
+		const examples = [
+			{
+				expression: "fm.Status === 'Active'",
+				color: "#22c55e",
+				description: "Active nodes in green",
+			},
+			{
+				expression: "fm.type === 'project'",
+				color: "#3b82f6",
+				description: "Project nodes in blue",
+			},
+			{
+				expression: "fm.Priority === 'High'",
+				color: "#ef4444",
+				description: "High priority nodes in red",
+			},
+			{
+				expression: "Array.isArray(fm.tags) && fm.tags.includes('important')",
+				color: "#f59e0b",
+				description: "Important tagged nodes in orange",
+			},
+		];
+
+		for (const example of examples) {
+			const li = examplesList.createEl("li", { cls: "color-example-item" });
+
+			li.createEl("code", { text: example.expression, cls: "settings-info-box-example" });
+
+			li.createSpan({ text: "→", cls: "color-arrow" });
+
+			const colorSpan = li.createEl("span", { cls: "color-example-dot" });
+			colorSpan.style.setProperty("--example-color", example.color);
+
+			li.createSpan({ text: example.description, cls: "color-example-description" });
+		}
+
+		// Warning section
+		const warningContainer = desc.createDiv("settings-warning-box");
+		warningContainer.createEl("strong", { text: "⚠️ Important:" });
+		warningContainer.createEl("p", {
+			text: "Use 'fm' to access frontmatter properties. Invalid expressions will be ignored. Colors can be CSS color names, hex codes, or HSL values.",
+		});
+
+		// Color rules list
+		const colorRulesListContainer = colorRulesContainer.createDiv();
+
+		this.renderColorRulesList(colorRulesListContainer);
+
+		// Add new color rule button
+		new Setting(colorRulesContainer)
+			.setName("Add color rule")
+			.setDesc("Add a new color rule")
+			.addButton((button) => {
+				button.setButtonText("Add Rule");
+				button.onClick(async () => {
+					const newRule = {
+						id: `color-rule-${Date.now()}`,
+						expression: "",
+						color: "hsl(200, 70%, 50%)",
+						enabled: true,
+					};
+
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						colorRules: [...s.colorRules, newRule],
+					}));
+
+					// Re-render the list
+					this.renderColorRulesList(colorRulesListContainer);
+				});
+			});
+	}
+
+	private renderColorRulesList(container: HTMLElement): void {
+		container.empty();
+		const { colorRules } = this.plugin.settingsStore.currentSettings;
+
+		if (colorRules.length === 0) {
+			const emptyState = container.createDiv();
+			emptyState.textContent = "No color rules defined. Click 'Add Rule' to create one.";
+			return;
+		}
+
+		colorRules.forEach((rule, index) => {
+			const ruleContainer = container.createDiv("color-rule-item");
+
+			// Single row with all controls
+			const mainRow = ruleContainer.createDiv("color-rule-main-row");
+
+			// Left section: order, checkbox, expression
+			const leftSection = mainRow.createDiv("color-rule-left");
+
+			leftSection.createEl("span", {
+				text: `#${index + 1}`,
+				cls: "color-rule-order",
+			});
+
+			const enableToggle = leftSection.createEl("input", { type: "checkbox" });
+			enableToggle.checked = rule.enabled;
+			enableToggle.onchange = async () => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					colorRules: s.colorRules.map((r) => (r.id === rule.id ? { ...r, enabled: enableToggle.checked } : r)),
+				}));
+			};
+
+			const expressionInput = leftSection.createEl("input", {
+				type: "text",
+				value: rule.expression,
+				placeholder: "fm.Status === 'Active'",
+				cls: "color-rule-expression-input",
+			});
+
+			const updateExpression = async () => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					colorRules: s.colorRules.map((r) => (r.id === rule.id ? { ...r, expression: expressionInput.value } : r)),
+				}));
+			};
+
+			expressionInput.addEventListener("blur", updateExpression);
+			expressionInput.addEventListener("keydown", (e: KeyboardEvent) => {
+				if (e.key === "Enter") {
+					e.preventDefault();
+					updateExpression();
+				}
+			});
+
+			// Right section: color picker + controls
+			const rightSection = mainRow.createDiv("color-rule-right");
+
+			// Integrated color picker using Setting
+			const colorPickerWrapper = rightSection.createDiv("color-rule-picker-wrapper");
+			new Setting(colorPickerWrapper).addColorPicker((colorPicker) => {
+				colorPicker.setValue(rule.color);
+				colorPicker.onChange(async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						colorRules: s.colorRules.map((r) => (r.id === rule.id ? { ...r, color: value } : r)),
+					}));
+				});
+			});
+
+			// Control buttons
+			const controlsSection = rightSection.createDiv("color-rule-controls");
+
+			if (index > 0) {
+				const moveUpButton = controlsSection.createEl("button", {
+					text: "↑",
+					attr: { title: "Move up" },
+					cls: "color-rule-btn",
+				});
+				moveUpButton.onclick = async () => {
+					await this.plugin.settingsStore.updateSettings((s) => {
+						const currentRules = [...s.colorRules];
+						const ruleIndex = currentRules.findIndex((r) => r.id === rule.id);
+						if (ruleIndex > 0) {
+							[currentRules[ruleIndex], currentRules[ruleIndex - 1]] = [
+								currentRules[ruleIndex - 1],
+								currentRules[ruleIndex],
+							];
+						}
+						return { ...s, colorRules: currentRules };
+					});
+					this.renderColorRulesList(container);
+				};
+			}
+
+			if (index < colorRules.length - 1) {
+				const moveDownButton = controlsSection.createEl("button", {
+					text: "↓",
+					attr: { title: "Move down" },
+					cls: "color-rule-btn",
+				});
+				moveDownButton.onclick = async () => {
+					await this.plugin.settingsStore.updateSettings((s) => {
+						const currentRules = [...s.colorRules];
+						const ruleIndex = currentRules.findIndex((r) => r.id === rule.id);
+						if (ruleIndex !== -1 && ruleIndex < currentRules.length - 1) {
+							[currentRules[ruleIndex], currentRules[ruleIndex + 1]] = [
+								currentRules[ruleIndex + 1],
+								currentRules[ruleIndex],
+							];
+						}
+						return { ...s, colorRules: currentRules };
+					});
+					this.renderColorRulesList(container);
+				};
+			}
+
+			const deleteButton = controlsSection.createEl("button", {
+				text: "×",
+				attr: { title: "Delete rule" },
+				cls: "color-rule-btn color-rule-btn-delete",
+			});
+			deleteButton.onclick = async () => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					colorRules: s.colorRules.filter((r) => r.id !== rule.id),
+				}));
+				this.renderColorRulesList(container);
+			};
 		});
 	}
 

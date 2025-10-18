@@ -23,6 +23,9 @@ export const SETTINGS_DEFAULTS = {
 	// Zoom preview defaults
 	DEFAULT_ZOOM_HIDE_FRONTMATTER: false,
 	DEFAULT_ZOOM_HIDE_CONTENT: false,
+
+	// Node color defaults
+	DEFAULT_NODE_COLOR: "#e9f2ff",
 } as const;
 
 export const SCAN_CONCURRENCY = 10;

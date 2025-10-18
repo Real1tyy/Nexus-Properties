@@ -4,6 +4,7 @@ import { ItemView, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
+import { ColorEvaluator } from "../utils/colors";
 import { extractDisplayName, extractFilePath, getFileContext } from "../utils/file";
 import { FilterEvaluator } from "../utils/filters";
 import { formatValueForNode } from "../utils/frontmatter-value";
@@ -36,6 +37,7 @@ export class RelationshipGraphView extends ItemView {
 	private zoomPreview: GraphZoomPreview | null = null;
 	private isUpdating = false;
 	private filterEvaluator!: FilterEvaluator;
+	private colorEvaluator!: ColorEvaluator;
 	// Persistent toggle states for preview
 	private previewHideFrontmatter = false;
 	private previewHideContent = false;
@@ -117,6 +119,9 @@ export class RelationshipGraphView extends ItemView {
 
 		// Initialize filter evaluator bound to live settings
 		this.filterEvaluator = new FilterEvaluator(this.plugin.settingsStore.settings$);
+
+		// Initialize color evaluator bound to live settings
+		this.colorEvaluator = new ColorEvaluator(this.plugin.settingsStore.settings$);
 
 		// Register event listener for active file changes
 		this.registerEvent(
@@ -428,7 +433,7 @@ export class RelationshipGraphView extends ItemView {
 					style: {
 						width: 16,
 						height: 16,
-						"background-color": "#e9f2ff",
+						"background-color": "data(nodeColor)",
 						"border-width": 2,
 						"border-color": "#ffffff",
 						"border-opacity": 0.8,
@@ -448,7 +453,7 @@ export class RelationshipGraphView extends ItemView {
 						"overlay-color": "#7ad1ff",
 						"overlay-opacity": 0.15,
 						"overlay-padding": 12,
-						"transition-property": "overlay-opacity, overlay-padding, width, height",
+						"transition-property": "overlay-opacity, overlay-padding, width, height, background-color",
 						"transition-duration": 300,
 						"transition-timing-function": "ease-out",
 					},
@@ -459,14 +464,12 @@ export class RelationshipGraphView extends ItemView {
 					style: {
 						width: 24,
 						height: 24,
-						"background-color": "#ffd89b",
 						"border-color": "#fff",
 						"border-width": 3,
 						"font-weight": "bold",
 						"font-size": 13,
 						color: "#ffeaa7",
 						"text-max-width": "160px",
-						"overlay-color": "#ffd89b",
 						"overlay-opacity": 0.35,
 						"overlay-padding": 20,
 					},
@@ -477,7 +480,6 @@ export class RelationshipGraphView extends ItemView {
 					style: {
 						width: 20,
 						height: 20,
-						"background-color": "#a8daff",
 						"overlay-padding": 16,
 					},
 				},
@@ -755,6 +757,38 @@ export class RelationshipGraphView extends ItemView {
 		}
 	}
 
+	private addNodeToGraph(
+		nodes: ElementDefinition[],
+		processedNodes: Set<string>,
+		pathOrWikiLink: string,
+		level: number,
+		isSource: boolean
+	): void {
+		const filePath = extractFilePath(pathOrWikiLink);
+		if (processedNodes.has(filePath)) return;
+
+		processedNodes.add(filePath);
+		const displayName = extractDisplayName(pathOrWikiLink);
+
+		const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
+		const estimatedHeight = 45;
+
+		const context = getFileContext(this.app, filePath);
+		const nodeColor = this.colorEvaluator.evaluateColor(context.frontmatter ?? {});
+
+		nodes.push({
+			data: {
+				id: filePath,
+				label: displayName,
+				level: level,
+				isSource: isSource,
+				width: estimatedWidth,
+				height: estimatedHeight,
+				nodeColor: nodeColor,
+			},
+		});
+	}
+
 	// Ensure the graph is centered/fit in its container, and handle zoom-mode centering
 	private ensureCentered(): void {
 		if (!this.cy || this.isUpdating) return;
@@ -789,30 +823,8 @@ export class RelationshipGraphView extends ItemView {
 		const edges: ElementDefinition[] = [];
 		const processedNodes = new Set<string>();
 
-		const addNode = (pathOrWikiLink: string, isSource: boolean): void => {
-			const filePath = extractFilePath(pathOrWikiLink);
-			if (processedNodes.has(filePath)) return;
-
-			processedNodes.add(filePath);
-			const displayName = extractDisplayName(pathOrWikiLink);
-
-			const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
-			const estimatedHeight = 45;
-
-			nodes.push({
-				data: {
-					id: filePath,
-					label: displayName,
-					level: isSource ? 0 : 1,
-					isSource: isSource,
-					width: estimatedWidth,
-					height: estimatedHeight,
-				},
-			});
-		};
-
 		// Add central node (current file)
-		addNode(sourcePath, true);
+		this.addNodeToGraph(nodes, processedNodes, sourcePath, 0, true);
 
 		// Get relationships for current file
 		const context = getFileContext(this.app, sourcePath);
@@ -827,7 +839,7 @@ export class RelationshipGraphView extends ItemView {
 				const relatedPath = extractFilePath(relatedWikiLink);
 
 				if (!processedNodes.has(relatedPath)) {
-					addNode(relatedWikiLink, false);
+					this.addNodeToGraph(nodes, processedNodes, relatedWikiLink, 1, false);
 
 					edges.push({
 						data: {
@@ -910,31 +922,9 @@ export class RelationshipGraphView extends ItemView {
 
 		const rootPath = this.ignoreTopmostParent ? sourcePath : this.findTopmostParent(sourcePath);
 
-		const addNode = (pathOrWikiLink: string, level: number, isSource: boolean): void => {
-			const filePath = extractFilePath(pathOrWikiLink);
-			if (processedNodes.has(filePath)) return;
-
-			processedNodes.add(filePath);
-			const displayName = extractDisplayName(pathOrWikiLink);
-
-			const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
-			const estimatedHeight = 45;
-
-			nodes.push({
-				data: {
-					id: filePath,
-					label: displayName,
-					level: level,
-					isSource: isSource,
-					width: estimatedWidth,
-					height: estimatedHeight,
-				},
-			});
-		};
-
 		const buildDownwardsBFS = (): void => {
 			const queue: Array<{ path: string; level: number }> = [{ path: rootPath, level: 0 }];
-			addNode(rootPath, 0, rootPath === sourcePath);
+			this.addNodeToGraph(nodes, processedNodes, rootPath, 0, rootPath === sourcePath);
 
 			while (queue.length > 0) {
 				const { path: currentPath, level: currentLevel } = queue.shift()!;
@@ -951,7 +941,7 @@ export class RelationshipGraphView extends ItemView {
 
 					if (!processedNodes.has(childPath)) {
 						const isSource = childPath === sourcePath;
-						addNode(childWikiLink, currentLevel + 1, isSource);
+						this.addNodeToGraph(nodes, processedNodes, childWikiLink, currentLevel + 1, isSource);
 
 						edges.push({
 							data: {

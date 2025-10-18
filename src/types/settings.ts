@@ -3,6 +3,15 @@ import { SETTINGS_DEFAULTS, SETTINGS_VERSION } from "./constants";
 
 export type Frontmatter = Record<string, unknown>;
 
+export const ColorRuleSchema = z.object({
+	id: z.string(),
+	expression: z.string(),
+	color: z.string(),
+	enabled: z.boolean(),
+});
+
+export type ColorRule = z.infer<typeof ColorRuleSchema>;
+
 export const NexusPropertiesSettingsSchema = z.object({
 	version: z.number().int().positive().optional().default(SETTINGS_VERSION),
 
@@ -60,6 +69,10 @@ export const NexusPropertiesSettingsSchema = z.object({
 		.array(z.string())
 		.optional()
 		.default([...SETTINGS_DEFAULTS.DEFAULT_DISPLAY_NODE_PROPERTIES]),
+
+	// Node color rules
+	defaultNodeColor: z.string().optional().default(SETTINGS_DEFAULTS.DEFAULT_NODE_COLOR),
+	colorRules: z.array(ColorRuleSchema).optional().default([]),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;
