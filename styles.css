@@ -764,12 +764,15 @@
 	padding: 0.65em 0.85em;
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
 	font-size: 0.85em;
-	max-width: 300px;
+	max-width: 255px;
 	pointer-events: auto;
 }
 
 .nexus-property-tooltip-title {
 	margin-bottom: 0.5em;
+	word-wrap: break-word;
+	word-break: break-word;
+	overflow-wrap: break-word;
 }
 
 .nexus-property-tooltip-title-link {

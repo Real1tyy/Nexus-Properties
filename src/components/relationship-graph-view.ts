@@ -7,11 +7,11 @@ import type NexusPropertiesPlugin from "../main";
 import { ColorEvaluator } from "../utils/colors";
 import { extractDisplayName, extractFilePath, getFileContext } from "../utils/file";
 import { FilterEvaluator } from "../utils/filters";
-import { formatValueForNode } from "../utils/frontmatter-value";
 import { GraphHeader } from "./graph-header";
 import { GraphSearch } from "./graph-search";
 import { GraphZoomPreview } from "./graph-zoom-preview";
 import { NodeContextMenu } from "./node-context-menu";
+import { PropertyTooltip } from "./property-tooltip";
 
 cytoscape.use(cytoscapeDagre);
 
@@ -42,8 +42,7 @@ export class RelationshipGraphView extends ItemView {
 	private previewHideFrontmatter = false;
 	private previewHideContent = false;
 	private settingsSubscription: Subscription | null = null;
-	private propertyTooltip: HTMLElement | null = null;
-	private hideTooltipTimer: number | null = null;
+	private propertyTooltip: PropertyTooltip | null = null;
 	// When exiting zoom, suppress the next resize-driven fit/center to avoid double snap
 	private suppressNextResizeFit = false;
 	// Search functionality
@@ -57,6 +56,10 @@ export class RelationshipGraphView extends ItemView {
 	) {
 		super(leaf);
 		this.contextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
+		this.propertyTooltip = new PropertyTooltip(this.app, {
+			settingsStore: this.plugin.settingsStore,
+			onFileOpen: (linkPath, event) => this.openFile(linkPath, event),
+		});
 	}
 
 	getViewType(): string {
@@ -245,7 +248,10 @@ export class RelationshipGraphView extends ItemView {
 		}
 
 		// Clean up tooltip
-		this.hidePropertyTooltip();
+		if (this.propertyTooltip) {
+			this.propertyTooltip.destroy();
+			this.propertyTooltip = null;
+		}
 
 		// Clean up search component
 		if (this.graphSearch) {
@@ -581,22 +587,17 @@ export class RelationshipGraphView extends ItemView {
 				});
 
 				// Show property tooltip if properties are configured
-				this.showPropertyTooltip(filePath, evt);
+				if (this.propertyTooltip) {
+					this.propertyTooltip.show(filePath, evt.originalEvent as MouseEvent);
+				}
 			}
 		});
 
 		// Hide tooltip on mouseout (with delay to allow moving to tooltip)
 		this.cy.on("mouseout", "node", () => {
-			// Clear any existing timer
-			if (this.hideTooltipTimer !== null) {
-				window.clearTimeout(this.hideTooltipTimer);
+			if (this.propertyTooltip) {
+				this.propertyTooltip.scheduleHide(300);
 			}
-
-			// Start a timer to hide the tooltip (gives user time to move into it)
-			this.hideTooltipTimer = window.setTimeout(() => {
-				this.hidePropertyTooltip();
-				this.hideTooltipTimer = null;
-			}, 300);
 		});
 
 		// Click handler to enter zoom mode and focus on node
@@ -1102,217 +1103,6 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	/**
-	 * Shows a tooltip with frontmatter properties when hovering over a node.
-	 */
-	private showPropertyTooltip(filePath: string, evt: any): void {
-		const settings = this.plugin.settingsStore.settings$.value;
-
-		// Don't show tooltip if setting is disabled
-		if (!settings.showGraphTooltips) {
-			return;
-		}
-
-		if (settings.displayNodeProperties.length === 0) {
-			return;
-		}
-
-		const context = getFileContext(this.app, filePath);
-		if (!context.file || !context.frontmatter) {
-			return;
-		}
-
-		const { frontmatter } = context;
-
-		const propertyData = settings.displayNodeProperties
-			.map((propName) => {
-				const value = frontmatter[propName];
-				return value !== undefined && value !== null ? { key: propName, value } : null;
-			})
-			.filter((prop): prop is { key: string; value: unknown } => prop !== null);
-
-		// Create tooltip element
-		this.hidePropertyTooltip();
-		this.propertyTooltip = document.createElement("div");
-		this.propertyTooltip.addClass("nexus-property-tooltip");
-
-		// Keep tooltip open when hovering over it
-		this.propertyTooltip.addEventListener("mouseenter", () => {
-			// Cancel any pending hide timer
-			if (this.hideTooltipTimer !== null) {
-				window.clearTimeout(this.hideTooltipTimer);
-				this.hideTooltipTimer = null;
-			}
-		});
-
-		this.propertyTooltip.addEventListener("mouseleave", () => {
-			// Hide immediately when leaving the tooltip
-			this.hidePropertyTooltip();
-		});
-
-		// Add clickable title at the top
-		const displayName = extractDisplayName(filePath);
-		const titleEl = this.propertyTooltip.createEl("div", {
-			cls: "nexus-property-tooltip-title",
-		});
-
-		const titleLink = titleEl.createEl("a", {
-			text: displayName,
-			cls: "nexus-property-tooltip-title-link",
-		});
-
-		titleLink.addEventListener("click", (e) => {
-			e.preventDefault();
-			e.stopPropagation();
-			this.openFile(filePath, e);
-		});
-
-		// Add separator if there are properties
-		if (propertyData.length > 0) {
-			this.propertyTooltip.createDiv("nexus-property-tooltip-separator");
-		}
-
-		for (const { key, value } of propertyData) {
-			const propEl = this.propertyTooltip.createDiv("nexus-property-tooltip-item");
-			const keyEl = propEl.createSpan("nexus-property-tooltip-key");
-			keyEl.setText(`${key}:`);
-			const valueEl = propEl.createSpan("nexus-property-tooltip-value");
-
-			// Render value with clickable links
-			this.renderPropertyValue(valueEl, value);
-		}
-
-		// Position tooltip to the left of cursor to avoid context menu overlap
-		// NOTE: Inline styles are acceptable here - runtime-calculated position during hover interaction
-		const mouseEvent = evt.originalEvent as MouseEvent;
-		document.body.appendChild(this.propertyTooltip);
-
-		// Position to the left to avoid context menu (which appears on right-click)
-		const offsetX = 35;
-		const offsetY = 10;
-
-		// Check if tooltip would go off-screen and adjust if needed
-		const tooltipRect = this.propertyTooltip.getBoundingClientRect();
-		let left = mouseEvent.clientX - tooltipRect.width - offsetX;
-		const top = mouseEvent.clientY + offsetY;
-
-		// If tooltip goes off the left edge, position to the right of cursor instead
-		if (left < 0) {
-			left = mouseEvent.clientX + 15;
-		}
-
-		// Ensure tooltip doesn't go off the bottom
-		let adjustedTop = top;
-		if (top + tooltipRect.height > window.innerHeight) {
-			adjustedTop = window.innerHeight - tooltipRect.height - 10;
-		}
-
-		this.propertyTooltip.style.left = `${left}px`;
-		this.propertyTooltip.style.top = `${adjustedTop}px`;
-	}
-
-	/**
-	 * Renders a property value with clickable wiki links.
-	 */
-	private renderPropertyValue(container: HTMLElement, value: unknown): void {
-		if (value === null || value === undefined) {
-			container.setText("");
-			return;
-		}
-
-		// Handle arrays
-		if (Array.isArray(value)) {
-			const stringValues = value.filter((item) => typeof item === "string");
-
-			if (stringValues.length === 0) {
-				container.setText("");
-				return;
-			}
-
-			// Render each item
-			for (let i = 0; i < stringValues.length; i++) {
-				if (i > 0) {
-					container.createSpan({ text: ", ", cls: "nexus-property-separator" });
-				}
-				this.renderStringValue(container, stringValues[i]);
-			}
-			return;
-		}
-
-		// Handle strings
-		if (typeof value === "string") {
-			this.renderStringValue(container, value);
-			return;
-		}
-
-		// Handle booleans
-		if (typeof value === "boolean") {
-			container.setText(value ? "Yes" : "No");
-			return;
-		}
-
-		// Handle numbers
-		if (typeof value === "number") {
-			container.setText(value.toString());
-			return;
-		}
-
-		// Handle objects
-		if (typeof value === "object") {
-			container.setText(formatValueForNode(value, 30));
-			return;
-		}
-
-		container.setText(String(value));
-	}
-
-	/**
-	 * Renders a string value, converting wiki links to clickable elements.
-	 */
-	private renderStringValue(container: HTMLElement, text: string): void {
-		// Parse for wiki links
-		const wikiLinkRegex = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
-		let lastIndex = 0;
-		const matches = text.matchAll(wikiLinkRegex);
-		let hasMatches = false;
-
-		for (const match of matches) {
-			hasMatches = true;
-
-			// Add text before the link
-			if (match.index !== undefined && match.index > lastIndex) {
-				container.createSpan({ text: text.substring(lastIndex, match.index) });
-			}
-
-			// Create clickable link
-			const linkPath = match[1];
-			const displayText = match[2] || linkPath;
-
-			const linkEl = container.createEl("a", {
-				text: displayText,
-				cls: "nexus-property-link",
-			});
-
-			linkEl.addEventListener("click", (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				this.openFile(linkPath, e);
-			});
-
-			lastIndex = (match.index ?? 0) + match[0].length;
-		}
-
-		// Add remaining text
-		if (hasMatches && lastIndex < text.length) {
-			container.createSpan({ text: text.substring(lastIndex) });
-		}
-
-		// If no wiki links found, just add the text
-		if (!hasMatches) {
-			container.setText(text);
-		}
-	}
-
-	/**
 	 * Opens a file using Obsidian's API.
 	 */
 	private openFile(linkPath: string, event: MouseEvent): void {
@@ -1328,22 +1118,6 @@ export class RelationshipGraphView extends ItemView {
 			} else {
 				this.app.workspace.getLeaf(false).openFile(file);
 			}
-		}
-	}
-
-	/**
-	 * Hides the property tooltip.
-	 */
-	private hidePropertyTooltip(): void {
-		// Clear any pending hide timer
-		if (this.hideTooltipTimer !== null) {
-			window.clearTimeout(this.hideTooltipTimer);
-			this.hideTooltipTimer = null;
-		}
-
-		if (this.propertyTooltip) {
-			this.propertyTooltip.remove();
-			this.propertyTooltip = null;
 		}
 	}
 }
