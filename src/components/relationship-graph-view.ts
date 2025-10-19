@@ -685,75 +685,51 @@ export class RelationshipGraphView extends ItemView {
 		} else if (this.renderRelated) {
 			// Use concentric layout for simple constellation/nebula pattern
 			// Central star (source) in the middle, related nodes in outer orbit
-			const layout = this.cy.layout({
-				name: "concentric",
-				fit: true,
-				padding: 120,
-				startAngle: (3 / 2) * Math.PI, // Start at top
-				sweep: undefined, // Full circle
-				clockwise: true,
-				equidistant: true,
-				minNodeSpacing: 100, // Prevent overlapping
-				concentric: (node: any) => {
-					// Source node gets highest concentric value (innermost)
-					return node.data("isSource") ? 2 : 1;
-				},
-				levelWidth: () => {
-					// All non-source nodes at same level
-					return 1;
-				},
-				animate: animationDuration > 0,
-				animationDuration: animationDuration,
-				animationEasing: "ease-out-cubic",
-			});
-
-			// Ensure final view is centered once layout completes
-			if (animationDuration > 0) {
-				this.cy.one("layoutstop", () => this.ensureCentered());
-			}
-			layout.run();
-
-			// For instant layouts (no animation), center immediately
-			if (animationDuration === 0) {
-				setTimeout(() => {
-					if (!this.cy) return;
-					this.cy.resize();
-					this.cy.fit();
-					this.cy.center();
-				}, 0);
-			}
+			this.runLayoutWithAnimationHandling(
+				() =>
+					this.cy!.layout({
+						name: "concentric",
+						fit: true,
+						padding: 120,
+						startAngle: (3 / 2) * Math.PI, // Start at top
+						sweep: undefined, // Full circle
+						clockwise: true,
+						equidistant: true,
+						minNodeSpacing: 100, // Prevent overlapping
+						concentric: (node: any) => {
+							// Source node gets highest concentric value (innermost)
+							return node.data("isSource") ? 2 : 1;
+						},
+						levelWidth: () => {
+							// All non-source nodes at same level
+							return 1;
+						},
+						animate: animationDuration > 0,
+						animationDuration: animationDuration,
+						animationEasing: "ease-out-cubic",
+					}),
+				animationDuration
+			);
 		} else {
 			// Use dagre top-down layout for hierarchy
-			const layout = this.cy.layout({
-				name: "dagre",
-				rankDir: "TB", // Top to bottom hierarchy
-				align: undefined,
-				nodeSep: 80, // Horizontal spacing between nodes
-				rankSep: 120, // Vertical spacing between levels
-				edgeSep: 50, // Spacing between edges
-				ranker: "network-simplex",
-				animate: animationDuration > 0,
-				animationDuration: animationDuration,
-				animationEasing: "ease-out-cubic",
-				fit: true,
-				padding: 80,
-			} as any);
-
-			// Ensure final view is centered once layout completes
-			if (animationDuration > 0) {
-				this.cy.one("layoutstop", () => this.ensureCentered());
-			}
-			layout.run();
-
-			// For instant layouts (no animation), center immediately
-			if (animationDuration === 0) {
-				setTimeout(() => {
-					if (!this.cy) return;
-					this.cy.resize();
-					this.cy.fit();
-					this.cy.center();
-				}, 0);
-			}
+			this.runLayoutWithAnimationHandling(
+				() =>
+					this.cy!.layout({
+						name: "dagre",
+						rankDir: "TB", // Top to bottom hierarchy
+						align: undefined,
+						nodeSep: 80, // Horizontal spacing between nodes
+						rankSep: 120, // Vertical spacing between levels
+						edgeSep: 50, // Spacing between edges
+						ranker: "network-simplex",
+						animate: animationDuration > 0,
+						animationDuration: animationDuration,
+						animationEasing: "ease-out-cubic",
+						fit: true,
+						padding: 80,
+					} as any),
+				animationDuration
+			);
 		}
 	}
 
@@ -834,22 +810,37 @@ export class RelationshipGraphView extends ItemView {
 		});
 
 		// Apply preset layout with animation if enabled
-		const layout = this.cy.layout({
-			name: "preset",
-			fit: true,
-			padding: 120,
-			animate: animationDuration > 0,
-			animationDuration: animationDuration,
-			animationEasing: "ease-out-cubic",
-		});
+		this.runLayoutWithAnimationHandling(
+			() =>
+				this.cy!.layout({
+					name: "preset",
+					fit: true,
+					padding: 120,
+					animate: animationDuration > 0,
+					animationDuration: animationDuration,
+					animationEasing: "ease-out-cubic",
+				}),
+			animationDuration
+		);
+	}
 
+	/**
+	 * Executes a layout with proper animation handling and centering.
+	 * Handles both animated and instant (no animation) layout scenarios.
+	 */
+	private runLayoutWithAnimationHandling(layoutFactory: () => cytoscape.Layouts, animationDuration: number): void {
+		if (!this.cy) return;
+
+		const layout = layoutFactory();
+
+		// For animated layouts, center after animation completes
 		if (animationDuration > 0) {
 			this.cy.one("layoutstop", () => this.ensureCentered());
 		}
 
 		layout.run();
 
-		// For instant layouts, center immediately
+		// For instant layouts (no animation), center immediately
 		if (animationDuration === 0) {
 			setTimeout(() => {
 				if (!this.cy) return;
