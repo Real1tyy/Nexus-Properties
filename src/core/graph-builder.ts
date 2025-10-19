@@ -11,6 +11,18 @@ export interface GraphData {
 	edges: ElementDefinition[];
 }
 
+export interface ConstellationNode {
+	center: string; // file path of center node
+	orbitals: string[]; // file paths of nodes in orbit
+	level: number; // depth in hierarchy (0 = root)
+}
+
+export interface ConstellationGraphData {
+	constellations: ConstellationNode[];
+	allNodePaths: Set<string>; // all unique node paths
+	edges: ElementDefinition[]; // only center-to-orbital edges
+}
+
 export interface GraphBuilderOptions {
 	sourcePath: string;
 	renderRelated: boolean;
@@ -50,9 +62,13 @@ export class GraphBuilder {
 				const { file, frontmatter } = getFileContext(this.app, path);
 				return { wikiLink, path, file, frontmatter };
 			})
-			.filter(
-				(ctx): ctx is ValidFileContext => ctx.file !== null && ctx.frontmatter !== null && !excludePaths.has(ctx.path)
-			);
+			.filter((ctx): ctx is ValidFileContext => {
+				if (ctx.file === null || !ctx.frontmatter || excludePaths.has(ctx.path)
+					|| !this.filterEvaluator.evaluateFilters(ctx.frontmatter)) {
+					return false;
+				}
+				return true;
+			});
 	}
 
 	private createNodeElement(pathOrWikiLink: string, level: number, isSource: boolean): ElementDefinition {
@@ -81,7 +97,12 @@ export class GraphBuilder {
 		let graphData: GraphData;
 
 		if (options.renderRelated) {
-			graphData = this.buildRelatedGraphData(options.sourcePath, options.includeAllRelated);
+			if (options.includeAllRelated) {
+				const constellationData = this.buildRecursiveConstellations(options.sourcePath);
+				graphData = this.convertConstellationsToGraphData(constellationData);
+			} else {
+				graphData = this.buildRelatedGraphData(options.sourcePath);
+			}
 		} else {
 			graphData = this.buildHierarchyGraphData(options.sourcePath, options.startFromCurrent);
 		}
@@ -89,7 +110,7 @@ export class GraphBuilder {
 		return this.applyGraphFilters(graphData, options.searchQuery);
 	}
 
-	private buildRelatedGraphData(sourcePath: string, includeAllRelated: boolean): GraphData {
+	private buildRelatedGraphData(sourcePath: string): GraphData {
 		const processedPaths = new Set<string>([sourcePath]);
 		const sourceNode = this.createNodeElement(sourcePath, 0, true);
 
@@ -99,11 +120,8 @@ export class GraphBuilder {
 		}
 
 		const relations = this.indexer.extractRelationships(file, frontmatter);
-		const allRelated = includeAllRelated
-			? this.computeAllRelatedRecursively(sourcePath, relations.related)
-			: relations.related;
 
-		const validContexts = this.resolveValidContexts(allRelated, processedPaths);
+		const validContexts = this.resolveValidContexts(relations.related, processedPaths);
 
 		const relatedNodes = validContexts.map((ctx) => this.createNodeElement(ctx.wikiLink, 1, false));
 
@@ -186,45 +204,153 @@ export class GraphBuilder {
 		return topmostParent;
 	}
 
-	private computeAllRelatedRecursively(sourceFilePath: string, directRelated: string[]): string[] {
-		const visited = new Set<string>([sourceFilePath]);
-		const allRelated: string[] = [];
+	private buildRecursiveConstellations(sourcePath: string): ConstellationGraphData {
+		const constellations: ConstellationNode[] = [];
+		const allNodePaths = new Set<string>([sourcePath]);
+		const edges: ElementDefinition[] = [];
 
-		const collectRelated = (relatedItems: string[]): void => {
-			const validContexts = this.resolveValidContexts(relatedItems, visited);
+		// Queue of constellation centers to process with their level
+		const queue: Array<{ centerPath: string; level: number }> = [{ centerPath: sourcePath, level: 0 }];
 
-			validContexts.forEach((ctx) => {
-				visited.add(ctx.path);
-				allRelated.push(ctx.wikiLink);
+		while (queue.length > 0) {
+			const { centerPath, level } = queue.shift()!;
 
-				const nestedRels = this.indexer.extractRelationships(ctx.file, ctx.frontmatter);
-				collectRelated(nestedRels.related);
+			// Safety check to prevent infinite loops
+			if (level > 10) continue;
+
+			const { file, frontmatter } = getFileContext(this.app, centerPath);
+			if (!file || !frontmatter) continue;
+
+			const relations = this.indexer.extractRelationships(file, frontmatter);
+			const validOrbitals = this.resolveValidContexts(relations.related, allNodePaths);
+
+			// Create constellation if there are orbitals
+			if (validOrbitals.length > 0 || level === 0) {
+				const orbitalPaths = validOrbitals.map((ctx) => ctx.path);
+
+				constellations.push({
+					center: centerPath,
+					orbitals: orbitalPaths,
+					level: level,
+				});
+
+				// Add edges from center to each orbital
+				orbitalPaths.forEach((orbitalPath) => {
+					edges.push({
+						data: { source: centerPath, target: orbitalPath },
+					});
+				});
+
+				// Add orbitals to processed set and queue them for their own constellations
+				validOrbitals.forEach((ctx) => {
+					allNodePaths.add(ctx.path);
+					queue.push({ centerPath: ctx.path, level: level + 1 });
+				});
+			}
+		}
+
+		return { constellations, allNodePaths, edges };
+	}
+
+	private convertConstellationsToGraphData(constellationData: ConstellationGraphData): GraphData {
+		const nodes: ElementDefinition[] = [];
+		const nodeSet = new Set<string>();
+
+		// Create a map of node path to its constellation info
+		const nodeToConstellation = new Map<
+			string,
+			{ constellationIndex: number; isCenter: boolean; centerPath: string }
+		>();
+
+		constellationData.constellations.forEach((constellation, index) => {
+			// Mark center node
+			nodeToConstellation.set(constellation.center, {
+				constellationIndex: index,
+				isCenter: true,
+				centerPath: constellation.center,
 			});
-		};
 
-		collectRelated(directRelated);
-		return allRelated;
+			// Mark orbital nodes
+			constellation.orbitals.forEach((orbitalPath) => {
+				if (!nodeToConstellation.has(orbitalPath)) {
+					nodeToConstellation.set(orbitalPath, {
+						constellationIndex: index,
+						isCenter: false,
+						centerPath: constellation.center,
+					});
+				}
+			});
+		});
+
+		// Create nodes for all unique paths with constellation metadata
+		constellationData.constellations.forEach((constellation) => {
+			// Add center node
+			if (!nodeSet.has(constellation.center)) {
+				nodeSet.add(constellation.center);
+				const baseNode = this.createNodeElement(
+					constellation.center,
+					constellation.level,
+					constellation.level === 0 // isSource if level 0
+				);
+
+				// Attach constellation metadata
+				const constellationInfo = nodeToConstellation.get(constellation.center)!;
+				baseNode.data = {
+					...baseNode.data,
+					constellationIndex: constellationInfo.constellationIndex,
+					isConstellationCenter: true,
+					constellationLevel: constellation.level,
+					orbitalCount: constellation.orbitals.length,
+				};
+
+				nodes.push(baseNode);
+			}
+
+			// Add orbital nodes
+			constellation.orbitals.forEach((orbitalPath, orbitalIndex) => {
+				if (!nodeSet.has(orbitalPath)) {
+					nodeSet.add(orbitalPath);
+					const baseNode = this.createNodeElement(
+						orbitalPath,
+						constellation.level + 1,
+						false // orbitals are never source
+					);
+
+					// Attach constellation metadata
+					const constellationInfo = nodeToConstellation.get(orbitalPath)!;
+					baseNode.data = {
+						...baseNode.data,
+						constellationIndex: constellationInfo.constellationIndex,
+						isConstellationCenter: false,
+						constellationLevel: constellation.level,
+						centerPath: constellationInfo.centerPath,
+						orbitalIndex: orbitalIndex,
+						orbitalCount: constellation.orbitals.length,
+					};
+
+					nodes.push(baseNode);
+				}
+			});
+		});
+
+		return {
+			nodes,
+			edges: constellationData.edges,
+		};
 	}
 
 	private applyGraphFilters(graphData: GraphData, searchQuery?: string): GraphData {
+		// Only apply search filter here - frontmatter filters are applied during graph building
+		if (!searchQuery) return graphData;
+
 		const filteredNodes = graphData.nodes.filter((node) => {
-			const { id, isSource, label } = node.data || {};
-			if (!id) return false;
+			const { isSource, label } = node.data || {};
 
 			// Always keep source node
 			if (isSource) return true;
 
-			// Apply search filter if active
-			if (searchQuery) {
-				const nodeName = ((label as string) || "").toLowerCase();
-				if (!nodeName.includes(searchQuery.toLowerCase())) {
-					return false;
-				}
-			}
-
-			// Apply frontmatter filters
-			const { frontmatter } = getFileContext(this.app, id);
-			return this.filterEvaluator.evaluateFilters(frontmatter ?? {});
+			const nodeName = (label as string).toLowerCase();
+			return nodeName.includes(searchQuery.toLowerCase());
 		});
 
 		const keepNodeIds = new Set(filteredNodes.map((node) => node.data?.id as string));
