@@ -36,9 +36,6 @@ export class GraphBuilder {
 		this.colorEvaluator = new ColorEvaluator(settingsStore.settings$);
 	}
 
-	/**
-	 * Build graph data based on provided options
-	 */
 	buildGraph(options: GraphBuilderOptions): GraphData {
 		let graphData: GraphData;
 
@@ -48,29 +45,23 @@ export class GraphBuilder {
 			graphData = this.buildHierarchyGraphData(options.sourcePath, options.startFromCurrent);
 		}
 
-		// Apply filtering
 		return this.applyGraphFilters(graphData, options.searchQuery);
 	}
 
-	/**
-	 * Build constellation/related view - shows current file and all related nodes in circular layout
-	 */
 	private buildRelatedGraphData(sourcePath: string, includeAllRelated: boolean): GraphData {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
 		const processedNodes = new Set<string>();
 
-		// Add central node (current file)
 		this.addNodeToGraph(nodes, processedNodes, sourcePath, 0, true);
 
-		// Get relationships for current file
-		const context = getFileContext(this.app, sourcePath);
-		if (context.file && context.frontmatter) {
-			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
+		const { file, frontmatter } = getFileContext(this.app, sourcePath);
+		if (file && frontmatter) {
+			const relations = this.indexer.extractRelationships(file, frontmatter);
 
 			const allRelated = includeAllRelated
-				? this.computeAllRelatedRecursively(sourcePath, rels.related)
-				: [...rels.related];
+				? this.computeAllRelatedRecursively(sourcePath, relations.related)
+				: [...relations.related];
 
 			for (const relatedWikiLink of allRelated) {
 				const relatedPath = extractFilePath(relatedWikiLink);
@@ -91,9 +82,6 @@ export class GraphBuilder {
 		return { nodes, edges };
 	}
 
-	/**
-	 * Build hierarchy view - shows parent-child relationships from root
-	 */
 	private buildHierarchyGraphData(sourcePath: string, startFromCurrent: boolean): GraphData {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
@@ -107,27 +95,26 @@ export class GraphBuilder {
 		while (queue.length > 0) {
 			const { path: currentPath, level: currentLevel } = queue.shift()!;
 
-			if (currentLevel > 50) continue;
+			// safety check to prevent infinite loops
+			if (currentLevel > 30) continue;
 
-			const context = getFileContext(this.app, currentPath);
-			if (!context.file || !context.frontmatter) continue;
+			const { file, frontmatter } = getFileContext(this.app, currentPath);
+			if (!file || !frontmatter) continue;
 
-			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
+			const relations = this.indexer.extractRelationships(file, frontmatter);
 
-			for (const childWikiLink of rels.children) {
+			for (const childWikiLink of relations.children) {
 				const childPath = extractFilePath(childWikiLink);
 
-				if (!processedNodes.has(childPath)) {
-					const isSource = childPath === sourcePath;
-					this.addNodeToGraph(nodes, processedNodes, childWikiLink, currentLevel + 1, isSource);
-
+				const isSource = childPath === sourcePath;
+				const added = this.addNodeToGraph(nodes, processedNodes, childWikiLink, currentLevel + 1, isSource);
+				if (added) {
 					edges.push({
 						data: {
 							source: currentPath,
 							target: childPath,
 						},
 					});
-
 					queue.push({ path: childPath, level: currentLevel + 1 });
 				}
 			}
@@ -136,27 +123,24 @@ export class GraphBuilder {
 		return { nodes, edges };
 	}
 
-	/**
-	 * Add a single node to the graph
-	 */
 	private addNodeToGraph(
 		nodes: ElementDefinition[],
-		processedNodes: Set<string>,
+		processedPaths: Set<string>,
 		pathOrWikiLink: string,
 		level: number,
 		isSource: boolean
-	): void {
+	): boolean {
 		const filePath = extractFilePath(pathOrWikiLink);
-		if (processedNodes.has(filePath)) return;
+		if (processedPaths.has(filePath)) return false;
+		processedPaths.add(filePath);
 
-		processedNodes.add(filePath);
 		const displayName = extractDisplayName(pathOrWikiLink);
 
 		const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
 		const estimatedHeight = 45;
 
-		const context = getFileContext(this.app, filePath);
-		const nodeColor = this.colorEvaluator.evaluateColor(context.frontmatter ?? {});
+		const { frontmatter } = getFileContext(this.app, filePath);
+		const nodeColor = this.colorEvaluator.evaluateColor(frontmatter ?? {});
 
 		nodes.push({
 			data: {
@@ -169,11 +153,10 @@ export class GraphBuilder {
 				nodeColor: nodeColor,
 			},
 		});
+
+		return true;
 	}
 
-	/**
-	 * Find the topmost parent in the hierarchy by traversing upwards
-	 */
 	private findTopmostParent(startPath: string, maxDepth = 50): string {
 		const visited = new Set<string>();
 		let topmostParent = startPath;
@@ -183,17 +166,15 @@ export class GraphBuilder {
 			if (currentLevel > maxDepth || visited.has(filePath)) return;
 			visited.add(filePath);
 
-			if (currentLevel > maxLevel) {
-				maxLevel = currentLevel;
-				topmostParent = filePath;
-			}
+			if (currentLevel > maxLevel) maxLevel = currentLevel;
+			if (currentLevel > maxLevel) topmostParent = filePath;
 
-			const context = getFileContext(this.app, filePath);
-			if (!context.file || !context.frontmatter) return;
+			const { file, frontmatter } = getFileContext(this.app, filePath);
+			if (!file || !frontmatter) return;
 
-			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
+			const relations = this.indexer.extractRelationships(file, frontmatter);
 
-			for (const parentWikiLink of rels.parent) {
+			for (const parentWikiLink of relations.parent) {
 				const parentPath = extractFilePath(parentWikiLink);
 
 				if (!visited.has(parentPath)) {
@@ -206,9 +187,6 @@ export class GraphBuilder {
 		return topmostParent;
 	}
 
-	/**
-	 * Recursively collect all related nodes
-	 */
 	private computeAllRelatedRecursively(sourceFilePath: string, directRelated: string[]): string[] {
 		const visited = new Set<string>([sourceFilePath]);
 		const allRelated: string[] = [];
@@ -238,40 +216,40 @@ export class GraphBuilder {
 		return allRelated;
 	}
 
-	/**
-	 * Apply search and frontmatter filters to graph data
-	 */
 	private applyGraphFilters(graphData: GraphData, searchQuery?: string): GraphData {
+		const filteredNodes: ElementDefinition[] = [];
 		const keepNodeIds = new Set<string>();
 
-		for (const n of graphData.nodes) {
-			const id = n.data?.id as string | undefined;
+		const includeSourceNode = (node: ElementDefinition): void => {
+			filteredNodes.push(node);
+			keepNodeIds.add(node.data?.id as string);
+		};
+
+		for (const node of graphData.nodes) {
+			const { id } = node.data;
 			if (!id) continue;
 
 			// Always keep source node
-			if (n.data?.isSource) {
-				keepNodeIds.add(id);
+			if (node.data?.isSource) {
+				includeSourceNode(node);
 				continue;
 			}
 
 			// Apply search filter if active
 			if (searchQuery) {
-				const nodeName = ((n.data?.label as string) || "").toLowerCase();
+				const nodeName = ((node.data?.label as string) || "").toLowerCase();
 				if (!nodeName.includes(searchQuery.toLowerCase())) {
 					continue;
 				}
 			}
 
 			// Apply frontmatter filters
-			const context = getFileContext(this.app, id);
-			const fm = context.frontmatter ?? {};
-			const matchesAllFilters = this.filterEvaluator.evaluateFilters(fm);
-			if (matchesAllFilters) {
-				keepNodeIds.add(id);
+			const { frontmatter } = getFileContext(this.app, id);
+			if (this.filterEvaluator.evaluateFilters(frontmatter ?? {})) {
+				includeSourceNode(node);
 			}
 		}
 
-		const filteredNodes = graphData.nodes.filter((n) => keepNodeIds.has(n.data?.id as string));
 		const filteredEdges = graphData.edges.filter(
 			(e) => keepNodeIds.has(e.data?.source as string) && keepNodeIds.has(e.data?.target as string)
 		);
