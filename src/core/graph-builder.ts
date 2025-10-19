@@ -43,6 +43,7 @@ export class GraphBuilder {
 	private readonly filterEvaluator: FilterEvaluator;
 	private readonly colorEvaluator: ColorEvaluator;
 	private allRelatedMaxDepth: number;
+	private hierarchyMaxDepth: number;
 
 	constructor(
 		private readonly app: App,
@@ -52,10 +53,12 @@ export class GraphBuilder {
 		this.filterEvaluator = new FilterEvaluator(settingsStore.settings$);
 		this.colorEvaluator = new ColorEvaluator(settingsStore.settings$);
 
-		// Initialize and subscribe to allRelatedMaxDepth setting
+		// Initialize and subscribe to depth settings
 		this.allRelatedMaxDepth = settingsStore.settings$.value.allRelatedMaxDepth;
+		this.hierarchyMaxDepth = settingsStore.settings$.value.hierarchyMaxDepth;
 		settingsStore.settings$.subscribe((settings) => {
 			this.allRelatedMaxDepth = settings.allRelatedMaxDepth;
+			this.hierarchyMaxDepth = settings.hierarchyMaxDepth;
 		});
 	}
 
@@ -151,8 +154,8 @@ export class GraphBuilder {
 		while (queue.length > 0) {
 			const { path: currentPath, level: currentLevel } = queue.shift()!;
 
-			// safety check to prevent infinite loops
-			if (currentLevel > 30) continue;
+			// Safety check to prevent infinite loops
+			if (currentLevel >= this.hierarchyMaxDepth) continue;
 
 			const { file, frontmatter } = getFileContext(this.app, currentPath);
 			if (!file || !frontmatter) continue;

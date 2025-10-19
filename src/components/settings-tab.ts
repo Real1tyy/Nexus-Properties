@@ -81,6 +81,15 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		});
 
 		this.uiBuilder.auto(containerEl, {
+			key: "hierarchyMaxDepth",
+			name: "Hierarchy traversal depth",
+			desc: "Maximum number of levels to traverse in hierarchy mode (1-50). Controls how deep the parent-child tree will be displayed.",
+			min: 1,
+			max: 50,
+			step: 1,
+		});
+
+		this.uiBuilder.auto(containerEl, {
 			key: "displayNodeProperties",
 			name: "Display properties in nodes",
 			desc: "Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)",
