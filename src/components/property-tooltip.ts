@@ -3,12 +3,13 @@ import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { extractDisplayName, getFileContext } from "../utils/file";
-import { formatValueForNode, isEmptyValue } from "../utils/frontmatter-value";
+import { filterSpecificProperties, formatValue, parseInlineWikiLinks } from "../utils/frontmatter-value";
 
 export interface PropertyTooltipOptions {
 	settingsStore: SettingsStore;
 	currentFilePath?: string;
 	onFileOpen?: (filePath: string, event: MouseEvent) => void;
+	isZoomMode?: () => boolean;
 }
 
 export class PropertyTooltip {
@@ -23,16 +24,22 @@ export class PropertyTooltip {
 	) {
 		this.settings = options.settingsStore.currentSettings;
 
-		// Subscribe to settings changes to re-render if tooltip is visible
+		// Subscribe to settings changes to update tooltip width dynamically
 		this.settingsSubscription = options.settingsStore.settings$.subscribe((settings) => {
 			this.settings = settings;
-			// If tooltip is visible, we could re-render it here if needed
+			if (this.tooltipEl) {
+				this.tooltipEl.style.maxWidth = `${settings.graphTooltipWidth}px`;
+			}
 		});
 	}
 
 	show(filePath: string, mouseEvent: MouseEvent): void {
 		// Don't show tooltip if setting is disabled
 		if (!this.settings.showGraphTooltips) {
+			return;
+		}
+
+		if (this.options.isZoomMode?.()) {
 			return;
 		}
 
@@ -45,31 +52,13 @@ export class PropertyTooltip {
 			return;
 		}
 
-		const propertyData = this.settings.displayNodeProperties
-			.map((propName) => {
-				const value = frontmatter[propName];
-				return value !== undefined && value !== null ? { key: propName, value } : null;
-			})
-			.filter((prop): prop is { key: string; value: unknown } => {
-				if (prop === null) return false;
-
-				// Hide empty properties if configured
-				if (this.settings.hideEmptyProperties && isEmptyValue(prop.value)) {
-					return false;
-				}
-
-				// Hide underscore properties if configured
-				if (this.settings.hideUnderscoreProperties && prop.key.startsWith("_")) {
-					return false;
-				}
-
-				return true;
-			});
+		const propertyData = filterSpecificProperties(frontmatter, this.settings.displayNodeProperties, this.settings);
 
 		// Create tooltip element
 		this.hide();
 		this.tooltipEl = document.createElement("div");
 		this.tooltipEl.addClass("nexus-property-tooltip");
+		this.tooltipEl.style.maxWidth = `${this.settings.graphTooltipWidth}px`;
 
 		// Keep tooltip open when hovering over it
 		this.tooltipEl.addEventListener("mouseenter", () => {
@@ -99,7 +88,6 @@ export class PropertyTooltip {
 			}
 		});
 
-		// Add separator if there are properties
 		if (propertyData.length > 0) {
 			this.tooltipEl.createDiv("nexus-property-tooltip-separator");
 		}
@@ -192,76 +180,35 @@ export class PropertyTooltip {
 			return;
 		}
 
-		// Handle strings
+		// Handle strings with potential wiki links
 		if (typeof value === "string") {
 			this.renderStringValue(container, value);
 			return;
 		}
 
-		// Handle booleans
-		if (typeof value === "boolean") {
-			container.setText(value ? "Yes" : "No");
-			return;
-		}
-
-		// Handle numbers
-		if (typeof value === "number") {
-			container.setText(value.toString());
-			return;
-		}
-
-		// Handle objects
-		if (typeof value === "object") {
-			container.setText(formatValueForNode(value, 30));
-			return;
-		}
-
-		container.setText(String(value));
+		container.setText(formatValue(value));
 	}
 
 	private renderStringValue(container: HTMLElement, text: string): void {
-		// Parse for wiki links
-		const wikiLinkRegex = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
-		let lastIndex = 0;
-		const matches = text.matchAll(wikiLinkRegex);
-		let hasMatches = false;
+		const segments = parseInlineWikiLinks(text);
 
-		for (const match of matches) {
-			hasMatches = true;
+		for (const segment of segments) {
+			if (segment.type === "text") {
+				container.createSpan({ text: segment.content });
+			} else if (segment.type === "link" && segment.linkPath && segment.displayText) {
+				const linkEl = container.createEl("a", {
+					text: segment.displayText,
+					cls: "nexus-property-link",
+				});
 
-			// Add text before the link
-			if (match.index !== undefined && match.index > lastIndex) {
-				container.createSpan({ text: text.substring(lastIndex, match.index) });
+				linkEl.addEventListener("click", (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					if (this.options.onFileOpen && segment.linkPath) {
+						this.options.onFileOpen(segment.linkPath, e);
+					}
+				});
 			}
-
-			// Create clickable link
-			const linkPath = match[1];
-			const displayText = match[2] || linkPath;
-
-			const linkEl = container.createEl("a", {
-				text: displayText,
-				cls: "nexus-property-link",
-			});
-
-			linkEl.addEventListener("click", (e) => {
-				e.preventDefault();
-				e.stopPropagation();
-				if (this.options.onFileOpen) {
-					this.options.onFileOpen(linkPath, e);
-				}
-			});
-
-			lastIndex = (match.index ?? 0) + match[0].length;
-		}
-
-		// Add remaining text
-		if (hasMatches && lastIndex < text.length) {
-			container.createSpan({ text: text.substring(lastIndex) });
-		}
-
-		// If no wiki links found, just add the text
-		if (!hasMatches) {
-			container.setText(text);
 		}
 	}
 

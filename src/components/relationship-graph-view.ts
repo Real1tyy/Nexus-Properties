@@ -59,6 +59,7 @@ export class RelationshipGraphView extends ItemView {
 		this.propertyTooltip = new PropertyTooltip(this.app, {
 			settingsStore: this.plugin.settingsStore,
 			onFileOpen: (linkPath, event) => this.openFile(linkPath, event),
+			isZoomMode: () => this.isZoomMode,
 		});
 	}
 

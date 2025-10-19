@@ -106,6 +106,15 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			name: "Show node tooltips",
 			desc: "Display property tooltips when hovering over nodes in the graph. Can also be toggled with a hotkey.",
 		});
+
+		this.uiBuilder.auto(containerEl, {
+			key: "graphTooltipWidth",
+			name: "Tooltip width",
+			desc: "Maximum width of node tooltips in pixels (150-500px)",
+			min: 150,
+			max: 500,
+			step: 5,
+		});
 	}
 
 	private addPreviewSettings(containerEl: HTMLElement): void {

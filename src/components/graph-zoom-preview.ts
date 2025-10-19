@@ -2,7 +2,7 @@ import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { isEmptyValue } from "../utils/frontmatter-value";
+import { filterPropertiesForDisplay } from "../utils/frontmatter-value";
 import { PropertyRenderer } from "./property-renderer";
 
 export interface GraphZoomPreviewProps {
@@ -203,19 +203,11 @@ export class GraphZoomPreview {
 		}
 
 		if (Object.keys(frontmatter).length > 0) {
-			for (const [key, value] of Object.entries(frontmatter)) {
+			const filteredProperties = filterPropertiesForDisplay(frontmatter, this.settings);
+
+			for (const [key, value] of filteredProperties) {
 				// Skip parent/child properties (visible in graph)
 				if (key === this.settings.parentProp || key === this.settings.childrenProp) {
-					continue;
-				}
-
-				// Skip underscore properties if configured
-				if (this.settings.hideUnderscoreProperties && key.startsWith("_")) {
-					continue;
-				}
-
-				// Skip empty properties if configured
-				if (this.settings.hideEmptyProperties && isEmptyValue(value)) {
 					continue;
 				}
 
