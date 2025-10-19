@@ -339,6 +339,11 @@ export class RelationshipGraphView extends ItemView {
 			return;
 		}
 
+		// Exit zoom mode when switching to a different file
+		if (this.isZoomMode && this.currentFile && file.path !== this.currentFile.path) {
+			this.exitZoomMode();
+		}
+
 		this.currentFile = file;
 		this.updateGraph();
 	}
