@@ -1,0 +1,137 @@
+---
+alwaysApply: true
+description: Always check utils directory before duplicating logic
+---
+
+# Utils-First Development Rule
+
+**CRITICAL: Always check [src/utils/](mdc:src/utils/) before implementing any helper function or utility logic.**
+
+## Core Principle
+
+**If a function is NOT directly related to business logic, it MUST be in utils.**
+
+Before writing ANY helper function, you MUST:
+1. **Check** if the function already exists in [src/utils/](mdc:src/utils/)
+2. **Check** if a similar function exists that can be extended
+3. **Only create new code** if no existing utility can be reused
+
+## ✅ Available Utils Modules
+
+### [frontmatter-value.ts](mdc:src/utils/frontmatter-value.ts)
+- `isEmptyValue()` - Check if value is null/undefined/empty
+- `formatValue()` - Format values for display (booleans, numbers, objects)
+- `parseWikiLink()` - Parse single wiki link `[[path|alias]]`
+- `parseInlineWikiLinks()` - Parse wiki links within text
+- `filterPropertiesForDisplay()` - Filter properties based on hide empty/underscore settings
+- `filterSpecificProperties()` - Filter specific property names with settings
+- `formatValueForNode()` - Format values for compact graph node display
+- `normalizeProperty()` - Normalize frontmatter values to string arrays
+- `truncateString()` - Truncate with ellipsis
+- `removeWikiLinks()` - Strip wiki link syntax from text
+
+### [property-utils.ts](mdc:src/utils/property-utils.ts)
+- Property manipulation utilities
+
+### [file.ts](mdc:src/utils/file.ts)
+- `extractDisplayName()` - Get display name from file path
+- `extractFilePath()` - Extract file path from wiki link
+- `getFileContext()` - Get file and frontmatter context
+
+### [link-parser.ts](mdc:src/utils/link-parser.ts)
+- Link parsing and resolution utilities
+
+### [filters.ts](mdc:src/utils/filters.ts)
+- `FilterEvaluator` - Evaluate filter expressions
+
+### [colors.ts](mdc:src/utils/colors.ts)
+- `ColorEvaluator` - Evaluate color rules
+
+## ❌ Common Violations
+
+### Duplicate Property Filtering
+```typescript
+// ❌ DON'T: Duplicate filtering logic in components
+const filtered = Object.entries(frontmatter).filter(([key, value]) => {
+  if (settings.hideUnderscoreProperties && key.startsWith("_")) return false;
+  if (settings.hideEmptyProperties && isEmptyValue(value)) return false;
+  return true;
+});
+
+// ✅ DO: Use existing utility
+import { filterPropertiesForDisplay } from "../utils/frontmatter-value";
+const filtered = filterPropertiesForDisplay(frontmatter, {
+  hideEmpty: settings.hideEmptyProperties,
+  hideUnderscore: settings.hideUnderscoreProperties,
+});
+```
+
+### Duplicate Wiki Link Parsing
+```typescript
+// ❌ DON'T: Manually parse wiki links
+const wikiLinkRegex = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+let lastIndex = 0;
+const matches = text.matchAll(wikiLinkRegex);
+// ... complex parsing logic
+
+// ✅ DO: Use existing utility
+import { parseInlineWikiLinks } from "../utils/frontmatter-value";
+const segments = parseInlineWikiLinks(text);
+for (const segment of segments) {
+  if (segment.type === "link") {
+    // Use segment.linkPath and segment.displayText
+  }
+}
+```
+
+### Duplicate Value Formatting
+```typescript
+// ❌ DON'T: Manually format values
+if (typeof value === "boolean") {
+  return value ? "Yes" : "No";
+}
+if (typeof value === "number") {
+  return value.toString();
+}
+
+// ✅ DO: Use existing utility
+import { formatValue } from "../utils/frontmatter-value";
+return formatValue(value);
+```
+
+## 🎯 When to Create New Utils
+
+Create a new utility function when:
+1. **No existing function** covers the use case
+2. **Function is reusable** across multiple components
+3. **Function is pure** (no side effects, depends only on inputs)
+4. **Function is domain-independent** (not tied to specific business logic)
+
+## 📋 Pre-Code Checklist
+
+Before writing ANY helper function:
+- [ ] Searched [src/utils/](mdc:src/utils/) for existing function
+- [ ] Checked if existing function can be extended
+- [ ] Verified no similar logic exists in other components
+- [ ] If creating new util, added comprehensive unit tests
+- [ ] If creating new util, exported from appropriate utils file
+
+## 🚨 Red Flags
+
+These indicate you should look for existing utils:
+- Writing regex for wiki links
+- Parsing or formatting frontmatter values
+- Filtering properties based on settings
+- Checking if values are empty
+- Truncating or manipulating strings
+- Converting between data types
+
+## Benefits of Utils-First Approach
+
+- **DRY**: Write once, use everywhere
+- **Tested**: Utils have comprehensive test coverage
+- **Consistent**: Same logic produces same results
+- **Maintainable**: Fix bugs in one place
+- **Discoverable**: Centralized location for common operations
+
+**Remember: When in doubt, check utils first!**
