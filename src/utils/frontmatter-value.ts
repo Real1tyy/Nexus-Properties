@@ -443,7 +443,6 @@ export function parseInlineWikiLinks(text: string): WikiLinkSegment[] {
 	return segments;
 }
 
-
 /**
  * Formats a frontmatter value for compact display inside graph nodes.
  * Truncates long values and handles arrays gracefully.

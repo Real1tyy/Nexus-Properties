@@ -286,6 +286,11 @@ export class GraphZoomPreview {
 			this.hideContentCheckbox?.checked ?? false
 		);
 	}
+	private setSectionHidden(section: HTMLElement | null, checkbox: HTMLInputElement | null, hidden: boolean): void {
+		if (!section || !checkbox) return;
+		checkbox.checked = hidden;
+		section.toggleClass("nexus-hidden", hidden);
+	}
 
 	private updateBodyVisibility(): void {
 		if (!this.bodyContainer) return;
@@ -296,16 +301,12 @@ export class GraphZoomPreview {
 	}
 
 	public setHideFrontmatter(hidden: boolean): void {
-		if (!this.frontmatterSection || !this.hideFrontmatterCheckbox) return;
-		this.hideFrontmatterCheckbox.checked = hidden;
-		this.frontmatterSection.toggleClass("nexus-hidden", hidden);
+		this.setSectionHidden(this.frontmatterSection, this.hideFrontmatterCheckbox, hidden);
 		this.updateBodyVisibility();
 	}
 
 	public setHideContent(hidden: boolean): void {
-		if (!this.contentSection || !this.hideContentCheckbox) return;
-		this.hideContentCheckbox.checked = hidden;
-		this.contentSection.toggleClass("nexus-hidden", hidden);
+		this.setSectionHidden(this.contentSection, this.hideContentCheckbox, hidden);
 		this.updateBodyVisibility();
 	}
 

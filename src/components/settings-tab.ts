@@ -42,57 +42,34 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	}
 
 	private addGraphSettings(containerEl: HTMLElement): void {
-		const { currentSettings: settings } = this.plugin.settingsStore;
-
 		new Setting(containerEl).setName("Graph Display").setHeading();
 
-		new Setting(containerEl)
-			.setName("Graph enlarged width")
-			.setDesc("Percentage of window width when graph is enlarged (50-100%)")
-			.addSlider((slider) =>
-				slider
-					.setLimits(50, 100, 1)
-					.setValue(settings.graphEnlargedWidthPercent)
-					.setDynamicTooltip()
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							graphEnlargedWidthPercent: value,
-						}));
-					})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "graphEnlargedWidthPercent",
+			name: "Graph enlarged width",
+			desc: "Percentage of window width when graph is enlarged",
+			min: 50,
+			max: 100,
+			step: 1,
+		});
 
-		new Setting(containerEl)
-			.setName("Zoom preview height")
-			.setDesc("Maximum height in pixels for the zoom preview panel (150-500px)")
-			.addSlider((slider) =>
-				slider
-					.setLimits(120, 700, 10)
-					.setValue(settings.graphZoomPreviewHeight)
-					.setDynamicTooltip()
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							graphZoomPreviewHeight: value,
-						}));
-					})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "graphZoomPreviewHeight",
+			name: "Zoom preview height",
+			desc: "Maximum height in pixels for the zoom preview panel",
+			min: 120,
+			max: 700,
+			step: 10,
+		});
 
-		new Setting(containerEl)
-			.setName("Graph animation duration")
-			.setDesc("Duration of graph layout animations in milliseconds (0-3000ms). Set to 0 for instant layout.")
-			.addSlider((slider) =>
-				slider
-					.setLimits(0, 2000, 50)
-					.setValue(settings.graphAnimationDuration)
-					.setDynamicTooltip()
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							graphAnimationDuration: value,
-						}));
-					})
-			);
+		this.uiBuilder.auto(containerEl, {
+			key: "graphAnimationDuration",
+			name: "Graph animation duration",
+			desc: "Duration of graph layout animations in milliseconds. Set to 0 for instant layout.",
+			min: 0,
+			max: 2000,
+			step: 50,
+		});
 
 		this.uiBuilder.auto(containerEl, {
 			key: "displayNodeProperties",
