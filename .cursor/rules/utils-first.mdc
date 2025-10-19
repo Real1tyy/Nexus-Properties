@@ -58,12 +58,9 @@ const filtered = Object.entries(frontmatter).filter(([key, value]) => {
   return true;
 });
 
-// ✅ DO: Use existing utility
+// ✅ DO: Use existing utility with settings
 import { filterPropertiesForDisplay } from "../utils/frontmatter-value";
-const filtered = filterPropertiesForDisplay(frontmatter, {
-  hideEmpty: settings.hideEmptyProperties,
-  hideUnderscore: settings.hideUnderscoreProperties,
-});
+const filtered = filterPropertiesForDisplay(frontmatter, settings);
 ```
 
 ### Duplicate Wiki Link Parsing

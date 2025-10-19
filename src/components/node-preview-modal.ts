@@ -2,7 +2,7 @@ import { type App, Modal, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { isEmptyValue } from "../utils/frontmatter-value";
+import { filterPropertiesForDisplay } from "../utils/frontmatter-value";
 import { PropertyRenderer } from "./property-renderer";
 
 export class NodePreviewModal extends Modal {
@@ -96,15 +96,9 @@ export class NodePreviewModal extends Modal {
 
 		const grid = section.createDiv("node-preview-props-grid");
 
-		for (const [key, value] of Object.entries(this.frontmatter)) {
-			if (this.settings.hideUnderscoreProperties && key.startsWith("_")) {
-				continue;
-			}
+		const filteredProperties = filterPropertiesForDisplay(this.frontmatter, this.settings);
 
-			if (this.settings.hideEmptyProperties && isEmptyValue(value)) {
-				continue;
-			}
-
+		for (const [key, value] of filteredProperties) {
 			this.propertyRenderer.renderProperty(grid, key, value);
 		}
 	}

@@ -1,4 +1,4 @@
-import type { Frontmatter } from "../types/settings";
+import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
 
 // ============================================================================
 // Value Checking
@@ -318,9 +318,131 @@ export function formatArrayCompact(items: string[], maxLength: number): string {
 	return result;
 }
 
-// ============================================================================
-// Node Display Formatting
-// ============================================================================
+/**
+ * Filters frontmatter properties based on display settings.
+ * Returns an array of [key, value] pairs that should be displayed.
+ */
+export function filterPropertiesForDisplay(
+	frontmatter: Frontmatter,
+	settings: NexusPropertiesSettings
+): Array<[string, unknown]> {
+	const entries = Object.entries(frontmatter);
+
+	return entries.filter(([key, value]) => {
+		// Hide underscore properties if configured
+		if (settings.hideUnderscoreProperties && key.startsWith("_")) {
+			return false;
+		}
+
+		// Hide empty properties if configured
+		if (settings.hideEmptyProperties && isEmptyValue(value)) {
+			return false;
+		}
+
+		return true;
+	});
+}
+
+/**
+ * Filters a specific list of property names from frontmatter.
+ * Useful when you want to display only specific properties (like in tooltips).
+ */
+export function filterSpecificProperties(
+	frontmatter: Frontmatter,
+	propertyNames: string[],
+	settings: NexusPropertiesSettings
+): Array<{ key: string; value: unknown }> {
+	const result: Array<{ key: string; value: unknown }> = [];
+
+	for (const propName of propertyNames) {
+		const value = frontmatter[propName];
+
+		// Hide underscore properties if configured
+		if (settings.hideUnderscoreProperties && propName.startsWith("_")) {
+			continue;
+		}
+
+		// Hide empty properties if configured
+		if (settings.hideEmptyProperties && isEmptyValue(value)) {
+			continue;
+		}
+
+		result.push({ key: propName, value });
+	}
+
+	return result;
+}
+
+export interface WikiLinkSegment {
+	type: "text" | "link";
+	content: string;
+	linkPath?: string;
+	displayText?: string;
+}
+
+/**
+ * Parses a string containing inline wiki links into segments.
+ * Useful for rendering strings with clickable wiki links mixed with regular text.
+ *
+ * @example
+ * parseInlineWikiLinks("Visit [[Page1]] and [[Page2|Second Page]]")
+ * // Returns:
+ * // [
+ * //   { type: "text", content: "Visit " },
+ * //   { type: "link", content: "[[Page1]]", linkPath: "Page1", displayText: "Page1" },
+ * //   { type: "text", content: " and " },
+ * //   { type: "link", content: "[[Page2|Second Page]]", linkPath: "Page2", displayText: "Second Page" }
+ * // ]
+ */
+export function parseInlineWikiLinks(text: string): WikiLinkSegment[] {
+	const segments: WikiLinkSegment[] = [];
+	const wikiLinkRegex = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
+	let lastIndex = 0;
+
+	const matches = text.matchAll(wikiLinkRegex);
+
+	for (const match of matches) {
+		// Add text before the link
+		if (match.index !== undefined && match.index > lastIndex) {
+			segments.push({
+				type: "text",
+				content: text.substring(lastIndex, match.index),
+			});
+		}
+
+		// Add the link segment
+		const linkPath = match[1];
+		const displayText = match[2] || linkPath;
+
+		segments.push({
+			type: "link",
+			content: match[0],
+			linkPath,
+			displayText,
+		});
+
+		lastIndex = (match.index ?? 0) + match[0].length;
+	}
+
+	// Add remaining text
+	if (lastIndex < text.length) {
+		segments.push({
+			type: "text",
+			content: text.substring(lastIndex),
+		});
+	}
+
+	// If no links found, return the entire text as a single segment
+	if (segments.length === 0) {
+		segments.push({
+			type: "text",
+			content: text,
+		});
+	}
+
+	return segments;
+}
+
 
 /**
  * Formats a frontmatter value for compact display inside graph nodes.

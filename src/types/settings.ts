@@ -62,6 +62,7 @@ export const NexusPropertiesSettingsSchema = z.object({
 
 	// Tooltip settings
 	showGraphTooltips: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_GRAPH_TOOLTIPS),
+	graphTooltipWidth: z.number().min(150).max(500).optional().default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_TOOLTIP_WIDTH),
 
 	// Graph filtering settings
 	filterExpressions: z.array(z.string()).optional().default([]),
