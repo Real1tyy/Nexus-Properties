@@ -42,6 +42,7 @@ interface ValidFileContext extends FileContext {
 export class GraphBuilder {
 	private readonly filterEvaluator: FilterEvaluator;
 	private readonly colorEvaluator: ColorEvaluator;
+	private allRelatedMaxDepth: number;
 
 	constructor(
 		private readonly app: App,
@@ -50,6 +51,12 @@ export class GraphBuilder {
 	) {
 		this.filterEvaluator = new FilterEvaluator(settingsStore.settings$);
 		this.colorEvaluator = new ColorEvaluator(settingsStore.settings$);
+
+		// Initialize and subscribe to allRelatedMaxDepth setting
+		this.allRelatedMaxDepth = settingsStore.settings$.value.allRelatedMaxDepth;
+		settingsStore.settings$.subscribe((settings) => {
+			this.allRelatedMaxDepth = settings.allRelatedMaxDepth;
+		});
 	}
 
 	private resolveValidContexts(wikiLinks: string[], excludePaths: Set<string>): ValidFileContext[] {
@@ -212,7 +219,7 @@ export class GraphBuilder {
 			const { centerPath, level } = queue.shift()!;
 
 			// Safety check to prevent infinite loops
-			if (level > 10) continue;
+			if (level >= this.allRelatedMaxDepth) continue;
 
 			const { file, frontmatter } = getFileContext(this.app, centerPath);
 			if (!file || !frontmatter) continue;

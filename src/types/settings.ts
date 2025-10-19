@@ -55,6 +55,13 @@ export const NexusPropertiesSettingsSchema = z.object({
 		.max(2000)
 		.optional()
 		.default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ANIMATION_DURATION),
+	allRelatedMaxDepth: z
+		.number()
+		.int()
+		.min(1)
+		.max(20)
+		.optional()
+		.default(SETTINGS_DEFAULTS.DEFAULT_ALL_RELATED_MAX_DEPTH),
 
 	// Zoom preview behavior
 	zoomHideFrontmatterByDefault: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_ZOOM_HIDE_FRONTMATTER),

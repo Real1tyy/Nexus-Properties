@@ -72,6 +72,15 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		});
 
 		this.uiBuilder.auto(containerEl, {
+			key: "allRelatedMaxDepth",
+			name: "All Related recursion depth",
+			desc: "Maximum number of constellation levels to traverse when 'All Related' is enabled (1-20). Higher values show more distant relationships but may impact performance.",
+			min: 1,
+			max: 20,
+			step: 1,
+		});
+
+		this.uiBuilder.auto(containerEl, {
 			key: "displayNodeProperties",
 			name: "Display properties in nodes",
 			desc: "Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)",
