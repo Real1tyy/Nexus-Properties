@@ -2,11 +2,9 @@ import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { ItemView, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
+import { GraphBuilder } from "../core/graph-builder";
 import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
-import { ColorEvaluator } from "../utils/colors";
-import { extractDisplayName, extractFilePath, getFileContext } from "../utils/file";
-import { FilterEvaluator } from "../utils/filters";
 import { GraphHeader } from "./graph-header";
 import { GraphSearch } from "./graph-search";
 import { GraphZoomPreview } from "./graph-zoom-preview";
@@ -36,8 +34,7 @@ export class RelationshipGraphView extends ItemView {
 	private focusedNodeId: string | null = null;
 	private zoomPreview: GraphZoomPreview | null = null;
 	private isUpdating = false;
-	private filterEvaluator!: FilterEvaluator;
-	private colorEvaluator!: ColorEvaluator;
+	private graphBuilder: GraphBuilder;
 	// Persistent toggle states for preview
 	private previewHideFrontmatter = false;
 	private previewHideContent = false;
@@ -61,6 +58,7 @@ export class RelationshipGraphView extends ItemView {
 			onFileOpen: (linkPath, event) => this.openFile(linkPath, event),
 			isZoomMode: () => this.isZoomMode,
 		});
+		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
 	}
 
 	getViewType(): string {
@@ -120,12 +118,6 @@ export class RelationshipGraphView extends ItemView {
 		this.graphContainerEl = contentEl.createEl("div", {
 			cls: "nexus-graph-view-container",
 		});
-
-		// Initialize filter evaluator bound to live settings
-		this.filterEvaluator = new FilterEvaluator(this.plugin.settingsStore.settings$);
-
-		// Initialize color evaluator bound to live settings
-		this.colorEvaluator = new ColorEvaluator(this.plugin.settingsStore.settings$);
 
 		// Register event listener for active file changes
 		this.registerEvent(
@@ -379,18 +371,13 @@ export class RelationshipGraphView extends ItemView {
 				this.header.updateTitle(this.currentFile.basename);
 			}
 
-			// Rebuild graph based on mode (but not for zoom mode - zoom mode just focuses on existing graph)
-			let nodes: ElementDefinition[];
-			let edges: ElementDefinition[];
-
-			if (this.renderRelated) {
-				({ nodes, edges } = this.buildRelatedGraphData(this.currentFile.path));
-			} else {
-				({ nodes, edges } = this.buildGraphData(this.currentFile.path));
-			}
-
-			// Apply filtering of nodes and edges based on frontmatter
-			({ nodes, edges } = this.applyGraphFilters(nodes, edges));
+			const { nodes, edges } = this.graphBuilder.buildGraph({
+				sourcePath: this.currentFile.path,
+				renderRelated: this.renderRelated,
+				includeAllRelated: this.includeAllRelated,
+				startFromCurrent: this.ignoreTopmostParent,
+				searchQuery: this.searchQuery,
+			});
 
 			this.destroyGraph();
 
@@ -759,38 +746,6 @@ export class RelationshipGraphView extends ItemView {
 		}
 	}
 
-	private addNodeToGraph(
-		nodes: ElementDefinition[],
-		processedNodes: Set<string>,
-		pathOrWikiLink: string,
-		level: number,
-		isSource: boolean
-	): void {
-		const filePath = extractFilePath(pathOrWikiLink);
-		if (processedNodes.has(filePath)) return;
-
-		processedNodes.add(filePath);
-		const displayName = extractDisplayName(pathOrWikiLink);
-
-		const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
-		const estimatedHeight = 45;
-
-		const context = getFileContext(this.app, filePath);
-		const nodeColor = this.colorEvaluator.evaluateColor(context.frontmatter ?? {});
-
-		nodes.push({
-			data: {
-				id: filePath,
-				label: displayName,
-				level: level,
-				isSource: isSource,
-				width: estimatedWidth,
-				height: estimatedHeight,
-				nodeColor: nodeColor,
-			},
-		});
-	}
-
 	// Ensure the graph is centered/fit in its container, and handle zoom-mode centering
 	private ensureCentered(): void {
 		if (!this.cy || this.isUpdating) return;
@@ -818,190 +773,6 @@ export class RelationshipGraphView extends ItemView {
 			this.cy.fit();
 			this.cy.center();
 		});
-	}
-
-	private buildRelatedGraphData(sourcePath: string): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
-		const nodes: ElementDefinition[] = [];
-		const edges: ElementDefinition[] = [];
-		const processedNodes = new Set<string>();
-
-		// Add central node (current file)
-		this.addNodeToGraph(nodes, processedNodes, sourcePath, 0, true);
-
-		// Get relationships for current file
-		const context = getFileContext(this.app, sourcePath);
-		if (context.file && context.frontmatter) {
-			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
-
-			const allRelated = this.includeAllRelated
-				? this.computeAllRelatedRecursively(sourcePath, rels.related)
-				: [...rels.related];
-
-			for (const relatedWikiLink of allRelated) {
-				const relatedPath = extractFilePath(relatedWikiLink);
-
-				if (!processedNodes.has(relatedPath)) {
-					this.addNodeToGraph(nodes, processedNodes, relatedWikiLink, 1, false);
-
-					edges.push({
-						data: {
-							source: sourcePath,
-							target: relatedPath,
-						},
-					});
-				}
-			}
-		}
-
-		return { nodes, edges };
-	}
-
-	private computeAllRelatedRecursively(sourceFilePath: string, directRelated: string[]): string[] {
-		const visited = new Set<string>([sourceFilePath]);
-		const allRelated: string[] = [];
-
-		const collectRelated = (relatedItems: string[]): void => {
-			for (const relatedWikiLink of relatedItems) {
-				const relatedPath = extractFilePath(relatedWikiLink);
-				const relatedContext = getFileContext(this.app, relatedPath);
-
-				if (visited.has(relatedContext.pathWithExt)) {
-					continue;
-				}
-
-				visited.add(relatedContext.pathWithExt);
-				allRelated.push(relatedWikiLink);
-
-				if (!relatedContext.file || !relatedContext.frontmatter) {
-					continue;
-				}
-
-				const nestedRels = this.indexer.extractRelationships(relatedContext.file, relatedContext.frontmatter);
-				collectRelated(nestedRels.related);
-			}
-		};
-
-		collectRelated(directRelated);
-		return allRelated;
-	}
-
-	private findTopmostParent(startPath: string, maxDepth = 50): string {
-		const visited = new Set<string>();
-		let topmostParent = startPath;
-		let maxLevel = 0;
-
-		const dfsUpwards = (filePath: string, currentLevel: number): void => {
-			if (currentLevel > maxDepth || visited.has(filePath)) return;
-			visited.add(filePath);
-
-			if (currentLevel > maxLevel) {
-				maxLevel = currentLevel;
-				topmostParent = filePath;
-			}
-
-			const context = getFileContext(this.app, filePath);
-			if (!context.file || !context.frontmatter) return;
-
-			const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
-
-			for (const parentWikiLink of rels.parent) {
-				const parentPath = extractFilePath(parentWikiLink);
-
-				if (!visited.has(parentPath)) {
-					dfsUpwards(parentPath, currentLevel + 1);
-				}
-			}
-		};
-
-		dfsUpwards(startPath, 0);
-		return topmostParent;
-	}
-
-	private buildGraphData(sourcePath: string): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
-		const nodes: ElementDefinition[] = [];
-		const edges: ElementDefinition[] = [];
-		const processedNodes = new Set<string>();
-
-		const rootPath = this.ignoreTopmostParent ? sourcePath : this.findTopmostParent(sourcePath);
-
-		const buildDownwardsBFS = (): void => {
-			const queue: Array<{ path: string; level: number }> = [{ path: rootPath, level: 0 }];
-			this.addNodeToGraph(nodes, processedNodes, rootPath, 0, rootPath === sourcePath);
-
-			while (queue.length > 0) {
-				const { path: currentPath, level: currentLevel } = queue.shift()!;
-
-				if (currentLevel > 50) continue;
-
-				const context = getFileContext(this.app, currentPath);
-				if (!context.file || !context.frontmatter) continue;
-
-				const rels = this.indexer.extractRelationships(context.file, context.frontmatter);
-
-				for (const childWikiLink of rels.children) {
-					const childPath = extractFilePath(childWikiLink);
-
-					if (!processedNodes.has(childPath)) {
-						const isSource = childPath === sourcePath;
-						this.addNodeToGraph(nodes, processedNodes, childWikiLink, currentLevel + 1, isSource);
-
-						edges.push({
-							data: {
-								source: currentPath,
-								target: childPath,
-							},
-						});
-
-						queue.push({ path: childPath, level: currentLevel + 1 });
-					}
-				}
-			}
-		};
-
-		buildDownwardsBFS();
-
-		return { nodes, edges };
-	}
-
-	private applyGraphFilters(
-		nodes: ElementDefinition[],
-		edges: ElementDefinition[]
-	): { nodes: ElementDefinition[]; edges: ElementDefinition[] } {
-		const keepNodeIds = new Set<string>();
-
-		for (const n of nodes) {
-			const id = n.data?.id as string | undefined;
-			if (!id) continue;
-
-			// Always keep source node
-			if (n.data?.isSource) {
-				keepNodeIds.add(id);
-				continue;
-			}
-
-			// Apply search filter if active
-			if (this.searchQuery) {
-				const nodeName = ((n.data?.label as string) || "").toLowerCase();
-				if (!nodeName.includes(this.searchQuery)) {
-					continue;
-				}
-			}
-
-			// Apply frontmatter filters
-			const context = getFileContext(this.app, id);
-			const fm = context.frontmatter ?? {};
-			const matchesAllFilters = this.filterEvaluator.evaluateFilters(fm);
-			if (matchesAllFilters) {
-				keepNodeIds.add(id);
-			}
-		}
-
-		const filteredNodes = nodes.filter((n) => keepNodeIds.has(n.data?.id as string));
-		const filteredEdges = edges.filter(
-			(e) => keepNodeIds.has(e.data?.source as string) && keepNodeIds.has(e.data?.target as string)
-		);
-
-		return { nodes: filteredNodes, edges: filteredEdges };
 	}
 
 	private enterZoomMode(filePath: string): void {
@@ -1103,9 +874,6 @@ export class RelationshipGraphView extends ItemView {
 		}
 	}
 
-	/**
-	 * Opens a file using Obsidian's API.
-	 */
 	private openFile(linkPath: string, event: MouseEvent): void {
 		// Resolve the file
 		const file = this.app.metadataCache.getFirstLinkpathDest(linkPath, this.currentFile?.path || "");
