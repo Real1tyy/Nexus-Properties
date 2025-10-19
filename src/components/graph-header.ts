@@ -25,6 +25,15 @@ export class GraphHeader {
 		this.render();
 	}
 
+	private makeContainerClickable(container: HTMLElement, checkbox: HTMLInputElement): void {
+		container.style.cursor = "pointer";
+		container.addEventListener("click", (e) => {
+			// Don't double-trigger if clicking the checkbox itself
+			if (e.target === checkbox) return;
+			checkbox.click();
+		});
+	}
+
 	private render(): void {
 		this.headerEl.empty();
 
@@ -55,6 +64,8 @@ export class GraphHeader {
 			this.updateVisibility();
 		});
 
+		this.makeContainerClickable(relatedToggleContainer, this.relatedCheckbox);
+
 		// Include all related checkbox
 		this.includeAllContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
 		this.includeAllCheckbox = this.includeAllContainer.createEl("input", { type: "checkbox" });
@@ -70,6 +81,8 @@ export class GraphHeader {
 			this.props.onIncludeAllRelatedChange(this.includeAllCheckbox?.checked ?? false);
 		});
 
+		this.makeContainerClickable(this.includeAllContainer, this.includeAllCheckbox);
+
 		// Start from current file checkbox
 		this.startFromCurrentContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
 		this.toggleCheckbox = this.startFromCurrentContainer.createEl("input", { type: "checkbox" });
@@ -84,6 +97,8 @@ export class GraphHeader {
 		this.toggleCheckbox.addEventListener("change", () => {
 			this.props.onStartFromCurrentChange(this.toggleCheckbox?.checked ?? false);
 		});
+
+		this.makeContainerClickable(this.startFromCurrentContainer, this.toggleCheckbox);
 
 		this.updateVisibility();
 	}
