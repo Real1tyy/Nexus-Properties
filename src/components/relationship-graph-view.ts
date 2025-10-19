@@ -676,8 +676,14 @@ export class RelationshipGraphView extends ItemView {
 		const settings = this.plugin.settingsStore.settings$.value;
 		const animationDuration = settings.graphAnimationDuration;
 
-		if (this.renderRelated) {
-			// Use concentric layout for constellation/nebula pattern
+		// Check if nodes have constellation metadata (recursive constellation mode)
+		const hasConstellationData = nodes.some((node) => node.data && typeof node.data.constellationIndex === "number");
+
+		if (this.renderRelated && this.includeAllRelated && hasConstellationData) {
+			// Use manual positioning for recursive constellations
+			this.applyRecursiveConstellationLayout(nodes, animationDuration);
+		} else if (this.renderRelated) {
+			// Use concentric layout for simple constellation/nebula pattern
 			// Central star (source) in the middle, related nodes in outer orbit
 			const layout = this.cy.layout({
 				name: "concentric",
@@ -748,6 +754,109 @@ export class RelationshipGraphView extends ItemView {
 					this.cy.center();
 				}, 0);
 			}
+		}
+	}
+
+	private applyRecursiveConstellationLayout(nodes: ElementDefinition[], animationDuration: number): void {
+		if (!this.cy) return;
+
+		const BASE_ORBITAL_RADIUS = 150; // Base radius for orbitals around their center
+		const nodePositions = new Map<string, { x: number; y: number }>();
+
+		// Group nodes by level to ensure we position centers before their orbitals
+		const nodesByLevel = new Map<number, ElementDefinition[]>();
+		let maxLevel = 0;
+
+		nodes.forEach((node) => {
+			const level = node.data?.constellationLevel ?? 0;
+			if (!nodesByLevel.has(level)) {
+				nodesByLevel.set(level, []);
+			}
+			nodesByLevel.get(level)!.push(node);
+			maxLevel = Math.max(maxLevel, level);
+		});
+
+		// Position nodes level by level to ensure centers are positioned before orbitals
+		for (let level = 0; level <= maxLevel; level++) {
+			const nodesAtLevel = nodesByLevel.get(level) || [];
+
+			nodesAtLevel.forEach((node) => {
+				if (!node.data?.id) return;
+
+				// Root node at origin
+				if (level === 0) {
+					nodePositions.set(node.data.id, { x: 0, y: 0 });
+					return;
+				}
+
+				// All other nodes are positioned as orbitals around their center
+				const centerPath = node.data.centerPath;
+				const orbitalIndex = node.data.orbitalIndex;
+				const orbitalCount = node.data.parentOrbitalCount ?? node.data.orbitalCount ?? 1;
+
+				const centerPos = nodePositions.get(centerPath)!;
+				// Calculate orbital radius based on number of orbitals at this level
+				// More orbitals = larger radius to prevent overlap
+				const orbitalRadius = BASE_ORBITAL_RADIUS + Math.max(0, (orbitalCount - 5) * 15);
+
+				// Calculate starting angle offset based on the center's own position
+				// This staggers orbital patterns to reduce overlaps between different constellations
+				let angleOffset = Math.PI / 2; // Default: start at top
+
+				// If the center itself has an orbital index, use that to vary the starting angle
+				// This spreads out constellations that are siblings (share the same parent)
+				const centerNode = nodes.find((n) => n.data?.id === centerPath);
+				if (centerNode?.data?.orbitalIndex !== undefined) {
+					// Add offset based on parent's orbital index to stagger sibling constellations
+					angleOffset += (centerNode.data.orbitalIndex * Math.PI) / 3;
+				}
+
+				// Distribute orbitals evenly around their center with the offset
+				const angle = (orbitalIndex / orbitalCount) * 2 * Math.PI + angleOffset;
+				const x = centerPos.x + orbitalRadius * Math.cos(angle);
+				const y = centerPos.y + orbitalRadius * Math.sin(angle);
+
+				nodePositions.set(node.data.id, { x, y });
+			});
+		}
+
+		// Apply all calculated positions to the graph
+		nodes.forEach((node) => {
+			if (!node.data?.id) return;
+
+			const pos = nodePositions.get(node.data.id);
+			if (!pos) return;
+
+			const cyNode = this.cy!.getElementById(node.data.id);
+			if (cyNode.length > 0) {
+				cyNode.position(pos);
+			}
+		});
+
+		// Apply preset layout with animation if enabled
+		const layout = this.cy.layout({
+			name: "preset",
+			fit: true,
+			padding: 120,
+			animate: animationDuration > 0,
+			animationDuration: animationDuration,
+			animationEasing: "ease-out-cubic",
+		});
+
+		if (animationDuration > 0) {
+			this.cy.one("layoutstop", () => this.ensureCentered());
+		}
+
+		layout.run();
+
+		// For instant layouts, center immediately
+		if (animationDuration === 0) {
+			setTimeout(() => {
+				if (!this.cy) return;
+				this.cy.resize();
+				this.cy.fit();
+				this.cy.center();
+			}, 0);
 		}
 	}
 
