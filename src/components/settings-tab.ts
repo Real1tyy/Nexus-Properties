@@ -109,18 +109,18 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	}
 
 	private addPreviewSettings(containerEl: HTMLElement): void {
-		new Setting(containerEl).setName("Preview Settings").setHeading();
+		new Setting(containerEl).setName("Property Display").setHeading();
 
 		this.uiBuilder.auto(containerEl, {
 			key: "hideEmptyProperties",
 			name: "Hide empty properties",
-			desc: "Hide properties with empty, null, or undefined values in the node preview modal",
+			desc: "Hide properties with empty, null, or undefined values in tooltips and previews",
 		});
 
 		this.uiBuilder.auto(containerEl, {
 			key: "hideUnderscoreProperties",
 			name: "Hide underscore properties",
-			desc: "Hide properties that start with an underscore (_) in the node preview modal",
+			desc: "Hide properties that start with an underscore (_) in tooltips and previews",
 		});
 
 		this.uiBuilder.auto(containerEl, {
