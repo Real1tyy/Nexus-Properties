@@ -28,6 +28,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		this.addRescanSection(containerEl);
 		this.addDirectorySettings(containerEl);
 		this.addDirectRelationshipSettings(containerEl);
+		this.addNodeCreationSettings(containerEl);
 		this.addExampleSection(containerEl);
 	}
 
@@ -588,6 +589,42 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			name: "Related property",
 			desc: "Property name for related files (bidirectional - automatically syncs between linked files)",
 			placeholder: "related",
+		});
+	}
+
+	private addNodeCreationSettings(containerEl: HTMLElement): void {
+		new Setting(containerEl).setName("Node creation shortcuts").setHeading();
+
+		containerEl
+			.createDiv("setting-item-description")
+			.setText(
+				"Enable quick creation of Parent, Child, and Related nodes from the command palette. New nodes inherit frontmatter properties and automatically establish bidirectional relationships."
+			);
+
+		this.uiBuilder.auto(containerEl, {
+			key: "zettelIdProp",
+			name: "Zettel ID property",
+			desc: "Property name for unique timestamp identifier assigned to new nodes",
+			placeholder: "_ZettelID",
+		});
+
+		const infoBox = containerEl.createDiv("settings-info-box");
+		infoBox.createEl("strong", { text: "How it works:" });
+		const list = infoBox.createEl("ul");
+		list.createEl("li", {
+			text: "New nodes are created in the same folder as the source file",
+		});
+		list.createEl("li", {
+			text: "All frontmatter properties are inherited (except Parent, Child, Related)",
+		});
+		list.createEl("li", {
+			text: "A new Zettel ID is generated automatically (timestamp-based)",
+		});
+		list.createEl("li", {
+			text: "Bidirectional relationships are established automatically",
+		});
+		list.createEl("li", {
+			text: "Commands are only available for files in indexed directories",
 		});
 	}
 

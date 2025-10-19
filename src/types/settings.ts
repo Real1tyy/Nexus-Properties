@@ -29,6 +29,9 @@ export const NexusPropertiesSettingsSchema = z.object({
 	// Relationship settings
 	autoLinkSiblings: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_AUTO_LINK_SIBLINGS),
 
+	// Node creation settings
+	zettelIdProp: z.string().optional().default(SETTINGS_DEFAULTS.DEFAULT_ZETTEL_ID_PROP),
+
 	// UI settings
 	showRibbonIcon: z.boolean().optional().default(true),
 

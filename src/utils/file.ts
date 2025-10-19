@@ -202,3 +202,45 @@ export async function withFileContext<T>(
 	}
 	return await callback(context);
 }
+
+// ============================================================================
+// File Path Generation
+// ============================================================================
+
+/**
+ * Generates a unique file path by appending a counter if the file already exists.
+ * Automatically adds .md extension if not present.
+ *
+ * @param app - The Obsidian App instance
+ * @param folder - Folder path (empty string for root, no trailing slash needed)
+ * @param baseName - Base file name without extension
+ * @returns Unique file path that doesn't exist in the vault
+ *
+ * @example
+ * ```ts
+ * // If "MyNote.md" exists, returns "MyNote 1.md"
+ * const path = getUniqueFilePath(app, "", "MyNote");
+ *
+ * // With folder: "Projects/Task.md" -> "Projects/Task 1.md"
+ * const path = getUniqueFilePath(app, "Projects", "Task");
+ *
+ * // Root folder handling
+ * const path = getUniqueFilePath(app, "/", "Note"); // -> "Note.md"
+ * ```
+ */
+export function getUniqueFilePath(app: App, folder: string, baseName: string): string {
+	const normalizedFolder = folder && folder !== "/" ? folder : "";
+	const folderPath = normalizedFolder ? `${normalizedFolder}/` : "";
+
+	let fileName = `${baseName}.md`;
+	let fullPath = `${folderPath}${fileName}`;
+	let counter = 1;
+
+	while (app.vault.getAbstractFileByPath(fullPath)) {
+		fileName = `${baseName} ${counter}.md`;
+		fullPath = `${folderPath}${fileName}`;
+		counter++;
+	}
+
+	return fullPath;
+}
