@@ -1,7 +1,7 @@
 import type { ElementDefinition } from "cytoscape";
-import type { App, TFile } from "obsidian";
+import type { App } from "obsidian";
 import { ColorEvaluator } from "../utils/colors";
-import { extractDisplayName, extractFilePath, getFileContext } from "../utils/file";
+import { extractDisplayName, extractFilePath, type FileContext, getFileContext } from "../utils/file";
 import { FilterEvaluator } from "../utils/filters";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
@@ -31,11 +31,8 @@ export interface GraphBuilderOptions {
 	searchQuery?: string;
 }
 
-interface ValidFileContext {
+interface ValidFileContext extends FileContext {
 	wikiLink: string;
-	path: string;
-	file: TFile;
-	frontmatter: Record<string, unknown>;
 }
 
 /**
@@ -59,19 +56,14 @@ export class GraphBuilder {
 		return wikiLinks
 			.map((wikiLink) => {
 				const path = extractFilePath(wikiLink);
-				const { file, frontmatter } = getFileContext(this.app, path);
-				return { wikiLink, path, file, frontmatter };
+				const fileContext = getFileContext(this.app, path);
+				return { wikiLink, ...fileContext };
 			})
 			.filter((ctx): ctx is ValidFileContext => {
-				if (
-					ctx.file === null ||
-					!ctx.frontmatter ||
-					excludePaths.has(ctx.path) ||
-					!this.filterEvaluator.evaluateFilters(ctx.frontmatter)
-				) {
+				if (ctx.file === null || !ctx.frontmatter || excludePaths.has(ctx.path)) {
 					return false;
 				}
-				return true;
+				return this.filterEvaluator.evaluateFilters(ctx.frontmatter);
 			});
 	}
 
@@ -261,20 +253,81 @@ export class GraphBuilder {
 		const nodeSet = new Set<string>();
 
 		// Track which nodes are centers of their own constellations
-		const centerNodeIds = new Set(constellationData.constellations.map((constellation) => constellation.center));
+		const centerNodeIds = new Set(constellationData.constellations.map((c) => c.center));
 
-		// Track orbital metadata for ALL nodes (including those that are also centers)
-		const orbitalMetadata = new Map<
+		// Track orbital metadata for ALL nodes (first occurrence only)
+		const orbitalMetadata = this.collectOrbitalMetadata(constellationData.constellations);
+
+		// Create constellation lookup for O(1) access
+		const constellationByCenter = new Map(constellationData.constellations.map((c) => [c.center, c]));
+
+		// Create all nodes with complete metadata
+		constellationData.constellations.forEach((constellation, constellationIndex) => {
+			// Add center node if not already added
+			if (!nodeSet.has(constellation.center)) {
+				nodeSet.add(constellation.center);
+				const centerNode = this.createNodeElement(constellation.center, constellation.level, constellation.level === 0);
+				const asOrbitalOf = orbitalMetadata.get(constellation.center);
+				centerNode.data = {
+					...centerNode.data,
+					constellationIndex,
+					isConstellationCenter: true,
+					constellationLevel: constellation.level,
+					orbitalCount: constellation.orbitals.length,
+					...(asOrbitalOf && {
+						centerPath: asOrbitalOf.centerPath,
+						orbitalIndex: asOrbitalOf.orbitalIndex,
+						parentOrbitalCount: asOrbitalOf.orbitalCount,
+					}),
+				};
+				nodes.push(centerNode);
+			}
+
+			// Add orbital nodes
+			constellation.orbitals.forEach((orbitalPath) => {
+				if (!nodeSet.has(orbitalPath)) {
+					nodeSet.add(orbitalPath);
+					const orbitalNode = this.createNodeElement(orbitalPath, constellation.level + 1, false);
+					const orbital = orbitalMetadata.get(orbitalPath)!;
+					const isAlsoCenter = centerNodeIds.has(orbitalPath);
+					const ownConstellation = constellationByCenter.get(orbitalPath);
+					orbitalNode.data = {
+						...orbitalNode.data,
+						constellationIndex,
+						isConstellationCenter: isAlsoCenter,
+						constellationLevel: constellation.level + 1,
+						centerPath: orbital.centerPath,
+						orbitalIndex: orbital.orbitalIndex,
+						orbitalCount: orbital.orbitalCount,
+						...(isAlsoCenter &&
+							ownConstellation && {
+								ownOrbitalCount: ownConstellation.orbitals.length,
+							}),
+					};
+					nodes.push(orbitalNode);
+				}
+			});
+		});
+
+		return {
+			nodes,
+			edges: constellationData.edges,
+		};
+	}
+
+	private collectOrbitalMetadata(
+		constellations: ConstellationNode[]
+	): Map<string, { centerPath: string; orbitalIndex: number; orbitalCount: number; constellationLevel: number }> {
+		const metadata = new Map<
 			string,
 			{ centerPath: string; orbitalIndex: number; orbitalCount: number; constellationLevel: number }
 		>();
 
-		// First pass: collect orbital metadata for all nodes
-		constellationData.constellations.forEach((constellation) => {
+		constellations.forEach((constellation) => {
 			constellation.orbitals.forEach((orbitalPath, orbitalIndex) => {
-				// Store orbital metadata - this is needed for positioning
-				if (!orbitalMetadata.has(orbitalPath)) {
-					orbitalMetadata.set(orbitalPath, {
+				// Only store first occurrence - this is the primary orbital relationship
+				if (!metadata.has(orbitalPath)) {
+					metadata.set(orbitalPath, {
 						centerPath: constellation.center,
 						orbitalIndex: orbitalIndex,
 						orbitalCount: constellation.orbitals.length,
@@ -284,81 +337,7 @@ export class GraphBuilder {
 			});
 		});
 
-		// Second pass: create all nodes with complete metadata
-		constellationData.constellations.forEach((constellation, constellationIndex) => {
-			// Add center node if not already added
-			if (!nodeSet.has(constellation.center)) {
-				nodeSet.add(constellation.center);
-				const baseNode = this.createNodeElement(
-					constellation.center,
-					constellation.level,
-					constellation.level === 0 // isSource if level 0
-				);
-
-				// Every center has its own constellation data
-				baseNode.data = {
-					...baseNode.data,
-					constellationIndex: constellationIndex,
-					isConstellationCenter: true,
-					constellationLevel: constellation.level,
-					orbitalCount: constellation.orbitals.length,
-				};
-
-				// If this center is also an orbital of another constellation, add that data
-				const asOrbital = orbitalMetadata.get(constellation.center);
-				if (asOrbital) {
-					baseNode.data = {
-						...baseNode.data,
-						centerPath: asOrbital.centerPath,
-						orbitalIndex: asOrbital.orbitalIndex,
-						parentOrbitalCount: asOrbital.orbitalCount,
-					};
-				}
-
-				nodes.push(baseNode);
-			}
-
-			// Add orbital nodes
-			constellation.orbitals.forEach((orbitalPath) => {
-				if (!nodeSet.has(orbitalPath)) {
-					nodeSet.add(orbitalPath);
-					const baseNode = this.createNodeElement(
-						orbitalPath,
-						constellation.level + 1, // Orbitals are at parent level + 1
-						false // orbitals are never source
-					);
-
-					const orbital = orbitalMetadata.get(orbitalPath)!;
-					baseNode.data = {
-						...baseNode.data,
-						constellationIndex: constellationIndex,
-						isConstellationCenter: centerNodeIds.has(orbitalPath), // Is it also a center?
-						constellationLevel: constellation.level + 1, // Use parent level + 1
-						centerPath: orbital.centerPath,
-						orbitalIndex: orbital.orbitalIndex,
-						orbitalCount: orbital.orbitalCount,
-					};
-
-					// If this orbital is also a center, add its own constellation data
-					if (centerNodeIds.has(orbitalPath)) {
-						const ownConstellation = constellationData.constellations.find((c) => c.center === orbitalPath);
-						if (ownConstellation) {
-							baseNode.data = {
-								...baseNode.data,
-								ownOrbitalCount: ownConstellation.orbitals.length,
-							};
-						}
-					}
-
-					nodes.push(baseNode);
-				}
-			});
-		});
-
-		return {
-			nodes,
-			edges: constellationData.edges,
-		};
+		return metadata;
 	}
 
 	private applyGraphFilters(graphData: GraphData, searchQuery?: string): GraphData {
