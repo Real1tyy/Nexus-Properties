@@ -244,6 +244,17 @@
 	border-color: var(--text-error);
 }
 
+/* Settings array manager */
+.settings-array-manager-list {
+	margin-bottom: 1em;
+}
+
+/* Make array manager input fields wider */
+.settings-array-manager-list + .setting-item .setting-item-control input[type="text"] {
+	min-width: 400px;
+	flex: 1;
+}
+
 /* Settings container spacing */
 .vertical-tab-content-container {
 	padding: 2em;
