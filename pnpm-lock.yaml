@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@real1ty-obsidian-plugins/utils':
-        specifier: ^2.0.1
-        version: 2.0.1(@codemirror/state@6.5.2)(@codemirror/view@6.38.5)
+        specifier: ^2.1.0
+        version: 2.1.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.5)
       cytoscape:
         specifier: ^3.33.1
         version: 3.33.1
@@ -318,8 +318,8 @@ packages:
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
 
-  '@real1ty-obsidian-plugins/utils@2.0.1':
-    resolution: {integrity: sha512-x3VuBNi2gEDF8StPNn5J4MlSh0s92yFmyfI9ztYzIJWrRbzGC1dwphF56oOgUl28uCcdQ9CVrhDFcL29hr0Exg==}
+  '@real1ty-obsidian-plugins/utils@2.1.0':
+    resolution: {integrity: sha512-Q4e+G7t2rXtJxtKKLKUr2cn3twaqX1JsA0DsOD2aeBKqIXTNspe44G+fKxVeAm0va0JAFKf5fQzQGnoZiSCiEw==}
 
   '@rollup/rollup-android-arm-eabi@4.52.4':
     resolution: {integrity: sha512-BTm2qKNnWIQ5auf4deoetINJm2JzvihvGb9R6K/ETwKLql/Bb3Eg2H1FBp1gUb4YGbydMA3jcmQTR73q7J+GAA==}
@@ -1172,7 +1172,7 @@ snapshots:
 
   '@marijn/find-cluster-break@1.0.2': {}
 
-  '@real1ty-obsidian-plugins/utils@2.0.1(@codemirror/state@6.5.2)(@codemirror/view@6.38.5)':
+  '@real1ty-obsidian-plugins/utils@2.1.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.5)':
     dependencies:
       gray-matter: 4.0.3
       luxon: 3.7.2

@@ -1,8 +1,8 @@
 import { type App, PluginSettingTab, Setting } from "obsidian";
 import type NexusPropertiesPlugin from "../main";
 import { SETTINGS_DEFAULTS } from "../types/constants";
-import type { NexusPropertiesSettingsSchema } from "../types/settings";
-import { SettingsUIBuilder } from "../utils/settings-ui-builder";
+import { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils"
+import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 
 export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	plugin: NexusPropertiesPlugin;
@@ -35,7 +35,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	private addUserInterfaceSettings(containerEl: HTMLElement): void {
 		new Setting(containerEl).setName("User Interface").setHeading();
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addToggle(containerEl, {
 			key: "showRibbonIcon",
 			name: "Show ribbon icon",
 			desc: "Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.",
@@ -45,7 +45,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	private addGraphSettings(containerEl: HTMLElement): void {
 		new Setting(containerEl).setName("Graph Display").setHeading();
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addSlider(containerEl, {
 			key: "graphEnlargedWidthPercent",
 			name: "Graph enlarged width",
 			desc: "Percentage of window width when graph is enlarged",
@@ -54,7 +54,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			step: 1,
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addSlider(containerEl, {
 			key: "graphZoomPreviewHeight",
 			name: "Zoom preview height",
 			desc: "Maximum height in pixels for the zoom preview panel",
@@ -63,7 +63,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			step: 10,
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addSlider(containerEl, {
 			key: "graphAnimationDuration",
 			name: "Graph animation duration",
 			desc: "Duration of graph layout animations in milliseconds. Set to 0 for instant layout.",
@@ -72,7 +72,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			step: 50,
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addSlider(containerEl, {
 			key: "allRelatedMaxDepth",
 			name: "All Related recursion depth",
 			desc: "Maximum number of constellation levels to traverse when 'All Related' is enabled (1-20). Higher values show more distant relationships but may impact performance.",
@@ -81,7 +81,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			step: 1,
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addSlider(containerEl, {
 			key: "hierarchyMaxDepth",
 			name: "Hierarchy traversal depth",
 			desc: "Maximum number of levels to traverse in hierarchy mode (1-50). Controls how deep the parent-child tree will be displayed.",
@@ -90,20 +90,20 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			step: 1,
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addTextArray(containerEl, {
 			key: "displayNodeProperties",
 			name: "Display properties in nodes",
 			desc: "Comma-separated list of property names to display inside graph nodes (e.g., status, priority, type)",
 			placeholder: "e.g., status, priority",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addToggle(containerEl, {
 			key: "showGraphTooltips",
 			name: "Show node tooltips",
 			desc: "Display property tooltips when hovering over nodes in the graph. Can also be toggled with a hotkey.",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addSlider(containerEl, {
 			key: "graphTooltipWidth",
 			name: "Tooltip width",
 			desc: "Maximum width of node tooltips in pixels (150-500px)",
@@ -116,25 +116,25 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	private addPreviewSettings(containerEl: HTMLElement): void {
 		new Setting(containerEl).setName("Property Display").setHeading();
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addToggle(containerEl, {
 			key: "hideEmptyProperties",
 			name: "Hide empty properties",
 			desc: "Hide properties with empty, null, or undefined values in tooltips and previews",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addToggle(containerEl, {
 			key: "hideUnderscoreProperties",
 			name: "Hide underscore properties",
 			desc: "Hide properties that start with an underscore (_) in tooltips and previews",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addToggle(containerEl, {
 			key: "zoomHideFrontmatterByDefault",
 			name: "Zoom: hide frontmatter by default",
 			desc: "When entering zoom preview, frontmatter starts hidden by default",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addToggle(containerEl, {
 			key: "zoomHideContentByDefault",
 			name: "Zoom: hide content by default",
 			desc: "When entering zoom preview, file content starts hidden by default",
@@ -402,7 +402,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			code.addClass("settings-info-box-example");
 		}
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addTextArray(containerEl, {
 			key: "filterExpressions",
 			name: "Filter expressions",
 			desc: "One per line. Changes apply on blur or Ctrl/Cmd+Enter. Only nodes matching all expressions are shown in the graph.",
@@ -564,27 +564,27 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 				"Configure property names for direct bidirectional relationships. When you set a relationship in one direction, the plugin automatically updates the reverse relationship."
 			);
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addToggle(containerEl, {
 			key: "autoLinkSiblings",
 			name: "Auto-link siblings",
 			desc: "Automatically mark nodes as related when they share the same parent (siblings are related to each other)",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addText(containerEl, {
 			key: "parentProp",
 			name: "Parent property",
 			desc: "Property name for parent reference (bidirectional with children)",
 			placeholder: "parent",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addText(containerEl, {
 			key: "childrenProp",
 			name: "Children property",
 			desc: "Property name for children references (bidirectional with parent)",
 			placeholder: "children",
 		});
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addText(containerEl, {
 			key: "relatedProp",
 			name: "Related property",
 			desc: "Property name for related files (bidirectional - automatically syncs between linked files)",
@@ -601,7 +601,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 				"Enable quick creation of Parent, Child, and Related nodes from the command palette. New nodes inherit frontmatter properties and automatically establish bidirectional relationships."
 			);
 
-		this.uiBuilder.auto(containerEl, {
+		this.uiBuilder.addText(containerEl, {
 			key: "zettelIdProp",
 			name: "Zettel ID property",
 			desc: "Property name for unique timestamp identifier assigned to new nodes",
