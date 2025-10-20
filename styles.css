@@ -190,6 +190,23 @@
 	border-color: var(--interactive-accent);
 }
 
+.excluded-properties-input {
+	min-width: 200px;
+	padding: 4px 8px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+	font-family: var(--font-monospace);
+	font-size: 0.9em;
+	margin-right: 8px;
+}
+
+.excluded-properties-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+}
+
 .color-rule-right {
 	display: flex;
 	align-items: center;

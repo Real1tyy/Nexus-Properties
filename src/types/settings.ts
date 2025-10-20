@@ -12,6 +12,15 @@ export const ColorRuleSchema = z.object({
 
 export type ColorRule = z.infer<typeof ColorRuleSchema>;
 
+export const PathExcludedPropertiesSchema = z.object({
+	id: z.string(),
+	path: z.string(),
+	excludedProperties: z.array(z.string()),
+	enabled: z.boolean(),
+});
+
+export type PathExcludedProperties = z.infer<typeof PathExcludedPropertiesSchema>;
+
 export const NexusPropertiesSettingsSchema = z.object({
 	version: z.number().int().positive().optional().default(SETTINGS_VERSION),
 
@@ -85,6 +94,13 @@ export const NexusPropertiesSettingsSchema = z.object({
 	// Node color rules
 	defaultNodeColor: z.string().optional().default(SETTINGS_DEFAULTS.DEFAULT_NODE_COLOR),
 	colorRules: z.array(ColorRuleSchema).optional().default([]),
+
+	// Excluded properties for node creation
+	defaultExcludedProperties: z
+		.array(z.string())
+		.optional()
+		.default([...SETTINGS_DEFAULTS.DEFAULT_EXCLUDED_PROPERTIES]),
+	pathExcludedProperties: z.array(PathExcludedPropertiesSchema).optional().default([]),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

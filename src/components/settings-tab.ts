@@ -247,6 +247,91 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			});
 	}
 
+	// Helper methods for rule list rendering
+	private createRuleToggle(checked: boolean, onChange: (checked: boolean) => Promise<void>): HTMLInputElement {
+		const toggle = document.createElement("input");
+		toggle.type = "checkbox";
+		toggle.checked = checked;
+		toggle.onchange = async () => {
+			await onChange(toggle.checked);
+		};
+		return toggle;
+	}
+
+	private createRuleInput(
+		value: string,
+		placeholder: string,
+		cssClass: string,
+		onUpdate: (value: string) => Promise<void>
+	): HTMLInputElement {
+		const input = document.createElement("input");
+		input.type = "text";
+		input.value = value;
+		input.placeholder = placeholder;
+		input.className = cssClass;
+
+		const update = async () => {
+			await onUpdate(input.value);
+		};
+
+		input.addEventListener("blur", update);
+		input.addEventListener("keydown", (e: KeyboardEvent) => {
+			if (e.key === "Enter") {
+				e.preventDefault();
+				update();
+			}
+		});
+
+		return input;
+	}
+
+	private createMoveButtons(
+		container: HTMLElement,
+		index: number,
+		totalCount: number,
+		onMoveUp: () => Promise<void>,
+		onMoveDown: () => Promise<void>
+	): void {
+		if (index > 0) {
+			const moveUpButton = container.createEl("button", {
+				text: "↑",
+				attr: { title: "Move up" },
+				cls: "color-rule-btn",
+			});
+			moveUpButton.onclick = onMoveUp;
+		}
+
+		if (index < totalCount - 1) {
+			const moveDownButton = container.createEl("button", {
+				text: "↓",
+				attr: { title: "Move down" },
+				cls: "color-rule-btn",
+			});
+			moveDownButton.onclick = onMoveDown;
+		}
+	}
+
+	private createDeleteButton(container: HTMLElement, onDelete: () => Promise<void>): void {
+		const deleteButton = container.createEl("button", {
+			text: "×",
+			attr: { title: "Delete rule" },
+			cls: "color-rule-btn color-rule-btn-delete",
+		});
+		deleteButton.onclick = onDelete;
+	}
+
+	private swapRules<T extends { id: string }>(rules: T[], ruleId: string, offset: number): T[] {
+		const currentRules = [...rules];
+		const ruleIndex = currentRules.findIndex((r) => r.id === ruleId);
+		const targetIndex = ruleIndex + offset;
+
+		if (ruleIndex !== -1 && targetIndex >= 0 && targetIndex < currentRules.length) {
+			[currentRules[ruleIndex], currentRules[targetIndex]] = [currentRules[targetIndex], currentRules[ruleIndex]];
+		}
+
+		return currentRules;
+	}
+
 	private renderColorRulesList(container: HTMLElement): void {
 		container.empty();
 		const { colorRules } = this.plugin.settingsStore.currentSettings;
@@ -259,11 +344,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		colorRules.forEach((rule, index) => {
 			const ruleContainer = container.createDiv("color-rule-item");
-
-			// Single row with all controls
 			const mainRow = ruleContainer.createDiv("color-rule-main-row");
-
-			// Left section: order, checkbox, expression
 			const leftSection = mainRow.createDiv("color-rule-left");
 
 			leftSection.createEl("span", {
@@ -271,36 +352,26 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 				cls: "color-rule-order",
 			});
 
-			const enableToggle = leftSection.createEl("input", { type: "checkbox" });
-			enableToggle.checked = rule.enabled;
-			enableToggle.onchange = async () => {
+			const enableToggle = this.createRuleToggle(rule.enabled, async (checked) => {
 				await this.plugin.settingsStore.updateSettings((s) => ({
 					...s,
-					colorRules: s.colorRules.map((r) => (r.id === rule.id ? { ...r, enabled: enableToggle.checked } : r)),
+					colorRules: s.colorRules.map((r) => (r.id === rule.id ? { ...r, enabled: checked } : r)),
 				}));
-			};
-
-			const expressionInput = leftSection.createEl("input", {
-				type: "text",
-				value: rule.expression,
-				placeholder: "fm.Status === 'Active'",
-				cls: "color-rule-expression-input",
 			});
+			leftSection.appendChild(enableToggle);
 
-			const updateExpression = async () => {
-				await this.plugin.settingsStore.updateSettings((s) => ({
-					...s,
-					colorRules: s.colorRules.map((r) => (r.id === rule.id ? { ...r, expression: expressionInput.value } : r)),
-				}));
-			};
-
-			expressionInput.addEventListener("blur", updateExpression);
-			expressionInput.addEventListener("keydown", (e: KeyboardEvent) => {
-				if (e.key === "Enter") {
-					e.preventDefault();
-					updateExpression();
+			const expressionInput = this.createRuleInput(
+				rule.expression,
+				"fm.Status === 'Active'",
+				"color-rule-expression-input",
+				async (value) => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						colorRules: s.colorRules.map((r) => (r.id === rule.id ? { ...r, expression: value } : r)),
+					}));
 				}
-			});
+			);
+			leftSection.appendChild(expressionInput);
 
 			// Right section: color picker + controls
 			const rightSection = mainRow.createDiv("color-rule-right");
@@ -317,65 +388,128 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 				});
 			});
 
-			// Control buttons
 			const controlsSection = rightSection.createDiv("color-rule-controls");
 
-			if (index > 0) {
-				const moveUpButton = controlsSection.createEl("button", {
-					text: "↑",
-					attr: { title: "Move up" },
-					cls: "color-rule-btn",
-				});
-				moveUpButton.onclick = async () => {
-					await this.plugin.settingsStore.updateSettings((s) => {
-						const currentRules = [...s.colorRules];
-						const ruleIndex = currentRules.findIndex((r) => r.id === rule.id);
-						if (ruleIndex > 0) {
-							[currentRules[ruleIndex], currentRules[ruleIndex - 1]] = [
-								currentRules[ruleIndex - 1],
-								currentRules[ruleIndex],
-							];
-						}
-						return { ...s, colorRules: currentRules };
-					});
+			this.createMoveButtons(
+				controlsSection,
+				index,
+				colorRules.length,
+				async () => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						colorRules: this.swapRules(s.colorRules, rule.id, -1),
+					}));
 					this.renderColorRulesList(container);
-				};
-			}
-
-			if (index < colorRules.length - 1) {
-				const moveDownButton = controlsSection.createEl("button", {
-					text: "↓",
-					attr: { title: "Move down" },
-					cls: "color-rule-btn",
-				});
-				moveDownButton.onclick = async () => {
-					await this.plugin.settingsStore.updateSettings((s) => {
-						const currentRules = [...s.colorRules];
-						const ruleIndex = currentRules.findIndex((r) => r.id === rule.id);
-						if (ruleIndex !== -1 && ruleIndex < currentRules.length - 1) {
-							[currentRules[ruleIndex], currentRules[ruleIndex + 1]] = [
-								currentRules[ruleIndex + 1],
-								currentRules[ruleIndex],
-							];
-						}
-						return { ...s, colorRules: currentRules };
-					});
+				},
+				async () => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						colorRules: this.swapRules(s.colorRules, rule.id, 1),
+					}));
 					this.renderColorRulesList(container);
-				};
-			}
+				}
+			);
 
-			const deleteButton = controlsSection.createEl("button", {
-				text: "×",
-				attr: { title: "Delete rule" },
-				cls: "color-rule-btn color-rule-btn-delete",
-			});
-			deleteButton.onclick = async () => {
+			this.createDeleteButton(controlsSection, async () => {
 				await this.plugin.settingsStore.updateSettings((s) => ({
 					...s,
 					colorRules: s.colorRules.filter((r) => r.id !== rule.id),
 				}));
 				this.renderColorRulesList(container);
-			};
+			});
+		});
+	}
+
+	private renderExcludedPropertyRulesList(container: HTMLElement): void {
+		container.empty();
+		const { pathExcludedProperties } = this.plugin.settingsStore.currentSettings;
+
+		if (pathExcludedProperties.length === 0) {
+			const emptyState = container.createDiv();
+			emptyState.textContent =
+				"No path-based exclusion rules defined. Click 'Add Rule' to create one. Default excluded properties will be used for all files.";
+			return;
+		}
+
+		pathExcludedProperties.forEach((rule, index) => {
+			const ruleContainer = container.createDiv("color-rule-item");
+			const mainRow = ruleContainer.createDiv("color-rule-main-row");
+			const leftSection = mainRow.createDiv("color-rule-left");
+
+			leftSection.createEl("span", {
+				text: `#${index + 1}`,
+				cls: "color-rule-order",
+			});
+
+			const enableToggle = this.createRuleToggle(rule.enabled, async (checked) => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					pathExcludedProperties: s.pathExcludedProperties.map((r) =>
+						r.id === rule.id ? { ...r, enabled: checked } : r
+					),
+				}));
+			});
+			leftSection.appendChild(enableToggle);
+
+			const pathInput = this.createRuleInput(rule.path, "Projects/", "color-rule-expression-input", async (value) => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					pathExcludedProperties: s.pathExcludedProperties.map((r) => (r.id === rule.id ? { ...r, path: value } : r)),
+				}));
+			});
+			leftSection.appendChild(pathInput);
+
+			const rightSection = mainRow.createDiv("color-rule-right");
+
+			const propertiesInput = this.createRuleInput(
+				rule.excludedProperties.join(", "),
+				"status, progress, date",
+				"excluded-properties-input",
+				async (value) => {
+					const propsArray = value
+						.split(",")
+						.map((p) => p.trim())
+						.filter((p) => p.length > 0);
+
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						pathExcludedProperties: s.pathExcludedProperties.map((r) =>
+							r.id === rule.id ? { ...r, excludedProperties: propsArray } : r
+						),
+					}));
+				}
+			);
+			rightSection.appendChild(propertiesInput);
+
+			const controlsSection = rightSection.createDiv("color-rule-controls");
+
+			this.createMoveButtons(
+				controlsSection,
+				index,
+				pathExcludedProperties.length,
+				async () => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						pathExcludedProperties: this.swapRules(s.pathExcludedProperties, rule.id, -1),
+					}));
+					this.renderExcludedPropertyRulesList(container);
+				},
+				async () => {
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						pathExcludedProperties: this.swapRules(s.pathExcludedProperties, rule.id, 1),
+					}));
+					this.renderExcludedPropertyRulesList(container);
+				}
+			);
+
+			this.createDeleteButton(controlsSection, async () => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					pathExcludedProperties: s.pathExcludedProperties.filter((r) => r.id !== rule.id),
+				}));
+				this.renderExcludedPropertyRulesList(container);
+			});
 		});
 	}
 
@@ -580,7 +714,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			text: "New nodes are created in the same folder as the source file",
 		});
 		list.createEl("li", {
-			text: "All frontmatter properties are inherited (except Parent, Child, Related)",
+			text: "All frontmatter properties are inherited (except excluded properties)",
 		});
 		list.createEl("li", {
 			text: "A new Zettel ID is generated automatically (timestamp-based)",
@@ -591,6 +725,79 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		list.createEl("li", {
 			text: "Commands are only available for files in indexed directories",
 		});
+
+		// Excluded properties section
+		new Setting(containerEl).setName("Excluded properties").setHeading();
+
+		this.uiBuilder.addTextArray(containerEl, {
+			key: "defaultExcludedProperties",
+			name: "Default excluded properties",
+			desc: "Comma-separated list of frontmatter properties to ALWAYS exclude from copying when creating new nodes. These are excluded regardless of any rules below.",
+			placeholder: "e.g., Parent, Child, Related, _ZettelID",
+		});
+
+		const excludedPropertiesContainer = containerEl.createDiv();
+
+		const desc = excludedPropertiesContainer.createDiv();
+		desc.createEl("p", {
+			text: "Define path-based rules to exclude ADDITIONAL properties for files in specific directories. The default excluded properties above are always excluded. Rules are evaluated in order - the first matching path's properties are ADDED to the default exclusion list.",
+		});
+
+		const examplesContainer = desc.createDiv("settings-info-box");
+		examplesContainer.createEl("strong", { text: "Example path-based exclusion rules:" });
+		const examplesList = examplesContainer.createEl("ul");
+
+		const examples = [
+			{
+				path: "Projects/",
+				properties: "status, progress",
+				description: "Exclude status and progress from files in Projects/",
+			},
+			{
+				path: "Daily Notes/2024/",
+				properties: "date, weekday",
+				description: "Exclude date fields from files in Daily Notes/2024/",
+			},
+		];
+
+		for (const example of examples) {
+			const li = examplesList.createEl("li", { cls: "color-example-item" });
+			li.createEl("code", { text: example.path, cls: "settings-info-box-example" });
+			li.createSpan({ text: "→", cls: "color-arrow" });
+			li.createEl("code", { text: example.properties, cls: "settings-info-box-example" });
+			li.createSpan({ text: `: ${example.description}`, cls: "color-example-description" });
+		}
+
+		const warningContainer = desc.createDiv("settings-warning-box");
+		warningContainer.createEl("strong", { text: "⚠️ Important:" });
+		warningContainer.createEl("p", {
+			text: "Path matching uses startsWith - a file matches if its path starts with the rule's path. Default excluded properties are ALWAYS excluded. Path rules ADD additional properties to exclude on top of the defaults.",
+		});
+
+		const excludedPropertyRulesListContainer = excludedPropertiesContainer.createDiv();
+		this.renderExcludedPropertyRulesList(excludedPropertyRulesListContainer);
+
+		new Setting(excludedPropertiesContainer)
+			.setName("Add path-based exclusion rule")
+			.setDesc("Add a new rule to exclude properties for files in a specific path")
+			.addButton((button) => {
+				button.setButtonText("Add Rule");
+				button.onClick(async () => {
+					const newRule = {
+						id: `path-excluded-${Date.now()}`,
+						path: "",
+						excludedProperties: [],
+						enabled: true,
+					};
+
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						pathExcludedProperties: [...s.pathExcludedProperties, newRule],
+					}));
+
+					this.renderExcludedPropertyRulesList(excludedPropertyRulesListContainer);
+				});
+			});
 	}
 
 	private addExampleSection(containerEl: HTMLElement): void {

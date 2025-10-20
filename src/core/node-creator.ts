@@ -1,7 +1,9 @@
 import { generateZettelId } from "@real1ty-obsidian-plugins/utils/generate";
 import type { App, TFile } from "obsidian";
+import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
+import { ExcludedPropertiesEvaluator } from "../utils/excluded-properties";
 import { getUniqueFilePath } from "../utils/file";
 import { normalizeProperty } from "../utils/frontmatter-value";
 import { formatWikiLink } from "../utils/link-parser";
@@ -9,10 +11,20 @@ import { formatWikiLink } from "../utils/link-parser";
 type NodeCreationType = "parent" | "child" | "related";
 
 export class NodeCreator {
+	private excludedPropertiesEvaluator: ExcludedPropertiesEvaluator;
+	private settings: NexusPropertiesSettings;
+
 	constructor(
 		private app: App,
-		private settings: NexusPropertiesSettings
-	) {}
+		settingsObservable: BehaviorSubject<NexusPropertiesSettings>
+	) {
+		this.excludedPropertiesEvaluator = new ExcludedPropertiesEvaluator(settingsObservable);
+		this.settings = settingsObservable.value;
+
+		settingsObservable.subscribe((settings) => {
+			this.settings = settings;
+		});
+	}
 
 	async createRelatedNode(sourceFile: TFile, type: NodeCreationType): Promise<TFile | null> {
 		try {
@@ -56,7 +68,7 @@ export class NodeCreator {
 		const newFileLink = formatWikiLink(newFilePath);
 
 		await this.app.fileManager.processFrontMatter(newFile, (fm) => {
-			this.copyPropertiesExcludingRelationships(fm, sourceFrontmatter);
+			this.copyPropertiesExcludingRelationships(fm, sourceFrontmatter, sourceFile.path);
 
 			fm[this.settings.zettelIdProp] = generateZettelId();
 
@@ -68,13 +80,9 @@ export class NodeCreator {
 		});
 	}
 
-	private copyPropertiesExcludingRelationships(target: Frontmatter, source: Frontmatter): void {
-		const excludeProps = new Set([
-			this.settings.parentProp,
-			this.settings.childrenProp,
-			this.settings.relatedProp,
-			this.settings.zettelIdProp,
-		]);
+	private copyPropertiesExcludingRelationships(target: Frontmatter, source: Frontmatter, sourceFilePath: string): void {
+		const excludedProperties = this.excludedPropertiesEvaluator.evaluateExcludedProperties(sourceFilePath);
+		const excludeProps = new Set(excludedProperties);
 
 		for (const [key, value] of Object.entries(source)) {
 			if (!excludeProps.has(key)) {

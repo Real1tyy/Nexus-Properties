@@ -31,6 +31,9 @@ export const SETTINGS_DEFAULTS = {
 
 	// Node color defaults
 	DEFAULT_NODE_COLOR: "#e9f2ff",
+
+	// Node creation defaults
+	DEFAULT_EXCLUDED_PROPERTIES: ["Parent", "Child", "Related", "_ZettelID"],
 } as const;
 
 export const SCAN_CONCURRENCY = 10;
