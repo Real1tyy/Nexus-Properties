@@ -86,7 +86,12 @@ export class NodeCreator {
 
 		for (const [key, value] of Object.entries(source)) {
 			if (!excludeProps.has(key)) {
+				// Copy the property value
 				target[key] = value;
+			} else {
+				// Keep the property key but set it to undefined
+				// This preserves the property structure while clearing the value
+				target[key] = "";
 			}
 		}
 	}
