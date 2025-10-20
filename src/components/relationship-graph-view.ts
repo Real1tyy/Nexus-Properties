@@ -473,6 +473,18 @@ export class RelationshipGraphView extends ItemView {
 						"overlay-padding": 20,
 					},
 				},
+				// Focused node in zoom mode - same size as source node but keep text style
+				{
+					selector: "node.focused",
+					style: {
+						width: 24,
+						height: 24,
+						"border-color": "#fff",
+						"border-width": 3,
+						"overlay-opacity": 0.35,
+						"overlay-padding": 20,
+					},
+				},
 				// Root/parent nodes - medium importance
 				{
 					selector: "node[level = 0]",
@@ -891,6 +903,8 @@ export class RelationshipGraphView extends ItemView {
 		// Stop any ongoing animations before resetting view
 		if (this.cy) {
 			this.cy.stop();
+			// Remove focused class from all nodes
+			this.cy.nodes().removeClass("focused");
 		}
 		this.hidePreviewOverlay();
 		// Reset zoom to show full graph exactly once. We suppress the next resize-driven
@@ -916,9 +930,15 @@ export class RelationshipGraphView extends ItemView {
 
 		// Zoom to the focused node on the existing graph with stronger zoom
 		if (this.cy && !this.isUpdating) {
+			// Remove focused class from all nodes
+			this.cy.nodes().removeClass("focused");
+
 			// Use filter instead of selector to avoid escaping issues with complex file paths
 			const node = this.cy.nodes().filter((n) => n.id() === filePath);
 			if (node.length > 0) {
+				// Add focused class to the focused node
+				node.addClass("focused");
+
 				this.cy.animate(
 					{
 						zoom: 2.5,
