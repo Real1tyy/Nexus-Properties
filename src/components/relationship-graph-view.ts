@@ -473,7 +473,17 @@ export class RelationshipGraphView extends ItemView {
 						"overlay-padding": 20,
 					},
 				},
+				// Root/parent nodes - medium importance
+				{
+					selector: "node[level = 0]",
+					style: {
+						width: 20,
+						height: 20,
+						"overlay-padding": 16,
+					},
+				},
 				// Focused node in zoom mode - same size as source node but keep text style
+				// This comes after level-based styles to ensure it takes priority
 				{
 					selector: "node.focused",
 					style: {
@@ -483,15 +493,6 @@ export class RelationshipGraphView extends ItemView {
 						"border-width": 3,
 						"overlay-opacity": 0.35,
 						"overlay-padding": 20,
-					},
-				},
-				// Root/parent nodes - medium importance
-				{
-					selector: "node[level = 0]",
-					style: {
-						width: 20,
-						height: 20,
-						"overlay-padding": 16,
 					},
 				},
 				// Glow effect for special nodes
