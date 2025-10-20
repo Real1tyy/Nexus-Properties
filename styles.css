@@ -251,7 +251,7 @@
 
 /* Utility classes */
 .nexus-hidden {
-	display: none !important;
+	display: none;
 }
 
 /* Relationship Graph View */

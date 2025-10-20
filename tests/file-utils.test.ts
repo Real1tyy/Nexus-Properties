@@ -159,7 +159,7 @@ describe("getUniqueFilePath", () => {
 						if (path === "Note.md") return { path };
 						const match = path.match(/Note (\d+)\.md/);
 						if (match) {
-							const counter = Number.parseInt(match[1]);
+							const counter = Number.parseInt(match[1], 10);
 							return counter < 100 ? { path } : null;
 						}
 						return null;

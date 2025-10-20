@@ -1,8 +1,8 @@
+import { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
 import { type App, PluginSettingTab, Setting } from "obsidian";
+import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 import type NexusPropertiesPlugin from "../main";
 import { SETTINGS_DEFAULTS } from "../types/constants";
-import { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils"
-import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 
 export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	plugin: NexusPropertiesPlugin;
