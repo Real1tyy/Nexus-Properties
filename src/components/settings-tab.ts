@@ -387,20 +387,42 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			text: "Show only nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false; use 'fm' to access frontmatter. The source node is always shown.",
 		});
 
+		// Examples section
+		const examplesContainer = desc.createDiv("settings-info-box");
+		examplesContainer.createEl("strong", { text: "Example filter expressions:" });
+		const examplesList = examplesContainer.createEl("ul");
+
 		const examples = [
-			"fm.Status === 'Active'",
-			"fm.type === 'project'",
-			"Array.isArray(fm.tags) && fm.tags.includes('important')",
+			{
+				expression: "fm.Status === 'Active'",
+				description: "Only show nodes with Status = 'Active'",
+			},
+			{
+				expression: "fm.type === 'project'",
+				description: "Only show project-type nodes",
+			},
+			{
+				expression: "Array.isArray(fm.tags) && fm.tags.includes('important')",
+				description: "Only show nodes tagged as important",
+			},
 		];
 
-		const examplesContainer = desc.createDiv("settings-info-box");
-		examplesContainer.createEl("strong", { text: "Examples:" });
-		const ul = examplesContainer.createEl("ul");
-		for (const ex of examples) {
-			const li = ul.createEl("li");
-			const code = li.createEl("code", { text: ex });
-			code.addClass("settings-info-box-example");
+		for (const example of examples) {
+			const li = examplesList.createEl("li", { cls: "color-example-item" });
+
+			li.createEl("code", { text: example.expression, cls: "settings-info-box-example" });
+
+			li.createSpan({ text: "→", cls: "color-arrow" });
+
+			li.createSpan({ text: example.description, cls: "color-example-description" });
 		}
+
+		// Warning section
+		const warningContainer = desc.createDiv("settings-warning-box");
+		warningContainer.createEl("strong", { text: "⚠️ Important:" });
+		warningContainer.createEl("p", {
+			text: "Use 'fm' to access frontmatter properties. Invalid expressions will be ignored. All expressions must evaluate to true for a node to be shown.",
+		});
 
 		this.uiBuilder.addTextArray(containerEl, {
 			key: "filterExpressions",
