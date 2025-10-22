@@ -758,6 +758,9 @@ export class RelationshipGraphView extends ItemView {
 		if (!this.cy) return;
 
 		const BASE_ORBITAL_RADIUS = 150; // Base radius for orbitals around their center
+		const MIN_NODE_DISTANCE = 60; // Minimum distance between any two nodes
+		const MAX_COLLISION_ATTEMPTS = 36; // Try up to 36 different angles (10° increments)
+		const RADIUS_INCREMENT = 30; // Increase radius if all angles fail
 		const nodePositions = new Map<string, { x: number; y: number }>();
 
 		// Group nodes by level to ensure we position centers before their orbitals
@@ -772,6 +775,52 @@ export class RelationshipGraphView extends ItemView {
 			nodesByLevel.get(level)!.push(node);
 			maxLevel = Math.max(maxLevel, level);
 		});
+
+		// Helper function to check if a position collides with existing nodes
+		const hasCollision = (x: number, y: number): boolean => {
+			for (const pos of nodePositions.values()) {
+				const distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+				if (distance < MIN_NODE_DISTANCE) {
+					return true;
+				}
+			}
+			return false;
+		};
+
+		// Helper function to find a collision-free position
+		const findValidPosition = (
+			centerX: number,
+			centerY: number,
+			baseRadius: number,
+			baseAngle: number
+		): { x: number; y: number } => {
+			let currentRadius = baseRadius;
+			const maxRadiusAttempts = 5; // Try expanding radius up to 5 times
+
+			for (let radiusAttempt = 0; radiusAttempt < maxRadiusAttempts; radiusAttempt++) {
+				// Try different angles at this radius
+				for (let angleAttempt = 0; angleAttempt < MAX_COLLISION_ATTEMPTS; angleAttempt++) {
+					const angleOffset = (angleAttempt * 2 * Math.PI) / MAX_COLLISION_ATTEMPTS;
+					const angle = baseAngle + angleOffset;
+					const x = centerX + currentRadius * Math.cos(angle);
+					const y = centerY + currentRadius * Math.sin(angle);
+
+					if (!hasCollision(x, y)) {
+						return { x, y };
+					}
+				}
+
+				// All angles at this radius failed, increase radius
+				currentRadius += RADIUS_INCREMENT;
+			}
+
+			// Fallback: Return the original position even if it collides
+			// This prevents infinite loops, but should rarely happen
+			return {
+				x: centerX + currentRadius * Math.cos(baseAngle),
+				y: centerY + currentRadius * Math.sin(baseAngle),
+			};
+		};
 
 		// Position nodes level by level to ensure centers are positioned before orbitals
 		for (let level = 0; level <= maxLevel; level++) {
@@ -808,12 +857,10 @@ export class RelationshipGraphView extends ItemView {
 					angleOffset += (centerNode.data.orbitalIndex * Math.PI) / 3;
 				}
 
-				// Distribute orbitals evenly around their center with the offset
-				const angle = (orbitalIndex / orbitalCount) * 2 * Math.PI + angleOffset;
-				const x = centerPos.x + orbitalRadius * Math.cos(angle);
-				const y = centerPos.y + orbitalRadius * Math.sin(angle);
-
-				nodePositions.set(node.data.id, { x, y });
+				// Calculate ideal angle for this orbital
+				const idealAngle = (orbitalIndex / orbitalCount) * 2 * Math.PI + angleOffset;
+				const position = findValidPosition(centerPos.x, centerPos.y, orbitalRadius, idealAngle);
+				nodePositions.set(node.data.id, position);
 			});
 		}
 
