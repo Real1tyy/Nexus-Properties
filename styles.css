@@ -282,16 +282,8 @@
 	display: none;
 }
 
-/* Override display for various containers when hidden */
+/* Override display for toggle containers when hidden */
 .nexus-graph-toggle-container.nexus-hidden {
-	display: none;
-}
-
-.nexus-graph-zoom-preview-frontmatter.nexus-hidden {
-	display: none;
-}
-
-.nexus-graph-zoom-preview-content.nexus-hidden {
 	display: none;
 }
 
@@ -621,7 +613,6 @@
 .nexus-graph-zoom-preview {
 	position: relative;
 	width: 100%;
-	height: var(--zoom-preview-max-height, 280px);
 	max-height: var(--zoom-preview-max-height, 280px);
 	background: linear-gradient(to bottom, var(--background-primary) 0%, var(--background-primary) 85%, transparent 100%);
 	border-bottom: 2px solid var(--background-modifier-border);
@@ -759,7 +750,7 @@
 
 .nexus-graph-zoom-preview-content {
 	flex: 1;
-	padding: 1.5em 2em;
+	padding: 0.3em 2em 0.5em 2em;
 	overflow-y: auto;
 	overflow-x: hidden;
 	min-height: 0;
@@ -771,6 +762,26 @@
 	line-height: 1.6;
 	white-space: pre-wrap;
 	word-wrap: break-word;
+}
+
+/* CSS overrides for hidden sections - MUST come after base styles for proper cascade */
+/* These have higher specificity (2 classes) than base styles (1 class) */
+.nexus-graph-zoom-preview-body.nexus-hidden {
+	display: none;
+}
+
+.nexus-graph-zoom-preview-frontmatter.nexus-hidden {
+	display: none;
+}
+
+.nexus-graph-zoom-preview-content.nexus-hidden {
+	display: none;
+}
+
+/* When frontmatter is hidden, content should only take needed space */
+.nexus-graph-zoom-preview-body:has(.nexus-graph-zoom-preview-frontmatter.nexus-hidden)
+.nexus-graph-zoom-preview-content {
+	flex: 0 1 auto;
 }
 
 /* Scrollbar styling for preview */
