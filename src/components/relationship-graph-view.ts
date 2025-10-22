@@ -126,11 +126,19 @@ export class RelationshipGraphView extends ItemView {
 			})
 		);
 
-		// Register event listener for metadata changes (frontmatter updates)
 		this.registerEvent(
 			this.app.metadataCache.on("changed", (file) => {
 				// Only re-render if the changed file is the currently displayed file
 				if (this.currentFile && file.path === this.currentFile.path) {
+					this.updateGraph();
+				}
+			})
+		);
+
+		this.registerEvent(
+			this.app.vault.on("rename", (file, oldPath) => {
+				if (this.currentFile && oldPath === this.currentFile.path && file instanceof TFile) {
+					this.currentFile = file;
 					this.updateGraph();
 				}
 			})
