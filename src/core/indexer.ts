@@ -226,11 +226,11 @@ export class Indexer {
 
 		const addAffectedFiles = (wikiLinks: string[]) => {
 			wikiLinks
-				.map(wikiLink => parseWikiLink(wikiLink))
-				.filter(parsed => parsed?.linkPath)
-				.map(parsed => this.vault.getFileByPath(`${parsed!.linkPath}.md`))
-				.filter(file => file !== null)
-				.forEach(file => {
+				.map((wikiLink) => parseWikiLink(wikiLink))
+				.filter((parsed) => parsed?.linkPath)
+				.map((parsed) => this.vault.getFileByPath(`${parsed!.linkPath}.md`))
+				.filter((file) => file !== null)
+				.forEach((file) => {
 					affectedFiles.add(file.path);
 				});
 		};

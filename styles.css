@@ -282,6 +282,11 @@
 	display: none;
 }
 
+/* Override display for toggle containers when hidden */
+.nexus-graph-toggle-container.nexus-hidden {
+	display: none;
+}
+
 /* Relationship Graph View */
 .nexus-graph-view-content {
 	display: flex;
