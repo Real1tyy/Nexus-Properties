@@ -13,7 +13,7 @@ import {
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { normalizeProperty } from "../utils/frontmatter-value";
+import { normalizeProperty, parseWikiLink } from "../utils/frontmatter-value";
 
 export interface FileRelationships {
 	filePath: string;
@@ -177,16 +177,19 @@ export class Indexer {
 
 		const deletedIntents$ = deleted$.pipe(map((file): FileIntent => ({ kind: "deleted", path: file.path })));
 
-		const renamedIntents$ = renamed$.pipe(
-			map(([f, oldPath]) => [f, oldPath] as const),
-			filter(([f]) => Indexer.isMarkdownFile(f)),
-			mergeMap(([f, oldPath]) => [
-				{ kind: "deleted", path: oldPath } as FileIntent,
-				{ kind: "changed", file: f, path: f.path } as FileIntent,
-			])
-		);
+		// Handle renames by updating the cache internally without emitting events
+		// Obsidian automatically updates all wiki links, so we just sync the cache
+		// Debounce by 1.5 seconds to let Obsidian finish updating all links
+		renamed$
+			.pipe(
+				filter(([f]) => Indexer.isMarkdownFile(f)),
+				debounceTime(1500)
+			)
+			.subscribe(([newFile, oldPath]) => {
+				this.handleRename(newFile, oldPath);
+			});
 
-		const intents$ = merge(changedIntents$, deletedIntents$, renamedIntents$);
+		const intents$ = merge(changedIntents$, deletedIntents$);
 
 		return intents$.pipe(
 			switchMap((intent) => {
@@ -203,6 +206,53 @@ export class Indexer {
 				return from(this.buildEvent(intent.file)).pipe(filter((e): e is IndexerEvent => e !== null));
 			})
 		);
+	}
+
+	private handleRename(newFile: TFile, oldPath: string): void {
+		const oldRelationships = this.relationshipsCache.get(oldPath);
+		const frontmatter = this.metadataCache.getFileCache(newFile)?.frontmatter;
+
+		if (!frontmatter || !oldRelationships) {
+			return;
+		}
+
+		// Update cache for renamed file
+		const newRelationships = this.extractRelationships(newFile, frontmatter);
+		this.relationshipsCache.delete(oldPath);
+		this.relationshipsCache.set(newFile.path, newRelationships);
+
+		// Collect affected files from old relationships
+		const affectedFiles = new Set<string>();
+
+		const addAffectedFiles = (wikiLinks: string[]) => {
+			wikiLinks
+				.map(wikiLink => parseWikiLink(wikiLink))
+				.filter(parsed => parsed?.linkPath)
+				.map(parsed => this.vault.getFileByPath(`${parsed!.linkPath}.md`))
+				.filter(file => file !== null)
+				.forEach(file => {
+					affectedFiles.add(file.path);
+				});
+		};
+
+		addAffectedFiles(oldRelationships.parent);
+		addAffectedFiles(oldRelationships.children);
+		addAffectedFiles(oldRelationships.related);
+
+		// Re-extract relationships from frontmatter for all affected files
+		// Obsidian has already updated their frontmatter with the new file name
+		const updatedPaths = [newFile.path];
+		for (const filePath of affectedFiles) {
+			const file = this.vault.getFileByPath(filePath);
+			if (file === null) continue;
+
+			const fm = this.metadataCache.getFileCache(file)?.frontmatter;
+			if (!fm) continue;
+
+			const updatedRelationships = this.extractRelationships(file, fm);
+			this.relationshipsCache.set(filePath, updatedRelationships);
+			updatedPaths.push(filePath);
+		}
 	}
 
 	private async buildEvent(file: TFile): Promise<IndexerEvent | null> {
