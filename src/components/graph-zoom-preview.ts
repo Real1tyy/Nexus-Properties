@@ -53,17 +53,19 @@ export class GraphZoomPreview {
 		this.previewOverlay = this.containerEl.createEl("div", {
 			cls: "nexus-graph-zoom-preview",
 		});
-		// Apply custom height from settings using CSS variable
+		// Apply custom heights from settings using CSS variables
 		this.previewOverlay.setCssProps({
 			"--zoom-preview-max-height": `${this.settings.graphZoomPreviewHeight}px`,
+			"--zoom-preview-frontmatter-height": `${this.settings.graphZoomPreviewFrontmatterHeight}px`,
 		});
 
 		// Subscribe to settings changes to update preview reactively
 		this.settingsSubscription = this.props.settingsStore.settings$.subscribe((settings) => {
 			this.settings = settings;
-			// Update height CSS variable
+			// Update height CSS variables
 			this.previewOverlay.setCssProps({
 				"--zoom-preview-max-height": `${settings.graphZoomPreviewHeight}px`,
+				"--zoom-preview-frontmatter-height": `${settings.graphZoomPreviewFrontmatterHeight}px`,
 			});
 			// Update checkbox states from settings
 			if (this.hideFrontmatterCheckbox) {

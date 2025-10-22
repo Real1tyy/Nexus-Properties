@@ -694,7 +694,7 @@
 	border-bottom: 1px solid var(--background-modifier-border);
 	background-color: var(--background-secondary-alt);
 	flex-shrink: 0;
-	max-height: 105px;
+	max-height: var(--zoom-preview-frontmatter-height, 90px);
 	overflow-y: auto;
 	font-size: 0.9em;
 }

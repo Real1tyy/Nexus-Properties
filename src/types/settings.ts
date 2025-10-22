@@ -61,6 +61,12 @@ export const NexusPropertiesSettingsSchema = z.object({
 		.max(700)
 		.optional()
 		.default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ZOOM_PREVIEW_HEIGHT),
+	graphZoomPreviewFrontmatterHeight: z
+		.number()
+		.min(50)
+		.max(300)
+		.optional()
+		.default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ZOOM_PREVIEW_FRONTMATTER_HEIGHT),
 	graphAnimationDuration: z
 		.number()
 		.min(0)

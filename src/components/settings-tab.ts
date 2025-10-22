@@ -64,6 +64,15 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		});
 
 		this.uiBuilder.addSlider(containerEl, {
+			key: "graphZoomPreviewFrontmatterHeight",
+			name: "Zoom preview frontmatter height",
+			desc: "Maximum height in pixels for the frontmatter section in zoom preview",
+			min: 50,
+			max: 300,
+			step: 5,
+		});
+
+		this.uiBuilder.addSlider(containerEl, {
 			key: "graphAnimationDuration",
 			name: "Graph animation duration",
 			desc: "Duration of graph layout animations in milliseconds. Set to 0 for instant layout.",
