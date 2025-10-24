@@ -154,14 +154,15 @@ export class GraphBuilder {
 	private buildHierarchyGraphData(
 		sourcePath: string,
 		startFromCurrent: boolean,
-		sharedProcessedPaths?: Set<string>
+		sharedProcessedPaths?: Set<string>,
+		allowSourceHighlight = true
 	): GraphData {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
 		const processedPaths = sharedProcessedPaths || new Set<string>();
 
 		const rootPath = startFromCurrent ? sourcePath : this.findTopmostParent(sourcePath);
-		const rootNode = this.createNodeElement(rootPath, 0, rootPath === sourcePath);
+		const rootNode = this.createNodeElement(rootPath, 0, allowSourceHighlight && rootPath === sourcePath);
 		nodes.push(rootNode);
 		processedPaths.add(rootPath);
 
@@ -180,7 +181,7 @@ export class GraphBuilder {
 			const validChildren = this.resolveValidContexts(relations.children, processedPaths);
 
 			const childNodes = validChildren.map((ctx) =>
-				this.createNodeElement(ctx.wikiLink, currentLevel + 1, ctx.path === sourcePath)
+				this.createNodeElement(ctx.wikiLink, currentLevel + 1, allowSourceHighlight && ctx.path === sourcePath)
 			);
 
 			const childEdges = validChildren.map((ctx) => ({ data: { source: currentPath, target: ctx.path } }));
@@ -396,7 +397,8 @@ export class GraphBuilder {
 			if (!fileObj || !frontmatter) return;
 			if (!this.filterEvaluator.evaluateFilters(frontmatter)) return;
 
-			const treeData = this.buildHierarchyGraphData(filePath, false, processedPaths);
+			// For folder notes, don't highlight any node as source (all nodes equal)
+			const treeData = this.buildHierarchyGraphData(filePath, false, processedPaths, false);
 			nodes.push(...treeData.nodes);
 			edges.push(...treeData.edges);
 		});
