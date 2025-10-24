@@ -3,6 +3,7 @@ export interface GraphHeaderProps {
 	renderRelated: boolean;
 	includeAllRelated: boolean;
 	startFromCurrent: boolean;
+	isFolderNote?: boolean;
 	onRenderRelatedChange: (value: boolean) => void;
 	onIncludeAllRelatedChange: (value: boolean) => void;
 	onStartFromCurrentChange: (value: boolean) => void;
@@ -14,6 +15,7 @@ export class GraphHeader {
 	private includeAllCheckbox: HTMLInputElement | null = null;
 	private toggleCheckbox: HTMLInputElement | null = null;
 	private titleEl: HTMLElement | null = null;
+	private relatedToggleContainer: HTMLElement | null = null;
 	private startFromCurrentContainer: HTMLElement | null = null;
 	private includeAllContainer: HTMLElement | null = null;
 
@@ -47,12 +49,12 @@ export class GraphHeader {
 		const controlsContainer = this.headerEl.createEl("div", { cls: "nexus-graph-controls-container" });
 
 		// Render Related checkbox
-		const relatedToggleContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
-		this.relatedCheckbox = relatedToggleContainer.createEl("input", { type: "checkbox" });
+		this.relatedToggleContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
+		this.relatedCheckbox = this.relatedToggleContainer.createEl("input", { type: "checkbox" });
 		this.relatedCheckbox.addClass("nexus-graph-toggle-checkbox");
 		this.relatedCheckbox.checked = this.props.renderRelated;
 
-		relatedToggleContainer.createEl("label", {
+		this.relatedToggleContainer.createEl("label", {
 			text: "Render Related",
 			cls: "nexus-graph-toggle-label",
 		});
@@ -64,7 +66,7 @@ export class GraphHeader {
 			this.updateVisibility();
 		});
 
-		this.makeContainerClickable(relatedToggleContainer, this.relatedCheckbox);
+		this.makeContainerClickable(this.relatedToggleContainer, this.relatedCheckbox);
 
 		// Include all related checkbox
 		this.includeAllContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
@@ -110,6 +112,24 @@ export class GraphHeader {
 	}
 
 	private updateVisibility(): void {
+		// Hide all controls for folder notes
+		if (this.props.isFolderNote) {
+			if (this.relatedToggleContainer) {
+				this.relatedToggleContainer.toggleClass("nexus-hidden", true);
+			}
+			if (this.startFromCurrentContainer) {
+				this.startFromCurrentContainer.toggleClass("nexus-hidden", true);
+			}
+			if (this.includeAllContainer) {
+				this.includeAllContainer.toggleClass("nexus-hidden", true);
+			}
+			return;
+		}
+
+		// Normal visibility logic for non-folder notes
+		if (this.relatedToggleContainer) {
+			this.relatedToggleContainer.toggleClass("nexus-hidden", false);
+		}
 		if (this.startFromCurrentContainer) {
 			this.startFromCurrentContainer.toggleClass("nexus-hidden", this.props.renderRelated);
 		}
@@ -141,6 +161,7 @@ export class GraphHeader {
 		this.includeAllCheckbox = null;
 		this.toggleCheckbox = null;
 		this.titleEl = null;
+		this.relatedToggleContainer = null;
 		this.startFromCurrentContainer = null;
 		this.includeAllContainer = null;
 	}
