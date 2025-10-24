@@ -5,6 +5,7 @@ import type { Subscription } from "rxjs";
 import { GraphBuilder } from "../core/graph-builder";
 import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
+import { isFolderNote } from "../utils/file";
 import { GraphHeader } from "./graph-header";
 import { GraphSearch } from "./graph-search";
 import { GraphZoomPreview } from "./graph-zoom-preview";
@@ -342,7 +343,7 @@ export class RelationshipGraphView extends ItemView {
 
 		const { frontmatter } = this.app.metadataCache.getFileCache(file) ?? {};
 
-		if (!frontmatter) {
+		if (!frontmatter && !isFolderNote(file.path)) {
 			this.showEmptyState("This file has no frontmatter properties.");
 			return;
 		}
@@ -697,10 +698,33 @@ export class RelationshipGraphView extends ItemView {
 		const settings = this.plugin.settingsStore.settings$.value;
 		const animationDuration = settings.graphAnimationDuration;
 
+		const isFolderNoteGraph = this.currentFile && isFolderNote(this.currentFile.path);
+
 		// Check if nodes have constellation metadata (recursive constellation mode)
 		const hasConstellationData = nodes.some((node) => node.data && typeof node.data.constellationIndex === "number");
 
-		if (this.renderRelated && this.includeAllRelated && hasConstellationData) {
+		if (isFolderNoteGraph) {
+			// Folder notes use dagre hierarchical layout for forest of trees
+			// Dagre naturally handles disconnected components (multiple trees)
+			this.runLayoutWithAnimationHandling(
+				() =>
+					this.cy!.layout({
+						name: "dagre",
+						rankDir: "TB", // Top to bottom hierarchy
+						align: undefined, // Let disconnected components position naturally
+						nodeSep: 80, // Horizontal spacing between nodes
+						rankSep: 120, // Vertical spacing between levels
+						edgeSep: 50, // Spacing between edges
+						ranker: "network-simplex", // Best for general hierarchies
+						animate: animationDuration > 0,
+						animationDuration: animationDuration,
+						animationEasing: "ease-out-cubic",
+						fit: true,
+						padding: 80,
+					} as any),
+				animationDuration
+			);
+		} else if (this.renderRelated && this.includeAllRelated && hasConstellationData) {
 			// Use manual positioning for recursive constellations
 			this.applyRecursiveConstellationLayout(nodes, animationDuration);
 		} else if (this.renderRelated) {

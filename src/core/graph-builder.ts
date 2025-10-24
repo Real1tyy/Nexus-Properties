@@ -1,7 +1,14 @@
 import type { ElementDefinition } from "cytoscape";
 import type { App } from "obsidian";
 import { ColorEvaluator } from "../utils/colors";
-import { extractDisplayName, extractFilePath, type FileContext, getFileContext } from "../utils/file";
+import {
+	extractDisplayName,
+	extractFilePath,
+	type FileContext,
+	getFileContext,
+	getFolderPath,
+	isFolderNote,
+} from "../utils/file";
 import { FilterEvaluator } from "../utils/filters";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
@@ -102,7 +109,12 @@ export class GraphBuilder {
 	buildGraph(options: GraphBuilderOptions): GraphData {
 		let graphData: GraphData;
 
-		if (options.renderRelated) {
+		const isFolder = isFolderNote(options.sourcePath);
+
+		if (isFolder) {
+			// For folder notes, always build based on folder structure
+			graphData = this.buildFolderHierarchyGraphData(options.sourcePath);
+		} else if (options.renderRelated) {
 			if (options.includeAllRelated) {
 				const constellationData = this.buildRecursiveConstellations(options.sourcePath);
 				graphData = this.convertConstellationsToGraphData(constellationData);
@@ -139,10 +151,14 @@ export class GraphBuilder {
 		};
 	}
 
-	private buildHierarchyGraphData(sourcePath: string, startFromCurrent: boolean): GraphData {
+	private buildHierarchyGraphData(
+		sourcePath: string,
+		startFromCurrent: boolean,
+		sharedProcessedPaths?: Set<string>
+	): GraphData {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
-		const processedPaths = new Set<string>();
+		const processedPaths = sharedProcessedPaths || new Set<string>();
 
 		const rootPath = startFromCurrent ? sourcePath : this.findTopmostParent(sourcePath);
 		const rootNode = this.createNodeElement(rootPath, 0, rootPath === sourcePath);
@@ -154,11 +170,11 @@ export class GraphBuilder {
 		while (queue.length > 0) {
 			const { path: currentPath, level: currentLevel } = queue.shift()!;
 
-			// Safety check to prevent infinite loops
-			if (currentLevel >= this.hierarchyMaxDepth) continue;
-
 			const { file, frontmatter } = getFileContext(this.app, currentPath);
 			if (!file || !frontmatter) continue;
+
+			// Check if we can add children (next level must be within depth limit)
+			if (currentLevel + 1 >= this.hierarchyMaxDepth) continue;
 
 			const relations = this.indexer.extractRelationships(file, frontmatter);
 			const validChildren = this.resolveValidContexts(relations.children, processedPaths);
@@ -348,6 +364,44 @@ export class GraphBuilder {
 		});
 
 		return metadata;
+	}
+
+	private buildFolderHierarchyGraphData(sourcePath: string): GraphData {
+		const nodes: ElementDefinition[] = [];
+		const edges: ElementDefinition[] = [];
+		const processedPaths = new Set<string>();
+
+		const folderPath = getFolderPath(sourcePath);
+
+		// Get ALL files in this folder tree (including subfolders)
+		const allFiles = this.app.vault.getMarkdownFiles();
+		const filesInFolder = allFiles.filter((file) => {
+			const fileFolderPath = getFolderPath(file.path);
+			// File is in this folder or a subfolder of it
+			return (
+				file.path !== sourcePath && // Exclude folder note itself
+				(fileFolderPath === folderPath || fileFolderPath.startsWith(`${folderPath}/`))
+			);
+		});
+
+		// For each file in the folder, build its hierarchy tree from the topmost parent
+		filesInFolder.forEach((file) => {
+			const filePath = file.path;
+
+			// Skip if already processed
+			if (processedPaths.has(filePath)) return;
+
+			// Check if file has frontmatter and passes filters
+			const { file: fileObj, frontmatter } = getFileContext(this.app, filePath);
+			if (!fileObj || !frontmatter) return;
+			if (!this.filterEvaluator.evaluateFilters(frontmatter)) return;
+
+			const treeData = this.buildHierarchyGraphData(filePath, false, processedPaths);
+			nodes.push(...treeData.nodes);
+			edges.push(...treeData.edges);
+		});
+
+		return { nodes, edges };
 	}
 
 	private applyGraphFilters(graphData: GraphData, searchQuery?: string): GraphData {

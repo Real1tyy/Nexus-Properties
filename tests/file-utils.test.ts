@@ -1,5 +1,12 @@
 import { describe, expect, it, vi } from "vitest";
-import { getUniqueFilePath } from "../src/utils/file";
+import {
+	findRootNodesInFolder,
+	getChildrenByFolder,
+	getFolderPath,
+	getParentByFolder,
+	getUniqueFilePath,
+	isFolderNote,
+} from "../src/utils/file";
 
 describe("getUniqueFilePath", () => {
 	describe("basic functionality", () => {
@@ -200,6 +207,273 @@ describe("getUniqueFilePath", () => {
 			const result = getUniqueFilePath(mockApp, "Notes", "Prisma Child");
 
 			expect(result).toBe("Notes/Prisma Child 2.md");
+		});
+	});
+});
+
+describe("isFolderNote", () => {
+	describe("folder note detection", () => {
+		it("should return true for folder note (folder/folder.md)", () => {
+			expect(isFolderNote("tasks/tasks.md")).toBe(true);
+		});
+
+		it("should return true for nested folder note", () => {
+			expect(isFolderNote("projects/docs/docs.md")).toBe(true);
+		});
+
+		it("should return true for deeply nested folder note", () => {
+			expect(isFolderNote("a/b/c/d/d.md")).toBe(true);
+		});
+
+		it("should return false for non-folder note", () => {
+			expect(isFolderNote("tasks/subtask.md")).toBe(false);
+		});
+
+		it("should return false for root level file", () => {
+			expect(isFolderNote("note.md")).toBe(false);
+		});
+
+		it("should return false for empty path", () => {
+			expect(isFolderNote("")).toBe(false);
+		});
+	});
+
+	describe("edge cases", () => {
+		it("should handle path without extension", () => {
+			expect(isFolderNote("tasks/tasks")).toBe(true);
+		});
+
+		it("should handle case-sensitive folder names", () => {
+			expect(isFolderNote("Tasks/tasks.md")).toBe(false);
+			expect(isFolderNote("Tasks/Tasks.md")).toBe(true);
+		});
+	});
+});
+
+describe("getFolderPath", () => {
+	describe("basic functionality", () => {
+		it("should extract folder path from file path", () => {
+			expect(getFolderPath("tasks/subtask.md")).toBe("tasks");
+		});
+
+		it("should extract nested folder path", () => {
+			expect(getFolderPath("projects/docs/notes.md")).toBe("projects/docs");
+		});
+
+		it("should return empty string for root level file", () => {
+			expect(getFolderPath("note.md")).toBe("");
+		});
+
+		it("should return empty string for empty path", () => {
+			expect(getFolderPath("")).toBe("");
+		});
+	});
+
+	describe("edge cases", () => {
+		it("should handle paths with multiple slashes", () => {
+			expect(getFolderPath("a/b/c/d/file.md")).toBe("a/b/c/d");
+		});
+
+		it("should handle paths without extension", () => {
+			expect(getFolderPath("folder/file")).toBe("folder");
+		});
+	});
+});
+
+describe("getParentByFolder", () => {
+	describe("basic functionality", () => {
+		it("should return parent folder note if it exists", () => {
+			const mockApp = {
+				vault: {
+					getFileByPath: vi.fn((path) => {
+						return path === "tasks/tasks.md" ? { path: "tasks/tasks.md" } : null;
+					}),
+				},
+			} as any;
+
+			expect(getParentByFolder(mockApp, "tasks/subtask.md")).toBe("tasks/tasks.md");
+		});
+
+		it("should return null if parent folder note doesn't exist", () => {
+			const mockApp = {
+				vault: {
+					getFileByPath: vi.fn().mockReturnValue(null),
+				},
+			} as any;
+
+			expect(getParentByFolder(mockApp, "tasks/subtask.md")).toBe(null);
+		});
+
+		it("should return null for root level file", () => {
+			const mockApp = {
+				vault: {
+					getFileByPath: vi.fn(),
+				},
+			} as any;
+
+			expect(getParentByFolder(mockApp, "note.md")).toBe(null);
+		});
+	});
+
+	describe("nested folders", () => {
+		it("should find parent in nested folder structure", () => {
+			const mockApp = {
+				vault: {
+					getFileByPath: vi.fn((path) => {
+						return path === "projects/docs/docs.md" ? { path: "projects/docs/docs.md" } : null;
+					}),
+				},
+			} as any;
+
+			expect(getParentByFolder(mockApp, "projects/docs/readme.md")).toBe("projects/docs/docs.md");
+		});
+
+		it("should return null if nested parent doesn't exist", () => {
+			const mockApp = {
+				vault: {
+					getFileByPath: vi.fn().mockReturnValue(null),
+				},
+			} as any;
+
+			expect(getParentByFolder(mockApp, "projects/docs/readme.md")).toBe(null);
+		});
+	});
+});
+
+describe("getChildrenByFolder", () => {
+	describe("folder note children", () => {
+		it("should return children of folder note", () => {
+			const mockFiles = [
+				{ path: "tasks/tasks.md" },
+				{ path: "tasks/task1.md" },
+				{ path: "tasks/task2.md" },
+				{ path: "tasks/subtasks/subtask1.md" },
+			];
+
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => mockFiles),
+				},
+			} as any;
+
+			const children = getChildrenByFolder(mockApp, "tasks/tasks.md");
+			expect(children).toContain("tasks/task1.md");
+			expect(children).toContain("tasks/task2.md");
+			expect(children).not.toContain("tasks/tasks.md"); // Exclude self
+			expect(children).not.toContain("tasks/subtasks/subtask1.md"); // Exclude files in subfolders
+		});
+
+		it("should include subfolder notes as children", () => {
+			const mockFiles = [
+				{ path: "tasks/tasks.md" },
+				{ path: "tasks/task1.md" },
+				{ path: "tasks/subtasks/subtasks.md" },
+				{ path: "tasks/subtasks/subtask1.md" },
+			];
+
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => mockFiles),
+				},
+			} as any;
+
+			const children = getChildrenByFolder(mockApp, "tasks/tasks.md");
+			expect(children).toContain("tasks/task1.md");
+			expect(children).toContain("tasks/subtasks/subtasks.md"); // Include subfolder note
+			expect(children).not.toContain("tasks/subtasks/subtask1.md"); // Exclude files inside subfolder
+		});
+
+		it("should return empty array if folder is empty", () => {
+			const mockFiles = [{ path: "tasks/tasks.md" }];
+
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => mockFiles),
+				},
+			} as any;
+
+			const children = getChildrenByFolder(mockApp, "tasks/tasks.md");
+			expect(children).toEqual([]);
+		});
+	});
+
+	describe("regular file children", () => {
+		it("should return matching subfolder note for regular file", () => {
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => []),
+					getFileByPath: vi.fn((path) => {
+						return path === "tasks/task1/task1.md" ? { path: "tasks/task1/task1.md" } : null;
+					}),
+				},
+			} as any;
+
+			const children = getChildrenByFolder(mockApp, "tasks/task1.md");
+			expect(children).toContain("tasks/task1/task1.md");
+		});
+
+		it("should return empty array if no matching subfolder note exists", () => {
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => []),
+					getFileByPath: vi.fn().mockReturnValue(null),
+				},
+			} as any;
+
+			const children = getChildrenByFolder(mockApp, "tasks/task1.md");
+			expect(children).toEqual([]);
+		});
+	});
+});
+
+describe("findRootNodesInFolder", () => {
+	describe("root node identification", () => {
+		it("should find all files at the top level of folder", () => {
+			const mockFiles = [
+				{ path: "tasks/tasks.md" },
+				{ path: "tasks/task1.md" },
+				{ path: "tasks/task2.md" },
+				{ path: "tasks/subtasks/subtasks.md" },
+				{ path: "tasks/subtasks/subtask1.md" },
+			];
+
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => mockFiles),
+				},
+			} as any;
+
+			const roots = findRootNodesInFolder(mockApp, "tasks");
+			expect(roots).toHaveLength(3);
+			expect(roots).toContain("tasks/tasks.md");
+			expect(roots).toContain("tasks/task1.md");
+			expect(roots).toContain("tasks/task2.md");
+			expect(roots).not.toContain("tasks/subtasks/subtasks.md");
+			expect(roots).not.toContain("tasks/subtasks/subtask1.md");
+		});
+
+		it("should return empty array if folder has no files", () => {
+			const mockFiles = [{ path: "other/file.md" }, { path: "tasks/subfolder/file.md" }];
+
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => mockFiles),
+				},
+			} as any;
+
+			const roots = findRootNodesInFolder(mockApp, "tasks");
+			expect(roots).toEqual([]);
+		});
+
+		it("should handle empty vault", () => {
+			const mockApp = {
+				vault: {
+					getMarkdownFiles: vi.fn(() => []),
+				},
+			} as any;
+
+			const roots = findRootNodesInFolder(mockApp, "tasks");
+			expect(roots).toEqual([]);
 		});
 	});
 });

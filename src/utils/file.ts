@@ -244,3 +244,242 @@ export function getUniqueFilePath(app: App, folder: string, baseName: string): s
 
 	return fullPath;
 }
+
+// ============================================================================
+// Folder Note Operations
+// ============================================================================
+
+/**
+ * Checks if a file is a folder note.
+ * A folder note is a file whose name matches its parent folder name.
+ *
+ * @param filePath - Path to the file (e.g., "tasks/tasks.md")
+ * @returns true if the file is a folder note, false otherwise
+ *
+ * @example
+ * ```ts
+ * isFolderNote("tasks/tasks.md") // true
+ * isFolderNote("tasks/subtask.md") // false
+ * isFolderNote("note.md") // false (no parent folder)
+ * isFolderNote("projects/docs/docs.md") // true
+ * ```
+ */
+export function isFolderNote(filePath: string): boolean {
+	if (!filePath) return false;
+
+	// Remove .md extension for comparison
+	const pathWithoutExt = removeMarkdownExtension(filePath);
+
+	// Split path into segments
+	const segments = pathWithoutExt.split("/");
+
+	// Need at least 2 segments (folder/file)
+	if (segments.length < 2) return false;
+
+	// Get the file name (last segment) and parent folder name (second to last)
+	const fileName = segments[segments.length - 1];
+	const parentFolderName = segments[segments.length - 2];
+
+	// File is a folder note if its name matches the parent folder
+	return fileName === parentFolderName;
+}
+
+/**
+ * Gets the folder path for a file.
+ *
+ * @param filePath - Path to the file (e.g., "tasks/subtask.md")
+ * @returns Folder path without trailing slash, or empty string if file is in root
+ *
+ * @example
+ * ```ts
+ * getFolderPath("tasks/subtask.md") // "tasks"
+ * getFolderPath("projects/docs/notes.md") // "projects/docs"
+ * getFolderPath("note.md") // ""
+ * ```
+ */
+export function getFolderPath(filePath: string): string {
+	if (!filePath) return "";
+
+	const lastSlashIndex = filePath.lastIndexOf("/");
+	if (lastSlashIndex === -1) return "";
+
+	return filePath.substring(0, lastSlashIndex);
+}
+
+/**
+ * Gets all markdown files in a specific folder (non-recursive).
+ *
+ * @param app - The Obsidian App instance
+ * @param folderPath - Path to the folder (e.g., "tasks")
+ * @returns Array of TFile objects in the folder
+ *
+ * @example
+ * ```ts
+ * const files = getFilesInFolder(app, "tasks");
+ * // Returns [task1.md, task2.md, tasks.md] but not tasks/subtasks/file.md
+ * ```
+ */
+export function getFilesInFolder(app: App, folderPath: string): TFile[] {
+	const allFiles = app.vault.getMarkdownFiles();
+
+	return allFiles.filter((file) => {
+		const fileFolder = getFolderPath(file.path);
+		return fileFolder === folderPath;
+	});
+}
+
+/**
+ * Gets all markdown files in a folder and its subfolders recursively.
+ *
+ * @param app - The Obsidian App instance
+ * @param folderPath - Path to the folder (e.g., "tasks")
+ * @returns Array of TFile objects in the folder tree
+ *
+ * @example
+ * ```ts
+ * const files = getAllFilesInFolderTree(app, "tasks");
+ * // Returns all .md files in tasks/ and all its subdirectories
+ * ```
+ */
+export function getAllFilesInFolderTree(app: App, folderPath: string): TFile[] {
+	const allFiles = app.vault.getMarkdownFiles();
+	const normalizedFolder = folderPath ? `${folderPath}/` : "";
+
+	return allFiles.filter((file) => {
+		if (!normalizedFolder) return true; // Root folder includes all files
+		return file.path.startsWith(normalizedFolder);
+	});
+}
+
+/**
+ * Gets the parent file path based on folder structure.
+ * For a file in a folder, the parent is the folder note if it exists.
+ *
+ * @param app - The Obsidian App instance
+ * @param filePath - Path to the file
+ * @returns Path to parent file, or null if no parent exists
+ *
+ * @example
+ * ```ts
+ * // If tasks/tasks.md exists
+ * getParentByFolder(app, "tasks/subtask.md") // "tasks/tasks.md"
+ *
+ * // If parent folder note doesn't exist
+ * getParentByFolder(app, "tasks/subtask.md") // null
+ *
+ * // Root level file
+ * getParentByFolder(app, "note.md") // null
+ * ```
+ */
+export function getParentByFolder(app: App, filePath: string): string | null {
+	const folderPath = getFolderPath(filePath);
+	if (!folderPath) return null; // File is at root level
+
+	// Check if folder note exists
+	const folderSegments = folderPath.split("/");
+	const parentFolderName = folderSegments[folderSegments.length - 1];
+	const potentialParentPath = `${folderPath}/${parentFolderName}.md`;
+
+	const parentFile = getFileByPath(app, potentialParentPath);
+	return parentFile ? potentialParentPath : null;
+}
+
+/**
+ * Gets all child file paths based on folder structure.
+ * Works for both folder notes and regular files.
+ *
+ * For folder notes (e.g., "tasks/tasks.md"):
+ * - Returns all files directly in the folder (excluding the folder note)
+ * - Includes subfolder notes one level down
+ *
+ * For regular files (e.g., "tasks/task1.md"):
+ * - Returns the folder note from matching subfolder if it exists (e.g., "tasks/task1/task1.md")
+ *
+ * @param app - The Obsidian App instance
+ * @param filePath - Path to the file
+ * @returns Array of child file paths
+ *
+ * @example
+ * ```ts
+ * // For tasks/tasks.md (folder note)
+ * getChildrenByFolder(app, "tasks/tasks.md")
+ * // Returns ["tasks/task1.md", "tasks/task2.md", "tasks/subtasks/subtasks.md"]
+ *
+ * // For tasks/task1.md (regular file with matching subfolder)
+ * getChildrenByFolder(app, "tasks/task1.md")
+ * // Returns ["tasks/task1/task1.md"] if it exists
+ * ```
+ */
+export function getChildrenByFolder(app: App, filePath: string): string[] {
+	const allFiles = app.vault.getMarkdownFiles();
+
+	// Case 1: Folder note - get all files in the folder
+	if (isFolderNote(filePath)) {
+		const folderPath = getFolderPath(filePath);
+		const children: string[] = [];
+
+		allFiles.forEach((file) => {
+			// Skip the folder note itself
+			if (file.path === filePath) return;
+
+			const fileFolder = getFolderPath(file.path);
+
+			// Direct child: file is in the same folder as the folder note
+			if (fileFolder === folderPath) {
+				children.push(file.path);
+				return;
+			}
+
+			// Subfolder note: file is a folder note one level deeper
+			// e.g., for "tasks/tasks.md", include "tasks/subtasks/subtasks.md"
+			if (fileFolder.startsWith(`${folderPath}/`)) {
+				// Check if it's exactly one level deeper and is a folder note
+				const relativePath = fileFolder.substring(folderPath.length + 1);
+				const isOneLevel = !relativePath.includes("/");
+
+				if (isOneLevel && isFolderNote(file.path)) {
+					children.push(file.path);
+				}
+			}
+		});
+
+		return children;
+	}
+
+	// Case 2: Regular file - check for matching subfolder with folder note
+	const pathWithoutExt = removeMarkdownExtension(filePath);
+	const fileName = pathWithoutExt.split("/").pop() || "";
+	const potentialChildFolder = `${pathWithoutExt}`;
+	const potentialChildPath = `${potentialChildFolder}/${fileName}.md`;
+
+	// Check if the child folder note exists
+	const childFile = getFileByPath(app, potentialChildPath);
+	return childFile ? [potentialChildPath] : [];
+}
+
+/**
+ * Finds all root nodes in a folder tree.
+ * Root nodes are files at the top level of the folder (directly in the folder, not in subfolders).
+ *
+ * @param app - The Obsidian App instance
+ * @param folderPath - Path to the folder
+ * @returns Array of root file paths
+ *
+ * @example
+ * ```ts
+ * // For folder structure:
+ * // tasks/
+ * //   tasks.md (folder note)
+ * //   task1.md
+ * //   subtasks/
+ * //     subtasks.md
+ * //     subtask1.md
+ *
+ * findRootNodesInFolder(app, "tasks")
+ * // Returns ["tasks/tasks.md", "tasks/task1.md"]
+ * // Excludes subtasks/subtasks.md and subtasks/subtask1.md (they're in subfolder)
+ * ```
+ */
+export function findRootNodesInFolder(app: App, folderPath: string): string[] {
+	return getFilesInFolder(app, folderPath).map((file) => file.path);
+}
