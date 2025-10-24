@@ -84,6 +84,7 @@ export class RelationshipGraphView extends ItemView {
 			renderRelated: this.renderRelated,
 			includeAllRelated: this.includeAllRelated,
 			startFromCurrent: this.ignoreTopmostParent,
+			isFolderNote: false,
 			onRenderRelatedChange: (value) => {
 				this.renderRelated = value;
 				this.updateGraph();
@@ -380,9 +381,12 @@ export class RelationshipGraphView extends ItemView {
 		this.isUpdating = true;
 
 		try {
-			// Update header title
+			const isFolder = isFolderNote(this.currentFile.path);
 			if (this.header) {
-				this.header.updateTitle(this.currentFile.basename);
+				this.header.update({
+					currentFileName: this.currentFile.basename,
+					isFolderNote: isFolder,
+				});
 			}
 
 			const { nodes, edges } = this.graphBuilder.buildGraph({
@@ -704,26 +708,8 @@ export class RelationshipGraphView extends ItemView {
 		const hasConstellationData = nodes.some((node) => node.data && typeof node.data.constellationIndex === "number");
 
 		if (isFolderNoteGraph) {
-			// Folder notes use dagre hierarchical layout for forest of trees
-			// Dagre naturally handles disconnected components (multiple trees)
-			this.runLayoutWithAnimationHandling(
-				() =>
-					this.cy!.layout({
-						name: "dagre",
-						rankDir: "TB", // Top to bottom hierarchy
-						align: undefined, // Let disconnected components position naturally
-						nodeSep: 80, // Horizontal spacing between nodes
-						rankSep: 120, // Vertical spacing between levels
-						edgeSep: 50, // Spacing between edges
-						ranker: "network-simplex", // Best for general hierarchies
-						animate: animationDuration > 0,
-						animationDuration: animationDuration,
-						animationEasing: "ease-out-cubic",
-						fit: true,
-						padding: 80,
-					} as any),
-				animationDuration
-			);
+			// Apply dagre first, then redistribute trees vertically
+			this.applyForestLayoutWithVerticalDistribution(nodes, edges, animationDuration);
 		} else if (this.renderRelated && this.includeAllRelated && hasConstellationData) {
 			// Use manual positioning for recursive constellations
 			this.applyRecursiveConstellationLayout(nodes, animationDuration);
@@ -914,6 +900,293 @@ export class RelationshipGraphView extends ItemView {
 				}),
 			animationDuration
 		);
+	}
+
+	/**
+	 * Apply forest layout with vertical distribution for folder notes.
+	 * Single-node trees are spread vertically, multi-node trees maintain hierarchy.
+	 */
+	private applyForestLayoutWithVerticalDistribution(
+		nodes: ElementDefinition[],
+		edges: ElementDefinition[],
+		animationDuration: number
+	): void {
+		if (!this.cy) return;
+
+		// First, apply dagre to get hierarchical structure
+		const layout = this.cy!.layout({
+			name: "dagre",
+			rankDir: "TB",
+			nodeSep: 80,
+			rankSep: 120,
+			edgeSep: 50,
+			ranker: "network-simplex",
+			animate: false, // No animation yet, we'll reposition
+		} as any);
+
+		layout.run();
+
+		// Identify trees (connected components)
+		const trees = this.identifyConnectedComponents(nodes, edges);
+
+		// Separate single-node trees from multi-node trees
+		const singleNodeTrees: string[][] = [];
+		const multiNodeTrees: string[][] = [];
+
+		trees.forEach((tree) => {
+			if (tree.length === 1) {
+				singleNodeTrees.push(tree);
+			} else {
+				multiNodeTrees.push(tree);
+			}
+		});
+
+		// Calculate bounds for multi-node trees
+		const treeBounds: Array<{ tree: string[]; minX: number; maxX: number; minY: number; maxY: number }> = [];
+
+		multiNodeTrees.forEach((tree) => {
+			let minX = Infinity;
+			let maxX = -Infinity;
+			let minY = Infinity;
+			let maxY = -Infinity;
+
+			tree.forEach((nodeId) => {
+				const cyNode = this.cy!.getElementById(nodeId);
+				if (cyNode.length > 0) {
+					const pos = cyNode.position();
+					minX = Math.min(minX, pos.x);
+					maxX = Math.max(maxX, pos.x);
+					minY = Math.min(minY, pos.y);
+					maxY = Math.max(maxY, pos.y);
+				}
+			});
+
+			treeBounds.push({ tree, minX, maxX, minY, maxY });
+		});
+
+		// Sort multi-node trees by width (narrower first, easier to pack)
+		treeBounds.sort((a, b) => a.maxX - a.minX - (b.maxX - b.minX));
+
+		// Position multi-node trees with staggered vertical starts
+		const TREE_HORIZONTAL_SPACING = 150;
+		const VERTICAL_STAGGER = 200; // Stagger start heights
+
+		let currentX = 0;
+		let maxCanvasHeight = 0;
+
+		treeBounds.forEach((bounds, index) => {
+			const { tree, minX, minY } = bounds;
+			const treeHeight = bounds.maxY - minY;
+
+			// Stagger vertical start (every other tree offset)
+			const verticalOffset = (index % 2) * VERTICAL_STAGGER;
+
+			// Calculate translation
+			const translateX = currentX - minX;
+			const translateY = verticalOffset - minY;
+
+			// Apply translation to all nodes in this tree
+			tree.forEach((nodeId) => {
+				const cyNode = this.cy!.getElementById(nodeId);
+				if (cyNode.length > 0) {
+					const pos = cyNode.position();
+					cyNode.position({
+						x: pos.x + translateX,
+						y: pos.y + translateY,
+					});
+				}
+			});
+
+			// Update current position
+			currentX += bounds.maxX - minX + TREE_HORIZONTAL_SPACING;
+			maxCanvasHeight = Math.max(maxCanvasHeight, treeHeight + verticalOffset);
+		});
+
+		// Now distribute single-node trees across the available space using a grid layout
+		if (singleNodeTrees.length > 0) {
+			this.distributeSingleNodesInGrid(singleNodeTrees, treeBounds, currentX, maxCanvasHeight);
+		}
+
+		// Fit the graph to viewport with animation
+		this.runLayoutWithAnimationHandling(
+			() =>
+				this.cy!.layout({
+					name: "preset",
+					fit: true,
+					padding: 100,
+					animate: animationDuration > 0,
+					animationDuration: animationDuration,
+					animationEasing: "ease-out-cubic",
+				}),
+			animationDuration
+		);
+	}
+
+	/**
+	 * Distribute single-node trees across the canvas in a grid pattern.
+	 * Uses space-filling algorithm to utilize entire canvas area efficiently.
+	 */
+	private distributeSingleNodesInGrid(
+		singleNodeTrees: string[][],
+		treeBounds: Array<{ tree: string[]; minX: number; maxX: number; minY: number; maxY: number }>,
+		multiTreeEndX: number,
+		maxMultiTreeHeight: number
+	): void {
+		if (!this.cy || singleNodeTrees.length === 0) return;
+
+		const MIN_NODE_SPACING = 80;
+		const PADDING = 50;
+
+		// Calculate optimal grid dimensions based on available space and number of nodes
+		const numNodes = singleNodeTrees.length;
+
+		// Determine the optimal number of columns and rows
+		// We want a roughly square grid, but adjust based on available space
+		const aspectRatio = 1.5; // Prefer slightly wider than tall
+		const cols = Math.ceil(Math.sqrt(numNodes * aspectRatio));
+		const rows = Math.ceil(numNodes / cols);
+
+		// Calculate cell size based on spacing requirements
+		const cellWidth = MIN_NODE_SPACING * 1.5;
+		const cellHeight = MIN_NODE_SPACING * 1.5;
+
+		// Calculate total grid height for available space calculation
+		const gridHeight = rows * cellHeight;
+
+		// Determine starting position for the grid
+		// Option 1: Place to the right of multi-node trees
+		// Option 2: If there's vertical space, place below
+		// Option 3: Fill gaps between multi-node trees
+
+		const startX = multiTreeEndX + PADDING;
+		const startY = PADDING;
+
+		// If we have a lot of single nodes and limited horizontal space,
+		// also use the space above/below multi-node trees
+		const availableHeight = Math.max(gridHeight, maxMultiTreeHeight);
+
+		// Position nodes in grid pattern with collision detection
+		const positions: Array<{ nodeId: string; x: number; y: number }> = [];
+
+		singleNodeTrees.forEach((tree, index) => {
+			const col = index % cols;
+			const row = Math.floor(index / cols);
+
+			const x = startX + col * cellWidth;
+			const y = startY + row * cellHeight;
+
+			// Check for collision with multi-node trees
+			let finalX = x;
+			let finalY = y;
+			let foundValidPosition = !this.collidesWithMultiTrees(x, y, treeBounds, MIN_NODE_SPACING);
+
+			// If collision detected, try alternative positions
+			if (!foundValidPosition) {
+				// Try shifting horizontally
+				for (let xOffset = 0; xOffset < 500; xOffset += cellWidth) {
+					const testX = x + xOffset;
+					if (!this.collidesWithMultiTrees(testX, y, treeBounds, MIN_NODE_SPACING)) {
+						finalX = testX;
+						finalY = y;
+						foundValidPosition = true;
+						break;
+					}
+				}
+			}
+
+			// If still no valid position, try vertical shift
+			if (!foundValidPosition) {
+				for (let yOffset = 0; yOffset < availableHeight; yOffset += cellHeight) {
+					const testY = startY + yOffset;
+					if (!this.collidesWithMultiTrees(x, testY, treeBounds, MIN_NODE_SPACING)) {
+						finalX = x;
+						finalY = testY;
+						foundValidPosition = true;
+						break;
+					}
+				}
+			}
+
+			positions.push({
+				nodeId: tree[0],
+				x: finalX,
+				y: finalY,
+			});
+		});
+
+		// Apply positions to nodes
+		positions.forEach(({ nodeId, x, y }) => {
+			const cyNode = this.cy!.getElementById(nodeId);
+			if (cyNode.length > 0) {
+				cyNode.position({ x, y });
+			}
+		});
+	}
+
+	/**
+	 * Check if a position collides with any multi-node tree bounds.
+	 */
+	private collidesWithMultiTrees(
+		x: number,
+		y: number,
+		treeBounds: Array<{ minX: number; maxX: number; minY: number; maxY: number }>,
+		padding: number
+	): boolean {
+		return treeBounds.some((bounds) => {
+			return (
+				x >= bounds.minX - padding &&
+				x <= bounds.maxX + padding &&
+				y >= bounds.minY - padding &&
+				y <= bounds.maxY + padding
+			);
+		});
+	}
+
+	/**
+	 * Identify connected components (separate trees) in the graph.
+	 */
+	private identifyConnectedComponents(nodes: ElementDefinition[], edges: ElementDefinition[]): string[][] {
+		const nodeIds = new Set(nodes.map((n) => n.data?.id as string));
+		const adjacency = new Map<string, Set<string>>();
+
+		// Build adjacency list (undirected)
+		nodeIds.forEach((id) => {
+			adjacency.set(id, new Set());
+		});
+		edges.forEach((edge) => {
+			const source = edge.data?.source as string;
+			const target = edge.data?.target as string;
+			adjacency.get(source)?.add(target);
+			adjacency.get(target)?.add(source);
+		});
+
+		// Find connected components using BFS
+		const visited = new Set<string>();
+		const components: string[][] = [];
+
+		nodeIds.forEach((startNode) => {
+			if (visited.has(startNode)) return;
+
+			const component: string[] = [];
+			const queue = [startNode];
+			visited.add(startNode);
+
+			while (queue.length > 0) {
+				const node = queue.shift()!;
+				component.push(node);
+
+				adjacency.get(node)?.forEach((neighbor) => {
+					if (!visited.has(neighbor)) {
+						visited.add(neighbor);
+						queue.push(neighbor);
+					}
+				});
+			}
+
+			components.push(component);
+		});
+
+		return components;
 	}
 
 	/**
