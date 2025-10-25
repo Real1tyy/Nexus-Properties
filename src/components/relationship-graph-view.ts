@@ -12,6 +12,7 @@ import { GraphSearch } from "./graph-search";
 import { GraphZoomManager } from "./graph-zoom-manager";
 import { GraphZoomPreview } from "./graph-zoom-preview";
 import { CollisionDetector } from "./layout/collision-detector";
+import { NodeOrganizer } from "./layout/node-organizer";
 import { NodeContextMenu } from "./node-context-menu";
 import { PropertyTooltip } from "./property-tooltip";
 
@@ -41,6 +42,7 @@ export class RelationshipGraphView extends ItemView {
 	private searchQuery = "";
 	private zoomManager: GraphZoomManager;
 	private interactionHandler: GraphInteractionHandler;
+	private nodeOrganizer: NodeOrganizer;
 
 	constructor(
 		leaf: any,
@@ -50,6 +52,7 @@ export class RelationshipGraphView extends ItemView {
 		super(leaf);
 		this.contextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
 		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
+		this.nodeOrganizer = new NodeOrganizer();
 
 		// Initialize zoom manager with lazy getters
 		this.zoomManager = new GraphZoomManager(this.app, {
@@ -686,18 +689,7 @@ export class RelationshipGraphView extends ItemView {
 		const RADIUS_INCREMENT = 30; // Increase radius if all angles fail
 		const nodePositions = new Map<string, { x: number; y: number }>();
 
-		// Group nodes by level to ensure we position centers before their orbitals
-		const nodesByLevel = new Map<number, ElementDefinition[]>();
-		let maxLevel = 0;
-
-		nodes.forEach((node) => {
-			const level = node.data?.constellationLevel ?? 0;
-			if (!nodesByLevel.has(level)) {
-				nodesByLevel.set(level, []);
-			}
-			nodesByLevel.get(level)!.push(node);
-			maxLevel = Math.max(maxLevel, level);
-		});
+		const { nodesByLevel, maxLevel } = this.nodeOrganizer.groupByLevel(nodes);
 
 		const collisionDetector = new CollisionDetector(MIN_NODE_DISTANCE);
 
@@ -802,18 +794,7 @@ export class RelationshipGraphView extends ItemView {
 	): void {
 		if (!this.cy) return;
 
-		// Group nodes by constellation group
-		const nodesByGroup = new Map<number, ElementDefinition[]>();
-		nodes.forEach((node) => {
-			const group = node.data?.constellationGroup as number;
-			if (group === undefined) return;
-
-			if (!nodesByGroup.has(group)) {
-				nodesByGroup.set(group, []);
-			}
-			nodesByGroup.get(group)!.push(node);
-		});
-
+		const nodesByGroup = this.nodeOrganizer.groupByConstellationGroup(nodes);
 		const groups = Array.from(nodesByGroup.entries()).sort((a, b) => a[0] - b[0]);
 
 		// Calculate grid layout for constellation groups
@@ -873,18 +854,7 @@ export class RelationshipGraphView extends ItemView {
 		const BASE_ORBITAL_RADIUS = 180;
 		const MIN_NODE_DISTANCE = 90;
 
-		// Group nodes by constellation level
-		const nodesByLevel = new Map<number, ElementDefinition[]>();
-		let maxLevel = 0;
-
-		nodes.forEach((node) => {
-			const level = node.data?.constellationLevel ?? 0;
-			if (!nodesByLevel.has(level)) {
-				nodesByLevel.set(level, []);
-			}
-			nodesByLevel.get(level)!.push(node);
-			maxLevel = Math.max(maxLevel, level);
-		});
+		const { nodesByLevel, maxLevel } = this.nodeOrganizer.groupByLevel(nodes);
 
 		const collisionDetector = new CollisionDetector(MIN_NODE_DISTANCE);
 
@@ -951,19 +921,10 @@ export class RelationshipGraphView extends ItemView {
 		layout.run();
 
 		// Identify trees (connected components)
-		const trees = this.identifyConnectedComponents(nodes, edges);
+		const trees = this.nodeOrganizer.identifyConnectedComponents(nodes, edges);
 
 		// Separate single-node trees from multi-node trees
-		const singleNodeTrees: string[][] = [];
-		const multiNodeTrees: string[][] = [];
-
-		trees.forEach((tree) => {
-			if (tree.length === 1) {
-				singleNodeTrees.push(tree);
-			} else {
-				multiNodeTrees.push(tree);
-			}
-		});
+		const { singleNodeTrees, multiNodeTrees } = this.nodeOrganizer.separateTreesBySize(trees);
 
 		// Calculate bounds for multi-node trees
 		const treeBounds: Array<{ tree: string[]; minX: number; maxX: number; minY: number; maxY: number }> = [];
@@ -1155,53 +1116,6 @@ export class RelationshipGraphView extends ItemView {
 	): boolean {
 		const collisionDetector = new CollisionDetector(0);
 		return collisionDetector.collidesWithBounds(x, y, treeBounds, padding);
-	}
-
-	/**
-	 * Identify connected components (separate trees) in the graph.
-	 */
-	private identifyConnectedComponents(nodes: ElementDefinition[], edges: ElementDefinition[]): string[][] {
-		const nodeIds = new Set(nodes.map((n) => n.data?.id as string));
-		const adjacency = new Map<string, Set<string>>();
-
-		// Build adjacency list (undirected)
-		nodeIds.forEach((id) => {
-			adjacency.set(id, new Set());
-		});
-		edges.forEach((edge) => {
-			const source = edge.data?.source as string;
-			const target = edge.data?.target as string;
-			adjacency.get(source)?.add(target);
-			adjacency.get(target)?.add(source);
-		});
-
-		// Find connected components using BFS
-		const visited = new Set<string>();
-		const components: string[][] = [];
-
-		nodeIds.forEach((startNode) => {
-			if (visited.has(startNode)) return;
-
-			const component: string[] = [];
-			const queue = [startNode];
-			visited.add(startNode);
-
-			while (queue.length > 0) {
-				const node = queue.shift()!;
-				component.push(node);
-
-				adjacency.get(node)?.forEach((neighbor) => {
-					if (!visited.has(neighbor)) {
-						visited.add(neighbor);
-						queue.push(neighbor);
-					}
-				});
-			}
-
-			components.push(component);
-		});
-
-		return components;
 	}
 
 	/**
