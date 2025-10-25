@@ -8,15 +8,16 @@ export class GraphFilter extends InputFilterManager {
 	constructor(
 		parentEl: HTMLElement,
 		onFilterChange: () => void,
-		private onClose: () => void,
-		initiallyVisible: boolean = false
+		initiallyVisible: boolean = false,
+		onHide?: () => void
 	) {
 		super(
 			parentEl,
 			"Filter nodes (e.g., status === 'active')",
 			"nexus-graph-filter-input",
 			onFilterChange,
-			initiallyVisible
+			initiallyVisible,
+			onHide
 		);
 	}
 
@@ -55,10 +56,5 @@ export class GraphFilter extends InputFilterManager {
 			console.warn("Invalid filter expression:", this.currentValue, error);
 			return true;
 		}
-	}
-
-	hide(): void {
-		super.hide();
-		this.onClose();
 	}
 }

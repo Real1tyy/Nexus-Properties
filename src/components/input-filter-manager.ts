@@ -7,18 +7,22 @@ export abstract class InputFilterManager {
 	protected inputEl: HTMLInputElement | null = null;
 	protected debounceTimer: number | null = null;
 	protected currentValue = "";
+	protected persistentlyVisible = false;
+	protected onHide?: () => void;
 
 	constructor(
 		protected parentEl: HTMLElement,
 		protected placeholder: string,
 		protected cssClass: string,
 		protected onFilterChange: FilterChangeCallback,
-		initiallyVisible: boolean
+		initiallyVisible: boolean,
+		onHide?: () => void
 	) {
 		const classes = `${cssClass}-container${initiallyVisible ? "" : " nexus-hidden"}`;
 		this.containerEl = this.parentEl.createEl("div", {
 			cls: classes,
 		});
+		this.onHide = onHide;
 
 		this.render();
 	}
@@ -36,7 +40,13 @@ export abstract class InputFilterManager {
 
 		this.inputEl.addEventListener("keydown", (evt) => {
 			if (evt.key === "Escape") {
-				this.hide();
+				// Only allow hiding if not persistently visible
+				if (!this.persistentlyVisible) {
+					this.hide();
+				} else {
+					// Just blur the input if persistently visible
+					this.inputEl?.blur();
+				}
 			} else if (evt.key === "Enter") {
 				this.applyFilterImmediately();
 			}
@@ -75,11 +85,16 @@ export abstract class InputFilterManager {
 	}
 
 	hide(): void {
+		// Don't allow hiding if persistently visible
+		if (this.persistentlyVisible) {
+			return;
+		}
 		this.containerEl.addClass("nexus-hidden");
 		if (this.inputEl) {
 			this.inputEl.value = "";
 		}
 		this.updateFilterValue("");
+		this.onHide?.();
 	}
 
 	focus(): void {
@@ -88,6 +103,15 @@ export abstract class InputFilterManager {
 
 	isVisible(): boolean {
 		return !this.containerEl.hasClass("nexus-hidden");
+	}
+
+	setPersistentlyVisible(value: boolean): void {
+		this.persistentlyVisible = value;
+		if (value) {
+			this.show();
+		} else {
+			this.hide();
+		}
 	}
 
 	destroy(): void {

@@ -40,6 +40,7 @@ export class RelationshipGraphView extends ItemView {
 	private settingsSubscription: Subscription | null = null;
 	private propertyTooltip: PropertyTooltip;
 	private graphSearch: GraphSearch | null = null;
+	private searchRowEl: HTMLElement | null = null;
 	private graphFilter: GraphFilter | null = null;
 	private graphFilterPresetSelector: GraphFilterPresetSelector | null = null;
 	private zoomManager: GraphZoomManager;
@@ -148,17 +149,25 @@ export class RelationshipGraphView extends ItemView {
 		const showSearchBar = settings.showSearchBar;
 		const showFilterBar = settings.showFilterBar;
 
-		// Create search component (sits between header and preview)
+		// Create search row wrapper
+		const searchRowClasses = `nexus-graph-search-row${showSearchBar ? "" : " nexus-hidden"}`;
+		this.searchRowEl = contentEl.createEl("div", {
+			cls: searchRowClasses,
+		});
+
+		// Create search component inside the row
 		this.graphSearch = new GraphSearch(
-			contentEl,
+			this.searchRowEl,
 			() => {
 				this.updateGraph();
 			},
+			showSearchBar,
 			() => {
-				// Search closed
-			},
-			showSearchBar
+				// onHide callback - hide the entire search row
+				this.hideSearchRow();
+			}
 		);
+		this.graphSearch.setPersistentlyVisible(showSearchBar);
 
 		// Create filter preset selector and filter (in a row)
 		const filterRowClasses = `nexus-graph-filter-row${showFilterBar ? "" : " nexus-hidden"}`;
@@ -180,11 +189,13 @@ export class RelationshipGraphView extends ItemView {
 			() => {
 				this.updateGraph();
 			},
+			showFilterBar, // Match parent visibility
 			() => {
-				// Filter closed
-			},
-			showFilterBar // Match parent visibility
+				// onHide callback - hide the entire filter row (including preset selector)
+				this.hideFilterRow();
+			}
 		);
+		this.graphFilter.setPersistentlyVisible(showFilterBar);
 
 		// Create a wrapper for zoom preview (sits between header and graph)
 		// This container will hold the zoom preview when active
@@ -237,16 +248,12 @@ export class RelationshipGraphView extends ItemView {
 			this.handleResize();
 		});
 
-		// Register ESC key to exit zoom mode or hide search
+		// Register ESC key to exit zoom mode
 		this.registerDomEvent(document, "keydown", (evt: KeyboardEvent) => {
 			if (evt.key === "Escape") {
-				if (this.graphSearch?.isVisible()) {
-					evt.preventDefault();
-					this.graphSearch.hide();
-				} else if (this.isFilterRowVisible()) {
-					evt.preventDefault();
-					this.hideFilterRow();
-				} else if (this.zoomManager.isInZoomMode()) {
+				// Only handle ESC if we're in zoom mode
+				// Search/filter inputs handle their own ESC behavior
+				if (this.zoomManager.isInZoomMode()) {
 					evt.preventDefault();
 					this.exitZoomMode();
 				}
@@ -254,19 +261,31 @@ export class RelationshipGraphView extends ItemView {
 		});
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
-			// Update filter presets
 			this.graphFilterPresetSelector?.updatePresets(settings.filterPresets);
 
-			// Update search bar visibility
+			// Update persistent visibility state
 			if (this.graphSearch) {
-				if (settings.showSearchBar) {
-					this.graphSearch.show();
+				this.graphSearch.setPersistentlyVisible(settings.showSearchBar);
+			}
+			if (this.graphFilter) {
+				this.graphFilter.setPersistentlyVisible(settings.showFilterBar);
+			}
+
+			// Show/hide search row based on settings
+			if (settings.showSearchBar) {
+				this.showSearchRow();
+			} else {
+				this.hideSearchRow();
+			}
+
+			if (this.graphFilterPresetSelector) {
+				if (settings.showFilterBar) {
+					this.graphFilterPresetSelector.show();
 				} else {
-					this.graphSearch.hide();
+					this.graphFilterPresetSelector.hide();
 				}
 			}
 
-			// Update filter bar visibility
 			if (settings.showFilterBar) {
 				this.showFilterRow();
 			} else {
@@ -348,6 +367,7 @@ export class RelationshipGraphView extends ItemView {
 			this.graphSearch.destroy();
 			this.graphSearch = null;
 		}
+		this.searchRowEl = null;
 
 		if (this.graphFilter) {
 			this.graphFilter.destroy();
@@ -411,37 +431,80 @@ export class RelationshipGraphView extends ItemView {
 	toggleSearch(): void {
 		if (!this.graphSearch) return;
 
-		if (this.graphSearch.isVisible()) {
-			// Already visible, just focus
+		const settings = this.plugin.settingsStore.settings$.value;
+		if (settings.showSearchBar) {
+			// Flow 1: Always shown in settings -> just focus, ESC removes focus only
 			this.graphSearch.focus();
 		} else {
-			this.graphSearch.show();
+			// Flow 2: Hidden in settings -> command shows temporarily, ESC hides
+			if (!this.graphSearch.isVisible()) {
+				// Currently hidden, show it temporarily
+				this.showSearchRow();
+				this.graphSearch.show(); // This removes nexus-hidden from inner container AND focuses
+			} else {
+				// Currently visible, hide it
+				this.graphSearch.hide(); // This will trigger onHide callback which hides searchRowEl
+			}
 		}
 	}
 
 	toggleFilter(): void {
-		if (this.isFilterRowVisible()) {
-			// Already visible, just focus the input
-			this.graphFilter?.focus();
+		if (!this.graphFilter) return;
+
+		const settings = this.plugin.settingsStore.settings$.value;
+		if (settings.showFilterBar) {
+			// If persistently visible, just focus the input
+			this.graphFilter.focus();
 		} else {
-			this.showFilterRow();
-			this.graphFilter?.focus();
+			// Toggle visibility
+			if (!this.graphFilter.isVisible()) {
+				// Currently hidden, show it temporarily
+				this.showFilterRow();
+				this.graphFilter.show(); // This removes nexus-hidden from inner container AND focuses
+				this.graphFilterPresetSelector?.show();
+			} else {
+				// Currently visible, hide it
+				this.graphFilter.hide(); // This will trigger onHide callback which hides filterRow
+				this.graphFilterPresetSelector?.hide();
+			}
 		}
 	}
 
 	toggleFilterPreset(): void {
-		if (this.isFilterRowVisible()) {
-			// Already visible, just focus the preset selector
-			this.graphFilterPresetSelector?.focus();
+		if (!this.graphFilterPresetSelector || !this.graphFilter) return;
+
+		const settings = this.plugin.settingsStore.settings$.value;
+		if (settings.showFilterBar) {
+			// If persistently visible, just focus the preset selector
+			this.graphFilterPresetSelector.focus();
 		} else {
-			this.showFilterRow();
-			this.graphFilterPresetSelector?.focus();
+			// Toggle visibility - check filter's visibility since they share the same row
+			if (!this.graphFilter.isVisible()) {
+				// Currently hidden, show the entire filter row
+				this.showFilterRow();
+				this.graphFilterPresetSelector.show(); // Show preset selector
+				this.graphFilter.show(); // Show filter input
+				this.graphFilterPresetSelector.focus(); // Focus preset selector
+			} else {
+				// Currently visible, hide the entire filter row
+				this.hideFilterRow();
+				this.graphFilterPresetSelector.hide();
+				this.graphFilter.hide();
+			}
 		}
 	}
 
-	private isFilterRowVisible(): boolean {
-		const filterRow = this.containerEl.querySelector(".nexus-graph-filter-row");
-		return filterRow ? !filterRow.hasClass("nexus-hidden") : false;
+	private showSearchRow(): void {
+		if (this.searchRowEl) {
+			this.searchRowEl.removeClass("nexus-hidden");
+		}
+		// Note: graphSearch is inside searchRowEl, so showing the row shows it automatically
+	}
+
+	private hideSearchRow(): void {
+		if (this.searchRowEl) {
+			this.searchRowEl.addClass("nexus-hidden");
+		}
 	}
 
 	private showFilterRow(): void {
