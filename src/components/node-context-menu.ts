@@ -1,15 +1,22 @@
 import { type App, Menu, Modal, Notice, Setting, TFile } from "obsidian";
 import type { SettingsStore } from "../core/settings-store";
+import type { RelationshipType } from "../types/constants";
 import { NodeEditModal } from "./node-edit-modal";
 import { NodePreviewModal } from "./node-preview-modal";
+
+export interface NodeContextMenuCallbacks {
+	onStartRelationship: (sourceNodePath: string, relationshipType: RelationshipType) => void;
+}
 
 export class NodeContextMenu {
 	private app: App;
 	private settingsStore: SettingsStore;
+	private callbacks: NodeContextMenuCallbacks;
 
-	constructor(app: App, settingsStore: SettingsStore) {
+	constructor(app: App, settingsStore: SettingsStore, callbacks: NodeContextMenuCallbacks) {
 		this.app = app;
 		this.settingsStore = settingsStore;
+		this.callbacks = callbacks;
 	}
 
 	show(e: MouseEvent, filePath: string): void {
@@ -39,6 +46,36 @@ export class NodeContextMenu {
 				.setIcon("edit")
 				.onClick(() => {
 					this.openEdit(filePath);
+				});
+		});
+
+		menu.addSeparator();
+
+		// Add relationship options
+		menu.addItem((item) => {
+			item
+				.setTitle("Add Related")
+				.setIcon("link")
+				.onClick(() => {
+					this.callbacks.onStartRelationship(filePath, "related");
+				});
+		});
+
+		menu.addItem((item) => {
+			item
+				.setTitle("Add Parent")
+				.setIcon("arrow-up")
+				.onClick(() => {
+					this.callbacks.onStartRelationship(filePath, "parent");
+				});
+		});
+
+		menu.addItem((item) => {
+			item
+				.setTitle("Add Child")
+				.setIcon("arrow-down")
+				.onClick(() => {
+					this.callbacks.onStartRelationship(filePath, "children");
 				});
 		});
 

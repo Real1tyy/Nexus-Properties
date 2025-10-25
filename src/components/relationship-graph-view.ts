@@ -17,6 +17,7 @@ import { GraphZoomPreview } from "./graph-zoom-preview";
 import { GraphLayoutManager } from "./layout/graph-layout-manager";
 import { NodeContextMenu } from "./node-context-menu";
 import { PropertyTooltip } from "./property-tooltip";
+import { RelationshipAdder } from "./relationship-adder";
 
 cytoscape.use(cytoscapeDagre);
 
@@ -33,6 +34,7 @@ export class RelationshipGraphView extends ItemView {
 	private includeAllRelated = false;
 	private nodeContextMenu: NodeContextMenu;
 	private edgeContextMenu: EdgeContextMenu;
+	private relationshipAdder: RelationshipAdder;
 	private resizeObserver: ResizeObserver | null = null;
 	private resizeDebounceTimer: number | null = null;
 	private isEnlarged = false;
@@ -55,7 +57,12 @@ export class RelationshipGraphView extends ItemView {
 		private readonly plugin: NexusPropertiesPlugin
 	) {
 		super(leaf);
-		this.nodeContextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
+		this.relationshipAdder = new RelationshipAdder(this.app, this.plugin.settingsStore);
+		this.nodeContextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore, {
+			onStartRelationship: (sourceNodePath, relationshipType) => {
+				this.relationshipAdder.startSelection(sourceNodePath, relationshipType);
+			},
+		});
 		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore);
 		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
 
@@ -85,6 +92,7 @@ export class RelationshipGraphView extends ItemView {
 			this.propertyTooltip,
 			this.nodeContextMenu,
 			this.edgeContextMenu,
+			this.relationshipAdder,
 			{
 				getCy: () => {
 					if (!this.cy) throw new Error("Cytoscape not yet initialized");
