@@ -14,10 +14,12 @@ export class RelationshipAdder {
 	private sourceNodePath: string | null = null;
 	private relationshipType: RelationshipType | null = null;
 	private isActive = false;
+	private onRelationshipAdded: (() => void) | null = null;
 
-	constructor(app: App, settingsStore: SettingsStore) {
+	constructor(app: App, settingsStore: SettingsStore, onRelationshipAdded?: () => void) {
 		this.app = app;
 		this.settingsStore = settingsStore;
+		this.onRelationshipAdded = onRelationshipAdded || null;
 	}
 
 	startSelection(sourceNodePath: string, relationshipType: RelationshipType): void {
@@ -42,6 +44,11 @@ export class RelationshipAdder {
 		try {
 			await this.addRelationship(this.sourceNodePath, targetNodePath, this.relationshipType);
 			new Notice(`${this.capitalize(this.relationshipType)} relationship added successfully`);
+
+			// Wait for indexer to process the change (300ms debounce + buffer)
+			setTimeout(() => {
+				this.onRelationshipAdded?.();
+			}, 400);
 		} catch (error) {
 			console.error("Failed to add relationship:", error);
 			new Notice("Failed to add relationship");

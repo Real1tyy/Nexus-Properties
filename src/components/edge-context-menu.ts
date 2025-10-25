@@ -6,10 +6,12 @@ import { hasLinkInProperty, removeLinkFromProperty } from "../utils/property-uti
 export class EdgeContextMenu {
 	private app: App;
 	private settingsStore: SettingsStore;
+	private onEdgeRemoved: (() => void) | null = null;
 
-	constructor(app: App, settingsStore: SettingsStore) {
+	constructor(app: App, settingsStore: SettingsStore, onEdgeRemoved?: () => void) {
 		this.app = app;
 		this.settingsStore = settingsStore;
+		this.onEdgeRemoved = onEdgeRemoved || null;
 	}
 
 	show(e: MouseEvent, sourceId: string, targetId: string, isRelatedView: boolean): void {
@@ -36,6 +38,11 @@ export class EdgeContextMenu {
 			}
 
 			new Notice("Relationship removed successfully");
+
+			// Wait for indexer to process the change (300ms debounce + buffer)
+			setTimeout(() => {
+				this.onEdgeRemoved?.();
+			}, 400);
 		} catch (error) {
 			console.error("Failed to remove relationship:", error);
 			new Notice("Failed to remove relationship");

@@ -57,13 +57,17 @@ export class RelationshipGraphView extends ItemView {
 		private readonly plugin: NexusPropertiesPlugin
 	) {
 		super(leaf);
-		this.relationshipAdder = new RelationshipAdder(this.app, this.plugin.settingsStore);
+		this.relationshipAdder = new RelationshipAdder(this.app, this.plugin.settingsStore, () => {
+			this.updateGraph();
+		});
 		this.nodeContextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore, {
 			onStartRelationship: (sourceNodePath, relationshipType) => {
 				this.relationshipAdder.startSelection(sourceNodePath, relationshipType);
 			},
 		});
-		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore);
+		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore, () => {
+			this.updateGraph();
+		});
 		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
 
 		this.zoomManager = new GraphZoomManager(this.app, {
