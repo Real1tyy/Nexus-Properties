@@ -519,6 +519,8 @@ export class RelationshipGraphView extends ItemView {
 		if (filterRow) {
 			filterRow.addClass("nexus-hidden");
 		}
+		// Also explicitly hide the preset selector when hiding the filter row
+		this.graphFilterPresetSelector?.hide();
 	}
 
 	private onFileOpen(file: TFile | null): void {

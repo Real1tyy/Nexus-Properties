@@ -426,6 +426,10 @@
 	animation: slideDown 0.2s ease-out;
 }
 
+.nexus-graph-search-row.nexus-hidden {
+	display: none;
+}
+
 /* Search input container */
 .nexus-graph-search-input-container {
 	flex: 1;
@@ -478,6 +482,10 @@
 	border-bottom: 2px solid var(--background-modifier-border);
 	flex-shrink: 0;
 	animation: slideDown 0.2s ease-out;
+}
+
+.nexus-graph-filter-row.nexus-hidden {
+	display: none;
 }
 
 /* Preset selector container */
