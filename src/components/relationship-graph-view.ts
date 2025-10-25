@@ -6,6 +6,7 @@ import { GraphBuilder } from "../core/graph-builder";
 import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
 import { isFolderNote } from "../utils/file";
+import { GraphFilter } from "./graph-filter";
 import { GraphHeader } from "./graph-header";
 import { GraphInteractionHandler } from "./graph-interaction-handler";
 import { GraphSearch } from "./graph-search";
@@ -38,7 +39,7 @@ export class RelationshipGraphView extends ItemView {
 	private settingsSubscription: Subscription | null = null;
 	private propertyTooltip: PropertyTooltip;
 	private graphSearch: GraphSearch | null = null;
-	private searchQuery = "";
+	private graphFilter: GraphFilter | null = null;
 	private zoomManager: GraphZoomManager;
 	private interactionHandler: GraphInteractionHandler;
 	private layoutManager: GraphLayoutManager;
@@ -142,15 +143,26 @@ export class RelationshipGraphView extends ItemView {
 		});
 
 		// Create search component (sits between header and preview)
-		this.graphSearch = new GraphSearch(contentEl, {
-			onSearchChange: (query) => {
-				this.searchQuery = query;
+		this.graphSearch = new GraphSearch(
+			contentEl,
+			() => {
 				this.updateGraph();
 			},
-			onClose: () => {
-				this.searchQuery = "";
+			() => {
+				// Search closed
+			}
+		);
+
+		// Create filter component (sits between header and preview)
+		this.graphFilter = new GraphFilter(
+			contentEl,
+			() => {
+				this.updateGraph();
 			},
-		});
+			() => {
+				// Filter closed
+			}
+		);
 
 		// Create a wrapper for zoom preview (sits between header and graph)
 		// This container will hold the zoom preview when active
@@ -209,6 +221,9 @@ export class RelationshipGraphView extends ItemView {
 				if (this.graphSearch?.isVisible()) {
 					evt.preventDefault();
 					this.graphSearch.hide();
+				} else if (this.graphFilter?.isVisible()) {
+					evt.preventDefault();
+					this.graphFilter.hide();
 				} else if (this.zoomManager.isInZoomMode()) {
 					evt.preventDefault();
 					this.exitZoomMode();
@@ -293,6 +308,11 @@ export class RelationshipGraphView extends ItemView {
 			this.graphSearch = null;
 		}
 
+		if (this.graphFilter) {
+			this.graphFilter.destroy();
+			this.graphFilter = null;
+		}
+
 		this.destroyGraph();
 
 		if (this.header) {
@@ -349,6 +369,16 @@ export class RelationshipGraphView extends ItemView {
 			this.graphSearch.hide();
 		} else {
 			this.graphSearch.show();
+		}
+	}
+
+	toggleFilter(): void {
+		if (!this.graphFilter) return;
+
+		if (this.graphFilter.isVisible()) {
+			this.graphFilter.hide();
+		} else {
+			this.graphFilter.show();
 		}
 	}
 
@@ -415,12 +445,18 @@ export class RelationshipGraphView extends ItemView {
 				});
 			}
 
+			const searchQuery = this.graphSearch?.getCurrentValue() || "";
+			const filterEvaluator = this.graphFilter?.getCurrentValue()
+				? (frontmatter: Record<string, any>) => this.graphFilter!.shouldInclude(frontmatter)
+				: undefined;
+
 			const { nodes, edges } = this.graphBuilder.buildGraph({
 				sourcePath: this.currentFile.path,
 				renderRelated: this.renderRelated,
 				includeAllRelated: this.includeAllRelated,
 				startFromCurrent: this.ignoreTopmostParent,
-				searchQuery: this.searchQuery,
+				searchQuery: searchQuery,
+				filterEvaluator: filterEvaluator,
 			});
 
 			this.destroyGraph();

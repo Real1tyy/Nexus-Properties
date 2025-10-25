@@ -36,6 +36,7 @@ export interface GraphBuilderOptions {
 	includeAllRelated: boolean;
 	startFromCurrent: boolean;
 	searchQuery?: string;
+	filterEvaluator?: (frontmatter: Record<string, any>) => boolean;
 }
 
 interface ValidFileContext extends FileContext {
@@ -128,7 +129,7 @@ export class GraphBuilder {
 			graphData = this.buildHierarchyGraphData(options.sourcePath, options.startFromCurrent);
 		}
 
-		return this.applyGraphFilters(graphData, options.searchQuery);
+		return this.applyGraphFilters(graphData, options.searchQuery, options.filterEvaluator);
 	}
 
 	private buildRelatedGraphData(sourcePath: string): GraphData {
@@ -458,18 +459,37 @@ export class GraphBuilder {
 		return { nodes, edges };
 	}
 
-	private applyGraphFilters(graphData: GraphData, searchQuery?: string): GraphData {
-		// Only apply search filter here - frontmatter filters are applied during graph building
-		if (!searchQuery) return graphData;
+	private applyGraphFilters(
+		graphData: GraphData,
+		searchQuery?: string,
+		filterEvaluator?: (frontmatter: Record<string, any>) => boolean
+	): GraphData {
+		// Apply both search and expression filters here - frontmatter property filters are applied during graph building
+		if (!searchQuery && !filterEvaluator) return graphData;
 
 		const filteredNodes = graphData.nodes.filter((node) => {
-			const { isSource, label } = node.data || {};
+			const { isSource, label, id } = node.data || {};
 
 			// Always keep source node
 			if (isSource) return true;
 
-			const nodeName = (label as string).toLowerCase();
-			return nodeName.includes(searchQuery.toLowerCase());
+			// Apply search filter
+			if (searchQuery) {
+				const nodeName = (label as string).toLowerCase();
+				if (!nodeName.includes(searchQuery.toLowerCase())) {
+					return false;
+				}
+			}
+
+			// Apply expression filter on frontmatter
+			if (filterEvaluator) {
+				const { frontmatter } = getFileContext(this.app, id as string);
+				if (!frontmatter || !filterEvaluator(frontmatter)) {
+					return false;
+				}
+			}
+
+			return true;
 		});
 
 		const keepNodeIds = new Set(filteredNodes.map((node) => node.data?.id as string));

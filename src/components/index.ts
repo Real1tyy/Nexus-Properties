@@ -1,6 +1,8 @@
+export { GraphFilter } from "./graph-filter";
 export { GraphHeader } from "./graph-header";
 export { GraphSearch } from "./graph-search";
 export { GraphZoomPreview } from "./graph-zoom-preview";
+export { InputFilterManager } from "./input-filter-manager";
 export { NodeContextMenu } from "./node-context-menu";
 export { NodeEditModal } from "./node-edit-modal";
 export { NodePreviewModal } from "./node-preview-modal";

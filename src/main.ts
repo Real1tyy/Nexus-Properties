@@ -37,6 +37,12 @@ export default class NexusPropertiesPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "toggle-graph-filter",
+			name: "Toggle Graph Filter",
+			callback: () => this.executeGraphViewMethod("toggleFilter"),
+		});
+
+		this.addCommand({
 			id: "hide-focus-node-content",
 			name: "Toggle Focus Content (Zoom Preview)",
 			callback: () =>
