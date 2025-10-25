@@ -8,6 +8,7 @@ import type NexusPropertiesPlugin from "../main";
 import { isFolderNote } from "../utils/file";
 import { GraphHeader } from "./graph-header";
 import { GraphSearch } from "./graph-search";
+import { GraphZoomManager } from "./graph-zoom-manager";
 import { GraphZoomPreview } from "./graph-zoom-preview";
 import { CollisionDetector } from "./layout/collision-detector";
 import { NodeContextMenu } from "./node-context-menu";
@@ -31,22 +32,13 @@ export class RelationshipGraphView extends ItemView {
 	private resizeDebounceTimer: number | null = null;
 	private isEnlarged = false;
 	private originalWidth: number | null = null;
-	private isZoomMode = false;
-	// Track the currently focused node in zoom mode (used for state tracking)
-	private focusedNodeId: string | null = null;
-	private zoomPreview: GraphZoomPreview | null = null;
 	private isUpdating = false;
 	private graphBuilder: GraphBuilder;
-	// Persistent toggle states for preview
-	private previewHideFrontmatter = false;
-	private previewHideContent = false;
 	private settingsSubscription: Subscription | null = null;
-	private propertyTooltip: PropertyTooltip | null = null;
-	// When exiting zoom, suppress the next resize-driven fit/center to avoid double snap
-	private suppressNextResizeFit = false;
-	// Search functionality
+	private propertyTooltip: PropertyTooltip;
 	private graphSearch: GraphSearch | null = null;
 	private searchQuery = "";
+	private zoomManager: GraphZoomManager;
 
 	constructor(
 		leaf: any,
@@ -55,12 +47,30 @@ export class RelationshipGraphView extends ItemView {
 	) {
 		super(leaf);
 		this.contextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
+		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
+
+		// Initialize zoom manager with lazy getters
+		this.zoomManager = new GraphZoomManager(this.app, {
+			getCy: () => {
+				if (!this.cy) throw new Error("Cytoscape not yet initialized");
+				return this.cy;
+			},
+			getPreviewWrapperEl: () => {
+				if (!this.previewWrapperEl) throw new Error("Preview wrapper not yet initialized");
+				return this.previewWrapperEl;
+			},
+			settingsStore: this.plugin.settingsStore,
+			onToggleStatesChange: () => {
+				// States are tracked by zoomManager
+			},
+		});
+
+		// Initialize property tooltip
 		this.propertyTooltip = new PropertyTooltip(this.app, {
 			settingsStore: this.plugin.settingsStore,
 			onFileOpen: (linkPath, event) => this.openFile(linkPath, event),
-			isZoomMode: () => this.isZoomMode,
+			isZoomMode: () => this.zoomManager.isInZoomMode(),
 		});
-		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
 	}
 
 	getViewType(): string {
@@ -168,7 +178,7 @@ export class RelationshipGraphView extends ItemView {
 				if (this.graphSearch?.isVisible()) {
 					evt.preventDefault();
 					this.graphSearch.hide();
-				} else if (this.isZoomMode) {
+				} else if (this.zoomManager.isInZoomMode()) {
 					evt.preventDefault();
 					this.exitZoomMode();
 				}
@@ -180,11 +190,6 @@ export class RelationshipGraphView extends ItemView {
 				this.updateGraph();
 			}
 		});
-
-		// Initialize preview hide states from settings for new sessions
-		const current = this.plugin.settingsStore.settings$.value;
-		this.previewHideFrontmatter = current.zoomHideFrontmatterByDefault;
-		this.previewHideContent = current.zoomHideContentByDefault;
 
 		// When this view becomes the active leaf, ensure the graph is centered
 		this.registerEvent(
@@ -217,11 +222,7 @@ export class RelationshipGraphView extends ItemView {
 	private handleResize(): void {
 		if (!this.cy) return;
 
-		const skipFitOnce = this.suppressNextResizeFit;
-		if (this.suppressNextResizeFit) {
-			// Only skip fit/center once, but still refresh viewport size
-			this.suppressNextResizeFit = false;
-		}
+		const skipFitOnce = this.zoomManager.shouldSuppressNextResizeFit();
 
 		// Always notify cytoscape of size changes
 		this.cy.resize();
@@ -251,10 +252,14 @@ export class RelationshipGraphView extends ItemView {
 			this.settingsSubscription = null;
 		}
 
+		// Clean up zoom manager
+		if (this.zoomManager) {
+			this.zoomManager.cleanup();
+		}
+
 		// Clean up tooltip
 		if (this.propertyTooltip) {
 			this.propertyTooltip.destroy();
-			this.propertyTooltip = null;
 		}
 
 		// Clean up search component
@@ -268,11 +273,6 @@ export class RelationshipGraphView extends ItemView {
 		if (this.header) {
 			this.header.destroy();
 			this.header = null;
-		}
-
-		if (this.zoomPreview) {
-			this.zoomPreview.destroy();
-			this.zoomPreview = null;
 		}
 
 		this.currentFile = null;
@@ -351,7 +351,7 @@ export class RelationshipGraphView extends ItemView {
 		}
 
 		// Exit zoom mode when switching to a different file
-		if (this.isZoomMode && this.currentFile && file.path !== this.currentFile.path) {
+		if (this.zoomManager.isInZoomMode() && this.currentFile && file.path !== this.currentFile.path) {
 			this.exitZoomMode();
 		}
 
@@ -634,7 +634,7 @@ export class RelationshipGraphView extends ItemView {
 					return;
 				}
 
-				if (this.isZoomMode) {
+				if (this.zoomManager.isInZoomMode()) {
 					// In zoom mode, focus on the clicked node
 					this.focusOnNode(filePath);
 				} else {
@@ -646,14 +646,14 @@ export class RelationshipGraphView extends ItemView {
 
 		// Edge click handler for zoom mode navigation
 		this.cy.on("tap", "edge", (evt) => {
-			if (!this.isZoomMode) return;
+			if (!this.zoomManager.isInZoomMode()) return;
 
 			const edge = evt.target;
 			const targetId = edge.data("target");
 			const sourceId = edge.data("source");
 
 			// If target is already focused, navigate to source instead (bidirectional navigation)
-			const nodeToFocus = targetId === this.focusedNodeId ? sourceId : targetId;
+			const nodeToFocus = targetId === this.zoomManager.getFocusedNodeId() ? sourceId : targetId;
 			this.focusOnNode(nodeToFocus);
 		});
 
@@ -1339,8 +1339,9 @@ export class RelationshipGraphView extends ItemView {
 		// Defer to next frame to allow any DOM/layout changes to settle
 		requestAnimationFrame(() => {
 			if (!this.cy) return;
-			if (this.isZoomMode && this.focusedNodeId) {
-				const node = this.cy.nodes().filter((n) => n.id() === this.focusedNodeId);
+			const focusedNodeId = this.zoomManager.getFocusedNodeId();
+			if (this.zoomManager.isInZoomMode() && focusedNodeId) {
+				const node = this.cy.nodes().filter((n) => n.id() === focusedNodeId);
 				if (node.length > 0) {
 					// Center on the focused node without changing zoom level
 					(this.cy as any).center(node);
@@ -1355,110 +1356,41 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	private enterZoomMode(filePath: string): void {
-		this.isZoomMode = true;
-		this.focusOnNode(filePath);
+		this.zoomManager.enterZoomMode(filePath, (el) => this.createZoomPreview(el, filePath));
 	}
 
 	private exitZoomMode(): void {
-		this.isZoomMode = false;
-		this.focusedNodeId = null;
-		// Stop any ongoing animations before resetting view
-		if (this.cy) {
-			this.cy.stop();
-			// Remove focused class from all nodes
-			this.cy.nodes().removeClass("focused");
-		}
-		this.hidePreviewOverlay();
-		// Reset zoom to show full graph exactly once. We suppress the next resize-driven
-		// fit since removing the preview changes layout and triggers a resize.
-		if (this.cy && !this.isUpdating) {
-			this.suppressNextResizeFit = true;
-			// Defer until after DOM reflow so container size is final
-			requestAnimationFrame(() => {
-				if (!this.cy) return;
-				// Ensure container dimensions are accounted for, then fit once
-				this.cy.resize();
-				this.cy.fit();
-				this.cy.center();
-			});
-		}
+		this.zoomManager.exitZoomMode();
 	}
 
 	private focusOnNode(filePath: string): void {
-		this.focusedNodeId = filePath;
+		this.zoomManager.focusOnNode(filePath, (el) => this.createZoomPreview(el, filePath));
+	}
+
+	private createZoomPreview(el: HTMLElement, filePath: string): GraphZoomPreview {
 		const file = this.app.vault.getAbstractFileByPath(filePath);
-
-		if (!(file instanceof TFile)) return;
-
-		// Zoom to the focused node on the existing graph with stronger zoom
-		if (this.cy && !this.isUpdating) {
-			// Remove focused class from all nodes
-			this.cy.nodes().removeClass("focused");
-
-			// Use filter instead of selector to avoid escaping issues with complex file paths
-			const node = this.cy.nodes().filter((n) => n.id() === filePath);
-			if (node.length > 0) {
-				// Add focused class to the focused node
-				node.addClass("focused");
-
-				this.cy.animate(
-					{
-						zoom: 2.5,
-						center: {
-							eles: node,
-						},
-					},
-					{
-						duration: 500,
-						easing: "ease-out-cubic",
-					}
-				);
-			}
+		if (!(file instanceof TFile)) {
+			throw new Error(`File not found: ${filePath}`);
 		}
 
-		// Show the preview overlay at the top
-		this.showPreviewOverlay(file);
-	}
-
-	public toggleHideContent(): void {
-		this.previewHideContent = !this.previewHideContent;
-		if (this.zoomPreview) {
-			this.zoomPreview.setHideContent(this.previewHideContent);
-		}
-	}
-
-	public toggleHideFrontmatter(): void {
-		this.previewHideFrontmatter = !this.previewHideFrontmatter;
-		if (this.zoomPreview) {
-			this.zoomPreview.setHideFrontmatter(this.previewHideFrontmatter);
-		}
-	}
-
-	private async showPreviewOverlay(file: TFile): Promise<void> {
-		if (!this.previewWrapperEl) return;
-
-		// Remove existing overlay if any
-		this.hidePreviewOverlay();
-
-		// Create preview in the wrapper element (between header and graph)
-		this.zoomPreview = new GraphZoomPreview(this.previewWrapperEl, this.app, {
+		return new GraphZoomPreview(el, this.app, {
 			file,
 			onExit: () => this.exitZoomMode(),
 			settingsStore: this.plugin.settingsStore,
-			initialHideFrontmatter: this.previewHideFrontmatter,
-			initialHideContent: this.previewHideContent,
+			initialHideFrontmatter: this.zoomManager.getFrontmatterHideState(),
+			initialHideContent: this.zoomManager.getContentHideState(),
 			onToggleStatesChange: (hideFrontmatter, hideContent) => {
-				this.previewHideFrontmatter = hideFrontmatter;
-				this.previewHideContent = hideContent;
+				this.zoomManager.updateHideStates(hideFrontmatter, hideContent);
 			},
 		});
 	}
 
-	private hidePreviewOverlay(): void {
-		if (this.zoomPreview) {
-			this.zoomPreview.destroy();
-			this.zoomPreview = null;
-		}
+	public toggleHideContent(): void {
+		this.zoomManager.toggleHideContent();
+	}
+
+	public toggleHideFrontmatter(): void {
+		this.zoomManager.toggleHideFrontmatter();
 	}
 
 	private openFile(linkPath: string, event: MouseEvent): void {
