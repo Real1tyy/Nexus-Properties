@@ -9,6 +9,7 @@ import { isFolderNote } from "../utils/file";
 import { GraphHeader } from "./graph-header";
 import { GraphSearch } from "./graph-search";
 import { GraphZoomPreview } from "./graph-zoom-preview";
+import { CollisionDetector } from "./layout/collision-detector";
 import { NodeContextMenu } from "./node-context-menu";
 import { PropertyTooltip } from "./property-tooltip";
 
@@ -792,50 +793,26 @@ export class RelationshipGraphView extends ItemView {
 			maxLevel = Math.max(maxLevel, level);
 		});
 
-		// Helper function to check if a position collides with existing nodes
-		const hasCollision = (x: number, y: number): boolean => {
-			for (const pos of nodePositions.values()) {
-				const distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
-				if (distance < MIN_NODE_DISTANCE) {
-					return true;
-				}
-			}
-			return false;
-		};
+		const collisionDetector = new CollisionDetector(MIN_NODE_DISTANCE);
 
-		// Helper function to find a collision-free position
 		const findValidPosition = (
 			centerX: number,
 			centerY: number,
 			baseRadius: number,
 			baseAngle: number
 		): { x: number; y: number } => {
-			let currentRadius = baseRadius;
-			const maxRadiusAttempts = 5; // Try expanding radius up to 5 times
-
-			for (let radiusAttempt = 0; radiusAttempt < maxRadiusAttempts; radiusAttempt++) {
-				// Try different angles at this radius
-				for (let angleAttempt = 0; angleAttempt < MAX_COLLISION_ATTEMPTS; angleAttempt++) {
-					const angleOffset = (angleAttempt * 2 * Math.PI) / MAX_COLLISION_ATTEMPTS;
-					const angle = baseAngle + angleOffset;
-					const x = centerX + currentRadius * Math.cos(angle);
-					const y = centerY + currentRadius * Math.sin(angle);
-
-					if (!hasCollision(x, y)) {
-						return { x, y };
-					}
+			return collisionDetector.findValidPosition(
+				centerX,
+				centerY,
+				baseRadius,
+				baseAngle,
+				(x, y) => collisionDetector.hasCollision(x, y, nodePositions),
+				{
+					maxAngleAttempts: MAX_COLLISION_ATTEMPTS,
+					maxRadiusAttempts: 5,
+					radiusIncrement: RADIUS_INCREMENT,
 				}
-
-				// All angles at this radius failed, increase radius
-				currentRadius += RADIUS_INCREMENT;
-			}
-
-			// Fallback: Return the original position even if it collides
-			// This prevents infinite loops, but should rarely happen
-			return {
-				x: centerX + currentRadius * Math.cos(baseAngle),
-				y: centerY + currentRadius * Math.sin(baseAngle),
-			};
+			);
 		};
 
 		// Position nodes level by level to ensure centers are positioned before orbitals
@@ -1003,16 +980,7 @@ export class RelationshipGraphView extends ItemView {
 			maxLevel = Math.max(maxLevel, level);
 		});
 
-		// Helper to check collisions
-		const hasCollision = (x: number, y: number): boolean => {
-			for (const pos of nodePositions.values()) {
-				const distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
-				if (distance < MIN_NODE_DISTANCE) {
-					return true;
-				}
-			}
-			return false;
-		};
+		const collisionDetector = new CollisionDetector(MIN_NODE_DISTANCE);
 
 		// Position nodes level by level
 		for (let level = 0; level <= maxLevel; level++) {
@@ -1038,21 +1006,16 @@ export class RelationshipGraphView extends ItemView {
 				const orbitalRadius = BASE_ORBITAL_RADIUS + Math.max(0, (orbitalCount - 5) * 15);
 				const angle = (orbitalIndex / orbitalCount) * 2 * Math.PI + Math.PI / 2;
 
-				let x = centerPos.x + orbitalRadius * Math.cos(angle);
-				let y = centerPos.y + orbitalRadius * Math.sin(angle);
+				const position = collisionDetector.findValidPositionSimple(
+					centerPos.x,
+					centerPos.y,
+					orbitalRadius,
+					angle,
+					(x, y) => collisionDetector.hasCollision(x, y, nodePositions),
+					36
+				);
 
-				// Try to avoid collisions
-				let attempts = 0;
-				const maxAttempts = 36;
-				while (hasCollision(x, y) && attempts < maxAttempts) {
-					attempts++;
-					const adjustedAngle = angle + (attempts * Math.PI) / 18;
-					const adjustedRadius = orbitalRadius + Math.floor(attempts / 12) * 30;
-					x = centerPos.x + adjustedRadius * Math.cos(adjustedAngle);
-					y = centerPos.y + adjustedRadius * Math.sin(adjustedAngle);
-				}
-
-				nodePositions.set(node.data.id, { x, y });
+				nodePositions.set(node.data.id, position);
 			});
 		}
 	}
@@ -1278,23 +1241,14 @@ export class RelationshipGraphView extends ItemView {
 		});
 	}
 
-	/**
-	 * Check if a position collides with any multi-node tree bounds.
-	 */
 	private collidesWithMultiTrees(
 		x: number,
 		y: number,
 		treeBounds: Array<{ minX: number; maxX: number; minY: number; maxY: number }>,
 		padding: number
 	): boolean {
-		return treeBounds.some((bounds) => {
-			return (
-				x >= bounds.minX - padding &&
-				x <= bounds.maxX + padding &&
-				y >= bounds.minY - padding &&
-				y <= bounds.maxY + padding
-			);
-		});
+		const collisionDetector = new CollisionDetector(0);
+		return collisionDetector.collidesWithBounds(x, y, treeBounds, padding);
 	}
 
 	/**
