@@ -39,10 +39,10 @@
 		}
 	},
 	"devDependencies": {
-		"@biomejs/biome": "^2.2.6",
+		"@biomejs/biome": "^2.3.0",
 		"@types/cytoscape": "^3.31.0",
 		"@types/cytoscape-dagre": "^2.3.4",
-		"@types/node": "^24.8.1",
+		"@types/node": "^24.9.1",
 		"builtin-modules": "5.0.0",
 		"esbuild": "0.25.11",
 		"fast-check": "^4.3.0",
@@ -53,7 +53,7 @@
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
-		"@real1ty-obsidian-plugins/utils": "^2.2.1",
+		"@real1ty-obsidian-plugins/utils": "^2.2.3",
 		"cytoscape": "^3.33.1",
 		"cytoscape-dagre": "^2.5.0",
 		"rxjs": "^7.8.2",

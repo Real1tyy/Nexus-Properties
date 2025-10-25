@@ -2,7 +2,7 @@ import type cytoscape from "cytoscape";
 import type { Core, ElementDefinition } from "cytoscape";
 import { CollisionDetector } from "./collision-detector";
 import { ConstellationPositioner } from "./constellation-positioner";
-import { NodeOrganizer } from "./node-organizer";
+import { type Bounds, NodeOrganizer, type TreeBounds } from "./node-organizer";
 
 export interface LayoutConfig {
 	animationDuration: number;
@@ -45,6 +45,67 @@ export class GraphLayoutManager {
 			this.applyConcentricLayout(animationDuration);
 		} else {
 			this.applyDagreLayout(animationDuration);
+		}
+		this.distributeIsolatedNodes(nodes, edges, animationDuration);
+	}
+
+	/**
+	 * Detects isolated single nodes (nodes with no edges) and distributes them
+	 * in a grid pattern to prevent overlapping. This is especially important
+	 * after filtering when previously connected nodes become isolated.
+	 */
+	private distributeIsolatedNodes(
+		nodes: ElementDefinition[],
+		edges: ElementDefinition[],
+		animationDuration: number
+	): void {
+		const trees = this.nodeOrganizer.identifyConnectedComponents(nodes, edges);
+		const { singleNodeTrees } = this.nodeOrganizer.separateTreesBySize(trees);
+
+		if (!this.nodeOrganizer.hasOverlappingIsolatedNodes(this.cy, singleNodeTrees)) {
+			return;
+		}
+
+		const singleNodeIds = new Set(singleNodeTrees.flat());
+		const connectedNodeIds = nodes.map((n) => n.data?.id as string).filter((id) => !singleNodeIds.has(id));
+		const connectedBounds = this.nodeOrganizer.calculateBounds(this.cy, connectedNodeIds);
+
+		const newPositions = this.nodeOrganizer.calculateIsolatedNodeGridPositions(singleNodeTrees, connectedBounds, {
+			minNodeSpacing: 80,
+			padding: 100,
+			aspectRatio: 1.5,
+		});
+
+		this.applyNodePositions(newPositions, animationDuration, 100);
+	}
+
+	private applyNodePositions(
+		positions: Map<string, { x: number; y: number }>,
+		animationDuration: number,
+		padding: number
+	): void {
+		positions.forEach((pos, nodeId) => {
+			const cyNode = this.cy.getElementById(nodeId);
+			if (cyNode.length > 0) {
+				if (animationDuration > 0) {
+					cyNode.animate({
+						position: pos,
+						duration: animationDuration,
+						easing: "ease-out-cubic",
+					});
+				} else {
+					cyNode.position(pos);
+				}
+			}
+		});
+
+		// After positioning, refit the viewport to show everything
+		if (animationDuration > 0) {
+			setTimeout(() => {
+				this.cy.fit(undefined, padding);
+			}, animationDuration);
+		} else {
+			this.cy.fit(undefined, padding);
 		}
 	}
 
@@ -120,37 +181,20 @@ export class GraphLayoutManager {
 		);
 	}
 
-	private calculateTreeBounds(
-		trees: string[][]
-	): Array<{ tree: string[]; minX: number; maxX: number; minY: number; maxY: number }> {
-		const treeBounds: Array<{ tree: string[]; minX: number; maxX: number; minY: number; maxY: number }> = [];
+	private calculateTreeBounds(trees: string[][]): TreeBounds[] {
+		const treeBounds: TreeBounds[] = [];
 
 		trees.forEach((tree) => {
-			let minX = Infinity;
-			let maxX = -Infinity;
-			let minY = Infinity;
-			let maxY = -Infinity;
-
-			tree.forEach((nodeId) => {
-				const cyNode = this.cy.getElementById(nodeId);
-				if (cyNode.length > 0) {
-					const pos = cyNode.position();
-					minX = Math.min(minX, pos.x);
-					maxX = Math.max(maxX, pos.x);
-					minY = Math.min(minY, pos.y);
-					maxY = Math.max(maxY, pos.y);
-				}
-			});
-
-			treeBounds.push({ tree, minX, maxX, minY, maxY });
+			const bounds = this.nodeOrganizer.calculateBounds(this.cy, tree);
+			if (bounds) {
+				treeBounds.push({ tree, ...bounds });
+			}
 		});
 
 		return treeBounds.sort((a, b) => a.maxX - a.minX - (b.maxX - b.minX));
 	}
 
-	private positionMultiNodeTrees(
-		treeBounds: Array<{ tree: string[]; minX: number; maxX: number; minY: number; maxY: number }>
-	): { maxX: number; maxHeight: number } {
+	private positionMultiNodeTrees(treeBounds: TreeBounds[]): { maxX: number; maxHeight: number } {
 		const TREE_HORIZONTAL_SPACING = 150;
 		const VERTICAL_STAGGER = 200;
 
@@ -185,7 +229,7 @@ export class GraphLayoutManager {
 
 	private distributeSingleNodesInGrid(
 		singleNodeTrees: string[][],
-		treeBounds: Array<{ minX: number; maxX: number; minY: number; maxY: number }>,
+		treeBounds: Bounds[],
 		multiTreeEndX: number,
 		maxMultiTreeHeight: number
 	): void {
