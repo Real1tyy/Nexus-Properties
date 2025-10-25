@@ -112,10 +112,9 @@ export class GraphHeader {
 	}
 
 	private updateVisibility(): void {
-		// Hide all controls for folder notes
 		if (this.props.isFolderNote) {
 			if (this.relatedToggleContainer) {
-				this.relatedToggleContainer.toggleClass("nexus-hidden", true);
+				this.relatedToggleContainer.toggleClass("nexus-hidden", false);
 			}
 			if (this.startFromCurrentContainer) {
 				this.startFromCurrentContainer.toggleClass("nexus-hidden", true);

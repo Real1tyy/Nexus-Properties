@@ -112,8 +112,11 @@ export class GraphBuilder {
 		const isFolder = isFolderNote(options.sourcePath);
 
 		if (isFolder) {
-			// For folder notes, always build based on folder structure
-			graphData = this.buildFolderHierarchyGraphData(options.sourcePath);
+			if (options.renderRelated) {
+				graphData = this.buildFolderRelatedGraphData(options.sourcePath);
+			} else {
+				graphData = this.buildFolderHierarchyGraphData(options.sourcePath);
+			}
 		} else if (options.renderRelated) {
 			if (options.includeAllRelated) {
 				const constellationData = this.buildRecursiveConstellations(options.sourcePath);
@@ -367,38 +370,87 @@ export class GraphBuilder {
 		return metadata;
 	}
 
+	/**
+	 * Get all markdown files within a folder (excluding the folder note itself).
+	 */
+	private getFilesInFolder(folderNotePath: string): string[] {
+		const folderPath = getFolderPath(folderNotePath);
+		const allFiles = this.app.vault.getMarkdownFiles();
+
+		return allFiles
+			.filter((file) => {
+				const fileFolderPath = getFolderPath(file.path);
+				return (
+					file.path !== folderNotePath && // Exclude folder note itself
+					(fileFolderPath === folderPath || fileFolderPath.startsWith(`${folderPath}/`))
+				);
+			})
+			.map((file) => file.path);
+	}
+
+	/**
+	 * Process files in a folder with a callback function.
+	 * Handles common logic: filtering, frontmatter checking, and processed path tracking.
+	 */
+	private processFolderFiles(
+		sourcePath: string,
+		processedPaths: Set<string>,
+		callback: (filePath: string, processedPaths: Set<string>) => void
+	): void {
+		const filePaths = this.getFilesInFolder(sourcePath);
+
+		filePaths.forEach((filePath) => {
+			// Skip if already processed
+			if (processedPaths.has(filePath)) return;
+
+			// Check if file has frontmatter and passes filters
+			const { file, frontmatter } = getFileContext(this.app, filePath);
+			if (!file || !frontmatter) return;
+			if (!this.filterEvaluator.evaluateFilters(frontmatter)) return;
+			callback(filePath, processedPaths);
+		});
+	}
+
+	private buildFolderRelatedGraphData(sourcePath: string): GraphData {
+		const allNodes: ElementDefinition[] = [];
+		const allEdges: ElementDefinition[] = [];
+		const processedPaths = new Set<string>();
+		let constellationGroupIndex = 0;
+
+		this.processFolderFiles(sourcePath, processedPaths, (filePath, paths) => {
+			const constellationData = this.buildRecursiveConstellations(filePath);
+			const graphData = this.convertConstellationsToGraphData(constellationData);
+
+			// Mark all nodes in this constellation as processed
+			constellationData.allNodePaths.forEach((path) => {
+				paths.add(path);
+			});
+
+			// Add constellation group metadata to all nodes in this group
+			const groupedNodes = graphData.nodes.map((node) => ({
+				...node,
+				data: {
+					...node.data,
+					constellationGroup: constellationGroupIndex,
+				},
+			}));
+
+			allNodes.push(...groupedNodes);
+			allEdges.push(...graphData.edges);
+			constellationGroupIndex++;
+		});
+
+		return { nodes: allNodes, edges: allEdges };
+	}
+
 	private buildFolderHierarchyGraphData(sourcePath: string): GraphData {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
 		const processedPaths = new Set<string>();
 
-		const folderPath = getFolderPath(sourcePath);
-
-		// Get ALL files in this folder tree (including subfolders)
-		const allFiles = this.app.vault.getMarkdownFiles();
-		const filesInFolder = allFiles.filter((file) => {
-			const fileFolderPath = getFolderPath(file.path);
-			// File is in this folder or a subfolder of it
-			return (
-				file.path !== sourcePath && // Exclude folder note itself
-				(fileFolderPath === folderPath || fileFolderPath.startsWith(`${folderPath}/`))
-			);
-		});
-
-		// For each file in the folder, build its hierarchy tree from the topmost parent
-		filesInFolder.forEach((file) => {
-			const filePath = file.path;
-
-			// Skip if already processed
-			if (processedPaths.has(filePath)) return;
-
-			// Check if file has frontmatter and passes filters
-			const { file: fileObj, frontmatter } = getFileContext(this.app, filePath);
-			if (!fileObj || !frontmatter) return;
-			if (!this.filterEvaluator.evaluateFilters(frontmatter)) return;
-
+		this.processFolderFiles(sourcePath, processedPaths, (filePath, paths) => {
 			// For folder notes, don't highlight any node as source (all nodes equal)
-			const treeData = this.buildHierarchyGraphData(filePath, false, processedPaths, false);
+			const treeData = this.buildHierarchyGraphData(filePath, false, paths, false);
 			nodes.push(...treeData.nodes);
 			edges.push(...treeData.edges);
 		});

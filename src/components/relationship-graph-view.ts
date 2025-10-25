@@ -707,7 +707,13 @@ export class RelationshipGraphView extends ItemView {
 		// Check if nodes have constellation metadata (recursive constellation mode)
 		const hasConstellationData = nodes.some((node) => node.data && typeof node.data.constellationIndex === "number");
 
-		if (isFolderNoteGraph) {
+		// Check if nodes have constellation group metadata (folder related mode)
+		const hasConstellationGroups = nodes.some((node) => node.data && typeof node.data.constellationGroup === "number");
+
+		if (isFolderNoteGraph && this.renderRelated && hasConstellationGroups) {
+			// Apply constellation layout for folder related mode
+			this.applyFolderConstellationLayout(nodes, edges, animationDuration);
+		} else if (isFolderNoteGraph) {
 			// Apply dagre first, then redistribute trees vertically
 			this.applyForestLayoutWithVerticalDistribution(nodes, edges, animationDuration);
 		} else if (this.renderRelated && this.includeAllRelated && hasConstellationData) {
@@ -900,6 +906,155 @@ export class RelationshipGraphView extends ItemView {
 				}),
 			animationDuration
 		);
+	}
+
+	/**
+	 * Apply constellation layout for folder related mode.
+	 * Positions multiple constellation groups on the canvas without overlaps.
+	 */
+	private applyFolderConstellationLayout(
+		nodes: ElementDefinition[],
+		_edges: ElementDefinition[],
+		animationDuration: number
+	): void {
+		if (!this.cy) return;
+
+		// Group nodes by constellation group
+		const nodesByGroup = new Map<number, ElementDefinition[]>();
+		nodes.forEach((node) => {
+			const group = node.data?.constellationGroup as number;
+			if (group === undefined) return;
+
+			if (!nodesByGroup.has(group)) {
+				nodesByGroup.set(group, []);
+			}
+			nodesByGroup.get(group)!.push(node);
+		});
+
+		const groups = Array.from(nodesByGroup.entries()).sort((a, b) => a[0] - b[0]);
+
+		// Calculate grid layout for constellation groups
+		const CONSTELLATION_SPACING = 600; // Space between constellation centers
+		const groupsPerRow = Math.ceil(Math.sqrt(groups.length));
+
+		const nodePositions = new Map<string, { x: number; y: number }>();
+
+		groups.forEach(([_groupIndex, groupNodes], arrayIndex) => {
+			// Calculate grid position for this constellation group
+			const gridRow = Math.floor(arrayIndex / groupsPerRow);
+			const gridCol = arrayIndex % groupsPerRow;
+			const groupCenterX = gridCol * CONSTELLATION_SPACING;
+			const groupCenterY = gridRow * CONSTELLATION_SPACING;
+
+			// Folder notes always use recursive constellation positioning
+			this.positionRecursiveConstellation(groupNodes, groupCenterX, groupCenterY, nodePositions);
+		});
+
+		// Apply all calculated positions to the graph
+		nodes.forEach((node) => {
+			if (!node.data?.id) return;
+
+			const pos = nodePositions.get(node.data.id);
+			if (!pos) return;
+
+			const cyNode = this.cy!.getElementById(node.data.id);
+			if (cyNode.length > 0) {
+				cyNode.position(pos);
+			}
+		});
+
+		// Apply preset layout with animation if enabled
+		this.runLayoutWithAnimationHandling(
+			() =>
+				this.cy!.layout({
+					name: "preset",
+					fit: true,
+					padding: 120,
+					animate: animationDuration > 0,
+					animationDuration: animationDuration,
+					animationEasing: "ease-out-cubic",
+				}),
+			animationDuration
+		);
+	}
+
+	/**
+	 * Position nodes in a recursive constellation pattern around a group center.
+	 */
+	private positionRecursiveConstellation(
+		nodes: ElementDefinition[],
+		groupCenterX: number,
+		groupCenterY: number,
+		nodePositions: Map<string, { x: number; y: number }>
+	): void {
+		const BASE_ORBITAL_RADIUS = 180;
+		const MIN_NODE_DISTANCE = 90;
+
+		// Group nodes by constellation level
+		const nodesByLevel = new Map<number, ElementDefinition[]>();
+		let maxLevel = 0;
+
+		nodes.forEach((node) => {
+			const level = node.data?.constellationLevel ?? 0;
+			if (!nodesByLevel.has(level)) {
+				nodesByLevel.set(level, []);
+			}
+			nodesByLevel.get(level)!.push(node);
+			maxLevel = Math.max(maxLevel, level);
+		});
+
+		// Helper to check collisions
+		const hasCollision = (x: number, y: number): boolean => {
+			for (const pos of nodePositions.values()) {
+				const distance = Math.sqrt((x - pos.x) ** 2 + (y - pos.y) ** 2);
+				if (distance < MIN_NODE_DISTANCE) {
+					return true;
+				}
+			}
+			return false;
+		};
+
+		// Position nodes level by level
+		for (let level = 0; level <= maxLevel; level++) {
+			const levelNodes = nodesByLevel.get(level) ?? [];
+
+			levelNodes.forEach((node) => {
+				if (!node.data?.id) return;
+
+				// Root node at group center
+				if (level === 0) {
+					nodePositions.set(node.data.id, { x: groupCenterX, y: groupCenterY });
+					return;
+				}
+
+				// Position as orbital around center
+				const centerPath = node.data.centerPath;
+				const orbitalIndex = node.data.orbitalIndex ?? 0;
+				const orbitalCount = node.data.orbitalCount ?? 1;
+
+				const centerPos = nodePositions.get(centerPath);
+				if (!centerPos) return;
+
+				const orbitalRadius = BASE_ORBITAL_RADIUS + Math.max(0, (orbitalCount - 5) * 15);
+				const angle = (orbitalIndex / orbitalCount) * 2 * Math.PI + Math.PI / 2;
+
+				let x = centerPos.x + orbitalRadius * Math.cos(angle);
+				let y = centerPos.y + orbitalRadius * Math.sin(angle);
+
+				// Try to avoid collisions
+				let attempts = 0;
+				const maxAttempts = 36;
+				while (hasCollision(x, y) && attempts < maxAttempts) {
+					attempts++;
+					const adjustedAngle = angle + (attempts * Math.PI) / 18;
+					const adjustedRadius = orbitalRadius + Math.floor(attempts / 12) * 30;
+					x = centerPos.x + adjustedRadius * Math.cos(adjustedAngle);
+					y = centerPos.y + adjustedRadius * Math.sin(adjustedAngle);
+				}
+
+				nodePositions.set(node.data.id, { x, y });
+			});
+		}
 	}
 
 	/**
