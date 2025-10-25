@@ -185,22 +185,22 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		const examples = [
 			{
-				expression: "fm.Status === 'Active'",
+				expression: "Status === 'Active'",
 				color: "#22c55e",
 				description: "Active nodes in green",
 			},
 			{
-				expression: "fm.type === 'project'",
+				expression: "type === 'project'",
 				color: "#3b82f6",
 				description: "Project nodes in blue",
 			},
 			{
-				expression: "fm.Priority === 'High'",
+				expression: "Priority === 'High'",
 				color: "#ef4444",
 				description: "High priority nodes in red",
 			},
 			{
-				expression: "Array.isArray(fm.tags) && fm.tags.includes('important')",
+				expression: "Array.isArray(tags) && tags.includes('important')",
 				color: "#f59e0b",
 				description: "Important tagged nodes in orange",
 			},
@@ -223,7 +223,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		const warningContainer = desc.createDiv("settings-warning-box");
 		warningContainer.createEl("strong", { text: "⚠️ Important:" });
 		warningContainer.createEl("p", {
-			text: "Use 'fm' to access frontmatter properties. Invalid expressions will be ignored. Colors can be CSS color names, hex codes, or HSL values.",
+			text: "Access frontmatter properties directly by name. Invalid expressions will be ignored. Colors can be CSS color names, hex codes, or HSL values.",
 		});
 
 		// Color rules list
@@ -527,7 +527,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		const desc = containerEl.createDiv();
 		desc.createEl("p", {
-			text: "Show only nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false; use 'fm' to access frontmatter. The source node is always shown.",
+			text: "Show only nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false. Access frontmatter properties directly by name. The source node is always shown.",
 		});
 
 		// Examples section
@@ -537,15 +537,15 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 		const examples = [
 			{
-				expression: "fm.Status === 'Active'",
+				expression: "Status === 'Active'",
 				description: "Only show nodes with Status = 'Active'",
 			},
 			{
-				expression: "fm.type === 'project'",
+				expression: "type === 'project'",
 				description: "Only show project-type nodes",
 			},
 			{
-				expression: "Array.isArray(fm.tags) && fm.tags.includes('important')",
+				expression: "Array.isArray(tags) && tags.includes('important')",
 				description: "Only show nodes tagged as important",
 			},
 		];
@@ -564,14 +564,14 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		const warningContainer = desc.createDiv("settings-warning-box");
 		warningContainer.createEl("strong", { text: "⚠️ Important:" });
 		warningContainer.createEl("p", {
-			text: "Use 'fm' to access frontmatter properties. Invalid expressions will be ignored. All expressions must evaluate to true for a node to be shown.",
+			text: "Access frontmatter properties directly by name. Invalid expressions will be ignored. All expressions must evaluate to true for a node to be shown.",
 		});
 
 		this.uiBuilder.addTextArray(containerEl, {
 			key: "filterExpressions",
 			name: "Filter expressions",
 			desc: "One per line. Changes apply on blur or Ctrl/Cmd+Enter. Only nodes matching all expressions are shown in the graph.",
-			placeholder: "fm.Status === 'Active'\nfm.type === 'project'",
+			placeholder: "Status === 'Active'\ntype === 'project'",
 			multiline: true,
 		});
 	}

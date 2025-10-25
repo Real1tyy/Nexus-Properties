@@ -1,5 +1,6 @@
-import { BaseEvaluator, type BaseRule } from "@real1ty-obsidian-plugins/utils/evaluator-base";
+import type { BehaviorSubject } from "rxjs";
 import type { NexusPropertiesSettings } from "../types/settings";
+import { BaseEvaluator, type BaseRule } from "./base-evaluator";
 
 export interface ColorRule extends BaseRule {
 	color: string;
@@ -8,11 +9,11 @@ export interface ColorRule extends BaseRule {
 export class ColorEvaluator extends BaseEvaluator<ColorRule, NexusPropertiesSettings> {
 	private defaultColor: string;
 
-	constructor(settingsObservable: any) {
-		super(settingsObservable);
-		this.defaultColor = settingsObservable.value.defaultNodeColor;
+	constructor(settingsStore: BehaviorSubject<NexusPropertiesSettings>) {
+		super(settingsStore);
+		this.defaultColor = settingsStore.value.defaultNodeColor;
 
-		settingsObservable.subscribe((settings: NexusPropertiesSettings) => {
+		settingsStore.subscribe((settings) => {
 			if (settings.defaultNodeColor) {
 				this.defaultColor = settings.defaultNodeColor;
 			}
@@ -24,7 +25,7 @@ export class ColorEvaluator extends BaseEvaluator<ColorRule, NexusPropertiesSett
 	}
 
 	evaluateColor(frontmatter: Record<string, unknown>): string {
-		const match = this.compiledRules.find((rule) => this.isTruthy(this.evaluateRule(rule, frontmatter)));
+		const match = this.rules.find((rule) => this.isTruthy(this.evaluateRule(rule, frontmatter)));
 		return match?.color ?? this.defaultColor;
 	}
 }
