@@ -1,3 +1,4 @@
+export { EdgeContextMenu } from "./edge-context-menu";
 export { GraphFilter } from "./graph-filter";
 export { GraphFilterPresetSelector } from "./graph-filter-preset-selector";
 export { GraphHeader } from "./graph-header";

@@ -1,6 +1,7 @@
 import type { Core } from "cytoscape";
 import type { App } from "obsidian";
 import { TFile } from "obsidian";
+import type { EdgeContextMenu } from "./edge-context-menu";
 import type { NodeContextMenu } from "./node-context-menu";
 import type { PropertyTooltip } from "./property-tooltip";
 
@@ -12,6 +13,7 @@ export interface GraphInteractionConfig {
 	onNodeClick: (filePath: string, event: MouseEvent) => void;
 	onEdgeClick: (targetId: string, sourceId: string) => void;
 	isZoomMode: () => boolean;
+	isRelatedView: () => boolean;
 	focusedNodeId: () => string | null;
 	isUpdating: () => boolean;
 }
@@ -20,7 +22,8 @@ export class GraphInteractionHandler {
 	constructor(
 		private readonly app: App,
 		private readonly propertyTooltip: PropertyTooltip,
-		private readonly contextMenu: NodeContextMenu,
+		private readonly nodeContextMenu: NodeContextMenu,
+		private readonly edgeContextMenu: EdgeContextMenu,
 		private readonly config: GraphInteractionConfig
 	) {}
 
@@ -37,7 +40,8 @@ export class GraphInteractionHandler {
 		this.setupNodeHoverPreview();
 		this.setupNodeClickHandler();
 		this.setupEdgeClickHandler();
-		this.setupContextMenu();
+		this.setupNodeContextMenu();
+		this.setupEdgeContextMenu();
 		this.setupDoubleClickZoom();
 		this.addSparkleAnimations();
 	}
@@ -111,13 +115,25 @@ export class GraphInteractionHandler {
 		});
 	}
 
-	private setupContextMenu(): void {
+	private setupNodeContextMenu(): void {
 		this.cy.on("cxttap", "node", (evt) => {
 			const node = evt.target;
 			const filePath = node.id();
 			const originalEvent = evt.originalEvent as MouseEvent;
 
-			this.contextMenu.show(originalEvent, filePath);
+			this.nodeContextMenu.show(originalEvent, filePath);
+		});
+	}
+
+	private setupEdgeContextMenu(): void {
+		this.cy.on("cxttap", "edge", (evt) => {
+			const edge = evt.target;
+			const sourceId = edge.data("source");
+			const targetId = edge.data("target");
+			const originalEvent = evt.originalEvent as MouseEvent;
+			const isRelatedView = this.config.isRelatedView();
+
+			this.edgeContextMenu.show(originalEvent, sourceId, targetId, isRelatedView);
 		});
 	}
 

@@ -6,6 +6,7 @@ import { GraphBuilder } from "../core/graph-builder";
 import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
 import { isFolderNote } from "../utils/file";
+import { EdgeContextMenu } from "./edge-context-menu";
 import { GraphFilter } from "./graph-filter";
 import { GraphFilterPresetSelector } from "./graph-filter-preset-selector";
 import { GraphHeader } from "./graph-header";
@@ -30,7 +31,8 @@ export class RelationshipGraphView extends ItemView {
 	private ignoreTopmostParent = false;
 	private renderRelated = false;
 	private includeAllRelated = false;
-	private contextMenu: NodeContextMenu;
+	private nodeContextMenu: NodeContextMenu;
+	private edgeContextMenu: EdgeContextMenu;
 	private resizeObserver: ResizeObserver | null = null;
 	private resizeDebounceTimer: number | null = null;
 	private isEnlarged = false;
@@ -53,7 +55,8 @@ export class RelationshipGraphView extends ItemView {
 		private readonly plugin: NexusPropertiesPlugin
 	) {
 		super(leaf);
-		this.contextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
+		this.nodeContextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore);
+		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore);
 		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
 
 		this.zoomManager = new GraphZoomManager(this.app, {
@@ -77,28 +80,35 @@ export class RelationshipGraphView extends ItemView {
 			isZoomMode: () => this.zoomManager.isInZoomMode(),
 		});
 
-		this.interactionHandler = new GraphInteractionHandler(this.app, this.propertyTooltip, this.contextMenu, {
-			getCy: () => {
-				if (!this.cy) throw new Error("Cytoscape not yet initialized");
-				return this.cy;
-			},
-			viewType: VIEW_TYPE_RELATIONSHIP_GRAPH,
-			getCurrentFile: () => this.currentFile,
-			getGraphContainerEl: () => this.graphContainerEl,
-			onNodeClick: (filePath, _event) => {
-				if (this.zoomManager.isInZoomMode()) {
-					this.focusOnNode(filePath);
-				} else {
-					this.enterZoomMode(filePath);
-				}
-			},
-			onEdgeClick: (nodeToFocus, _sourceId) => {
-				this.focusOnNode(nodeToFocus);
-			},
-			isZoomMode: () => this.zoomManager.isInZoomMode(),
-			focusedNodeId: () => this.zoomManager.getFocusedNodeId(),
-			isUpdating: () => this.isUpdating,
-		});
+		this.interactionHandler = new GraphInteractionHandler(
+			this.app,
+			this.propertyTooltip,
+			this.nodeContextMenu,
+			this.edgeContextMenu,
+			{
+				getCy: () => {
+					if (!this.cy) throw new Error("Cytoscape not yet initialized");
+					return this.cy;
+				},
+				viewType: VIEW_TYPE_RELATIONSHIP_GRAPH,
+				getCurrentFile: () => this.currentFile,
+				getGraphContainerEl: () => this.graphContainerEl,
+				onNodeClick: (filePath, _event) => {
+					if (this.zoomManager.isInZoomMode()) {
+						this.focusOnNode(filePath);
+					} else {
+						this.enterZoomMode(filePath);
+					}
+				},
+				onEdgeClick: (nodeToFocus, _sourceId) => {
+					this.focusOnNode(nodeToFocus);
+				},
+				isZoomMode: () => this.zoomManager.isInZoomMode(),
+				isRelatedView: () => this.renderRelated,
+				focusedNodeId: () => this.zoomManager.getFocusedNodeId(),
+				isUpdating: () => this.isUpdating,
+			}
+		);
 
 		this.layoutManager = new GraphLayoutManager({
 			getCy: () => {
