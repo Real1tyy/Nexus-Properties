@@ -12,6 +12,7 @@ import { GraphSearch } from "./graph-search";
 import { GraphZoomManager } from "./graph-zoom-manager";
 import { GraphZoomPreview } from "./graph-zoom-preview";
 import { CollisionDetector } from "./layout/collision-detector";
+import { ConstellationPositioner } from "./layout/constellation-positioner";
 import { NodeOrganizer } from "./layout/node-organizer";
 import { NodeContextMenu } from "./node-context-menu";
 import { PropertyTooltip } from "./property-tooltip";
@@ -263,35 +264,29 @@ export class RelationshipGraphView extends ItemView {
 	}
 
 	async onClose(): Promise<void> {
-		// Clean up resize observer
 		if (this.resizeObserver) {
 			this.resizeObserver.disconnect();
 			this.resizeObserver = null;
 		}
 
-		// Clean up resize debounce timer
 		if (this.resizeDebounceTimer !== null) {
 			window.clearTimeout(this.resizeDebounceTimer);
 			this.resizeDebounceTimer = null;
 		}
 
-		// Clean up settings subscription
 		if (this.settingsSubscription) {
 			this.settingsSubscription.unsubscribe();
 			this.settingsSubscription = null;
 		}
 
-		// Clean up zoom manager
 		if (this.zoomManager) {
 			this.zoomManager.cleanup();
 		}
 
-		// Clean up tooltip
 		if (this.propertyTooltip) {
 			this.propertyTooltip.destroy();
 		}
 
-		// Clean up search component
 		if (this.graphSearch) {
 			this.graphSearch.destroy();
 			this.graphSearch = null;
@@ -683,90 +678,14 @@ export class RelationshipGraphView extends ItemView {
 	private applyRecursiveConstellationLayout(nodes: ElementDefinition[], animationDuration: number): void {
 		if (!this.cy) return;
 
-		const BASE_ORBITAL_RADIUS = 150; // Base radius for orbitals around their center
-		const MIN_NODE_DISTANCE = 60; // Minimum distance between any two nodes
-		const MAX_COLLISION_ATTEMPTS = 36; // Try up to 36 different angles (10° increments)
-		const RADIUS_INCREMENT = 30; // Increase radius if all angles fail
-		const nodePositions = new Map<string, { x: number; y: number }>();
-
-		const { nodesByLevel, maxLevel } = this.nodeOrganizer.groupByLevel(nodes);
-
-		const collisionDetector = new CollisionDetector(MIN_NODE_DISTANCE);
-
-		const findValidPosition = (
-			centerX: number,
-			centerY: number,
-			baseRadius: number,
-			baseAngle: number
-		): { x: number; y: number } => {
-			return collisionDetector.findValidPosition(
-				centerX,
-				centerY,
-				baseRadius,
-				baseAngle,
-				(x, y) => collisionDetector.hasCollision(x, y, nodePositions),
-				{
-					maxAngleAttempts: MAX_COLLISION_ATTEMPTS,
-					maxRadiusAttempts: 5,
-					radiusIncrement: RADIUS_INCREMENT,
-				}
-			);
-		};
-
-		// Position nodes level by level to ensure centers are positioned before orbitals
-		for (let level = 0; level <= maxLevel; level++) {
-			const nodesAtLevel = nodesByLevel.get(level) || [];
-
-			nodesAtLevel.forEach((node) => {
-				if (!node.data?.id) return;
-
-				// Root node at origin
-				if (level === 0) {
-					nodePositions.set(node.data.id, { x: 0, y: 0 });
-					return;
-				}
-
-				// All other nodes are positioned as orbitals around their center
-				const centerPath = node.data.centerPath;
-				const orbitalIndex = node.data.orbitalIndex;
-				const orbitalCount = node.data.parentOrbitalCount ?? node.data.orbitalCount ?? 1;
-
-				const centerPos = nodePositions.get(centerPath)!;
-				// Calculate orbital radius based on number of orbitals at this level
-				// More orbitals = larger radius to prevent overlap
-				const orbitalRadius = BASE_ORBITAL_RADIUS + Math.max(0, (orbitalCount - 5) * 15);
-
-				// Calculate starting angle offset based on the center's own position
-				// This staggers orbital patterns to reduce overlaps between different constellations
-				let angleOffset = Math.PI / 2; // Default: start at top
-
-				// If the center itself has an orbital index, use that to vary the starting angle
-				// This spreads out constellations that are siblings (share the same parent)
-				const centerNode = nodes.find((n) => n.data?.id === centerPath);
-				if (centerNode?.data?.orbitalIndex !== undefined) {
-					// Add offset based on parent's orbital index to stagger sibling constellations
-					angleOffset += (centerNode.data.orbitalIndex * Math.PI) / 3;
-				}
-
-				// Calculate ideal angle for this orbital
-				const idealAngle = (orbitalIndex / orbitalCount) * 2 * Math.PI + angleOffset;
-				const position = findValidPosition(centerPos.x, centerPos.y, orbitalRadius, idealAngle);
-				nodePositions.set(node.data.id, position);
-			});
-		}
-
-		// Apply all calculated positions to the graph
-		nodes.forEach((node) => {
-			if (!node.data?.id) return;
-
-			const pos = nodePositions.get(node.data.id);
-			if (!pos) return;
-
-			const cyNode = this.cy!.getElementById(node.data.id);
-			if (cyNode.length > 0) {
-				cyNode.position(pos);
-			}
+		const positioner = new ConstellationPositioner(this.cy, {
+			baseOrbitalRadius: 150,
+			minNodeDistance: 60,
+			radiusIncrement: 30,
 		});
+
+		const nodePositions = new Map<string, { x: number; y: number }>();
+		positioner.positionRecursiveConstellation(nodes, 0, 0, nodePositions);
 
 		// Apply preset layout with animation if enabled
 		this.runLayoutWithAnimationHandling(
@@ -794,37 +713,13 @@ export class RelationshipGraphView extends ItemView {
 	): void {
 		if (!this.cy) return;
 
-		const nodesByGroup = this.nodeOrganizer.groupByConstellationGroup(nodes);
-		const groups = Array.from(nodesByGroup.entries()).sort((a, b) => a[0] - b[0]);
-
-		// Calculate grid layout for constellation groups
-		const CONSTELLATION_SPACING = 600; // Space between constellation centers
-		const groupsPerRow = Math.ceil(Math.sqrt(groups.length));
-
-		const nodePositions = new Map<string, { x: number; y: number }>();
-
-		groups.forEach(([_groupIndex, groupNodes], arrayIndex) => {
-			// Calculate grid position for this constellation group
-			const gridRow = Math.floor(arrayIndex / groupsPerRow);
-			const gridCol = arrayIndex % groupsPerRow;
-			const groupCenterX = gridCol * CONSTELLATION_SPACING;
-			const groupCenterY = gridRow * CONSTELLATION_SPACING;
-
-			// Folder notes always use recursive constellation positioning
-			this.positionRecursiveConstellation(groupNodes, groupCenterX, groupCenterY, nodePositions);
+		const positioner = new ConstellationPositioner(this.cy, {
+			baseOrbitalRadius: 180,
+			minNodeDistance: 90,
 		});
 
-		// Apply all calculated positions to the graph
-		nodes.forEach((node) => {
-			if (!node.data?.id) return;
-
-			const pos = nodePositions.get(node.data.id);
-			if (!pos) return;
-
-			const cyNode = this.cy!.getElementById(node.data.id);
-			if (cyNode.length > 0) {
-				cyNode.position(pos);
-			}
+		positioner.positionMultipleConstellations(nodes, 600, (groupNodes, centerX, centerY, positions) => {
+			positioner.positionRecursiveConstellation(groupNodes, centerX, centerY, positions);
 		});
 
 		// Apply preset layout with animation if enabled
@@ -840,60 +735,6 @@ export class RelationshipGraphView extends ItemView {
 				}),
 			animationDuration
 		);
-	}
-
-	/**
-	 * Position nodes in a recursive constellation pattern around a group center.
-	 */
-	private positionRecursiveConstellation(
-		nodes: ElementDefinition[],
-		groupCenterX: number,
-		groupCenterY: number,
-		nodePositions: Map<string, { x: number; y: number }>
-	): void {
-		const BASE_ORBITAL_RADIUS = 180;
-		const MIN_NODE_DISTANCE = 90;
-
-		const { nodesByLevel, maxLevel } = this.nodeOrganizer.groupByLevel(nodes);
-
-		const collisionDetector = new CollisionDetector(MIN_NODE_DISTANCE);
-
-		// Position nodes level by level
-		for (let level = 0; level <= maxLevel; level++) {
-			const levelNodes = nodesByLevel.get(level) ?? [];
-
-			levelNodes.forEach((node) => {
-				if (!node.data?.id) return;
-
-				// Root node at group center
-				if (level === 0) {
-					nodePositions.set(node.data.id, { x: groupCenterX, y: groupCenterY });
-					return;
-				}
-
-				// Position as orbital around center
-				const centerPath = node.data.centerPath;
-				const orbitalIndex = node.data.orbitalIndex ?? 0;
-				const orbitalCount = node.data.orbitalCount ?? 1;
-
-				const centerPos = nodePositions.get(centerPath);
-				if (!centerPos) return;
-
-				const orbitalRadius = BASE_ORBITAL_RADIUS + Math.max(0, (orbitalCount - 5) * 15);
-				const angle = (orbitalIndex / orbitalCount) * 2 * Math.PI + Math.PI / 2;
-
-				const position = collisionDetector.findValidPositionSimple(
-					centerPos.x,
-					centerPos.y,
-					orbitalRadius,
-					angle,
-					(x, y) => collisionDetector.hasCollision(x, y, nodePositions),
-					36
-				);
-
-				nodePositions.set(node.data.id, position);
-			});
-		}
 	}
 
 	/**
