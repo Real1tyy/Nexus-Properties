@@ -7,6 +7,7 @@ import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
 import { isFolderNote } from "../utils/file";
 import { GraphHeader } from "./graph-header";
+import { GraphInteractionHandler } from "./graph-interaction-handler";
 import { GraphSearch } from "./graph-search";
 import { GraphZoomManager } from "./graph-zoom-manager";
 import { GraphZoomPreview } from "./graph-zoom-preview";
@@ -39,6 +40,7 @@ export class RelationshipGraphView extends ItemView {
 	private graphSearch: GraphSearch | null = null;
 	private searchQuery = "";
 	private zoomManager: GraphZoomManager;
+	private interactionHandler: GraphInteractionHandler;
 
 	constructor(
 		leaf: any,
@@ -70,6 +72,30 @@ export class RelationshipGraphView extends ItemView {
 			settingsStore: this.plugin.settingsStore,
 			onFileOpen: (linkPath, event) => this.openFile(linkPath, event),
 			isZoomMode: () => this.zoomManager.isInZoomMode(),
+		});
+
+		// Initialize interaction handler
+		this.interactionHandler = new GraphInteractionHandler(this.app, this.propertyTooltip, this.contextMenu, {
+			getCy: () => {
+				if (!this.cy) throw new Error("Cytoscape not yet initialized");
+				return this.cy;
+			},
+			viewType: VIEW_TYPE_RELATIONSHIP_GRAPH,
+			getCurrentFile: () => this.currentFile,
+			getGraphContainerEl: () => this.graphContainerEl,
+			onNodeClick: (filePath, _event) => {
+				if (this.zoomManager.isInZoomMode()) {
+					this.focusOnNode(filePath);
+				} else {
+					this.enterZoomMode(filePath);
+				}
+			},
+			onEdgeClick: (nodeToFocus, _sourceId) => {
+				this.focusOnNode(nodeToFocus);
+			},
+			isZoomMode: () => this.zoomManager.isInZoomMode(),
+			focusedNodeId: () => this.zoomManager.getFocusedNodeId(),
+			isUpdating: () => this.isUpdating,
 		});
 	}
 
@@ -572,127 +598,7 @@ export class RelationshipGraphView extends ItemView {
 		// Add all edges to core class for layered rendering
 		this.cy.edges().addClass("core");
 
-		// Add sparkle animation to random nodes
-		this.addSparkleAnimations();
-
-		// Interactive hover effects
-		this.cy.on("mouseover", "node", (evt) => {
-			if (!this.cy) return;
-			const node = evt.target;
-			this.cy.elements().removeClass("dim");
-			this.cy.elements().not(node.closedNeighborhood()).addClass("dim");
-			node.closedNeighborhood("edge").addClass("highlighted");
-		});
-
-		this.cy.on("mouseout", "node", () => {
-			if (!this.cy) return;
-			this.cy.elements().removeClass("dim highlighted");
-		});
-
-		// Hover handler for preview popover and property tooltip
-		this.cy.on("mouseover", "node", (evt) => {
-			const node = evt.target;
-			const filePath = node.id();
-			const file = this.app.vault.getAbstractFileByPath(filePath);
-
-			if (file instanceof TFile) {
-				// Trigger Obsidian's hover preview
-				this.app.workspace.trigger("hover-link", {
-					event: evt.originalEvent,
-					source: VIEW_TYPE_RELATIONSHIP_GRAPH,
-					hoverParent: this,
-					targetEl: this.graphContainerEl,
-					linktext: file.path,
-					sourcePath: this.currentFile?.path || "",
-				});
-
-				// Show property tooltip if properties are configured
-				if (this.propertyTooltip) {
-					this.propertyTooltip.show(filePath, evt.originalEvent as MouseEvent);
-				}
-			}
-		});
-
-		// Hide tooltip on mouseout (with delay to allow moving to tooltip)
-		this.cy.on("mouseout", "node", () => {
-			if (this.propertyTooltip) {
-				this.propertyTooltip.scheduleHide(300);
-			}
-		});
-
-		// Click handler to enter zoom mode and focus on node
-		this.cy.on("tap", "node", (evt) => {
-			const node = evt.target;
-			const filePath = node.id();
-			const file = this.app.vault.getAbstractFileByPath(filePath);
-			const originalEvent = evt.originalEvent as MouseEvent;
-
-			if (file instanceof TFile) {
-				// Ctrl+click (or Cmd+click on Mac) opens file in new tab
-				if (originalEvent && (originalEvent.ctrlKey || originalEvent.metaKey)) {
-					this.app.workspace.getLeaf("tab").openFile(file);
-					return;
-				}
-
-				if (this.zoomManager.isInZoomMode()) {
-					// In zoom mode, focus on the clicked node
-					this.focusOnNode(filePath);
-				} else {
-					// Enter zoom mode by clicking on node
-					this.enterZoomMode(filePath);
-				}
-			}
-		});
-
-		// Edge click handler for zoom mode navigation
-		this.cy.on("tap", "edge", (evt) => {
-			if (!this.zoomManager.isInZoomMode()) return;
-
-			const edge = evt.target;
-			const targetId = edge.data("target");
-			const sourceId = edge.data("source");
-
-			// If target is already focused, navigate to source instead (bidirectional navigation)
-			const nodeToFocus = targetId === this.zoomManager.getFocusedNodeId() ? sourceId : targetId;
-			this.focusOnNode(nodeToFocus);
-		});
-
-		// Right-click handler for context menu
-		this.cy.on("cxttap", "node", (evt) => {
-			const node = evt.target;
-			const filePath = node.id();
-			const originalEvent = evt.originalEvent as MouseEvent;
-
-			if (this.contextMenu) {
-				this.contextMenu.show(originalEvent, filePath);
-			}
-		});
-	}
-
-	private addSparkleAnimations(): void {
-		if (!this.cy) return;
-
-		this.cy.nodes().forEach((node) => {
-			if (Math.random() < 0.4) {
-				node.addClass("glow");
-				const pulse = (): void => {
-					// Check if cy still exists and node is still in the graph before animating
-					if (!this.cy || !node.cy() || this.isUpdating) {
-						return;
-					}
-					node.animate({ style: { "overlay-opacity": 0.35 } }, { duration: 1500, easing: "ease-in-out" }).animate(
-						{ style: { "overlay-opacity": 0.12 } },
-						{
-							duration: 1500,
-							easing: "ease-in-out",
-							complete: pulse,
-						}
-					);
-				};
-				// Stagger animation start
-				setTimeout(() => pulse(), Math.random() * 1000);
-			}
-		});
+		this.interactionHandler.setupInteractions();
 	}
 
 	private renderGraph(nodes: ElementDefinition[], edges: ElementDefinition[]): void {

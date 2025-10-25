@@ -6,7 +6,7 @@ import type { GraphZoomPreview } from "./graph-zoom-preview";
 
 export interface ZoomConfig {
 	getCy: () => Core;
-	previewWrapperEl: HTMLElement;
+	getPreviewWrapperEl: () => HTMLElement;
 	settingsStore: SettingsStore;
 	onToggleStatesChange: (hideFrontmatter: boolean, hideContent: boolean) => void;
 }
@@ -144,7 +144,7 @@ export class GraphZoomManager {
 	private showPreviewOverlay(createPreview: (el: HTMLElement) => GraphZoomPreview): void {
 		this.hidePreviewOverlay();
 
-		this.zoomPreview = createPreview(this.config.previewWrapperEl);
+		this.zoomPreview = createPreview(this.config.getPreviewWrapperEl());
 	}
 
 	private hidePreviewOverlay(): void {
