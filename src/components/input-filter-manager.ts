@@ -7,18 +7,17 @@ export abstract class InputFilterManager {
 	protected inputEl: HTMLInputElement | null = null;
 	protected debounceTimer: number | null = null;
 	protected currentValue = "";
-	protected readonly debounceMs: number;
 
 	constructor(
 		protected parentEl: HTMLElement,
 		protected placeholder: string,
 		protected cssClass: string,
 		protected onFilterChange: FilterChangeCallback,
-		debounceMs: number = DEFAULT_DEBOUNCE_MS
+		initiallyVisible: boolean
 	) {
-		this.debounceMs = debounceMs;
+		const classes = `${cssClass}-container${initiallyVisible ? "" : " nexus-hidden"}`;
 		this.containerEl = this.parentEl.createEl("div", {
-			cls: `${cssClass}-container nexus-hidden`,
+			cls: classes,
 		});
 
 		this.render();
@@ -51,7 +50,7 @@ export abstract class InputFilterManager {
 
 		this.debounceTimer = window.setTimeout(() => {
 			this.applyFilterImmediately();
-		}, this.debounceMs);
+		}, DEFAULT_DEBOUNCE_MS);
 	}
 
 	private applyFilterImmediately(): void {
@@ -81,6 +80,10 @@ export abstract class InputFilterManager {
 			this.inputEl.value = "";
 		}
 		this.updateFilterValue("");
+	}
+
+	focus(): void {
+		this.inputEl?.focus();
 	}
 
 	isVisible(): boolean {

@@ -7,6 +7,7 @@ import type { Indexer } from "../core/indexer";
 import type NexusPropertiesPlugin from "../main";
 import { isFolderNote } from "../utils/file";
 import { GraphFilter } from "./graph-filter";
+import { GraphFilterPresetSelector } from "./graph-filter-preset-selector";
 import { GraphHeader } from "./graph-header";
 import { GraphInteractionHandler } from "./graph-interaction-handler";
 import { GraphSearch } from "./graph-search";
@@ -40,6 +41,7 @@ export class RelationshipGraphView extends ItemView {
 	private propertyTooltip: PropertyTooltip;
 	private graphSearch: GraphSearch | null = null;
 	private graphFilter: GraphFilter | null = null;
+	private graphFilterPresetSelector: GraphFilterPresetSelector | null = null;
 	private zoomManager: GraphZoomManager;
 	private interactionHandler: GraphInteractionHandler;
 	private layoutManager: GraphLayoutManager;
@@ -142,6 +144,10 @@ export class RelationshipGraphView extends ItemView {
 			},
 		});
 
+		const settings = this.plugin.settingsStore.settings$.value;
+		const showSearchBar = settings.showSearchBar;
+		const showFilterBar = settings.showFilterBar;
+
 		// Create search component (sits between header and preview)
 		this.graphSearch = new GraphSearch(
 			contentEl,
@@ -150,18 +156,34 @@ export class RelationshipGraphView extends ItemView {
 			},
 			() => {
 				// Search closed
-			}
+			},
+			showSearchBar
 		);
 
-		// Create filter component (sits between header and preview)
+		// Create filter preset selector and filter (in a row)
+		const filterRowClasses = `nexus-graph-filter-row${showFilterBar ? "" : " nexus-hidden"}`;
+		const filterRowEl = contentEl.createEl("div", {
+			cls: filterRowClasses,
+		});
+
+		this.graphFilterPresetSelector = new GraphFilterPresetSelector(
+			filterRowEl,
+			settings.filterPresets,
+			(expression: string) => {
+				this.graphFilter?.setFilterValue(expression);
+			},
+			showFilterBar // Match parent visibility
+		);
+
 		this.graphFilter = new GraphFilter(
-			contentEl,
+			filterRowEl,
 			() => {
 				this.updateGraph();
 			},
 			() => {
 				// Filter closed
-			}
+			},
+			showFilterBar // Match parent visibility
 		);
 
 		// Create a wrapper for zoom preview (sits between header and graph)
@@ -221,9 +243,9 @@ export class RelationshipGraphView extends ItemView {
 				if (this.graphSearch?.isVisible()) {
 					evt.preventDefault();
 					this.graphSearch.hide();
-				} else if (this.graphFilter?.isVisible()) {
+				} else if (this.isFilterRowVisible()) {
 					evt.preventDefault();
-					this.graphFilter.hide();
+					this.hideFilterRow();
 				} else if (this.zoomManager.isInZoomMode()) {
 					evt.preventDefault();
 					this.exitZoomMode();
@@ -231,7 +253,26 @@ export class RelationshipGraphView extends ItemView {
 			}
 		});
 
-		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe(() => {
+		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
+			// Update filter presets
+			this.graphFilterPresetSelector?.updatePresets(settings.filterPresets);
+
+			// Update search bar visibility
+			if (this.graphSearch) {
+				if (settings.showSearchBar) {
+					this.graphSearch.show();
+				} else {
+					this.graphSearch.hide();
+				}
+			}
+
+			// Update filter bar visibility
+			if (settings.showFilterBar) {
+				this.showFilterRow();
+			} else {
+				this.hideFilterRow();
+			}
+
 			if (this.currentFile && !this.isUpdating) {
 				this.updateGraph();
 			}
@@ -313,6 +354,11 @@ export class RelationshipGraphView extends ItemView {
 			this.graphFilter = null;
 		}
 
+		if (this.graphFilterPresetSelector) {
+			this.graphFilterPresetSelector.destroy();
+			this.graphFilterPresetSelector = null;
+		}
+
 		this.destroyGraph();
 
 		if (this.header) {
@@ -366,19 +412,49 @@ export class RelationshipGraphView extends ItemView {
 		if (!this.graphSearch) return;
 
 		if (this.graphSearch.isVisible()) {
-			this.graphSearch.hide();
+			// Already visible, just focus
+			this.graphSearch.focus();
 		} else {
 			this.graphSearch.show();
 		}
 	}
 
 	toggleFilter(): void {
-		if (!this.graphFilter) return;
-
-		if (this.graphFilter.isVisible()) {
-			this.graphFilter.hide();
+		if (this.isFilterRowVisible()) {
+			// Already visible, just focus the input
+			this.graphFilter?.focus();
 		} else {
-			this.graphFilter.show();
+			this.showFilterRow();
+			this.graphFilter?.focus();
+		}
+	}
+
+	toggleFilterPreset(): void {
+		if (this.isFilterRowVisible()) {
+			// Already visible, just focus the preset selector
+			this.graphFilterPresetSelector?.focus();
+		} else {
+			this.showFilterRow();
+			this.graphFilterPresetSelector?.focus();
+		}
+	}
+
+	private isFilterRowVisible(): boolean {
+		const filterRow = this.containerEl.querySelector(".nexus-graph-filter-row");
+		return filterRow ? !filterRow.hasClass("nexus-hidden") : false;
+	}
+
+	private showFilterRow(): void {
+		const filterRow = this.containerEl.querySelector(".nexus-graph-filter-row");
+		if (filterRow) {
+			filterRow.removeClass("nexus-hidden");
+		}
+	}
+
+	private hideFilterRow(): void {
+		const filterRow = this.containerEl.querySelector(".nexus-graph-filter-row");
+		if (filterRow) {
+			filterRow.addClass("nexus-hidden");
 		}
 	}
 

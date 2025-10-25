@@ -8,15 +8,29 @@ export class GraphFilter extends InputFilterManager {
 	constructor(
 		parentEl: HTMLElement,
 		onFilterChange: () => void,
-		private onClose: () => void
+		private onClose: () => void,
+		initiallyVisible: boolean = false
 	) {
-		super(parentEl, "Filter nodes (e.g., status === 'active')", "nexus-graph-filter-input", onFilterChange, 500);
+		super(
+			parentEl,
+			"Filter nodes (e.g., status === 'active')",
+			"nexus-graph-filter-input",
+			onFilterChange,
+			initiallyVisible
+		);
 	}
 
 	protected updateFilterValue(value: string): void {
 		super.updateFilterValue(value);
 		this.compiledFunc = null;
 		this.propertyMapping.clear();
+	}
+
+	setFilterValue(value: string): void {
+		if (this.inputEl) {
+			this.inputEl.value = value;
+		}
+		this.updateFilterValue(value);
 	}
 
 	shouldInclude(frontmatter: Record<string, any>): boolean {

@@ -30,6 +30,10 @@ export const SETTINGS_DEFAULTS = {
 	DEFAULT_ZOOM_HIDE_FRONTMATTER: false,
 	DEFAULT_ZOOM_HIDE_CONTENT: false,
 
+	// Graph UI defaults
+	DEFAULT_SHOW_SEARCH_BAR: true,
+	DEFAULT_SHOW_FILTER_BAR: true,
+
 	// Node color defaults
 	DEFAULT_NODE_COLOR: "#e9f2ff",
 

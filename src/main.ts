@@ -38,8 +38,14 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.addCommand({
 			id: "toggle-graph-filter",
-			name: "Toggle Graph Filter",
+			name: "Toggle Graph Filter (Expression Input)",
 			callback: () => this.executeGraphViewMethod("toggleFilter"),
+		});
+
+		this.addCommand({
+			id: "toggle-graph-filter-preset",
+			name: "Toggle Graph Filter (Preset Selector)",
+			callback: () => this.executeGraphViewMethod("toggleFilterPreset"),
 		});
 
 		this.addCommand({

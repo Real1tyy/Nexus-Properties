@@ -12,6 +12,13 @@ export const ColorRuleSchema = z.object({
 
 export type ColorRule = z.infer<typeof ColorRuleSchema>;
 
+export const FilterPresetSchema = z.object({
+	name: z.string(),
+	expression: z.string(),
+});
+
+export type FilterPreset = z.infer<typeof FilterPresetSchema>;
+
 export const PathExcludedPropertiesSchema = z.object({
 	id: z.string(),
 	path: z.string(),
@@ -90,8 +97,13 @@ export const NexusPropertiesSettingsSchema = z.object({
 	showGraphTooltips: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_GRAPH_TOOLTIPS),
 	graphTooltipWidth: z.number().min(150).max(500).optional().default(SETTINGS_DEFAULTS.DEFAULT_GRAPH_TOOLTIP_WIDTH),
 
+	// Graph UI settings
+	showSearchBar: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_SEARCH_BAR),
+	showFilterBar: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_FILTER_BAR),
+
 	// Graph filtering settings
 	filterExpressions: z.array(z.string()).optional().default([]),
+	filterPresets: z.array(FilterPresetSchema).optional().default([]),
 	displayNodeProperties: z
 		.array(z.string())
 		.optional()

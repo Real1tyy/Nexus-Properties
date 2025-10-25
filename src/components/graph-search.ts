@@ -4,9 +4,10 @@ export class GraphSearch extends InputFilterManager {
 	constructor(
 		parentEl: HTMLElement,
 		onSearchChange: () => void,
-		private onClose: () => void
+		private onClose: () => void,
+		initiallyVisible: boolean
 	) {
-		super(parentEl, "Search nodes by name...", "nexus-graph-search-input", onSearchChange);
+		super(parentEl, "Search nodes by name...", "nexus-graph-search-input", onSearchChange, initiallyVisible);
 	}
 
 	shouldInclude(nodeName: string): boolean {

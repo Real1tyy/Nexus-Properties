@@ -45,6 +45,18 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	private addGraphSettings(containerEl: HTMLElement): void {
 		new Setting(containerEl).setName("Graph Display").setHeading();
 
+		this.uiBuilder.addToggle(containerEl, {
+			key: "showSearchBar",
+			name: "Show search bar by default",
+			desc: "Display the search bar in the graph view when it loads. You can still toggle it with the command.",
+		});
+
+		this.uiBuilder.addToggle(containerEl, {
+			key: "showFilterBar",
+			name: "Show filter bar by default",
+			desc: "Display the filter bar (preset selector and expression input) in the graph view when it loads. You can still toggle it with commands.",
+		});
+
 		this.uiBuilder.addSlider(containerEl, {
 			key: "graphEnlargedWidthPercent",
 			name: "Graph enlarged width",
@@ -574,6 +586,115 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			placeholder: "Status === 'Active'\ntype === 'project'",
 			multiline: true,
 		});
+
+		// Filter presets section
+		new Setting(containerEl).setName("Filter presets").setHeading();
+
+		const presetDesc = containerEl.createDiv();
+		presetDesc.createEl("p", {
+			text: "Create named filter presets for quick access in the graph. Use the command 'Toggle Graph Filter (Preset Selector)' to show a dropdown with your presets. Selecting a preset fills the filter expression input.",
+		});
+
+		// Presets list
+		const presetsListContainer = containerEl.createDiv();
+		this.renderFilterPresetsList(presetsListContainer);
+
+		// Add new preset button
+		new Setting(containerEl)
+			.setName("Add filter preset")
+			.setDesc("Create a new filter preset")
+			.addButton((button) => {
+				button.setButtonText("Add Preset");
+				button.onClick(async () => {
+					const newPreset = {
+						name: "",
+						expression: "",
+					};
+
+					await this.plugin.settingsStore.updateSettings((s) => ({
+						...s,
+						filterPresets: [...s.filterPresets, newPreset],
+					}));
+
+					this.renderFilterPresetsList(presetsListContainer);
+				});
+			});
+	}
+
+	private renderFilterPresetsList(container: HTMLElement): void {
+		container.empty();
+		const { filterPresets } = this.plugin.settingsStore.settings$.value;
+
+		if (filterPresets.length === 0) {
+			const emptyState = container.createDiv("setting-item-description");
+			emptyState.textContent = "No filter presets defined. Click 'Add Preset' to create one.";
+			return;
+		}
+
+		for (let index = 0; index < filterPresets.length; index++) {
+			const preset = filterPresets[index];
+			const presetContainer = container.createDiv("filter-preset-item");
+
+			// Name input
+			const nameInput = presetContainer.createEl("input", {
+				type: "text",
+				value: preset.name,
+				placeholder: "Preset name (e.g., 'Active Tasks', 'Projects')",
+				cls: "filter-preset-name-input",
+			});
+
+			const updateName = async () => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					filterPresets: s.filterPresets.map((p, i) => (i === index ? { ...p, name: nameInput.value } : p)),
+				}));
+			};
+
+			nameInput.addEventListener("blur", updateName);
+			nameInput.addEventListener("keydown", (e: KeyboardEvent) => {
+				if (e.key === "Enter") {
+					e.preventDefault();
+					updateName();
+				}
+			});
+
+			// Expression input
+			const expressionInput = presetContainer.createEl("input", {
+				type: "text",
+				value: preset.expression,
+				placeholder: "Filter expression (e.g., Status === 'Active')",
+				cls: "filter-preset-expression-input",
+			});
+
+			const updateExpression = async () => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					filterPresets: s.filterPresets.map((p, i) => (i === index ? { ...p, expression: expressionInput.value } : p)),
+				}));
+			};
+
+			expressionInput.addEventListener("blur", updateExpression);
+			expressionInput.addEventListener("keydown", (e: KeyboardEvent) => {
+				if (e.key === "Enter") {
+					e.preventDefault();
+					updateExpression();
+				}
+			});
+
+			// Delete button
+			const deleteButton = presetContainer.createEl("button", {
+				text: "×",
+				attr: { title: "Delete preset" },
+				cls: "filter-preset-btn-delete",
+			});
+			deleteButton.onclick = async () => {
+				await this.plugin.settingsStore.updateSettings((s) => ({
+					...s,
+					filterPresets: s.filterPresets.filter((_, i) => i !== index),
+				}));
+				this.renderFilterPresetsList(container);
+			};
+		}
 	}
 
 	private addRescanSection(containerEl: HTMLElement): void {
