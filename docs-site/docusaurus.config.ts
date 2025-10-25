@@ -5,20 +5,20 @@ import type * as Preset from '@docusaurus/preset-classic';
 // Docusaurus config for Prisma Calendar docs
 
 const config: Config = {
-  title: 'Prisma Calendar',
-  tagline: 'A feature-rich, fully configurable calendar for Obsidian.',
-  favicon: 'img/PrismaCalendar.png',
+  title: 'Nexus Properties',
+  tagline: 'Automated property management and interactive relationship visualization for Obsidian.',
+  favicon: 'img/nexus-properties.png',
 
   // Set the production url of your site here
   url: 'https://Real1tyy.github.io',
   // Set the /<baseUrl>/ pathname under which your site is served
   // For GitHub pages deployment, it is often '/<projectName>/'
-  baseUrl: '/Prisma-Calendar/',
+  baseUrl: '/Nexus-Properties/',
 
   // GitHub pages deployment config.
   // If you aren't using GitHub pages, you don't need these.
   organizationName: 'Real1tyy', // Usually your GitHub org/user name.
-  projectName: 'Prisma-Calendar', // Usually your repo name.
+  projectName: 'Nexus-Properties', // Usually your repo name.
 
   onBrokenLinks: 'throw',
   onBrokenMarkdownLinks: 'warn',
@@ -42,7 +42,7 @@ const config: Config = {
           sidebarPath: './sidebars.ts',
           // Please change this to your repo.
           // Remove this to remove the "edit this page" links.
-          editUrl: 'https://github.com/Real1tyy/Prisma-Calendar/edit/main/docs-site/',
+          editUrl: 'https://github.com/Real1tyy/Nexus-Properties/edit/main/docs-site/',
           showLastUpdateAuthor: true,
           showLastUpdateTime: true,
         },
@@ -73,16 +73,16 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/PrismaCalendar.png',
+    image: 'img/nexus-properties.png',
     colorMode: {
       defaultMode: 'dark',
       respectPrefersColorScheme: true,
     },
     navbar: {
-      title: 'Prisma Calendar',
+      title: 'Nexus Properties',
       logo: {
-        alt: 'Prisma Calendar Logo',
-        src: 'img/PrismaCalendar.png',
+        alt: 'Nexus Properties Logo',
+        src: 'img/nexus-properties.png',
         href: '/', // Fix: Make logo/title link to root
       },
       items: [
@@ -92,12 +92,7 @@ const config: Config = {
           position: 'left',
         },
         {
-          href: 'https://www.youtube.com/watch?v=JjZmNJkQlnc',
-          label: 'Demo',
-          position: 'right',
-        },
-        {
-          href: 'https://github.com/Real1tyy/Prisma-Calendar',
+          href: 'https://github.com/Real1tyy/Nexus-Properties',
           label: 'GitHub',
           position: 'right',
         },
@@ -110,7 +105,7 @@ const config: Config = {
           title: 'Docs',
           items: [
             {
-              label: 'Prisma Calendar',
+              label: 'Nexus Properties',
               to: '/',
             },
             {
@@ -132,7 +127,7 @@ const config: Config = {
             },
             {
               label: 'GitHub Issues',
-              href: 'https://github.com/Real1tyy/Prisma-Calendar/issues',
+              href: 'https://github.com/Real1tyy/Nexus-Properties/issues',
             },
           ],
         },
@@ -140,16 +135,12 @@ const config: Config = {
           title: 'More',
           items: [
             {
-              label: 'Demo Video',
-              href: 'https://www.youtube.com/watch?v=JjZmNJkQlnc',
-            },
-            {
               label: 'Repository',
-              href: 'https://github.com/Real1tyy/Prisma-Calendar',
+              href: 'https://github.com/Real1tyy/Nexus-Properties',
             },
             {
               label: 'Releases',
-              href: 'https://github.com/Real1tyy/Prisma-Calendar/releases',
+              href: 'https://github.com/Real1tyy/Nexus-Properties/releases',
             },
           ],
         },
@@ -167,21 +158,18 @@ const config: Config = {
           ],
         },
       ],
-      copyright: `© ${new Date().getFullYear()} Prisma Calendar`,
+      copyright: `© ${new Date().getFullYear()} Nexus Properties`,
     },
     prism: {
       theme: prismThemes.github,
       darkTheme: prismThemes.dracula,
       additionalLanguages: ['bash', 'json', 'typescript'],
     },
-    metadata: [
-      { name: 'algolia-site-verification', content: '6D4AC65541FD3B7E' },
-    ],
     // Disable search until properly configured
     // algolia: {
     //   appId: 'YOUR_APP_ID',
     //   apiKey: 'YOUR_PUBLIC_API_KEY',
-    //   indexName: 'prisma_calendar',
+    //   indexName: 'nexus_properties',
     // },
   } satisfies Preset.ThemeConfig,
 };

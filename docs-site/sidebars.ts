@@ -5,7 +5,7 @@ const sidebars: SidebarsConfig = {
     {
       type: "doc",
       id: "intro",
-      label: "Prisma Calendar"
+      label: "Nexus Properties"
     },
     "installation",
     "quickstart",
@@ -15,18 +15,17 @@ const sidebars: SidebarsConfig = {
       collapsible: true,
       items: [
         "features/overview",
-        "features/multiple-calendars",
-        "features/folder-scanning",
-        "features/templater",
+        "features/bidirectional-sync",
+        "features/graph-views",
+        "features/node-layout",
         "features/color-rules",
         "features/filtering",
-        "features/event-previews",
-        "features/batch-operations",
-        "features/event-skipping",
-        "features/undo-redo",
-        "features/recurring-dsl",
-        "features/virtual-events",
-        "features/hotkeys"
+        "features/zoom-mode",
+        "features/tooltips",
+        "features/search",
+        "features/context-menus",
+        "features/node-creation",
+        "features/excluded-properties"
       ]
     },
     "configuration",
