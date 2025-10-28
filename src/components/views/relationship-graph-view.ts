@@ -2,22 +2,23 @@ import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { type App, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
-import { GraphBuilder } from "../core/graph-builder";
-import type { Indexer } from "../core/indexer";
-import type NexusPropertiesPlugin from "../main";
-import { isFolderNote } from "../utils/file";
-import { EdgeContextMenu } from "./edge-context-menu";
-import { GraphFilter } from "./graph-filter";
-import { GraphFilterPresetSelector } from "./graph-filter-preset-selector";
-import { GraphHeader } from "./graph-header";
-import { GraphInteractionHandler } from "./graph-interaction-handler";
-import { GraphSearch } from "./graph-search";
-import { GraphZoomManager } from "./graph-zoom-manager";
-import { GraphZoomPreview } from "./graph-zoom-preview";
-import { GraphLayoutManager } from "./layout/graph-layout-manager";
-import { NodeContextMenu } from "./node-context-menu";
-import { PropertyTooltip } from "./property-tooltip";
-import { RelationshipAdder } from "./relationship-adder";
+import { GraphBuilder } from "../../core/graph-builder";
+import type { Indexer } from "../../core/indexer";
+import type NexusPropertiesPlugin from "../../main";
+import { isFolderNote } from "../../utils/file";
+import { EdgeContextMenu } from "../edge-context-menu";
+import { GraphFilter } from "../graph-filter";
+import { GraphFilterPresetSelector } from "../graph-filter-preset-selector";
+import { GraphHeader } from "../graph-header";
+import { GraphInteractionHandler } from "../graph-interaction-handler";
+import { GraphSearch } from "../graph-search";
+import { GraphZoomManager } from "../graph-zoom-manager";
+import { GraphZoomPreview } from "../graph-zoom-preview";
+import { GraphLayoutManager } from "../layout/graph-layout-manager";
+import { NodeContextMenu } from "../node-context-menu";
+import { PropertyTooltip } from "../property-tooltip";
+import { RelationshipAdder } from "../relationship-adder";
+import { RegisteredEventsComponent } from "./component";
 
 cytoscape.use(cytoscapeDagre);
 
@@ -27,7 +28,7 @@ export const VIEW_TYPE_RELATIONSHIP_GRAPH = "nexus-relationship-graph-view";
  * Graph rendering component (not an ItemView)
  * Can be embedded in any container
  */
-export class RelationshipGraphView {
+export class RelationshipGraphView extends RegisteredEventsComponent {
 	private cy: Core | null = null;
 	private graphContainerEl: HTMLElement | null = null;
 	private previewWrapperEl: HTMLElement | null = null;
@@ -53,19 +54,13 @@ export class RelationshipGraphView {
 	private interactionHandler: GraphInteractionHandler;
 	private layoutManager: GraphLayoutManager;
 
-	// Event handlers
-	private fileOpenHandler: ((file: TFile | null) => void) | null = null;
-	private metadataCacheHandler: ((file: TFile) => void) | null = null;
-	private vaultRenameHandler: ((file: any, oldPath: string) => void) | null = null;
-	private windowResizeHandler: (() => void) | null = null;
-	private keydownHandler: ((evt: KeyboardEvent) => void) | null = null;
-
 	constructor(
 		private readonly app: App,
 		private readonly indexer: Indexer,
 		private readonly plugin: NexusPropertiesPlugin,
 		private readonly containerEl: HTMLElement
 	) {
+		super();
 		this.relationshipAdder = new RelationshipAdder(this.app, this.plugin.settingsStore, () => {
 			this.updateGraph();
 		});
@@ -227,24 +222,23 @@ export class RelationshipGraphView {
 		});
 
 		// Register event listeners
-		this.fileOpenHandler = (file) => this.onFileOpen(file);
-		this.app.workspace.on("file-open", this.fileOpenHandler);
+		this.registerEvent(this.app.workspace, "file-open", (file) => {
+			this.onFileOpen(file);
+		});
 
-		this.metadataCacheHandler = (file) => {
+		this.registerEvent(this.app.metadataCache, "changed", (file) => {
 			// Only re-render if the changed file is the currently displayed file
 			if (this.currentFile && file.path === this.currentFile.path) {
 				this.updateGraph();
 			}
-		};
-		this.app.metadataCache.on("changed", this.metadataCacheHandler);
+		});
 
-		this.vaultRenameHandler = (file, oldPath) => {
+		this.registerEvent(this.app.vault, "rename", (file, oldPath) => {
 			if (this.currentFile && oldPath === this.currentFile.path && file instanceof TFile) {
 				this.currentFile = file;
 				this.updateGraph();
 			}
-		};
-		this.app.vault.on("rename", this.vaultRenameHandler);
+		});
 
 		setTimeout(() => {
 			const activeFile = this.app.workspace.getActiveFile();
@@ -257,11 +251,12 @@ export class RelationshipGraphView {
 		this.setupResizeObserver();
 
 		// Also react to global window resizes
-		this.windowResizeHandler = () => this.handleResize();
-		window.addEventListener("resize", this.windowResizeHandler);
+		this.registerDomEvent(window, "resize", () => {
+			this.handleResize();
+		});
 
 		// Register ESC key to exit zoom mode
-		this.keydownHandler = (evt: KeyboardEvent) => {
+		this.registerDomEvent(document, "keydown", (evt) => {
 			if (evt.key === "Escape") {
 				// Only handle ESC if we're in zoom mode
 				// Search/filter inputs handle their own ESC behavior
@@ -270,8 +265,7 @@ export class RelationshipGraphView {
 					this.exitZoomMode();
 				}
 			}
-		};
-		document.addEventListener("keydown", this.keydownHandler);
+		});
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
 			this.graphFilterPresetSelector?.updatePresets(settings.filterPresets);
@@ -359,31 +353,7 @@ export class RelationshipGraphView {
 			this.settingsSubscription = null;
 		}
 
-		// Remove event listeners
-		if (this.fileOpenHandler) {
-			this.app.workspace.off("file-open", this.fileOpenHandler);
-			this.fileOpenHandler = null;
-		}
-
-		if (this.metadataCacheHandler) {
-			this.app.metadataCache.off("changed", this.metadataCacheHandler);
-			this.metadataCacheHandler = null;
-		}
-
-		if (this.vaultRenameHandler) {
-			this.app.vault.off("rename", this.vaultRenameHandler);
-			this.vaultRenameHandler = null;
-		}
-
-		if (this.windowResizeHandler) {
-			window.removeEventListener("resize", this.windowResizeHandler);
-			this.windowResizeHandler = null;
-		}
-
-		if (this.keydownHandler) {
-			document.removeEventListener("keydown", this.keydownHandler);
-			this.keydownHandler = null;
-		}
+		this.cleanupEvents();
 
 		if (this.zoomManager) {
 			this.zoomManager.cleanup();

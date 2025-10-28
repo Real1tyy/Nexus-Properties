@@ -1,6 +1,6 @@
 import { ItemView, type WorkspaceLeaf } from "obsidian";
-import type { Indexer } from "../core/indexer";
-import type NexusPropertiesPlugin from "../main";
+import type { Indexer } from "../../core/indexer";
+import type NexusPropertiesPlugin from "../../main";
 import { RelationshipGraphView } from "./relationship-graph-view";
 
 export const VIEW_TYPE_NEXUS_SWITCHER = "nexus-view-switcher";

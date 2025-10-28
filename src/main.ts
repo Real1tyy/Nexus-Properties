@@ -1,6 +1,6 @@
 import { Notice, Plugin, TFile } from "obsidian";
 import { NexusPropertiesSettingsTab } from "./components";
-import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/nexus-view-switcher";
+import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/views/nexus-view-switcher";
 import { Indexer } from "./core/indexer";
 import { NodeCreator } from "./core/node-creator";
 import { PropertiesManager } from "./core/properties-manager";
