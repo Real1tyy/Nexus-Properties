@@ -40,6 +40,12 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			name: "Show ribbon icon",
 			desc: "Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.",
 		});
+
+		this.uiBuilder.addToggle(containerEl, {
+			key: "showViewSwitcherHeader",
+			name: "Show view switcher header",
+			desc: "Display the header with toggle button in the Nexus Properties view. Changes apply immediately.",
+		});
 	}
 
 	private addGraphSettings(containerEl: HTMLElement): void {

@@ -100,6 +100,7 @@ export const NexusPropertiesSettingsSchema = z.object({
 	// Graph UI settings
 	showSearchBar: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_SEARCH_BAR),
 	showFilterBar: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_FILTER_BAR),
+	showViewSwitcherHeader: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_SHOW_VIEW_SWITCHER_HEADER),
 
 	// Graph filtering settings
 	filterExpressions: z.array(z.string()).optional().default([]),

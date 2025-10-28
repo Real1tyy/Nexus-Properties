@@ -1,4 +1,5 @@
 import { ItemView, type WorkspaceLeaf } from "obsidian";
+import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import { RelationshipGraphView } from "./relationship-graph-view";
@@ -15,6 +16,7 @@ export class NexusViewSwitcher extends ItemView {
 	private graphContainerEl: HTMLElement | null = null;
 	private isEnlarged = false;
 	private originalWidth: number | null = null;
+	private settingsSubscription: Subscription | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -41,32 +43,24 @@ export class NexusViewSwitcher extends ItemView {
 		contentEl.empty();
 		contentEl.addClass("nexus-view-switcher-content");
 
-		// Create a header bar with toggle button
-		const headerBar = contentEl.createEl("div", {
-			cls: "nexus-view-switcher-header",
+		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe(async (settings) => {
+			await this.handleSettingsChange(settings.showViewSwitcherHeader);
 		});
 
-		this.toggleButton = headerBar.createEl("button", {
-			text: "Switch to Bases View",
-			cls: "nexus-view-toggle-button",
-		});
-
-		this.toggleButton.addEventListener("click", async () => {
-			await this.toggleView();
-		});
-
-		// Render the initial view content
-		await this.renderCurrentView();
+		await this.renderView();
 	}
 
 	async onClose(): Promise<void> {
-		// Clean up graph view if it exists
+		if (this.settingsSubscription) {
+			this.settingsSubscription.unsubscribe();
+			this.settingsSubscription = null;
+		}
+
 		if (this.graphView) {
 			this.graphView.destroy();
 			this.graphView = null;
 		}
 
-		// Clean up bases content
 		if (this.basesContentEl) {
 			this.basesContentEl.empty();
 			this.basesContentEl = null;
@@ -74,6 +68,18 @@ export class NexusViewSwitcher extends ItemView {
 
 		if (this.graphContainerEl) {
 			this.graphContainerEl = null;
+		}
+	}
+
+	private async handleSettingsChange(showHeader: boolean): Promise<void> {
+		const { contentEl } = this;
+		const headerBar = contentEl.querySelector(".nexus-view-switcher-header");
+
+		if (showHeader && !headerBar) {
+			await this.renderView();
+		} else if (!showHeader && headerBar) {
+			headerBar.remove();
+			this.toggleButton = null;
 		}
 	}
 
@@ -89,17 +95,42 @@ export class NexusViewSwitcher extends ItemView {
 			this.toggleButton.textContent = this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View";
 		}
 
-		// Re-render
-		await this.renderCurrentView();
+		await this.renderViewContent();
+	}
+
+	private async renderView(): Promise<void> {
+		const { contentEl } = this;
+		const settings = this.plugin.settingsStore.settings$.value;
+
+		Array.from(contentEl.children).forEach((child) => {
+			child.remove();
+		});
+
+		if (settings.showViewSwitcherHeader) {
+			const headerBar = contentEl.createEl("div", {
+				cls: "nexus-view-switcher-header",
+			});
+
+			this.toggleButton = headerBar.createEl("button", {
+				text: this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View",
+				cls: "nexus-view-toggle-button",
+			});
+
+			this.toggleButton.addEventListener("click", async () => {
+				await this.toggleView();
+			});
+		}
+
+		await this.renderViewContent();
 	}
 
 	/**
-	 * Render the content based on current mode
+	 * Render only the view content based on current mode
 	 */
-	private async renderCurrentView(): Promise<void> {
+	private async renderViewContent(): Promise<void> {
 		const { contentEl } = this;
 
-		// Keep the header, clear the rest
+		// Keep the header if it exists, clear the rest
 		const headerBar = contentEl.querySelector(".nexus-view-switcher-header");
 		Array.from(contentEl.children).forEach((child) => {
 			if (child !== headerBar) {

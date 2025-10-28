@@ -159,7 +159,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 			const switcherView = existingLeaves[0].view;
 			if (switcherView instanceof NexusViewSwitcher) {
 				await switcherView.toggleView();
-				new Notice(`Switched to ${switcherView.getCurrentMode() === "graph" ? "Graph" : "Bases"} View`);
 			}
 		} else {
 			new Notice("Please open the Nexus Properties view first");
