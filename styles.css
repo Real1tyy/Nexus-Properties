@@ -356,6 +356,8 @@
 .nexus-graph-view-content {
 	display: flex;
 	flex-direction: column;
+	flex: 1;
+	min-height: 0;
 	height: 100%;
 	padding: 0;
 	overflow: hidden;
@@ -1042,5 +1044,66 @@
 }
 
 .nexus-property-separator {
+	color: var(--text-muted);
+}
+
+/* View Switcher Styles */
+.nexus-view-switcher-header {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 0.5em;
+	background-color: var(--background-secondary);
+	border-bottom: 1px solid var(--background-modifier-border);
+	flex-shrink: 0;
+}
+
+.nexus-view-toggle-button {
+	padding: 0.4em 1em;
+	background-color: var(--interactive-normal);
+	color: var(--text-normal);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	cursor: pointer;
+	font-size: 0.9em;
+	transition:
+		background-color 0.2s,
+		border-color 0.2s;
+}
+
+.nexus-view-toggle-button:hover {
+	background-color: var(--interactive-hover);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-view-toggle-button:active {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+/* Graph container when inside switcher */
+.nexus-graph-container {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+}
+
+/* Bases View Styles */
+.nexus-bases-view-content {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+}
+
+.nexus-bases-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	font-size: 1.2em;
 	color: var(--text-muted);
 }

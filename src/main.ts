@@ -1,6 +1,6 @@
 import { Notice, Plugin, TFile } from "obsidian";
 import { NexusPropertiesSettingsTab } from "./components";
-import { RelationshipGraphView, VIEW_TYPE_RELATIONSHIP_GRAPH } from "./components/relationship-graph-view";
+import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/nexus-view-switcher";
 import { Indexer } from "./core/indexer";
 import { NodeCreator } from "./core/node-creator";
 import { PropertiesManager } from "./core/properties-manager";
@@ -25,9 +25,15 @@ export default class NexusPropertiesPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "toggle-view-mode",
+			name: "Toggle between Graph and Bases View",
+			callback: () => this.toggleViewMode(),
+		});
+
+		this.addCommand({
 			id: "enlarge-relationship-graph",
 			name: "Enlarge Graph",
-			callback: () => this.executeGraphViewMethod("toggleEnlargement"),
+			callback: () => this.toggleEnlargement(),
 		});
 
 		this.addCommand({
@@ -108,13 +114,13 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		await this.indexer.start();
 
-		this.registerView(VIEW_TYPE_RELATIONSHIP_GRAPH, (leaf) => new RelationshipGraphView(leaf, this.indexer, this));
+		this.registerView(VIEW_TYPE_NEXUS_SWITCHER, (leaf) => new NexusViewSwitcher(leaf, this.indexer, this));
 	}
 
 	async onunload() {
 		this.propertiesManager?.stop();
 		this.indexer?.stop();
-		this.app.workspace.detachLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
 	}
 
 	async triggerFullRescan(): Promise<void> {
@@ -129,7 +135,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 	private async toggleRelationshipGraphView(): Promise<void> {
 		const { workspace } = this.app;
 
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
 
 		if (existingLeaves.length > 0) {
 			// View exists, reveal/focus it
@@ -139,29 +145,63 @@ export default class NexusPropertiesPlugin extends Plugin {
 			// View doesn't exist, create it in the left sidebar
 			const leaf = workspace.getLeftLeaf(false);
 			if (leaf) {
-				await leaf.setViewState({ type: VIEW_TYPE_RELATIONSHIP_GRAPH, active: true });
+				await leaf.setViewState({ type: VIEW_TYPE_NEXUS_SWITCHER, active: true });
 				workspace.revealLeaf(leaf);
 			}
 		}
 	}
 
-	private executeGraphViewMethod(methodName: string, noticeMessage?: string): void {
+	private async toggleViewMode(): Promise<void> {
 		const { workspace } = this.app;
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_RELATIONSHIP_GRAPH);
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
 
 		if (existingLeaves.length > 0) {
-			const graphView = existingLeaves[0].view;
-			if (graphView instanceof RelationshipGraphView) {
-				const method = graphView[methodName as keyof RelationshipGraphView];
-				if (typeof method === "function") {
-					(method as () => void).call(graphView);
+			const switcherView = existingLeaves[0].view;
+			if (switcherView instanceof NexusViewSwitcher) {
+				await switcherView.toggleView();
+				new Notice(`Switched to ${switcherView.getCurrentMode() === "graph" ? "Graph" : "Bases"} View`);
+			}
+		} else {
+			new Notice("Please open the Nexus Properties view first");
+		}
+	}
+
+	private toggleEnlargement(): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
+
+		if (existingLeaves.length > 0) {
+			const switcherView = existingLeaves[0].view;
+			if (switcherView instanceof NexusViewSwitcher) {
+				switcherView.toggleEnlargement();
+			}
+		} else {
+			new Notice("Please open the Nexus Properties view first");
+		}
+	}
+
+	private executeGraphViewMethod(methodName: string, noticeMessage?: string): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
+
+		if (existingLeaves.length > 0) {
+			const switcherView = existingLeaves[0].view;
+			if (switcherView instanceof NexusViewSwitcher) {
+				const graphView = switcherView.getGraphView();
+				if (graphView) {
+					const method = graphView[methodName as keyof typeof graphView];
+					if (typeof method === "function") {
+						(method as () => void).call(graphView);
+					}
+					return;
 				}
-				return;
 			}
 		}
 
 		if (noticeMessage) {
 			new Notice(noticeMessage);
+		} else {
+			new Notice("Please open the Nexus Properties view in Graph mode first");
 		}
 	}
 

@@ -1,0 +1,205 @@
+import { ItemView, type WorkspaceLeaf } from "obsidian";
+import type { Indexer } from "../core/indexer";
+import type NexusPropertiesPlugin from "../main";
+import { RelationshipGraphView } from "./relationship-graph-view";
+
+export const VIEW_TYPE_NEXUS_SWITCHER = "nexus-view-switcher";
+
+type ViewMode = "graph" | "bases";
+
+export class NexusViewSwitcher extends ItemView {
+	private currentMode: ViewMode = "graph";
+	private graphView: RelationshipGraphView | null = null;
+	private toggleButton: HTMLButtonElement | null = null;
+	private basesContentEl: HTMLElement | null = null;
+	private graphContainerEl: HTMLElement | null = null;
+	private isEnlarged = false;
+	private originalWidth: number | null = null;
+
+	constructor(
+		leaf: WorkspaceLeaf,
+		private readonly indexer: Indexer,
+		private readonly plugin: NexusPropertiesPlugin
+	) {
+		super(leaf);
+	}
+
+	getViewType(): string {
+		return VIEW_TYPE_NEXUS_SWITCHER;
+	}
+
+	getDisplayText(): string {
+		return "Nexus Properties";
+	}
+
+	getIcon(): string {
+		return this.currentMode === "graph" ? "git-fork" : "layout-grid";
+	}
+
+	async onOpen(): Promise<void> {
+		const { contentEl } = this;
+		contentEl.empty();
+		contentEl.addClass("nexus-view-switcher-content");
+
+		// Create a header bar with toggle button
+		const headerBar = contentEl.createEl("div", {
+			cls: "nexus-view-switcher-header",
+		});
+
+		this.toggleButton = headerBar.createEl("button", {
+			text: "Switch to Bases View",
+			cls: "nexus-view-toggle-button",
+		});
+
+		this.toggleButton.addEventListener("click", async () => {
+			await this.toggleView();
+		});
+
+		// Render the initial view content
+		await this.renderCurrentView();
+	}
+
+	async onClose(): Promise<void> {
+		// Clean up graph view if it exists
+		if (this.graphView) {
+			this.graphView.destroy();
+			this.graphView = null;
+		}
+
+		// Clean up bases content
+		if (this.basesContentEl) {
+			this.basesContentEl.empty();
+			this.basesContentEl = null;
+		}
+
+		if (this.graphContainerEl) {
+			this.graphContainerEl = null;
+		}
+	}
+
+	/**
+	 * Toggle between graph and bases views
+	 */
+	async toggleView(): Promise<void> {
+		const newMode: ViewMode = this.currentMode === "graph" ? "bases" : "graph";
+		this.currentMode = newMode;
+
+		// Update button text
+		if (this.toggleButton) {
+			this.toggleButton.textContent = this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View";
+		}
+
+		// Re-render
+		await this.renderCurrentView();
+	}
+
+	/**
+	 * Render the content based on current mode
+	 */
+	private async renderCurrentView(): Promise<void> {
+		const { contentEl } = this;
+
+		// Keep the header, clear the rest
+		const headerBar = contentEl.querySelector(".nexus-view-switcher-header");
+		Array.from(contentEl.children).forEach((child) => {
+			if (child !== headerBar) {
+				child.remove();
+			}
+		});
+
+		if (this.currentMode === "graph") {
+			// Clean up bases view
+			if (this.basesContentEl) {
+				this.basesContentEl = null;
+			}
+
+			// Create graph container
+			this.graphContainerEl = contentEl.createEl("div", {
+				cls: "nexus-graph-container",
+			});
+
+			// Create and render graph view
+			this.graphView = new RelationshipGraphView(this.app, this.indexer, this.plugin, this.graphContainerEl);
+
+			await this.graphView.render();
+		} else {
+			// Clean up graph view
+			if (this.graphView) {
+				this.graphView.destroy();
+				this.graphView = null;
+			}
+			if (this.graphContainerEl) {
+				this.graphContainerEl = null;
+			}
+
+			// Render bases view placeholder
+			this.basesContentEl = contentEl.createEl("div", {
+				cls: "nexus-bases-view-content",
+			});
+
+			this.basesContentEl.createEl("div", {
+				text: "Bases View - Coming Soon",
+				cls: "nexus-bases-placeholder",
+			});
+		}
+	}
+
+	/**
+	 * Get the current view mode
+	 */
+	getCurrentMode(): ViewMode {
+		return this.currentMode;
+	}
+
+	/**
+	 * Get the active graph view instance (if in graph mode)
+	 */
+	getGraphView(): RelationshipGraphView | null {
+		return this.currentMode === "graph" ? this.graphView : null;
+	}
+
+	/**
+	 * Get the active bases view instance (if in bases mode)
+	 */
+	getBasesView(): null {
+		return null;
+	}
+
+	/**
+	 * Toggle enlargement of the view (expand/collapse sidebar)
+	 */
+	toggleEnlargement(): void {
+		// Find the current view's leaf
+		const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
+		if (leaves.length === 0) return;
+
+		// Access the DOM element through the view's content element
+		const viewContainerEl = this.contentEl.closest(".workspace-leaf");
+		if (!viewContainerEl) return;
+
+		const splitContainer = viewContainerEl.closest(".workspace-split.mod-left-split, .workspace-split.mod-right-split");
+		if (!splitContainer || !(splitContainer instanceof HTMLElement)) return;
+
+		if (this.isEnlarged) {
+			// Restore original width
+			if (this.originalWidth !== null) {
+				splitContainer.style.width = `${this.originalWidth}px`;
+			}
+			this.isEnlarged = false;
+			this.originalWidth = null;
+		} else {
+			// Store original width and enlarge
+			this.originalWidth = splitContainer.clientWidth;
+
+			const settings = this.plugin.settingsStore.settings$.value;
+			const windowWidth = window.innerWidth;
+			const targetWidth = (windowWidth * settings.graphEnlargedWidthPercent) / 100;
+
+			splitContainer.style.width = `${targetWidth}px`;
+			this.isEnlarged = true;
+		}
+
+		// Trigger a resize event to update any content that needs it
+		window.dispatchEvent(new Event("resize"));
+	}
+}
