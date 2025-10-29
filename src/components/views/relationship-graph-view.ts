@@ -263,6 +263,45 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			}
 		});
 
+		// Register arrow keys for graph navigation
+		this.registerDomEvent(document, "keydown", (evt) => {
+			// Only handle arrow keys if we're in zoom mode and not typing in an input
+			if (!this.zoomManager.isInZoomMode()) return;
+
+			const target = evt.target as HTMLElement;
+			if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+				return;
+			}
+
+			const focusedNodeId = this.zoomManager.getFocusedNodeId();
+			if (!focusedNodeId) return;
+
+			let targetNodeId: string | null = null;
+
+			switch (evt.key) {
+				case "ArrowUp":
+					evt.preventDefault();
+					targetNodeId = this.interactionHandler.navigateToParent(focusedNodeId);
+					break;
+				case "ArrowDown":
+					evt.preventDefault();
+					targetNodeId = this.interactionHandler.navigateToChild(focusedNodeId);
+					break;
+				case "ArrowLeft":
+					evt.preventDefault();
+					targetNodeId = this.interactionHandler.navigateToLeft(focusedNodeId);
+					break;
+				case "ArrowRight":
+					evt.preventDefault();
+					targetNodeId = this.interactionHandler.navigateToRight(focusedNodeId);
+					break;
+			}
+
+			if (targetNodeId) {
+				this.focusOnNode(targetNodeId);
+			}
+		});
+
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
 			this.graphFilterPresetSelector?.updatePresets(settings.filterPresets);
 
