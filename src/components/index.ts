@@ -10,5 +10,5 @@ export { NodeEditModal } from "./node-edit-modal";
 export { NodePreviewModal } from "./node-preview-modal";
 export { PropertyTooltip } from "./property-tooltip";
 export { RelationshipAdder } from "./relationship-adder";
-export { NexusPropertiesSettingsTab } from "./settings-tab";
+export { NexusPropertiesSettingsTab } from "./settings/settings-tab";
 export { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./views/nexus-view-switcher";
