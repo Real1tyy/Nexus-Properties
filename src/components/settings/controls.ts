@@ -46,13 +46,7 @@ interface MoveButtonOptions {
 	onMoveDown: () => Promise<void>;
 }
 
-export const createMoveButtons = ({
-	container,
-	index,
-	totalCount,
-	onMoveUp,
-	onMoveDown,
-}: MoveButtonOptions): void => {
+export const createMoveButtons = ({ container, index, totalCount, onMoveUp, onMoveDown }: MoveButtonOptions): void => {
 	if (index > 0) {
 		const moveUpButton = container.createEl("button", {
 			text: "↑",
@@ -97,10 +91,7 @@ export const swapRules = <T extends { id: string }>(rules: T[], ruleId: string, 
 	const targetIndex = ruleIndex + offset;
 
 	if (ruleIndex !== -1 && targetIndex >= 0 && targetIndex < currentRules.length) {
-		[currentRules[ruleIndex], currentRules[targetIndex]] = [
-			currentRules[targetIndex],
-			currentRules[ruleIndex],
-		];
+		[currentRules[ruleIndex], currentRules[targetIndex]] = [currentRules[targetIndex], currentRules[ruleIndex]];
 	}
 
 	return currentRules;

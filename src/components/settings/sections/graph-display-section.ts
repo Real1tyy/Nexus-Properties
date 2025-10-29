@@ -1,16 +1,13 @@
-import { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
+import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
 import { Setting } from "obsidian";
-
-import type { SettingsSection } from "../types";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
+import type { SettingsSection } from "../types";
 
 export class GraphDisplaySettingsSection implements SettingsSection {
 	readonly id = "graph-display";
 	readonly label = "Graph Display";
 
-	constructor(
-		private readonly uiBuilder: SettingsUIBuilder<typeof NexusPropertiesSettingsSchema>
-	) {}
+	constructor(private readonly uiBuilder: SettingsUIBuilder<typeof NexusPropertiesSettingsSchema>) {}
 
 	render(container: HTMLElement): void {
 		new Setting(container).setName("Graph Display").setHeading();
