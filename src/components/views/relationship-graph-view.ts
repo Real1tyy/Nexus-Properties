@@ -45,6 +45,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	private isUpdating = false;
 	private graphBuilder: GraphBuilder;
 	private settingsSubscription: Subscription | null = null;
+	private indexerSubscription: Subscription | null = null;
 	private propertyTooltip: PropertyTooltip;
 	private graphSearch: GraphSearch | null = null;
 	private searchRowEl: HTMLElement | null = null;
@@ -226,16 +227,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.onFileOpen(file);
 		});
 
-		this.registerEvent(this.app.metadataCache, "changed", (file) => {
-			// Only re-render if the changed file is the currently displayed file
-			if (this.currentFile && file.path === this.currentFile.path) {
-				this.updateGraph();
-			}
-		});
 
-		this.registerEvent(this.app.vault, "rename", (file, oldPath) => {
-			if (this.currentFile && oldPath === this.currentFile.path && file instanceof TFile) {
-				this.currentFile = file;
+		// Subscribe to indexer events for reactive updates
+		// This handles file changes, renames, and deletions after indexer has processed them
+		this.indexerSubscription = this.indexer.events$.subscribe((event) => {
+			if (!this.currentFile) return;
+			if (event.filePath === this.currentFile.path) {
 				this.updateGraph();
 			}
 		});
@@ -351,6 +348,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		if (this.settingsSubscription) {
 			this.settingsSubscription.unsubscribe();
 			this.settingsSubscription = null;
+		}
+
+		if (this.indexerSubscription) {
+			this.indexerSubscription.unsubscribe();
+			this.indexerSubscription = null;
 		}
 
 		this.cleanupEvents();

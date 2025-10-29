@@ -183,7 +183,7 @@ export class Indexer {
 		renamed$
 			.pipe(
 				filter(([f]) => Indexer.isMarkdownFile(f)),
-				debounceTime(1500)
+				debounceTime(1000)
 			)
 			.subscribe(([newFile, oldPath]) => {
 				this.handleRename(newFile, oldPath);
@@ -221,6 +221,14 @@ export class Indexer {
 		this.relationshipsCache.delete(oldPath);
 		this.relationshipsCache.set(newFile.path, newRelationships);
 
+		// Emit event for the renamed file itself
+		this.scanEventsSubject.next({
+			type: "file-changed",
+			filePath: newFile.path,
+			oldRelationships,
+			newRelationships,
+		});
+
 		// Collect affected files from old relationships
 		const affectedFiles = new Set<string>();
 
@@ -241,7 +249,6 @@ export class Indexer {
 
 		// Re-extract relationships from frontmatter for all affected files
 		// Obsidian has already updated their frontmatter with the new file name
-		const updatedPaths = [newFile.path];
 		for (const filePath of affectedFiles) {
 			const file = this.vault.getFileByPath(filePath);
 			if (file === null) continue;
@@ -249,9 +256,17 @@ export class Indexer {
 			const fm = this.metadataCache.getFileCache(file)?.frontmatter;
 			if (!fm) continue;
 
+			const oldRel = this.relationshipsCache.get(filePath);
 			const updatedRelationships = this.extractRelationships(file, fm);
 			this.relationshipsCache.set(filePath, updatedRelationships);
-			updatedPaths.push(filePath);
+
+			// Emit event for each affected file
+			this.scanEventsSubject.next({
+				type: "file-changed",
+				filePath: filePath,
+				oldRelationships: oldRel,
+				newRelationships: updatedRelationships,
+			});
 		}
 	}
 

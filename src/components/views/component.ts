@@ -1,8 +1,11 @@
+import type { EventRef, Events } from "obsidian";
+
 /**
  * Base class that provides event registration and automatic cleanup
  * Similar to ItemView's registerEvent/registerDomEvent pattern
  */
 export abstract class RegisteredEventsComponent {
+	protected eventRefs: EventRef[] = [];
 	protected eventCleanupFunctions: Array<() => void> = [];
 
 	/**
