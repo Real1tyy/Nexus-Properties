@@ -227,7 +227,6 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.onFileOpen(file);
 		});
 
-
 		// Subscribe to indexer events for reactive updates
 		// This handles file changes, renames, and deletions after indexer has processed them
 		this.indexerSubscription = this.indexer.events$.subscribe((event) => {

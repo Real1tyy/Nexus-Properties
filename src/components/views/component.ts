@@ -1,4 +1,4 @@
-import type { EventRef, Events } from "obsidian";
+import type { EventRef } from "obsidian";
 
 /**
  * Base class that provides event registration and automatic cleanup
