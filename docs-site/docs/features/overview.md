@@ -68,6 +68,7 @@ Deep-dive into any node with inline preview.
 - Click any node to enter zoom mode
 - View frontmatter and content inline
 - Navigate between nodes without leaving the graph
+- Use arrow keys for keyboard navigation (Up/Down for parent/child, Left/Right for spatial)
 - Toggle visibility of frontmatter/content sections
 
 **[Learn more →](zoom-mode)**

@@ -149,6 +149,36 @@ While in zoom mode:
 
 Useful for quickly navigating relationships.
 
+### Keyboard Navigation
+
+**Navigate with arrow keys** while in zoom mode:
+
+**⬆️ Up Arrow** - Navigate to parent node
+- Follows incoming edges (parent-child relationships)
+- Moves to the source of the first incoming edge
+- Useful for moving up hierarchies
+
+**⬇️ Down Arrow** - Navigate to child node
+- Follows outgoing edges (parent-child relationships)
+- Moves to the target of the first outgoing edge
+- Useful for exploring children and descendants
+
+**⬅️ Left Arrow** - Navigate to node on the left
+- Finds the closest node positioned to the left
+- Uses spatial positioning in the graph
+- Prioritizes horizontal distance
+
+**➡️ Right Arrow** - Navigate to node on the right
+- Finds the closest node positioned to the right
+- Uses spatial positioning in the graph
+- Prioritizes horizontal distance
+
+**How it works**:
+1. Enter zoom mode by clicking any node
+2. Use arrow keys to navigate between nodes
+3. Preview updates automatically as you navigate
+4. Arrow keys are disabled when typing in search/filter inputs
+
 ## Zoom Preview Configuration
 
 ### Panel Height
@@ -232,11 +262,17 @@ Control how much space the preview takes:
 
 ### Keyboard Navigation
 
-1. **Assign hotkeys** to toggle commands:
+1. **Use arrow keys** for hands-free navigation:
+   - Up/Down: Navigate parent-child relationships
+   - Left/Right: Navigate spatially positioned nodes
+   - Fast traversal without mouse
+2. **Assign hotkeys** to toggle commands:
    - Toggle Focus Content
    - Toggle Focus Frontmatter
-2. **Navigate with mouse**, toggle with keyboard
-3. **Efficient workflow** without reaching for mouse
+3. **Combine keyboard and mouse**:
+   - Arrow keys for quick traversal
+   - Mouse clicks for jumping to distant nodes
+4. **Efficient workflow** without constantly reaching for mouse
 
 ### Two-Panel Workflow
 

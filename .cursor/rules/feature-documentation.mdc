@@ -1,0 +1,65 @@
+---
+alwaysApply: true
+---
+
+# Feature Documentation Rule
+
+**CRITICAL: For every new feature or significant code change, documentation MUST be updated alongside the code.**
+
+## Required Documentation for New Features
+
+### 1. Documentation Site Updates
+
+All new features MUST be documented in [docs-site/docs/](mdc:docs-site/docs/):
+
+**Create or Update Relevant Documentation**:
+- Add new page in [docs-site/docs/features/](mdc:docs-site/docs/features/) for major features
+- Update existing feature pages for enhancements
+- Include clear examples, use cases, and step-by-step instructions
+- Add screenshots or diagrams where helpful
+
+**Update Feature Overview**:
+- Add feature to [docs-site/docs/features/overview.md](mdc:docs-site/docs/features/overview.md)
+- Include brief description and link to detailed documentation
+
+**Update Related Pages**:
+- [quickstart.md](mdc:docs-site/docs/quickstart.md) - If feature affects getting started
+- [configuration.md](mdc:docs-site/docs/configuration.md) - For new settings
+- [troubleshooting.md](mdc:docs-site/docs/troubleshooting.md) - Add common issues
+- [faq.md](mdc:docs-site/docs/faq.md) - Add frequently asked questions
+
+### 2. Changelog Updates
+
+**ALWAYS update** [docs-site/docs/changelog.md](mdc:docs-site/docs/changelog.md):
+
+- Add to appropriate version section (or create new version section)
+- Use clear, user-friendly language
+- Explain WHAT changed, WHY it's useful, and HOW to use it
+- Include examples and workflows where applicable
+- Link to detailed documentation
+
+**Changelog Format**:
+```markdown
+## X.Y.Z
+
+### New Features
+
+#### Feature Name
+- **Key Point 1**: Brief description of what users can do with this feature.
+- **Key Point 2**: Another user benefit or capability.
+- **Key Point 3**: Additional user-facing detail.
+
+### Bug Fixes
+- Brief description of what was fixed from user perspective.
+
+### Improvements
+- Brief description of enhancement from user perspective.
+```
+
+**Changelog Style Guidelines**:
+- Keep entries concise (3-5 bullet points per feature)
+- Focus on WHAT users can do, not HOW it's implemented
+- No technical implementation details
+- Use bold for feature highlights
+- User-friendly language only
+- No emojis in section headers
