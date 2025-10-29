@@ -1,4 +1,4 @@
-import { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
+import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
 import { Setting } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
@@ -151,19 +151,14 @@ export class NodeCreationSettingsSection implements SettingsSection {
 			});
 			leftSection.appendChild(toggle);
 
-			const pathInput = createRuleInput(
-				rule.path,
-				"Projects/",
-				"color-rule-expression-input",
-				async (value) => {
-					await this.plugin.settingsStore.updateSettings((current) => ({
-						...current,
-						pathExcludedProperties: current.pathExcludedProperties.map((existingRule) =>
-							existingRule.id === rule.id ? { ...existingRule, path: value } : existingRule
-						),
-					}));
-				}
-			);
+			const pathInput = createRuleInput(rule.path, "Projects/", "color-rule-expression-input", async (value) => {
+				await this.plugin.settingsStore.updateSettings((current) => ({
+					...current,
+					pathExcludedProperties: current.pathExcludedProperties.map((existingRule) =>
+						existingRule.id === rule.id ? { ...existingRule, path: value } : existingRule
+					),
+				}));
+			});
 			leftSection.appendChild(pathInput);
 
 			const rightSection = mainRow.createDiv("color-rule-right");
@@ -180,9 +175,7 @@ export class NodeCreationSettingsSection implements SettingsSection {
 					await this.plugin.settingsStore.updateSettings((current) => ({
 						...current,
 						pathExcludedProperties: current.pathExcludedProperties.map((existingRule) =>
-							existingRule.id === rule.id
-								? { ...existingRule, excludedProperties: propertiesArray }
-								: existingRule
+							existingRule.id === rule.id ? { ...existingRule, excludedProperties: propertiesArray } : existingRule
 						),
 					}));
 				}
