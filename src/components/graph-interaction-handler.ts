@@ -313,16 +313,19 @@ export class GraphInteractionHandler {
 		if (!currentPos) return null;
 
 		// Find all tree roots (nodes with no incoming edges)
-		const treeRoots = this.cy.nodes().map((node) => {
-			const incomingEdges = node.connectedEdges().filter((edge) => edge.target().id() === node.id());
-			if (incomingEdges.length === 0) {
-				return {
-					id: node.id(),
-					position: node.position(),
-				};
-			}
-			return null;
-		}).filter((root): root is { id: string; position: { x: number; y: number } } => root !== null);
+		const treeRoots = this.cy
+			.nodes()
+			.map((node) => {
+				const incomingEdges = node.connectedEdges().filter((edge) => edge.target().id() === node.id());
+				if (incomingEdges.length === 0) {
+					return {
+						id: node.id(),
+						position: node.position(),
+					};
+				}
+				return null;
+			})
+			.filter((root): root is { id: string; position: { x: number; y: number } } => root !== null);
 
 		// Sort by X position (left to right)
 		treeRoots.sort((a, b) => a.position.x - b.position.x);
