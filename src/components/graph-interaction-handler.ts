@@ -266,6 +266,10 @@ export class GraphInteractionHandler {
 		// Get all other nodes
 		const otherNodes = this.cy.nodes().filter((n) => n.id() !== currentNodeId);
 
+		// Vertical tolerance for "same height" (in pixels)
+		// Nodes within this range are considered at the same level
+		const VERTICAL_TOLERANCE = 50;
+
 		let closestNode: any = null;
 		let closestDistance = Number.POSITIVE_INFINITY;
 
@@ -273,19 +277,19 @@ export class GraphInteractionHandler {
 			const pos = node.renderedPosition();
 			if (!pos) return;
 
-			// Check if node is in the correct direction
-			const isInDirection = direction === "left" ? pos.x < currentPos.x : pos.x > currentPos.x;
+			// Check if node is at approximately the same vertical level
+			const verticalDist = Math.abs(pos.y - currentPos.y);
+			if (verticalDist > VERTICAL_TOLERANCE) return;
 
+			// Check if node is in the correct horizontal direction
+			const isInDirection = direction === "left" ? pos.x < currentPos.x : pos.x > currentPos.x;
 			if (!isInDirection) return;
 
-			// Calculate distance (prioritize horizontal distance, but consider vertical too)
+			// Calculate horizontal distance only (since we've already filtered by vertical level)
 			const horizontalDist = Math.abs(pos.x - currentPos.x);
-			const verticalDist = Math.abs(pos.y - currentPos.y);
-			// Weight horizontal distance more heavily
-			const distance = horizontalDist + verticalDist * 0.3;
 
-			if (distance < closestDistance) {
-				closestDistance = distance;
+			if (horizontalDist < closestDistance) {
+				closestDistance = horizontalDist;
 				closestNode = node;
 			}
 		});
