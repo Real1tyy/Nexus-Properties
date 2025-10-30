@@ -297,6 +297,89 @@ export class GraphInteractionHandler {
 		return closestNode ? closestNode.id() : null;
 	}
 
+	navigateToNextTreeRoot(currentNodeId: string): string | null {
+		return this.navigateToTreeRoot(currentNodeId, "next");
+	}
+
+	navigateToPreviousTreeRoot(currentNodeId: string): string | null {
+		return this.navigateToTreeRoot(currentNodeId, "previous");
+	}
+
+	private navigateToTreeRoot(currentNodeId: string, direction: "next" | "previous"): string | null {
+		const currentNode = this.cy.getElementById(currentNodeId);
+		if (!currentNode.length) return null;
+
+		const currentPos = currentNode.position();
+		if (!currentPos) return null;
+
+		// Find all tree roots (nodes with no incoming edges)
+		const treeRoots = this.cy.nodes().map((node) => {
+			const incomingEdges = node.connectedEdges().filter((edge) => edge.target().id() === node.id());
+			if (incomingEdges.length === 0) {
+				return {
+					id: node.id(),
+					position: node.position(),
+				};
+			}
+			return null;
+		}).filter((root): root is { id: string; position: { x: number; y: number } } => root !== null);
+
+		// Sort by X position (left to right)
+		treeRoots.sort((a, b) => a.position.x - b.position.x);
+
+		if (treeRoots.length === 0) return null;
+
+		// Find the current tree root by traversing up from current node
+		const currentTreeRoot = this.findTreeRoot(currentNodeId);
+		if (!currentTreeRoot) return null;
+
+		// Find the current root in the sorted list
+		const currentIndex = treeRoots.findIndex((root) => root.id === currentTreeRoot);
+		if (currentIndex === -1) return null;
+
+		// Navigate to next or previous root
+		let targetIndex: number;
+		if (direction === "next") {
+			targetIndex = (currentIndex + 1) % treeRoots.length; // Wrap around to first
+		} else {
+			targetIndex = (currentIndex - 1 + treeRoots.length) % treeRoots.length; // Wrap around to last
+		}
+
+		return treeRoots[targetIndex].id;
+	}
+
+	private findTreeRoot(nodeId: string): string | null {
+		const node = this.cy.getElementById(nodeId);
+		if (!node.length) return null;
+
+		// Traverse up to find the root
+		let current = node;
+		const visited = new Set<string>();
+
+		while (true) {
+			const currentId = current.id();
+			if (visited.has(currentId)) {
+				return currentId;
+			}
+			visited.add(currentId);
+
+			const incomingEdges = current.connectedEdges().filter((edge) => edge.target().id() === currentId);
+
+			if (incomingEdges.length === 0) {
+				// Found root
+				return currentId;
+			}
+
+			// Move to parent (first incoming edge)
+			const parentId = incomingEdges[0].source().id();
+			current = this.cy.getElementById(parentId);
+
+			if (!current.length) {
+				return currentId;
+			}
+		}
+	}
+
 	cleanup(): void {
 		this.cy.removeAllListeners();
 	}

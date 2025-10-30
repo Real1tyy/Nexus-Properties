@@ -12,7 +12,8 @@ All notable changes to Nexus Properties will be documented here.
 
 #### Keyboard Navigation in Zoom Mode
 - **Arrow Key Navigation**: Navigate between nodes using arrow keys while in zoom mode. Up/Down arrows follow parent-child relationships, Left/Right arrows move to spatially adjacent nodes.
-- **Smart Context Awareness**: Arrow keys only work in zoom mode and are disabled when typing in search/filter inputs.
+- **Tree Navigation (Folder Notes)**: Press Enter to jump to the next tree root (right) and Shift+Enter to jump to the previous tree root (left) when viewing folder notes with multiple trees.
+- **Smart Context Awareness**: Keyboard shortcuts only work in zoom mode and are disabled when typing in search/filter inputs.
 
 #### Custom Sorting for Bases View
 - **Custom Formulas**: Define formulas that map property values to numeric priorities for advanced sorting.

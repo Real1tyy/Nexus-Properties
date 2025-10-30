@@ -263,9 +263,9 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			}
 		});
 
-		// Register arrow keys for graph navigation
+		// Register keyboard shortcuts for graph navigation
 		this.registerDomEvent(document, "keydown", (evt) => {
-			// Only handle arrow keys if we're in zoom mode and not typing in an input
+			// Only handle shortcuts if we're in zoom mode and not typing in an input
 			if (!this.zoomManager.isInZoomMode()) return;
 
 			const target = evt.target as HTMLElement;
@@ -277,6 +277,23 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			if (!focusedNodeId) return;
 
 			let targetNodeId: string | null = null;
+
+			// Check for Enter/Shift+Enter for tree navigation (folder notes only)
+			const isFolderNoteGraph = Boolean(this.currentFile && isFolderNote(this.currentFile.path));
+			if (isFolderNoteGraph && !this.renderRelated) {
+				if (evt.key === "Enter") {
+					evt.preventDefault();
+					if (evt.shiftKey) {
+						targetNodeId = this.interactionHandler.navigateToPreviousTreeRoot(focusedNodeId);
+					} else {
+						targetNodeId = this.interactionHandler.navigateToNextTreeRoot(focusedNodeId);
+					}
+					if (targetNodeId) {
+						this.focusOnNode(targetNodeId);
+					}
+					return;
+				}
+			}
 
 			switch (evt.key) {
 				case "ArrowUp":

@@ -173,11 +173,26 @@ Useful for quickly navigating relationships.
 - Uses spatial positioning in the graph
 - Prioritizes horizontal distance
 
+#### Tree Navigation (Folder Notes Only)
+
+**⏎ Enter** - Navigate to next tree root (right)
+- Only works in folder notes graphs (hierarchical mode)
+- Jumps to the root of the next tree to the right
+- Wraps around to the first tree when at the last tree
+- Useful for reviewing multiple independent hierarchies
+
+**⇧ Shift+Enter** - Navigate to previous tree root (left)
+- Only works in folder notes graphs (hierarchical mode)
+- Jumps to the root of the previous tree to the left
+- Wraps around to the last tree when at the first tree
+- Complements Enter for bidirectional tree traversal
+
 **How it works**:
 1. Enter zoom mode by clicking any node
 2. Use arrow keys to navigate between nodes
-3. Preview updates automatically as you navigate
-4. Arrow keys are disabled when typing in search/filter inputs
+3. Use Enter/Shift+Enter to jump between tree roots (folder notes only)
+4. Preview updates automatically as you navigate
+5. Keyboard shortcuts are disabled when typing in search/filter inputs
 
 ## Zoom Preview Configuration
 
@@ -266,13 +281,18 @@ Control how much space the preview takes:
    - Up/Down: Navigate parent-child relationships
    - Left/Right: Navigate spatially positioned nodes
    - Fast traversal without mouse
-2. **Assign hotkeys** to toggle commands:
+2. **Use Enter/Shift+Enter in folder notes**:
+   - Enter: Jump to next tree root (right)
+   - Shift+Enter: Jump to previous tree root (left)
+   - Quickly review multiple independent hierarchies
+3. **Assign hotkeys** to toggle commands:
    - Toggle Focus Content
    - Toggle Focus Frontmatter
-3. **Combine keyboard and mouse**:
+4. **Combine keyboard and mouse**:
    - Arrow keys for quick traversal
+   - Enter/Shift+Enter for tree jumping (folder notes)
    - Mouse clicks for jumping to distant nodes
-4. **Efficient workflow** without constantly reaching for mouse
+5. **Efficient workflow** without constantly reaching for mouse
 
 ### Two-Panel Workflow
 
