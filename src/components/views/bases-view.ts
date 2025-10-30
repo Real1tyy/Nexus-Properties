@@ -7,7 +7,13 @@ import { RegisteredEventsComponent } from "./component";
 
 export const VIEW_TYPE_BASES = "nexus-bases-view";
 
-export type BaseViewType = "children" | "parent" | "related" | "archived-children" | "archived-parent" | "archived-related";
+export type BaseViewType =
+	| "children"
+	| "parent"
+	| "related"
+	| "archived-children"
+	| "archived-parent"
+	| "archived-related";
 
 /**
  * Bases view component that uses Obsidian's Bases API to render
