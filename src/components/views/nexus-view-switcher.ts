@@ -2,7 +2,7 @@ import { ItemView, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
-import { BasesView } from "./bases-view";
+import { BasesView, type BaseViewType } from "./bases-view";
 import { RelationshipGraphView } from "./relationship-graph-view";
 
 export const VIEW_TYPE_NEXUS_SWITCHER = "nexus-view-switcher";
@@ -19,6 +19,7 @@ export class NexusViewSwitcher extends ItemView {
 	private isEnlarged = false;
 	private originalWidth: number | null = null;
 	private settingsSubscription: Subscription | null = null;
+	private lastBasesViewType: BaseViewType = "children";
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -183,7 +184,9 @@ export class NexusViewSwitcher extends ItemView {
 				cls: "nexus-bases-view-content",
 			});
 
-			this.basesView = new BasesView(this.app, this.basesContentEl, this.plugin);
+			this.basesView = new BasesView(this.app, this.basesContentEl, this.plugin, this.lastBasesViewType, (viewType) => {
+				this.lastBasesViewType = viewType;
+			});
 
 			await this.basesView.render();
 		}

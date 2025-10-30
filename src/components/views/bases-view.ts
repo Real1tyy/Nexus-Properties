@@ -7,7 +7,7 @@ import { RegisteredEventsComponent } from "./component";
 
 export const VIEW_TYPE_BASES = "nexus-bases-view";
 
-type BaseViewType = "children" | "parent" | "related" | "archived-children" | "archived-parent" | "archived-related";
+export type BaseViewType = "children" | "parent" | "related" | "archived-children" | "archived-parent" | "archived-related";
 
 /**
  * Bases view component that uses Obsidian's Bases API to render
@@ -23,8 +23,15 @@ export class BasesView extends RegisteredEventsComponent {
 	private currentSettings: NexusPropertiesSettings;
 	private selectedViewType: BaseViewType = "children";
 	private viewSelectorEl: HTMLElement | null = null;
+	private onViewTypeChange?: (viewType: BaseViewType) => void;
 
-	constructor(app: App, containerEl: HTMLElement, plugin: NexusPropertiesPlugin) {
+	constructor(
+		app: App,
+		containerEl: HTMLElement,
+		plugin: NexusPropertiesPlugin,
+		initialViewType?: BaseViewType,
+		onViewTypeChange?: (viewType: BaseViewType) => void
+	) {
 		super();
 		this.app = app;
 		this.contentEl = containerEl;
@@ -33,6 +40,11 @@ export class BasesView extends RegisteredEventsComponent {
 		this.component.load();
 		this.currentSettings = plugin.settingsStore.currentSettings;
 		this.includedPropertiesEvaluator = new IncludedPropertiesEvaluator(plugin.settingsStore.settings$);
+		this.onViewTypeChange = onViewTypeChange;
+
+		if (initialViewType) {
+			this.selectedViewType = initialViewType;
+		}
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
 			this.currentSettings = settings;
@@ -105,8 +117,12 @@ export class BasesView extends RegisteredEventsComponent {
 				button.addClass("is-active");
 			}
 
-			button.addEventListener("click", async () => {
+			button.addEventListener("mousedown", async (e) => {
+				e.preventDefault();
 				this.selectedViewType = type;
+				if (this.onViewTypeChange) {
+					this.onViewTypeChange(type);
+				}
 				await this.render();
 			});
 		}
@@ -172,6 +188,10 @@ ${orderArray}
 
 	async updateActiveFile(): Promise<void> {
 		await this.render();
+	}
+
+	getSelectedViewType(): BaseViewType {
+		return this.selectedViewType;
 	}
 
 	destroy(): void {
