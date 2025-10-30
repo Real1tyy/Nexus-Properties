@@ -1,4 +1,4 @@
-import { type App, Component, MarkdownRenderer } from "obsidian";
+import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
@@ -6,6 +6,8 @@ import { IncludedPropertiesEvaluator } from "../../utils/included-properties";
 import { RegisteredEventsComponent } from "./component";
 
 export const VIEW_TYPE_BASES = "nexus-bases-view";
+
+type BaseViewType = "children" | "parent" | "related";
 
 /**
  * Bases view component that uses Obsidian's Bases API to render
@@ -19,6 +21,8 @@ export class BasesView extends RegisteredEventsComponent {
 	private includedPropertiesEvaluator: IncludedPropertiesEvaluator;
 	private settingsSubscription: Subscription | null = null;
 	private currentSettings: NexusPropertiesSettings;
+	private selectedViewType: BaseViewType = "children";
+	private viewSelectorEl: HTMLElement | null = null;
 
 	constructor(app: App, containerEl: HTMLElement, plugin: NexusPropertiesPlugin) {
 		super();
@@ -47,52 +51,77 @@ export class BasesView extends RegisteredEventsComponent {
 			return;
 		}
 
-		const includedProperties = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
-
-		const orderArray = includedProperties.map((prop) => `      - ${prop}`).join("\n");
-
-		const childrenProp = this.currentSettings.childrenProp;
-		const parentProp = this.currentSettings.parentProp;
-		const relatedProp = this.currentSettings.relatedProp;
-
-		const basesMarkdown = `
-\`\`\`base
-views:
-  - type: table
-    name: Children
-    order:
-${orderArray}
-    filters:
-      and:
-        - this.${childrenProp}.contains(file)
-        - _Archived != true
-  - type: table
-    name: Parent
-    order:
-${orderArray}
-    filters:
-      and:
-        - this.${parentProp}.contains(file)
-        - _Archived != true
-  - type: table
-    name: Related
-    order:
-${orderArray}
-    filters:
-      and:
-        - this.${relatedProp}.contains(file)
-        - _Archived != true
-\`\`\`
-`;
+		// Create view selector buttons
+		this.createViewSelector();
 
 		// Create container for the rendered markdown
 		const markdownContainer = this.contentEl.createDiv({
 			cls: "nexus-bases-markdown-container",
 		});
 
-		// Render using Obsidian's MarkdownRenderer
-		// This will process the base code block and render the tables
-		await MarkdownRenderer.render(this.app, basesMarkdown, markdownContainer, activeFile.path, this.component);
+		// Render the selected view
+		await this.renderSelectedView(activeFile, markdownContainer);
+	}
+
+	private createViewSelector(): void {
+		this.viewSelectorEl = this.contentEl.createDiv({
+			cls: "nexus-bases-view-selector",
+		});
+
+		const viewTypes: { type: BaseViewType; label: string }[] = [
+			{ type: "children", label: "Children" },
+			{ type: "parent", label: "Parent" },
+			{ type: "related", label: "Related" },
+		];
+
+		for (const { type, label } of viewTypes) {
+			const button = this.viewSelectorEl.createEl("button", {
+				text: label,
+				cls: "nexus-bases-view-button",
+			});
+
+			if (type === this.selectedViewType) {
+				button.addClass("is-active");
+			}
+
+			button.addEventListener("click", async () => {
+				this.selectedViewType = type;
+				await this.render();
+			});
+		}
+	}
+
+	private async renderSelectedView(activeFile: TFile, container: HTMLElement): Promise<void> {
+		const includedProperties = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
+		const orderArray = includedProperties.map((prop) => `      - ${prop}`).join("\n");
+
+		const viewConfig = this.getViewConfig(this.selectedViewType);
+		const basesMarkdown = `
+\`\`\`base
+views:
+  - type: table
+    name: ${viewConfig.name}
+    order:
+${orderArray}
+    filters:
+      and:
+        - this.${viewConfig.prop}.contains(file)
+        - _Archived != true
+\`\`\`
+`;
+
+		await MarkdownRenderer.render(this.app, basesMarkdown, container, activeFile.path, this.component);
+	}
+
+	private getViewConfig(viewType: BaseViewType): { name: string; prop: string } {
+		switch (viewType) {
+			case "children":
+				return { name: "Children", prop: this.currentSettings.childrenProp };
+			case "parent":
+				return { name: "Parent", prop: this.currentSettings.parentProp };
+			case "related":
+				return { name: "Related", prop: this.currentSettings.relatedProp };
+		}
 	}
 
 	private renderEmptyState(message: string): void {
@@ -114,6 +143,7 @@ ${orderArray}
 		if (this.component) {
 			this.component.unload();
 		}
+		this.viewSelectorEl = null;
 		this.contentEl.empty();
 		this.cleanupEvents();
 	}

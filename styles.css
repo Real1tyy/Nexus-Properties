@@ -1151,6 +1151,38 @@
 	height: 100%;
 }
 
+.nexus-bases-view-selector {
+	display: flex;
+	gap: 8px;
+	padding: 12px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	background-color: var(--background-secondary);
+}
+
+.nexus-bases-view-button {
+	flex: 1;
+	padding: 8px 16px;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-normal);
+	cursor: pointer;
+	font-size: 0.9em;
+	font-weight: 500;
+	transition: all 0.2s ease;
+}
+
+.nexus-bases-view-button:hover {
+	background-color: var(--background-modifier-hover);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-bases-view-button.is-active {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
 .nexus-bases-markdown-container {
 	padding: 1em;
 	overflow-y: auto;
