@@ -1,4 +1,8 @@
 import { type App, Component, MarkdownRenderer } from "obsidian";
+import type { Subscription } from "rxjs";
+import type NexusPropertiesPlugin from "../../main";
+import type { NexusPropertiesSettings } from "../../types/settings";
+import { IncludedPropertiesEvaluator } from "../../utils/included-properties";
 import { RegisteredEventsComponent } from "./component";
 
 export const VIEW_TYPE_BASES = "nexus-bases-view";
@@ -11,13 +15,25 @@ export class BasesView extends RegisteredEventsComponent {
 	private app: App;
 	private contentEl: HTMLElement;
 	private component: Component;
+	private plugin: NexusPropertiesPlugin;
+	private includedPropertiesEvaluator: IncludedPropertiesEvaluator;
+	private settingsSubscription: Subscription | null = null;
+	private currentSettings: NexusPropertiesSettings;
 
-	constructor(app: App, containerEl: HTMLElement) {
+	constructor(app: App, containerEl: HTMLElement, plugin: NexusPropertiesPlugin) {
 		super();
 		this.app = app;
 		this.contentEl = containerEl;
+		this.plugin = plugin;
 		this.component = new Component();
 		this.component.load();
+		this.currentSettings = plugin.settingsStore.currentSettings;
+		this.includedPropertiesEvaluator = new IncludedPropertiesEvaluator(plugin.settingsStore.settings$);
+
+		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
+			this.currentSettings = settings;
+			this.render();
+		});
 	}
 
 	async render(): Promise<void> {
@@ -31,33 +47,40 @@ export class BasesView extends RegisteredEventsComponent {
 			return;
 		}
 
-		// Create the base code block markdown
+		const includedProperties = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
+
+		const orderArray = includedProperties.map((prop) => `      - ${prop}`).join("\n");
+
+		const childrenProp = this.currentSettings.childrenProp;
+		const parentProp = this.currentSettings.parentProp;
+		const relatedProp = this.currentSettings.relatedProp;
+
 		const basesMarkdown = `
 \`\`\`base
 views:
   - type: table
     name: Children
     order:
-      - file.name
+${orderArray}
     filters:
       and:
-        - this.Child.contains(file)
+        - this.${childrenProp}.contains(file)
         - _Archived != true
   - type: table
     name: Parent
     order:
-      - file.name
+${orderArray}
     filters:
       and:
-        - this.Parent.contains(file)
+        - this.${parentProp}.contains(file)
         - _Archived != true
   - type: table
     name: Related
     order:
-      - file.name
+${orderArray}
     filters:
       and:
-        - this.Related.contains(file)
+        - this.${relatedProp}.contains(file)
         - _Archived != true
 \`\`\`
 `;
@@ -84,6 +107,10 @@ views:
 	}
 
 	destroy(): void {
+		if (this.settingsSubscription) {
+			this.settingsSubscription.unsubscribe();
+			this.settingsSubscription = null;
+		}
 		if (this.component) {
 			this.component.unload();
 		}

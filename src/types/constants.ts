@@ -40,6 +40,9 @@ export const SETTINGS_DEFAULTS = {
 
 	// Node creation defaults
 	DEFAULT_EXCLUDED_PROPERTIES: ["Parent", "Child", "Related", "_ZettelID"],
+
+	// Bases view defaults
+	DEFAULT_BASES_INCLUDED_PROPERTIES: [],
 } as const;
 
 export const SCAN_CONCURRENCY = 10;

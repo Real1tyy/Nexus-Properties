@@ -28,6 +28,15 @@ export const PathExcludedPropertiesSchema = z.object({
 
 export type PathExcludedProperties = z.infer<typeof PathExcludedPropertiesSchema>;
 
+export const PathIncludedPropertiesSchema = z.object({
+	id: z.string(),
+	path: z.string(),
+	includedProperties: z.array(z.string()),
+	enabled: z.boolean(),
+});
+
+export type PathIncludedProperties = z.infer<typeof PathIncludedPropertiesSchema>;
+
 export const NexusPropertiesSettingsSchema = z.object({
 	version: z.number().int().positive().optional().default(SETTINGS_VERSION),
 
@@ -120,6 +129,13 @@ export const NexusPropertiesSettingsSchema = z.object({
 		.optional()
 		.default([...SETTINGS_DEFAULTS.DEFAULT_EXCLUDED_PROPERTIES]),
 	pathExcludedProperties: z.array(PathExcludedPropertiesSchema).optional().default([]),
+
+	// Included properties for bases view columns
+	defaultBasesIncludedProperties: z
+		.array(z.string())
+		.optional()
+		.default([...SETTINGS_DEFAULTS.DEFAULT_BASES_INCLUDED_PROPERTIES]),
+	pathBasesIncludedProperties: z.array(PathIncludedPropertiesSchema).optional().default([]),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

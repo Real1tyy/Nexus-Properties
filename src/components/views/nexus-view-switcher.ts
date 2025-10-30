@@ -183,7 +183,7 @@ export class NexusViewSwitcher extends ItemView {
 				cls: "nexus-bases-view-content",
 			});
 
-			this.basesView = new BasesView(this.app, this.basesContentEl);
+			this.basesView = new BasesView(this.app, this.basesContentEl, this.plugin);
 
 			await this.basesView.render();
 		}

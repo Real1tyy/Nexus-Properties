@@ -3,6 +3,7 @@ import { type App, PluginSettingTab } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
+import { BasesViewSettingsSection } from "./sections/bases-view-section";
 import { DirectRelationshipsSection } from "./sections/direct-relationships-section";
 import { DirectoriesSection } from "./sections/directories-section";
 import { ExamplesSection } from "./sections/examples-section";
@@ -85,6 +86,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			new UserInterfaceSettingsSection(this.uiBuilder),
 			new GraphDisplaySettingsSection(this.uiBuilder),
 			new PropertyDisplaySettingsSection(this.uiBuilder),
+			new BasesViewSettingsSection(this.plugin, this.uiBuilder),
 			new RulesSection(this.plugin, this.uiBuilder),
 			new DirectoriesSection(this.plugin, this.uiBuilder),
 			new DirectRelationshipsSection(this.uiBuilder),
