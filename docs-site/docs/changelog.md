@@ -14,6 +14,11 @@ All notable changes to Nexus Properties will be documented here.
 - **Arrow Key Navigation**: Navigate between nodes using arrow keys while in zoom mode. Up/Down arrows follow parent-child relationships, Left/Right arrows move to spatially adjacent nodes.
 - **Smart Context Awareness**: Arrow keys only work in zoom mode and are disabled when typing in search/filter inputs.
 
+#### Custom Sorting for Bases View
+- **Custom Formulas**: Define formulas that map property values to numeric priorities for advanced sorting.
+- **Flexible Sort Rules**: Configure multi-level sorting using formulas and built-in properties (e.g., sort by status, then priority, then modification time).
+- **Easy Configuration**: Settings provide text areas where you enter YAML content that gets dynamically embedded into base code blocks.
+
 ## Contributing
 
 See [Contributing Guide](contributing) for how to suggest features, report bugs, or contribute code.

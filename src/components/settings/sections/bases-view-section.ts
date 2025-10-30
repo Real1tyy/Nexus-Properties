@@ -47,6 +47,64 @@ export class BasesViewSettingsSection implements SettingsSection {
 			placeholder: "e.g., status, priority, tags",
 		});
 
+		new Setting(container).setName("Custom sorting").setHeading();
+
+		container
+			.createDiv("setting-item-description")
+			.setText(
+				"Define custom formulas and sort rules for advanced sorting in Bases view tables. Formulas map property values to numeric priorities, and sort rules specify how rows should be ordered."
+			);
+
+		new Setting(container)
+			.setName("Custom formulas")
+			.setDesc(
+				"Define custom formulas for sorting. Enter the YAML content that goes AFTER 'formulas:' (do not include 'formulas:' itself). Each formula maps values to sort priorities. Leave empty if not needed."
+			)
+			.addTextArea((text) => {
+				text
+					.setPlaceholder(
+						`  _priority_sort: |-
+    [
+      ["Very High", 1],
+      ["High", 2],
+      ["Medium", 3],
+      ["Low", 4],
+      ["null", 5]
+    ].filter(value[0] == Priority.toString())[0][1]`
+					)
+					.setValue(this.plugin.settingsStore.currentSettings.basesCustomFormulas)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((current) => ({
+							...current,
+							basesCustomFormulas: value,
+						}));
+					});
+				text.inputEl.rows = 8;
+			});
+
+		new Setting(container)
+			.setName("Custom sort configuration")
+			.setDesc(
+				"Define custom sort rules. Enter the YAML content that goes AFTER 'sort:' (do not include 'sort:' itself). Specifies how to sort table rows. Leave empty if not needed."
+			)
+			.addTextArea((text) => {
+				text
+					.setPlaceholder(
+						`      - property: formula._priority_sort
+        direction: ASC
+      - property: file.mtime
+        direction: DESC`
+					)
+					.setValue(this.plugin.settingsStore.currentSettings.basesCustomSort)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((current) => ({
+							...current,
+							basesCustomSort: value,
+						}));
+					});
+				text.inputEl.rows = 6;
+			});
+
 		const includedPropertiesContainer = container.createDiv();
 
 		const description = includedPropertiesContainer.createDiv();

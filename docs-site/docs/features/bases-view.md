@@ -47,8 +47,55 @@ The Bases View respects your global Nexus Properties settings:
 - **Property Names**: Uses the configured property names for Parent, Child, and Related (default: `Parent`, `Child`, `Related`)
 - **Directories**: Only shows notes from your configured scanning directories
 - **Archived Filter**: Automatically excludes notes marked with `_Archived: true`
+- **Custom Sorting**: Define advanced sorting rules using formulas and sort configurations
 
-Configure these in **Settings → Nexus Properties**.
+Configure these in **Settings → Nexus Properties → Bases View**.
+
+### Custom Sorting
+
+You can define custom formulas and sort rules to control how items are sorted in Bases view tables.
+
+#### Custom Formulas
+
+Formulas map property values to numeric priorities for sorting. Each formula returns a number that determines sort order.
+
+**Example**: Sort by priority level (High → Low)
+
+```yaml
+  _priority_sort: |-
+    [
+      ["Very High", 1],
+      ["High", 2],
+      ["Medium", 3],
+      ["Low", 4],
+      ["null", 5]
+    ].filter(value[0] == Priority.toString())[0][1]
+```
+
+#### Custom Sort Configuration
+
+Define the sorting rules applied to table rows. Reference formulas using `formula._formula_name` or use built-in properties.
+
+**Example**: Sort by status, then priority, then modification time
+
+```yaml
+      - property: formula._status_sort
+        direction: ASC
+      - property: formula._priority_sort
+        direction: ASC
+      - property: file.mtime
+        direction: DESC
+```
+
+#### How to Configure
+
+1. Go to **Settings → Nexus Properties → Bases View**
+2. Scroll to **Custom Sorting** section
+3. In **Custom formulas**, enter your formula definitions (content AFTER `formulas:`)
+4. In **Custom sort configuration**, enter your sort rules (content AFTER `sort:`)
+5. Leave empty if no custom sorting is needed
+
+**Note**: Only enter the content that goes AFTER the `formulas:` and `sort:` keywords - do NOT include those keywords themselves. The plugin automatically adds them to the generated base code blocks.
 
 ## Comparison with Graph View
 

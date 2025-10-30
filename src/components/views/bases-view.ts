@@ -141,20 +141,40 @@ export class BasesView extends RegisteredEventsComponent {
 		const viewConfig = this.getViewConfig(this.selectedViewType);
 		const archivedFilter = this.getArchivedFilter(this.selectedViewType);
 
+		const formulasSection = this.buildFormulasSection();
+		const sortSection = this.buildSortSection();
+
 		const basesMarkdown = `
 \`\`\`base
-views:
+${formulasSection}views:
   - type: table
     name: ${viewConfig.name}
     order:
 ${orderArray}
     filters:
       and:
-        - this.${viewConfig.prop}.contains(file)${archivedFilter}
+        - this.${viewConfig.prop}.contains(file)${archivedFilter}${sortSection}
 \`\`\`
 `;
-
 		await MarkdownRenderer.render(this.app, basesMarkdown, container, activeFile.path, this.component);
+	}
+
+	private buildFormulasSection(): string {
+		// Don't use trim() - it removes leading spaces from first line, breaking indentation
+		const formulas = this.currentSettings.basesCustomFormulas;
+		if (!formulas || formulas.trim() === "") {
+			return "";
+		}
+		return `formulas:\n${formulas}\n`;
+	}
+
+	private buildSortSection(): string {
+		// Don't use trim() - it removes leading spaces from first line, breaking indentation
+		const sort = this.currentSettings.basesCustomSort;
+		if (!sort || sort.trim() === "") {
+			return "";
+		}
+		return `\n    sort:\n${sort}`;
 	}
 
 	private getViewConfig(viewType: BaseViewType): { name: string; prop: string } {
