@@ -1140,6 +1140,31 @@
 	flex: 1;
 	min-height: 0;
 	width: 100%;
+	overflow: auto;
+}
+
+.nexus-bases-view {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	width: 100%;
+	height: 100%;
+}
+
+.nexus-bases-markdown-container {
+	padding: 1em;
+	overflow-y: auto;
+	flex: 1;
+}
+
+.nexus-bases-empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2em;
+	font-size: 1em;
+	color: var(--text-muted);
+	text-align: center;
 }
 
 .nexus-bases-placeholder {
@@ -1149,4 +1174,85 @@
 	flex: 1;
 	font-size: 1.2em;
 	color: var(--text-muted);
+}
+
+/* Dataview table styling in bases view */
+.nexus-bases-markdown-container .dataview {
+	margin: 1em 0;
+}
+
+.nexus-bases-markdown-container .dataview table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+.nexus-bases-markdown-container .dataview th,
+.nexus-bases-markdown-container .dataview td {
+	padding: 0.5em;
+	border: 1px solid var(--background-modifier-border);
+	text-align: left;
+}
+
+.nexus-bases-markdown-container .dataview th {
+	background-color: var(--background-secondary);
+	font-weight: 600;
+}
+
+/* Bases View Section Styles */
+.nexus-bases-section {
+	margin-bottom: 2em;
+	padding: 0 1em;
+}
+
+.nexus-bases-section-header {
+	margin: 0 0 1em 0;
+	padding-bottom: 0.5em;
+	font-size: 1.1em;
+	font-weight: 600;
+	color: var(--text-normal);
+	border-bottom: 2px solid var(--background-modifier-border);
+}
+
+.nexus-bases-empty-section {
+	padding: 1em;
+	color: var(--text-muted);
+	font-style: italic;
+	text-align: center;
+	background-color: var(--background-secondary);
+	border-radius: 4px;
+}
+
+.nexus-bases-file-list {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5em;
+}
+
+.nexus-bases-file-item {
+	padding: 0.6em 1em;
+	background-color: var(--background-primary-alt);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	transition:
+		background-color 0.2s,
+		border-color 0.2s,
+		transform 0.1s;
+}
+
+.nexus-bases-file-item:hover {
+	background-color: var(--background-secondary);
+	border-color: var(--interactive-accent);
+	transform: translateX(2px);
+}
+
+.nexus-bases-file-link {
+	color: var(--text-normal);
+	text-decoration: none;
+	font-size: 0.95em;
+	display: block;
+	cursor: pointer;
+}
+
+.nexus-bases-file-link:hover {
+	color: var(--interactive-accent);
 }

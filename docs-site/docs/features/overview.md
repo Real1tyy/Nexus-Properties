@@ -35,6 +35,24 @@ Visualize your knowledge network with multiple viewing modes and layouts.
 
 ---
 
+### 📝 Bases View
+
+A focused, list-based view of the current note's relationships.
+
+**Features:**
+- **Children** - Notes that reference the current note as a parent
+- **Parent** - Notes that reference the current note as a child
+- **Related** - Notes with mutual related connections
+- Automatically filters out archived notes
+- Real-time updates when switching notes
+- Clean, linear navigation interface
+
+Perfect for focused work on a single note's context without visual clutter.
+
+**[Learn more →](bases-view)**
+
+---
+
 ### 🎨 Node Color Rules
 
 Apply conditional colors to nodes based on frontmatter properties.
@@ -211,6 +229,7 @@ Assign custom hotkeys to any command:
 | **Related** | Show direct related links | Exploring connections |
 | **All Related** | Show entire constellations | Discovering indirect connections |
 | **Start from Current** | Focus on current file | Limiting scope to one node |
+| **Bases View** | List current note's relationships | Focused navigation, quick review |
 
 ---
 
@@ -249,6 +268,7 @@ Assign custom hotkeys to any command:
 | Bidirectional Sync | ✅ | Automatic relationship synchronization |
 | Graph Visualization | ✅ | Interactive relationship graph |
 | Multiple View Modes | ✅ | Hierarchical, Related, All Related |
+| Bases View | ✅ | List-based relationship view |
 | Color Rules | ✅ | Unlimited conditional node colors |
 | Filtering | ✅ | Expression-based filtering |
 | Filter Presets | ✅ | Named filter shortcuts |

@@ -2,6 +2,7 @@ import { ItemView, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
+import { BasesView } from "./bases-view";
 import { RelationshipGraphView } from "./relationship-graph-view";
 
 export const VIEW_TYPE_NEXUS_SWITCHER = "nexus-view-switcher";
@@ -11,6 +12,7 @@ type ViewMode = "graph" | "bases";
 export class NexusViewSwitcher extends ItemView {
 	private currentMode: ViewMode = "graph";
 	private graphView: RelationshipGraphView | null = null;
+	private basesView: BasesView | null = null;
 	private toggleButton: HTMLButtonElement | null = null;
 	private basesContentEl: HTMLElement | null = null;
 	private graphContainerEl: HTMLElement | null = null;
@@ -47,6 +49,14 @@ export class NexusViewSwitcher extends ItemView {
 			await this.handleSettingsChange(settings.showViewSwitcherHeader);
 		});
 
+		this.registerEvent(
+			this.app.workspace.on("active-leaf-change", async () => {
+				if (this.currentMode === "bases" && this.basesView) {
+					await this.basesView.updateActiveFile();
+				}
+			})
+		);
+
 		await this.renderView();
 	}
 
@@ -59,6 +69,11 @@ export class NexusViewSwitcher extends ItemView {
 		if (this.graphView) {
 			this.graphView.destroy();
 			this.graphView = null;
+		}
+
+		if (this.basesView) {
+			this.basesView.destroy();
+			this.basesView = null;
 		}
 
 		if (this.basesContentEl) {
@@ -163,15 +178,14 @@ export class NexusViewSwitcher extends ItemView {
 				this.graphContainerEl = null;
 			}
 
-			// Render bases view placeholder
+			// Create bases container
 			this.basesContentEl = contentEl.createEl("div", {
 				cls: "nexus-bases-view-content",
 			});
 
-			this.basesContentEl.createEl("div", {
-				text: "Bases View - Coming Soon",
-				cls: "nexus-bases-placeholder",
-			});
+			this.basesView = new BasesView(this.app, this.basesContentEl);
+
+			await this.basesView.render();
 		}
 	}
 
@@ -192,8 +206,8 @@ export class NexusViewSwitcher extends ItemView {
 	/**
 	 * Get the active bases view instance (if in bases mode)
 	 */
-	getBasesView(): null {
-		return null;
+	getBasesView(): BasesView | null {
+		return this.currentMode === "bases" ? this.basesView : null;
 	}
 
 	/**
