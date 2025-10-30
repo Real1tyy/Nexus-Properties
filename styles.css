@@ -1153,6 +1153,7 @@
 
 .nexus-bases-view-selector {
 	display: flex;
+	flex-wrap: wrap;
 	gap: 8px;
 	padding: 12px;
 	border-bottom: 1px solid var(--background-modifier-border);
@@ -1161,15 +1162,17 @@
 
 .nexus-bases-view-button {
 	flex: 1;
-	padding: 8px 16px;
+	min-width: 120px;
+	padding: 8px 12px;
 	background-color: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
 	color: var(--text-normal);
 	cursor: pointer;
-	font-size: 0.9em;
+	font-size: 0.85em;
 	font-weight: 500;
 	transition: all 0.2s ease;
+	text-align: center;
 }
 
 .nexus-bases-view-button:hover {

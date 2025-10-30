@@ -43,6 +43,8 @@ export const SETTINGS_DEFAULTS = {
 
 	// Bases view defaults
 	DEFAULT_BASES_INCLUDED_PROPERTIES: [],
+	DEFAULT_EXCLUDE_ARCHIVED: false,
+	DEFAULT_ARCHIVED_PROP: "Archived",
 } as const;
 
 export const SCAN_CONCURRENCY = 10;

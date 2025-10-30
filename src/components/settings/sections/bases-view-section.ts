@@ -27,6 +27,19 @@ export class BasesViewSettingsSection implements SettingsSection {
 				"Configure which frontmatter properties appear as columns in the Bases view tables. Properties are displayed in the order specified."
 			);
 
+		this.uiBuilder.addToggle(container, {
+			key: "excludeArchived",
+			name: "Enable archived filtering",
+			desc: "When enabled, shows separate archived and non-archived views. When disabled, shows all items without filtering.",
+		});
+
+		this.uiBuilder.addText(container, {
+			key: "archivedProp",
+			name: "Archived property name",
+			desc: "Name of the frontmatter property used to mark files as archived (e.g., 'Archived', '_Archived').",
+			placeholder: "Archived",
+		});
+
 		this.uiBuilder.addTextArray(container, {
 			key: "defaultBasesIncludedProperties",
 			name: "Default included properties",

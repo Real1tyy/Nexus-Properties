@@ -136,6 +136,10 @@ export const NexusPropertiesSettingsSchema = z.object({
 		.optional()
 		.default([...SETTINGS_DEFAULTS.DEFAULT_BASES_INCLUDED_PROPERTIES]),
 	pathBasesIncludedProperties: z.array(PathIncludedPropertiesSchema).optional().default([]),
+
+	// Archived filtering for bases view
+	excludeArchived: z.boolean().optional().default(SETTINGS_DEFAULTS.DEFAULT_EXCLUDE_ARCHIVED),
+	archivedProp: z.string().optional().default(SETTINGS_DEFAULTS.DEFAULT_ARCHIVED_PROP),
 });
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;

@@ -7,7 +7,7 @@ import { RegisteredEventsComponent } from "./component";
 
 export const VIEW_TYPE_BASES = "nexus-bases-view";
 
-type BaseViewType = "children" | "parent" | "related";
+type BaseViewType = "children" | "parent" | "related" | "archived-children" | "archived-parent" | "archived-related";
 
 /**
  * Bases view component that uses Obsidian's Bases API to render
@@ -51,6 +51,9 @@ export class BasesView extends RegisteredEventsComponent {
 			return;
 		}
 
+		// Validate and reset view type if necessary
+		this.validateSelectedViewType();
+
 		// Create view selector buttons
 		this.createViewSelector();
 
@@ -63,16 +66,34 @@ export class BasesView extends RegisteredEventsComponent {
 		await this.renderSelectedView(activeFile, markdownContainer);
 	}
 
+	private validateSelectedViewType(): void {
+		const isArchivedView = this.selectedViewType.startsWith("archived-");
+
+		if (isArchivedView && !this.currentSettings.excludeArchived) {
+			const baseType = this.selectedViewType.replace("archived-", "") as BaseViewType;
+			this.selectedViewType = baseType;
+		}
+	}
+
 	private createViewSelector(): void {
 		this.viewSelectorEl = this.contentEl.createDiv({
 			cls: "nexus-bases-view-selector",
 		});
 
-		const viewTypes: { type: BaseViewType; label: string }[] = [
-			{ type: "children", label: "Children" },
-			{ type: "parent", label: "Parent" },
-			{ type: "related", label: "Related" },
-		];
+		const viewTypes: { type: BaseViewType; label: string }[] = this.currentSettings.excludeArchived
+			? [
+					{ type: "children", label: "Children" },
+					{ type: "parent", label: "Parent" },
+					{ type: "related", label: "Related" },
+					{ type: "archived-children", label: "Archived Children" },
+					{ type: "archived-parent", label: "Archived Parent" },
+					{ type: "archived-related", label: "Archived Related" },
+				]
+			: [
+					{ type: "children", label: "Children" },
+					{ type: "parent", label: "Parent" },
+					{ type: "related", label: "Related" },
+				];
 
 		for (const { type, label } of viewTypes) {
 			const button = this.viewSelectorEl.createEl("button", {
@@ -96,6 +117,8 @@ export class BasesView extends RegisteredEventsComponent {
 		const orderArray = includedProperties.map((prop) => `      - ${prop}`).join("\n");
 
 		const viewConfig = this.getViewConfig(this.selectedViewType);
+		const archivedFilter = this.getArchivedFilter(this.selectedViewType);
+
 		const basesMarkdown = `
 \`\`\`base
 views:
@@ -105,8 +128,7 @@ views:
 ${orderArray}
     filters:
       and:
-        - this.${viewConfig.prop}.contains(file)
-        - _Archived != true
+        - this.${viewConfig.prop}.contains(file)${archivedFilter}
 \`\`\`
 `;
 
@@ -121,7 +143,24 @@ ${orderArray}
 				return { name: "Parent", prop: this.currentSettings.parentProp };
 			case "related":
 				return { name: "Related", prop: this.currentSettings.relatedProp };
+			case "archived-children":
+				return { name: "Archived Children", prop: this.currentSettings.childrenProp };
+			case "archived-parent":
+				return { name: "Archived Parent", prop: this.currentSettings.parentProp };
+			case "archived-related":
+				return { name: "Archived Related", prop: this.currentSettings.relatedProp };
 		}
+	}
+
+	private getArchivedFilter(viewType: BaseViewType): string {
+		if (!this.currentSettings.excludeArchived) {
+			return "";
+		}
+
+		const archivedProp = this.currentSettings.archivedProp;
+		const isArchivedView = viewType.startsWith("archived-");
+
+		return `\n        - ${archivedProp} ${isArchivedView ? "==" : "!="} true`;
 	}
 
 	private renderEmptyState(message: string): void {
