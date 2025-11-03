@@ -201,6 +201,25 @@ Save frequently-used filters as named presets for quick access.
 4. Filter expression input is filled automatically
 5. Filter is applied immediately
 
+### Pre-fill Preset on Startup
+
+Configure a preset to automatically fill the filter input when the graph opens.
+
+**Setting up Pre-fill**:
+1. Open Settings → Nexus Properties → Graph filtering
+2. Scroll to "Pre-fill filter preset"
+3. Select a preset from the dropdown (or "None" to disable)
+4. Next time the graph opens, the preset will be pre-filled
+
+**Key Differences**:
+- **Filter Expressions** (default) - Permanently applied, cannot be cleared by users
+- **Pre-fill Preset** - Initial suggestion that users can modify or clear anytime
+
+**When to Use**:
+- Provide a helpful starting filter without forcing it
+- Reduce repetitive filtering while maintaining flexibility
+- Set up different defaults per vault or workflow
+
 ### Preset Examples
 
 | Name | Expression | Description |

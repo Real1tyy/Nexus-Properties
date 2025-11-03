@@ -20,6 +20,11 @@ All notable changes to Nexus Properties will be documented here.
 - **Flexible Sort Rules**: Configure multi-level sorting using formulas and built-in properties (e.g., sort by status, then priority, then modification time).
 - **Easy Configuration**: Settings provide text areas where you enter YAML content that gets dynamically embedded into base code blocks.
 
+#### Pre-fill Filter Preset
+- **Automatic Filter on Startup**: Configure a filter preset to automatically fill the filter input when the graph opens.
+- **User Control**: Unlike default filter expressions (which are always applied), pre-fill presets can be cleared or modified by users.
+- **Flexible Workflows**: Set helpful starting filters without forcing them permanently.
+
 ## Contributing
 
 See [Contributing Guide](contributing) for how to suggest features, report bugs, or contribute code.

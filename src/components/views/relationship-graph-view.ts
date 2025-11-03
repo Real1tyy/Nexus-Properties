@@ -211,6 +211,8 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		);
 		this.graphFilter.setPersistentlyVisible(showFilterBar);
 
+		this.applyPreFillFilter();
+
 		// Create a wrapper for zoom preview (sits between header and graph)
 		// This container will hold the zoom preview when active
 		this.previewWrapperEl = this.containerEl.createEl("div", {
@@ -571,8 +573,25 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.exitZoomMode();
 		}
 
+		// Re-apply pre-fill filter when switching to a different file
+		if (this.currentFile && file.path !== this.currentFile.path) {
+			this.applyPreFillFilter();
+		}
+
 		this.currentFile = file;
 		this.updateGraph();
+	}
+
+	private applyPreFillFilter(): void {
+		if (!this.graphFilter) return;
+
+		const settings = this.plugin.settingsStore.currentSettings;
+		if (settings.preFillFilterPreset) {
+			const preFillPreset = settings.filterPresets.find((preset) => preset.name === settings.preFillFilterPreset);
+			if (preFillPreset) {
+				this.graphFilter.setFilterValue(preFillPreset.expression);
+			}
+		}
 	}
 
 	private showEmptyState(message: string): void {

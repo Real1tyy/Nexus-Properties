@@ -252,6 +252,19 @@ Each preset has:
 
 Selecting a preset fills the filter expression input.
 
+### Pre-fill Filter Preset
+
+Automatically fill the filter input with a selected preset when the graph opens.
+
+**Key Differences**:
+- **Filter Expressions** (default filters) - Always applied and cannot be toggled off by users
+- **Pre-fill Filter Preset** - Optional initial filter that users can clear or modify at any time
+
+**Use Cases**:
+- Start with a common filter but allow users to change it
+- Provide a helpful default without forcing it
+- Reduce repetitive filtering actions while maintaining flexibility
+
 ---
 
 ## Indexing
