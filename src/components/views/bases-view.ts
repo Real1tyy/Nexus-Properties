@@ -30,6 +30,8 @@ export class BasesView extends RegisteredEventsComponent {
 	private selectedViewType: BaseViewType = "children";
 	private viewSelectorEl: HTMLElement | null = null;
 	private onViewTypeChange?: (viewType: BaseViewType) => void;
+	private lastFilePath: string | null = null;
+	private isUpdating = false;
 
 	constructor(
 		app: App,
@@ -54,34 +56,59 @@ export class BasesView extends RegisteredEventsComponent {
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
 			this.currentSettings = settings;
+			// Force re-render when settings change
+			this.lastFilePath = null;
 			this.render();
 		});
 	}
 
 	async render(): Promise<void> {
-		this.contentEl.empty();
-		this.contentEl.addClass("nexus-bases-view");
-
-		// Get the active file
-		const activeFile = this.app.workspace.getActiveFile();
-		if (!activeFile) {
-			this.renderEmptyState("No active file. Open a note to see its bases view.");
+		// Prevent concurrent updates
+		if (this.isUpdating) {
 			return;
 		}
 
-		// Validate and reset view type if necessary
-		this.validateSelectedViewType();
+		this.isUpdating = true;
 
-		// Create view selector buttons
-		this.createViewSelector();
+		try {
+			// Get the active file
+			const activeFile = this.app.workspace.getActiveFile();
+			const currentFilePath = activeFile?.path || "";
 
-		// Create container for the rendered markdown
-		const markdownContainer = this.contentEl.createDiv({
-			cls: "nexus-bases-markdown-container",
-		});
+			// Early return: Has the file actually changed?
+			// This prevents unnecessary re-renders that break focus
+			if (currentFilePath === this.lastFilePath && currentFilePath !== "") {
+				return;
+			}
 
-		// Render the selected view
-		await this.renderSelectedView(activeFile, markdownContainer);
+			// Update tracking
+			this.lastFilePath = currentFilePath;
+
+			// Clear and render
+			this.contentEl.empty();
+			this.contentEl.addClass("nexus-bases-view");
+
+			if (!activeFile) {
+				this.renderEmptyState("No active file. Open a note to see its bases view.");
+				return;
+			}
+
+			// Validate and reset view type if necessary
+			this.validateSelectedViewType();
+
+			// Create view selector buttons
+			this.createViewSelector();
+
+			// Create container for the rendered markdown
+			const markdownContainer = this.contentEl.createDiv({
+				cls: "nexus-bases-markdown-container",
+			});
+
+			// Render the selected view
+			await this.renderSelectedView(activeFile, markdownContainer);
+		} finally {
+			this.isUpdating = false;
+		}
 	}
 
 	private validateSelectedViewType(): void {
@@ -129,6 +156,8 @@ export class BasesView extends RegisteredEventsComponent {
 				if (this.onViewTypeChange) {
 					this.onViewTypeChange(type);
 				}
+				// Force re-render by clearing last path since view changed
+				this.lastFilePath = null;
 				await this.render();
 			});
 		}
@@ -229,6 +258,8 @@ ${orderArray}
 			this.component.unload();
 		}
 		this.viewSelectorEl = null;
+		this.lastFilePath = null;
+		this.isUpdating = false;
 		this.contentEl.empty();
 		this.cleanupEvents();
 	}
