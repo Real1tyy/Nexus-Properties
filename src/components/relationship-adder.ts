@@ -1,8 +1,7 @@
-import { removeMarkdownExtension } from "@real1ty-obsidian-plugins/utils";
+import { addLinkToProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins/utils";
 import { type App, Notice, TFile } from "obsidian";
 import type { SettingsStore } from "../core/settings-store";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
-import { addLinkToProperty } from "../utils/property-utils";
 
 /**
  * Handles adding relationships between nodes using a template method pattern.

@@ -1,10 +1,14 @@
-import { extractDisplayName, getFileContext } from "@real1ty-obsidian-plugins/utils";
+import {
+	extractDisplayName,
+	filterSpecificProperties,
+	formatValue,
+	getFileContext,
+	parseInlineWikiLinks,
+} from "@real1ty-obsidian-plugins/utils";
 import type { App } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { filterSpecificProperties, formatValue, parseInlineWikiLinks } from "../utils/frontmatter-value";
-
 export interface PropertyTooltipOptions {
 	settingsStore: SettingsStore;
 	currentFilePath?: string;

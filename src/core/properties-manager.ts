@@ -3,8 +3,7 @@ import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { formatWikiLink, parsePropertyLinks } from "../utils/link-parser";
-import { addLinkToProperty } from "../utils/property-utils";
+import { formatWikiLink, parsePropertyLinks, addLinkToProperty } from "@real1ty-obsidian-plugins/utils";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 

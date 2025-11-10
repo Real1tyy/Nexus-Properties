@@ -53,7 +53,7 @@
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
-		"@real1ty-obsidian-plugins/utils": "^2.5.0",
+		"@real1ty-obsidian-plugins/utils": "^2.6.0",
 		"cytoscape": "^3.33.1",
 		"cytoscape-dagre": "^2.5.0",
 		"rxjs": "^7.8.2",

@@ -13,7 +13,7 @@ import {
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { normalizeProperty, parseWikiLink } from "../utils/frontmatter-value";
+import { normalizeProperty, parseWikiLinkWithDisplay } from "@real1ty-obsidian-plugins/utils";
 
 export interface FileRelationships {
 	filePath: string;
@@ -234,7 +234,7 @@ export class Indexer {
 
 		const addAffectedFiles = (wikiLinks: string[]) => {
 			wikiLinks
-				.map((wikiLink) => parseWikiLink(wikiLink))
+				.map((wikiLink) => parseWikiLinkWithDisplay(wikiLink))
 				.filter((parsed) => parsed?.linkPath)
 				.map((parsed) => this.vault.getFileByPath(`${parsed!.linkPath}.md`))
 				.filter((file) => file !== null)

@@ -1,5 +1,5 @@
+import { formatValue, parseWikiLinkWithDisplay } from "@real1ty-obsidian-plugins/utils";
 import type { App, TFile } from "obsidian";
-import { formatValue, parseWikiLink } from "../utils/frontmatter-value";
 
 export interface PropertyRendererOptions {
 	containerClass: string;
@@ -68,7 +68,7 @@ export class PropertyRenderer {
 
 	private renderSingleValue(container: HTMLElement, value: unknown): void {
 		if (typeof value === "string") {
-			const wikiLink = parseWikiLink(value);
+			const wikiLink = parseWikiLinkWithDisplay(value);
 			if (wikiLink) {
 				const link = container.createEl("a", {
 					text: wikiLink.displayText,

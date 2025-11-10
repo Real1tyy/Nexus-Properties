@@ -1,7 +1,7 @@
 import type { FileRelationships } from "../core/indexer";
 import type { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { parsePropertyLinks } from "./link-parser";
+import { parsePropertyLinks } from "@real1ty-obsidian-plugins/utils";
 
 export interface RelationshipContext {
 	propName: string;
