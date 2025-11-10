@@ -1,9 +1,14 @@
-import { getFileContext, withFileContext } from "@real1ty-obsidian-plugins/utils";
+import {
+	addLinkToProperty,
+	formatWikiLink,
+	getFileContext,
+	parsePropertyLinks,
+	withFileContext,
+} from "@real1ty-obsidian-plugins/utils";
 import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { formatWikiLink, parsePropertyLinks, addLinkToProperty } from "@real1ty-obsidian-plugins/utils";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 

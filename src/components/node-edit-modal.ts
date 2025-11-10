@@ -1,5 +1,5 @@
-import { type App, Modal, type TFile } from "obsidian";
 import { parseValue, serializeValue } from "@real1ty-obsidian-plugins/utils";
+import { type App, Modal, type TFile } from "obsidian";
 
 interface PropertyRow {
 	key: string;

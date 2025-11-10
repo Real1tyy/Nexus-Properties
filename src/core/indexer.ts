@@ -1,3 +1,4 @@
+import { normalizeProperty, parseWikiLinkWithDisplay } from "@real1ty-obsidian-plugins/utils";
 import { type App, type MetadataCache, type TAbstractFile, TFile, type Vault } from "obsidian";
 import {
 	type BehaviorSubject,
@@ -13,7 +14,6 @@ import {
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { normalizeProperty, parseWikiLinkWithDisplay } from "@real1ty-obsidian-plugins/utils";
 
 export interface FileRelationships {
 	filePath: string;

@@ -1,9 +1,14 @@
-import { ExcludedPropertiesEvaluator, generateZettelId, getUniqueFilePath } from "@real1ty-obsidian-plugins/utils";
+import {
+	ExcludedPropertiesEvaluator,
+	formatWikiLink,
+	generateZettelId,
+	getUniqueFilePath,
+	normalizeProperty,
+} from "@real1ty-obsidian-plugins/utils";
 import type { App, TFile } from "obsidian";
 import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { normalizeProperty, formatWikiLink } from "@real1ty-obsidian-plugins/utils";
 
 type NodeCreationType = "parent" | "child" | "related";
 
