@@ -1,3 +1,4 @@
+import { isFolderNote } from "@real1ty-obsidian-plugins/utils";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { type App, TFile } from "obsidian";
@@ -5,7 +6,6 @@ import type { Subscription } from "rxjs";
 import { GraphBuilder } from "../../core/graph-builder";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
-import { isFolderNote } from "../../utils/file";
 import { EdgeContextMenu } from "../edge-context-menu";
 import { GraphFilter } from "../graph-filter";
 import { GraphFilterPresetSelector } from "../graph-filter-preset-selector";

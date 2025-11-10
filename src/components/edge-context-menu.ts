@@ -1,6 +1,6 @@
+import { removeMarkdownExtension } from "@real1ty-obsidian-plugins/utils";
 import { type App, Menu, Notice, TFile } from "obsidian";
 import type { SettingsStore } from "../core/settings-store";
-import { removeMarkdownExtension } from "../utils/file";
 import { hasLinkInProperty, removeLinkFromProperty } from "../utils/property-utils";
 
 export class EdgeContextMenu {

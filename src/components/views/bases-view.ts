@@ -1,8 +1,8 @@
+import { IncludedPropertiesEvaluator } from "@real1ty-obsidian-plugins/utils";
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
-import { IncludedPropertiesEvaluator } from "../../utils/included-properties";
 import { RegisteredEventsComponent } from "./component";
 
 export const VIEW_TYPE_BASES = "nexus-bases-view";
@@ -24,7 +24,7 @@ export class BasesView extends RegisteredEventsComponent {
 	private contentEl: HTMLElement;
 	private component: Component;
 	private plugin: NexusPropertiesPlugin;
-	private includedPropertiesEvaluator: IncludedPropertiesEvaluator;
+	private includedPropertiesEvaluator: IncludedPropertiesEvaluator<NexusPropertiesSettings>;
 	private settingsSubscription: Subscription | null = null;
 	private currentSettings: NexusPropertiesSettings;
 	private selectedViewType: BaseViewType = "children";

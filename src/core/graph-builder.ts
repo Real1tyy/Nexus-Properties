@@ -1,15 +1,16 @@
-import type { ElementDefinition } from "cytoscape";
-import type { App } from "obsidian";
-import { ColorEvaluator } from "../utils/colors";
 import {
+	ColorEvaluator,
 	extractDisplayName,
 	extractFilePath,
 	type FileContext,
+	FilterEvaluator,
 	getFileContext,
 	getFolderPath,
 	isFolderNote,
-} from "../utils/file";
-import { FilterEvaluator } from "../utils/filters";
+} from "@real1ty-obsidian-plugins/utils";
+import type { ElementDefinition } from "cytoscape";
+import type { App } from "obsidian";
+import type { NexusPropertiesSettings } from "../types/settings";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
 
@@ -48,8 +49,8 @@ interface ValidFileContext extends FileContext {
  * Handles both hierarchy and constellation view modes.
  */
 export class GraphBuilder {
-	private readonly filterEvaluator: FilterEvaluator;
-	private readonly colorEvaluator: ColorEvaluator;
+	private readonly filterEvaluator: FilterEvaluator<NexusPropertiesSettings>;
+	private readonly colorEvaluator: ColorEvaluator<NexusPropertiesSettings>;
 	private allRelatedMaxDepth: number;
 	private hierarchyMaxDepth: number;
 

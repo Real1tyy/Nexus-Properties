@@ -1,17 +1,15 @@
-import { generateZettelId } from "@real1ty-obsidian-plugins/utils/generate";
+import { ExcludedPropertiesEvaluator, generateZettelId, getUniqueFilePath } from "@real1ty-obsidian-plugins/utils";
 import type { App, TFile } from "obsidian";
 import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { ExcludedPropertiesEvaluator } from "../utils/excluded-properties";
-import { getUniqueFilePath } from "../utils/file";
 import { normalizeProperty } from "../utils/frontmatter-value";
 import { formatWikiLink } from "../utils/link-parser";
 
 type NodeCreationType = "parent" | "child" | "related";
 
 export class NodeCreator {
-	private excludedPropertiesEvaluator: ExcludedPropertiesEvaluator;
+	private excludedPropertiesEvaluator: ExcludedPropertiesEvaluator<NexusPropertiesSettings>;
 	private settings: NexusPropertiesSettings;
 
 	constructor(
