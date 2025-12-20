@@ -82,20 +82,6 @@ Use standard screenshot tools (Snipping Tool, macOS screenshots, etc.) to captur
 
 ## Performance
 
-### The graph is slow with many notes. How can I improve it?
-
-1. **Reduce recursion depth**: Lower [All Related Max Depth](configuration#all-related-recursion-depth)
-2. **Limit directory scanning**: Only scan [relevant folders](configuration#directory-scanning)
-3. **Disable animations**: Set [animation duration](configuration#graph-animation-duration) to 0ms
-4. **Use filtering**: Show only [relevant nodes](features/filtering)
-5. **Use "Start from Current"**: Focus on subtrees
-
-### How many notes can the plugin handle?
-
-- **Small vaults** (< 500 notes): Excellent performance
-- **Medium vaults** (500-2000 notes): Good performance with optimizations
-- **Large vaults** (2000+ notes): May require [performance tuning](#the-graph-is-slow-with-many-notes-how-can-i-improve-it)
-
 ### Does the plugin index my entire vault on startup?
 
 Only files in [configured directories](configuration#directory-scanning) are indexed. Use specific directories to limit scope.
@@ -306,6 +292,20 @@ They remain in frontmatter. You can:
 - Keep them for future use
 - Remove manually if desired
 - Use other tools that read frontmatter
+
+## About This Documentation
+
+### Is the documentation completely up to date and accurate?
+
+We strive for perfection, but Nexus Properties is a large, feature-rich project with extensive documentation. It's quite complex for one person to manage everything perfectly, so there may be occasional inaccuracies or outdated information.
+
+If you spot something wrong, please help us!
+
+- **Create a Pull Request** to fix it
+- **Open an issue** to report it
+- **Suggest improvements** or clarifications
+
+Community contributions help us continuously improve the documentation and keep it accurate. Every correction, no matter how small, makes the docs better for everyone. Thank you for helping us improve! 🙏
 
 ## Didn't find your answer?
 
