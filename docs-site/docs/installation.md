@@ -4,104 +4,176 @@ sidebar_position: 2
 
 # Installation
 
-This guide will help you install Nexus Properties in Obsidian.
+Nexus Properties is currently **awaiting approval** for the Obsidian Community Plugin store. While we wait for approval, you can install it using one of the methods below.
 
-## Prerequisites
+## 🎯 Recommended: BRAT (Beta Reviewers Auto-update Tool)
 
-- **Obsidian version 1.6.0 or higher**
-- Basic familiarity with Obsidian's interface
+The easiest and most convenient way to install Nexus Properties with automatic updates:
 
-## Installation Methods
+### Steps
 
-### Method 1: Community Plugins (Recommended)
+1. **Install BRAT plugin** (if you don't have it already)
 
-:::info Coming Soon
-Nexus Properties is currently awaiting approval for the Obsidian Community Plugins directory. This will be the easiest installation method once available.
-:::
+   - Open Settings → Community Plugins → Browse
 
-1. Open Obsidian Settings
-2. Navigate to **Community plugins**
-3. Click **Browse** to open the community plugins browser
-4. Search for "**Nexus Properties**"
-5. Click **Install**
-6. Once installed, click **Enable** to activate the plugin
+   - Search for "BRAT"
 
-### Method 2: Manual Installation (Beta Testers)
+   - Install and enable [BRAT](https://github.com/TfTHacker/obsidian42-brat)
 
-If you want to install the latest development version or the plugin is not yet available in the community plugins:
+2. **Add Nexus Properties via BRAT**
 
-1. Download the latest release from [GitHub Releases](https://github.com/Real1tyy/Nexus-Properties/releases)
-2. Extract the following files from the release:
-   - `main.js`
-   - `manifest.json`
-   - `styles.css`
-3. Navigate to your vault's plugin folder: `<vault>/.obsidian/plugins/`
-4. Create a new folder called `nexus-properties`
-5. Copy the extracted files into the `nexus-properties` folder
-6. Restart Obsidian or reload the plugin
-7. Enable the plugin in **Settings → Community plugins**
+   - Open Settings → BRAT
 
-### Method 3: Build from Source (Developers)
+   - Click **Add Beta Plugin**
 
-If you want to contribute or test unreleased features:
+   - Enter the repository URL: `https://github.com/Real1tyy/Nexus-Properties`
 
-```bash
-# Clone the repository
-git clone https://github.com/Real1tyy/Nexus-Properties.git
-cd Nexus-Properties
+   - Click **Add Plugin**
 
-# Install dependencies
-pnpm install
+3. **Enable the plugin**
 
-# Build the plugin
-pnpm build
+   - Go to Settings → Community Plugins
 
-# Or run in development mode with hot reload
-pnpm dev
-```
-
-Then follow the manual installation steps above to copy the built files to your vault's plugin folder.
-
-## Post-Installation Setup
-
-After installing Nexus Properties:
-
-1. **Enable the Plugin**
-   - Go to Settings → Community plugins
    - Find "Nexus Properties" in the list
+
    - Toggle it on
 
-2. **Configure Basic Settings** (Optional)
-   - Open Settings → Nexus Properties
-   - Review the default property names (`Parent`, `Child`, `Related`)
-   - Adjust settings to match your workflow
-   - See [Configuration](configuration) for detailed settings
+### Benefits of BRAT
 
-3. **Open the Relationship Graph**
-   - Click the ribbon icon (if enabled)
-   - Or use the command palette: `Ctrl/Cmd+P` → "Show Relationship Graph"
-   - Or use the command: "Nexus Properties: Show Relationship Graph"
+- ✅ **Automatic updates** - Get new features and fixes automatically
 
-## Verifying Installation
+- ✅ **Easy installation** - Just paste the repo URL
 
-To verify that Nexus Properties is installed correctly:
+- ✅ **One-click setup** - No manual file management
 
-1. Open the command palette (`Ctrl/Cmd+P`)
+- ✅ **Smoother experience** - Updates handle themselves
+
+## 📥 Manual Installation from GitHub Releases
+
+If you prefer manual installation or can't use BRAT:
+
+### Steps
+
+1. **Download the latest release**
+
+   - Go to [GitHub Releases](https://github.com/Real1tyy/Nexus-Properties/releases)
+
+   - Find the latest version (all releases are versioned and tagged)
+
+   - Download these three files:
+
+     - `main.js`
+
+     - `manifest.json`
+
+     - `styles.css`
+
+2. **Create plugin folder**
+
+   - Navigate to your vault's plugins directory: `{VaultFolder}/.obsidian/plugins/`
+
+   - Create a new folder: `nexus-properties`
+
+   - Full path should be: `{VaultFolder}/.obsidian/plugins/nexus-properties/`
+
+3. **Move files**
+
+   - Place the three downloaded files into the `nexus-properties` folder
+
+4. **Reload Obsidian**
+
+   - Press `Ctrl/Cmd + R` to reload Obsidian
+
+   - Or close and reopen Obsidian
+
+5. **Enable the plugin**
+
+   - Go to Settings → Community Plugins
+
+   - Find "Nexus Properties" in the installed plugins list
+
+   - Toggle it on
+
+### Note on Manual Updates
+
+With manual installation, you'll need to repeat these steps whenever you want to update to a new version. Consider using BRAT for automatic updates.
+
+## ✨ Coming Soon: Community Plugin Store
+
+Once Nexus Properties is approved for the Obsidian Community Plugin store, you'll be able to install it directly:
+
+1. Open Settings → Community Plugins → Browse
+
 2. Search for "Nexus Properties"
-3. You should see commands like:
-   - Show Relationship Graph
-   - Create Parent Node
-   - Create Child Node
-   - Create Related Node
-   - And more...
 
-If you see these commands, the plugin is installed successfully! 🎉
+3. Click Install
 
-## Next Steps
+4. Enable the plugin
 
-- [Follow the Quickstart Guide](quickstart) to set up your first relationships
-- [Explore Configuration Options](configuration) to customize the plugin
-- [Learn about Features](features/overview) to discover what Nexus Properties can do
+We'll update this page as soon as the plugin is available in the store!
+
+## Requirements
+
+- Obsidian 1.6.0+
+
+## Opening Your Relationship Graph
+
+After installation, you can open the Relationship Graph in three ways:
+
+### Ribbon Icon (Optional)
+
+If enabled in settings, a **fork icon appears in the left sidebar**. Simply click it to open the Relationship Graph.
+
+### Command Palette
+
+1. **Open command palette**
+
+   - Press `Ctrl/Cmd + P` (or `Ctrl + E` on some systems)
+
+   - This opens Obsidian's command search
+
+2. **Find the graph command**
+
+   - Type: `Nexus Properties: Show Relationship Graph`
+
+   - Press Enter to open the graph view
+
+### Direct Command
+
+Use the command "Nexus Properties: Show Relationship Graph" from anywhere in Obsidian.
+
+**Note for Obsidian beginners:** Obsidian plugins can add ribbon icons (left sidebar), commands (command palette), or both. Nexus Properties provides multiple options for maximum flexibility.
+
+## First-time setup checklist
+
+- Open Settings → Nexus Properties and review the default property names (`Parent`, `Child`, `Related`)
+
+- Adjust property names if you already use different keys for relationships
+
+- (Optional) Configure directory scanning to focus on specific folders
+
+- (Optional) Enable the ribbon icon in settings for quick access
+
+- **Open the Relationship Graph** using the command palette (`Ctrl/Cmd + P` → `Nexus Properties: Show Relationship Graph`)
+
+- Create your first relationship by adding frontmatter to a note (see [Quick Start Guide](quickstart))
+
+### Optional: Example Relationship Setup
+
+```md
+---
+# Parent note
+Child:
+  - "[[Child Note 1]]"
+  - "[[Child Note 2]]"
+---
+
+# Child note (auto-updated by Nexus Properties)
+Parent: "[[Parent Note]]"
+Related:
+  - "[[Related Note]]"
+---
+```
 
 ## Troubleshooting Installation
 
@@ -109,7 +181,7 @@ If you see these commands, the plugin is installed successfully! 🎉
 
 - Make sure you're running Obsidian 1.6.0 or higher
 - Restart Obsidian completely (close and reopen)
-- Check that the plugin files are in the correct folder: `<vault>/.obsidian/plugins/nexus-properties/`
+- Check that the plugin files are in the correct folder: `{VaultFolder}/.obsidian/plugins/nexus-properties/`
 
 ### Plugin Won't Enable
 

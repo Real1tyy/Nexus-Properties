@@ -29,6 +29,7 @@ const sidebars: SidebarsConfig = {
       ]
     },
     "configuration",
+    "videos",
     "faq",
     "troubleshooting",
     "contributing",

@@ -2,7 +2,7 @@ import {themes as prismThemes} from 'prism-react-renderer';
 import type {Config} from '@docusaurus/types';
 import type * as Preset from '@docusaurus/preset-classic';
 
-// Docusaurus config for Prisma Calendar docs
+// Docusaurus config for Nexus Properties docs
 
 const config: Config = {
   title: 'Nexus Properties',
@@ -92,6 +92,11 @@ const config: Config = {
           position: 'left',
         },
         {
+          to: '/videos',
+          label: 'Videos',
+          position: 'left',
+        },
+        {
           href: 'https://github.com/Real1tyy/Nexus-Properties',
           label: 'GitHub',
           position: 'right',
@@ -116,6 +121,10 @@ const config: Config = {
               label: 'Quick Start',
               to: '/quickstart',
             },
+            {
+              label: 'Video Tutorials',
+              to: '/videos',
+            },
           ],
         },
         {
@@ -135,6 +144,10 @@ const config: Config = {
           title: 'More',
           items: [
             {
+              label: 'Video Tutorials',
+              to: '/videos',
+            },
+            {
               label: 'Repository',
               href: 'https://github.com/Real1tyy/Nexus-Properties',
             },
@@ -148,12 +161,12 @@ const config: Config = {
           title: 'Support',
           items: [
             {
-              label: 'Sponsor on GitHub',
-              href: 'https://github.com/sponsors/Real1tyy',
+              label: 'Support Me',
+              to: '/support',
             },
             {
-              label: 'Buy Me a Coffee',
-              href: 'https://www.buymeacoffee.com/real1ty',
+              label: 'Sponsorship options',
+              href: 'https://github.com/Real1tyy#-support-my-work',
             },
           ],
         },
