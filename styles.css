@@ -75,6 +75,25 @@
 	line-height: 1.4;
 }
 
+/* Settings subsection container */
+.settings-subsection {
+	margin-bottom: 0.5em;
+	padding-bottom: 0.25em;
+}
+
+/* Settings empty state */
+.settings-empty-state {
+	padding: 1.5em;
+	margin: 1em 0;
+	background-color: var(--background-secondary);
+	border-radius: 6px;
+	border: 1px dashed var(--background-modifier-border);
+	color: var(--text-muted);
+	text-align: center;
+	font-size: 0.95em;
+	line-height: 1.6;
+}
+
 /* Directories list container */
 .directories-list {
 	margin-bottom: 1em;
@@ -153,12 +172,12 @@
 /* Settings section container */
 .nexus-settings-section-container {
 	margin-top: 1em;
-	padding-bottom: 2em;
+	padding-bottom: 0.5em;
 }
 
 /* Settings footer */
 .settings-footer {
-	margin-top: 3em;
+	margin-top: 0.5em;
 	padding-top: 1.5em;
 	border-top: 2px solid var(--background-modifier-border);
 }

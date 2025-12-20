@@ -44,8 +44,8 @@ export class RulesSection implements SettingsSection {
 				});
 			});
 
-		const colorRulesContainer = container.createDiv();
-		const descriptionContainer = colorRulesContainer.createDiv();
+		const colorRulesContainer = container.createDiv("settings-subsection");
+		const descriptionContainer = colorRulesContainer.createDiv("setting-item-description");
 		descriptionContainer.createEl("p", {
 			text: "Define color rules based on frontmatter properties. Rules are evaluated in order - the first matching rule determines the node color.",
 		});
@@ -171,7 +171,7 @@ export class RulesSection implements SettingsSection {
 	private renderFilteringRules(container: HTMLElement): void {
 		new Setting(container).setName("Graph filtering").setHeading();
 
-		const description = container.createDiv();
+		const description = container.createDiv("setting-item-description");
 		description.createEl("p", {
 			text: "Show only nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false. Access frontmatter properties directly by name. The source node is always shown.",
 		});
@@ -221,7 +221,7 @@ export class RulesSection implements SettingsSection {
 
 		new Setting(container).setName("Filter presets").setHeading();
 
-		const presetDescription = container.createDiv();
+		const presetDescription = container.createDiv("setting-item-description");
 		presetDescription.createEl("p", {
 			text: "Create named filter presets for quick access in the graph. Use the command 'Toggle Graph Filter (Preset Selector)' to show a dropdown with your presets. Selecting a preset fills the filter expression input.",
 		});
@@ -257,7 +257,7 @@ export class RulesSection implements SettingsSection {
 		const { colorRules } = this.plugin.settingsStore.currentSettings;
 
 		if (colorRules.length === 0) {
-			const emptyState = this.colorRulesListContainer.createDiv();
+			const emptyState = this.colorRulesListContainer.createDiv("settings-empty-state");
 			emptyState.textContent = "No color rules defined. Click 'Add Rule' to create one.";
 			return;
 		}
@@ -353,7 +353,7 @@ export class RulesSection implements SettingsSection {
 		const { filterPresets } = this.plugin.settingsStore.settings$.value;
 
 		if (filterPresets.length === 0) {
-			const emptyState = this.filterPresetsContainer.createDiv("setting-item-description");
+			const emptyState = this.filterPresetsContainer.createDiv("settings-empty-state");
 			emptyState.textContent = "No filter presets defined. Click 'Add Preset' to create one.";
 			return;
 		}

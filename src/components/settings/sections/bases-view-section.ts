@@ -105,9 +105,9 @@ export class BasesViewSettingsSection implements SettingsSection {
 				text.inputEl.rows = 6;
 			});
 
-		const includedPropertiesContainer = container.createDiv();
+		const includedPropertiesContainer = container.createDiv("settings-subsection");
 
-		const description = includedPropertiesContainer.createDiv();
+		const description = includedPropertiesContainer.createDiv("setting-item-description");
 		description.createEl("p", {
 			text: "Define path-based rules to include ADDITIONAL properties as columns for files in specific directories. The default properties above are always included. Rules are evaluated in order - the first matching path's properties are ADDED to the default list.",
 		});
@@ -185,7 +185,7 @@ export class BasesViewSettingsSection implements SettingsSection {
 		const { pathBasesIncludedProperties } = this.plugin.settingsStore.currentSettings;
 
 		if (pathBasesIncludedProperties.length === 0) {
-			const emptyState = this.includedPropertyRulesContainer.createDiv();
+			const emptyState = this.includedPropertyRulesContainer.createDiv("settings-empty-state");
 			emptyState.textContent =
 				"No path-based inclusion rules defined. Click 'Add Rule' to create one. Default included properties will be used for all files.";
 			return;

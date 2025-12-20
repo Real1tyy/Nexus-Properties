@@ -145,9 +145,9 @@ export class GeneralSection implements SettingsSection {
 			placeholder: "e.g., Parent, Child, Related, _ZettelID",
 		});
 
-		const excludedPropertiesContainer = container.createDiv();
+		const excludedPropertiesContainer = container.createDiv("settings-subsection");
 
-		const description = excludedPropertiesContainer.createDiv();
+		const description = excludedPropertiesContainer.createDiv("setting-item-description");
 		description.createEl("p", {
 			text: "Define path-based rules to exclude ADDITIONAL properties for files in specific directories. The default excluded properties above are always excluded. Rules are evaluated in order - the first matching path's properties are ADDED to the default exclusion list.",
 		});
@@ -218,7 +218,7 @@ export class GeneralSection implements SettingsSection {
 		const { pathExcludedProperties } = this.plugin.settingsStore.currentSettings;
 
 		if (pathExcludedProperties.length === 0) {
-			const emptyState = this.excludedPropertyRulesContainer.createDiv();
+			const emptyState = this.excludedPropertyRulesContainer.createDiv("settings-empty-state");
 			emptyState.textContent =
 				"No path-based exclusion rules defined. Click 'Add Rule' to create one. Default excluded properties will be used for all files.";
 			return;
