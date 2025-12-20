@@ -25,6 +25,11 @@ All notable changes to Nexus Properties will be documented here.
 - **User Control**: Unlike default filter expressions (which are always applied), pre-fill presets can be cleared or modified by users.
 - **Flexible Workflows**: Set helpful starting filters without forcing them permanently.
 
+---
+
+## 1.0.0
+- Initial release of Nexus Properties
+
 ## Contributing
 
 See [Contributing Guide](contributing) for how to suggest features, report bugs, or contribute code.
