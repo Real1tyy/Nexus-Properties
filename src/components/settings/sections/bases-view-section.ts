@@ -9,7 +9,7 @@ import type { SettingsSection } from "../types";
 
 export class BasesViewSettingsSection implements SettingsSection {
 	readonly id = "bases-view";
-	readonly label = "Bases View";
+	readonly label = "Bases";
 
 	private includedPropertyRulesContainer: HTMLElement | null = null;
 

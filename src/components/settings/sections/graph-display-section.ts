@@ -5,12 +5,12 @@ import type { SettingsSection } from "../types";
 
 export class GraphDisplaySettingsSection implements SettingsSection {
 	readonly id = "graph-display";
-	readonly label = "Graph Display";
+	readonly label = "Graph";
 
 	constructor(private readonly uiBuilder: SettingsUIBuilder<typeof NexusPropertiesSettingsSchema>) {}
 
 	render(container: HTMLElement): void {
-		new Setting(container).setName("Graph Display").setHeading();
+		new Setting(container).setName("Graph").setHeading();
 
 		this.uiBuilder.addToggle(container, {
 			key: "showSearchBar",

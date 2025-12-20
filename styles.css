@@ -91,16 +91,25 @@
 /* Settings warning box */
 .settings-warning-box {
 	margin: 1em 0;
-	padding: 1em;
-	background-color: var(--background-modifier-error-hover);
-	border-radius: 4px;
-	border-left: 3px solid var(--text-error);
+	padding: 1em 1.2em;
+	background-color: rgba(255, 100, 100, 0.1);
+	border-radius: 6px;
+	border-left: 4px solid var(--text-error);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.settings-warning-box strong {
+	color: var(--text-error);
+	font-size: 1em;
+	display: block;
+	margin-bottom: 0.5em;
 }
 
 .settings-warning-box p {
 	margin: 0.5em 0 0;
 	color: var(--text-normal);
-	line-height: 1.5;
+	line-height: 1.6;
+	font-size: 0.95em;
 }
 
 /* Settings navigation tabs */
@@ -144,6 +153,47 @@
 /* Settings section container */
 .nexus-settings-section-container {
 	margin-top: 1em;
+	padding-bottom: 2em;
+}
+
+/* Settings footer */
+.settings-footer {
+	margin-top: 3em;
+	padding-top: 1.5em;
+	border-top: 2px solid var(--background-modifier-border);
+}
+
+.settings-footer-links {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1em;
+	align-items: center;
+	justify-content: center;
+}
+
+.settings-support-link {
+	padding: 0.6em 1.2em;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	color: var(--text-normal);
+	text-decoration: none;
+	font-size: 0.9em;
+	font-weight: 500;
+	transition: all 0.2s ease;
+	display: inline-block;
+}
+
+.settings-support-link:hover {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.settings-support-link:active {
+	transform: translateY(0);
 }
 
 /* Color example list items */
