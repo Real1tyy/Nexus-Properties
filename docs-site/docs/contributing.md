@@ -1,416 +1,171 @@
 ---
-sidebar_position: 100
+sidebar_position: 10
 ---
 
 # Contributing
 
-Thank you for considering contributing to Nexus Properties! This document provides guidelines and information for contributors.
+We welcome contributions and feedback from the community! Here's how you can help make Nexus Properties better.
 
-## Ways to Contribute
+## Found a Bug?
 
-### 🐛 Report Bugs
+Before creating a new issue, please follow this process:
 
-Help improve quality by reporting issues:
+### 1. Check for Existing Issues
 
-1. **Search existing issues** first to avoid duplicates
-2. **Use the bug report template** when creating an issue
-3. **Provide detailed information**:
-   - Steps to reproduce
-   - Expected vs actual behavior
-   - Obsidian version and plugin version
-   - Console errors (if any)
-   - Screenshots (if visual)
+**Search first!** Your issue may already be reported:
 
-[Report a bug →](https://github.com/Real1tyy/Nexus-Properties/issues/new)
+1. Go to [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues)
 
-### 💡 Suggest Features
+2. Search for keywords related to your problem
 
-Share your ideas for improvements:
+3. Check both **open** and **closed** issues
 
-1. **Search discussions** for similar suggestions
-2. **Create a new discussion** with:
-   - Clear description of the feature
-   - Use cases and benefits
-   - Possible implementation approach (optional)
-3. **Engage with feedback** from maintainers and community
+**If the issue already exists:**
 
-[Suggest a feature →](https://github.com/Real1tyy/Nexus-Properties/discussions/new)
+- 👍 **Upvote it** by adding a 👍 reaction to raise its priority
 
-### 📖 Improve Documentation
+- 💬 **Add a comment** if you have additional information or context
 
-Documentation is crucial for adoption:
+- 📎 **Share your specific case** if it differs from the original report
 
-- **Fix typos or errors** in existing docs
-- **Add examples** to clarify concepts
-- **Write tutorials** for common workflows
-- **Translate** documentation (future)
-- **Improve clarity** of explanations
+**Don't create duplicates!** Upvoting existing issues helps us prioritize better.
 
-Documentation lives in `docs-site/docs/`
+### 2. Verify You Have the Latest Version
 
-### 💻 Contribute Code
+Before reporting, ensure you're using the latest version:
 
-Contribute bug fixes, features, or improvements:
+1. Go to **Settings** → **Community plugins**
 
-1. **Fork the repository**
-2. **Create a feature branch**
-3. **Make your changes**
-4. **Write/update tests**
-5. **Submit a pull request**
+2. Check for available updates
 
-See [Development Setup](#development-setup) below.
+3. Update the plugin if a newer version exists
 
-### 🎨 Design Improvements
+4. Test if the issue still occurs
 
-Help improve the UI/UX:
+**Your issue may already be fixed in the latest release!**
 
-- **Graph styling** improvements
-- **Settings UI** enhancements
-- **Accessibility** improvements
-- **Theme compatibility** fixes
+### 3. Create a New Issue
 
-### 🧪 Testing
+If no existing issue matches and you're on the latest version, **[create a new bug report](https://github.com/Real1tyy/Nexus-Properties/issues/new/choose)**.
 
-Help ensure quality:
+Our bug report template will guide you through providing all necessary information:
 
-- **Test new features** in beta/preview builds
-- **Report edge cases** and unexpected behavior
-- **Test on different platforms** (Windows, Mac, Linux)
-- **Test with different themes** and configurations
+- Operating System (with version/build)
 
-### 💬 Community Support
+- Obsidian Version
 
-Help others in the community:
+- Plugin Version
 
-- **Answer questions** in GitHub Discussions
-- **Share your workflows** and tips
-- **Write blog posts** or tutorials
-- **Create videos** demonstrating features
+- Steps to reproduce
 
-## Development Setup
+- Expected vs actual behavior
 
-### Prerequisites
+- Console errors/logs
 
-- **Node.js** 18+ (check with `node --version`)
-- **pnpm** (install with `npm install -g pnpm`)
-- **Git** for version control
-- **Obsidian** for testing
+- Screenshots/videos
 
-### Initial Setup
+- Severity level
 
-```bash
-# Clone your fork
-git clone https://github.com/YOUR_USERNAME/Nexus-Properties.git
-cd Nexus-Properties
+## Feature Requests
 
-# Install dependencies
-pnpm install
+Have an idea for a new feature? We'd love to hear it!
 
-# Build the plugin
-pnpm build
-```
+### Before Requesting
 
-### Development Workflow
+1. **Search existing requests** - Your idea may already be proposed
 
-**Hot reload development**:
-```bash
-# Watch for changes and rebuild automatically
-pnpm dev
-```
+2. **Upvote existing requests** - Add 👍 to similar feature requests
 
-This creates:
-- `main.js` - Plugin code
-- `styles.css` - Styles
-- `manifest.json` - Plugin manifest
+3. **Comment on existing requests** - Share your specific use case
 
-**Link to Obsidian vault**:
-```bash
-# Create symlink to your test vault
-# Windows (as Administrator):
-mklink /D "C:\Users\YourUser\YourVault\.obsidian\plugins\nexus-properties" "C:\path\to\Nexus-Properties"
+### Submit a New Feature Request
 
-# Mac/Linux:
-ln -s /path/to/Nexus-Properties /path/to/YourVault/.obsidian/plugins/nexus-properties
-```
+**[Create a feature request](https://github.com/Real1tyy/Nexus-Properties/issues/new/choose)** using our structured template.
 
-Then reload the plugin in Obsidian after changes.
+Our feature request template will guide you through providing:
 
-### Running Tests
+- Feature title and problem statement
 
-```bash
-# Run all tests
-pnpm test
+- Proposed solution
 
-# Run tests in watch mode
-pnpm test:watch
-
-# Run with coverage
-pnpm test:coverage
-```
+- Real-world use case
 
-### Linting and Formatting
+- Alternatives you've considered
 
-```bash
-# Check for issues
-pnpm lint
-
-# Fix auto-fixable issues
-pnpm lint:fix
-
-# Format code
-pnpm format
-```
-
-### Building for Production
-
-```bash
-# Create optimized build
-pnpm build
-
-# Version bump (for maintainers)
-pnpm version:bump
-```
-
-## Code Guidelines
-
-### TypeScript
-
-- **Use TypeScript** for all code (strict mode)
-- **Define interfaces** for data structures
-- **Avoid `any`** - use proper types
-- **Use type inference** where possible
-- **Document complex types** with JSDoc
-
-### Code Style
-
-- **2 spaces** for indentation
-- **Semicolons** required
-- **Single quotes** for strings
-- **Trailing commas** in multiline
-- **Arrow functions** preferred
-- Follow the existing code style
-
-### File Organization
-
-```
-src/
-├── components/     # UI components
-├── core/          # Core business logic
-├── types/         # Type definitions
-└── utils/         # Utility functions
-```
-
-- **Keep files focused** - single responsibility
-- **Extract reusable code** to utils
-- **Separate concerns** - UI vs logic
-- **Use barrel exports** (`index.ts`)
-
-### Naming Conventions
-
-- **Classes**: PascalCase (`GraphBuilder`)
-- **Functions/methods**: camelCase (`buildGraph`)
-- **Constants**: UPPER_SNAKE_CASE (`DEFAULT_COLOR`)
-- **Files**: kebab-case (`graph-builder.ts`)
-- **Types/Interfaces**: PascalCase (`NodeData`)
-
-### Comments
-
-- **Document why**, not what
-- **Use JSDoc** for public APIs
-- **Explain complex logic**
-- **Keep comments up-to-date**
-- **Remove commented-out code**
-
-### Testing
-
-- **Write tests** for new features
-- **Update tests** when changing behavior
-- **Test edge cases** and error conditions
-- **Aim for high coverage** (80%+)
-- **Use descriptive test names**
-
-Example:
-```typescript
-describe("GraphBuilder", () => {
-  describe("buildHierarchy", () => {
-    it("should include all children recursively", () => {
-      // Test implementation
-    });
-
-    it("should handle circular relationships", () => {
-      // Test implementation
-    });
-  });
-});
-```
+- Examples/mockups
 
-## Pull Request Process
-
-### Before Submitting
+- Priority and category
 
-1. **Create an issue** first for large changes
-2. **Fork and branch** from `main`
-3. **Follow code guidelines** above
-4. **Write/update tests** for your changes
-5. **Update documentation** if needed
-6. **Run all checks**:
-   ```bash
-   pnpm lint
-   pnpm test
-   pnpm build
-   ```
-7. **Test in Obsidian** with various scenarios
+- Willingness to contribute
 
-### PR Guidelines
+**Tips for Great Feature Requests:**
 
-**Good PR title examples**:
-- `fix: Circular relationship detection in parent-child links`
-- `feat: Add keyboard navigation to graph`
-- `docs: Add examples for color rule expressions`
-- `refactor: Extract graph layout logic to separate class`
+- ✅ **Be specific**: "Add ability to filter nodes by property value"
 
-**PR description should include**:
-- **What** changed
-- **Why** it changed
-- **How** to test it
-- **Screenshots** (if visual changes)
-- **Breaking changes** (if any)
+- ❌ **Too vague**: "Make filtering better"
 
-### PR Template
-
-```markdown
-## Description
-Brief description of the changes
+- ✅ **Explain the why**: Share your workflow and how it helps
 
-## Type of Change
-- [ ] Bug fix
-- [ ] New feature
-- [ ] Breaking change
-- [ ] Documentation update
+- ❌ **Just the what**: Don't only describe what you want
 
-## Testing
-How to test the changes
+## Contributing Code
 
-## Screenshots (if applicable)
-Add screenshots for visual changes
+1. **Fork the repository** on GitHub
 
-## Checklist
-- [ ] Code follows style guidelines
-- [ ] Tests added/updated
-- [ ] Documentation updated
-- [ ] All tests pass
-- [ ] Tested in Obsidian
-```
+2. **Clone your fork** locally
 
-### Review Process
+3. **Create a feature branch** (`git checkout -b feature/amazing-feature`)
 
-1. **Automated checks** must pass (linting, tests, build)
-2. **Maintainer review** - may request changes
-3. **Address feedback** - update PR as needed
-4. **Approval** - maintainer approves when ready
-5. **Merge** - maintainer merges to main
+4. **Make your changes** and ensure they follow our coding standards
 
-## Git Commit Guidelines
+5. **Run quality checks** with `mise run ci` to ensure everything passes
 
-### Commit Message Format
+6. **Commit your changes** (`git commit -m 'Add amazing feature'`)
 
-```
-<type>: <subject>
+7. **Push to your branch** (`git push origin feature/amazing-feature`)
 
-<body>
+8. **Open a Pull Request** on GitHub
 
-<footer>
-```
+## 📝 Documentation Contributions
 
-### Types
+### Help Us Improve the Docs
 
-- **feat**: New feature
-- **fix**: Bug fix
-- **docs**: Documentation only
-- **style**: Code style (formatting, no logic change)
-- **refactor**: Code refactoring
-- **test**: Adding/updating tests
-- **chore**: Build process, dependencies, etc.
+Nexus Properties has documentation covering features and configurations. If you spot something that's incorrect, outdated, or unclear, **we'd love your help!**
 
-### Examples
+**How you can contribute:**
 
-```
-feat: Add filter presets to graph header
+- **Spot an error?** Create a PR to fix it
 
-Add dropdown selector for quickly applying saved filter presets.
-Users can now switch between predefined filters without typing expressions.
+- **Found unclear explanations?** Suggest improvements
 
-Closes #123
-```
+- **Missing information?** Add what's needed
 
-```
-fix: Prevent circular relationships in parent-child links
+- **Better examples?** Share them with us
 
-Check for circular dependencies before establishing relationships.
-Show error notice when circular link would be created.
+Documentation contributions are **highly appreciated** and help everyone in the community.
 
-Fixes #45
-```
+**Where to contribute:**
 
-## Code of Conduct
+- Documentation source is in `docs-site/docs/`
 
-### Our Pledge
+- Edit pages directly on GitHub or submit a PR
 
-We pledge to make participation in our community a harassment-free experience for everyone, regardless of:
-- Age, body size, disability
-- Ethnicity, gender identity
-- Level of experience
-- Nationality, personal appearance
-- Race, religion
-- Sexual identity and orientation
+- Follow the existing style and structure
 
-### Our Standards
+- No contribution is too small — typo fixes are welcome!
 
-**Positive behavior**:
-- Using welcoming and inclusive language
-- Being respectful of differing viewpoints
-- Gracefully accepting constructive criticism
-- Focusing on what's best for the community
-- Showing empathy towards others
+## 🤝 Getting Help
 
-**Unacceptable behavior**:
-- Trolling, insulting/derogatory comments
-- Public or private harassment
-- Publishing others' private information
-- Other conduct inappropriate in a professional setting
+- **Documentation**: Check our [comprehensive docs](https://real1tyy.github.io/Nexus-Properties/)
 
-### Enforcement
+- **FAQ**: Common questions are answered in our [FAQ section](/faq)
 
-Instances of unacceptable behavior may be reported to the project maintainers. All complaints will be reviewed and investigated promptly and fairly.
+- **Issues**: For bugs and feature requests, use [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues)
 
-## Recognition
+## 🙏 Thank You!
 
-Contributors will be recognized in:
-- **README.md** contributors section
-- **Release notes** for significant contributions
-- **Documentation** for doc contributors
-
-## Financial Support
-
-Support the project's development:
-
-- **GitHub Sponsors**: [Sponsor Real1ty](https://github.com/sponsors/Real1tyy)
-- **Buy Me a Coffee**: [Support on Ko-fi](https://ko-fi.com/real1ty)
-
-## Questions?
-
-- **General questions**: [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions)
-- **Development questions**: Ask in issues or discussions
-- **Private inquiries**: Contact via GitHub profile
-
-## License
-
-By contributing, you agree that your contributions will be licensed under the **MIT License**.
-
-## Thank You!
-
-Your contributions make Nexus Properties better for everyone. Whether you're fixing a typo or adding a major feature, every contribution is valued and appreciated! 🙏
+Every contribution, no matter how small, makes Nexus Properties better for everyone. Thank you for helping improve the plugin!
 
 ---
 
-**Happy Contributing! 🚀**
+**Ready to contribute?** [Fork the repository](https://github.com/Real1tyy/Nexus-Properties) and start making improvements!
