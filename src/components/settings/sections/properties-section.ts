@@ -3,14 +3,40 @@ import { Setting } from "obsidian";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 import type { SettingsSection } from "../types";
 
-export class DirectRelationshipsSection implements SettingsSection {
-	readonly id = "direct-relationships";
-	readonly label = "Direct Relationships";
+export class PropertiesSection implements SettingsSection {
+	readonly id = "properties";
+	readonly label = "Properties";
 
 	constructor(private readonly uiBuilder: SettingsUIBuilder<typeof NexusPropertiesSettingsSchema>) {}
 
 	render(container: HTMLElement): void {
-		new Setting(container).setName("Direct relationship properties").setHeading();
+		new Setting(container).setName("Property Display").setHeading();
+
+		this.uiBuilder.addToggle(container, {
+			key: "hideEmptyProperties",
+			name: "Hide empty properties",
+			desc: "Hide properties with empty, null, or undefined values in tooltips and previews",
+		});
+
+		this.uiBuilder.addToggle(container, {
+			key: "hideUnderscoreProperties",
+			name: "Hide underscore properties",
+			desc: "Hide properties that start with an underscore (_) in tooltips and previews",
+		});
+
+		this.uiBuilder.addToggle(container, {
+			key: "zoomHideFrontmatterByDefault",
+			name: "Zoom: hide frontmatter by default",
+			desc: "When entering zoom preview, frontmatter starts hidden by default",
+		});
+
+		this.uiBuilder.addToggle(container, {
+			key: "zoomHideContentByDefault",
+			name: "Zoom: hide content by default",
+			desc: "When entering zoom preview, file content starts hidden by default",
+		});
+
+		new Setting(container).setName("Direct Relationships").setHeading();
 
 		container
 			.createDiv("setting-item-description")
@@ -43,6 +69,13 @@ export class DirectRelationshipsSection implements SettingsSection {
 			name: "Related property",
 			desc: "Property name for related files (bidirectional - automatically syncs between linked files)",
 			placeholder: "related",
+		});
+
+		this.uiBuilder.addText(container, {
+			key: "zettelIdProp",
+			name: "Zettel ID property",
+			desc: "Property name for unique timestamp identifier assigned to new nodes",
+			placeholder: "_ZettelID",
 		});
 	}
 }

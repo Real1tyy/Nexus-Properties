@@ -4,17 +4,15 @@ import { type App, PluginSettingTab } from "obsidian";
 import type NexusPropertiesPlugin from "src/main";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 import { BasesViewSettingsSection } from "./sections/bases-view-section";
-import { DirectRelationshipsSection } from "./sections/direct-relationships-section";
-import { DirectoriesSection } from "./sections/directories-section";
-import { ExamplesSection } from "./sections/examples-section";
+import { GeneralSection } from "./sections/general-section";
 import { GraphDisplaySettingsSection } from "./sections/graph-display-section";
-import { NodeCreationSettingsSection } from "./sections/node-creation-section";
-import { PropertyDisplaySettingsSection } from "./sections/property-display-section";
+import { PropertiesSection } from "./sections/properties-section";
 import { RulesSection } from "./sections/rules-section";
-import { UserInterfaceSettingsSection } from "./sections/user-interface-section";
 import type { SettingsSection } from "./types";
 
-const SPONSOR_URL = "https://github.com/sponsors/Real1tyy";
+const DOCS_URL = "https://real1tyy.github.io/Nexus-Properties/";
+const CHANGELOG_URL = "https://real1tyy.github.io/Nexus-Properties/changelog";
+const SPONSOR_URL = "https://github.com/Real1tyy#-support-my-work";
 
 export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	plugin: NexusPropertiesPlugin;
@@ -62,7 +60,23 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		this.renderSelectedSection();
 
 		const footer = containerEl.createDiv({ cls: "setting-item settings-footer" });
-		footer.createEl("a", {
+		const linksContainer = footer.createDiv("settings-footer-links");
+
+		linksContainer.createEl("a", {
+			text: "Documentation",
+			href: DOCS_URL,
+			cls: "settings-support-link",
+			attr: { target: "_blank", rel: "noopener" },
+		});
+
+		linksContainer.createEl("a", {
+			text: "Changelog",
+			href: CHANGELOG_URL,
+			cls: "settings-support-link",
+			attr: { target: "_blank", rel: "noopener" },
+		});
+
+		linksContainer.createEl("a", {
 			text: "Support Nexus Properties Development",
 			href: SPONSOR_URL,
 			cls: "settings-support-link",
@@ -83,15 +97,11 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 
 	private createSections(): SettingsSection[] {
 		return [
-			new UserInterfaceSettingsSection(this.uiBuilder),
+			new GeneralSection(this.plugin, this.uiBuilder),
 			new GraphDisplaySettingsSection(this.uiBuilder),
-			new PropertyDisplaySettingsSection(this.uiBuilder),
+			new PropertiesSection(this.uiBuilder),
 			new BasesViewSettingsSection(this.plugin, this.uiBuilder),
 			new RulesSection(this.plugin, this.uiBuilder),
-			new DirectoriesSection(this.plugin, this.uiBuilder),
-			new DirectRelationshipsSection(this.uiBuilder),
-			new NodeCreationSettingsSection(this.plugin, this.uiBuilder),
-			new ExamplesSection(this.plugin),
 		];
 	}
 }

@@ -7,9 +7,9 @@ import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
 
-export class NodeCreationSettingsSection implements SettingsSection {
-	readonly id = "node-creation";
-	readonly label = "Node Creation";
+export class GeneralSection implements SettingsSection {
+	readonly id = "general";
+	readonly label = "General";
 
 	private excludedPropertyRulesContainer: HTMLElement | null = null;
 
@@ -19,6 +19,106 @@ export class NodeCreationSettingsSection implements SettingsSection {
 	) {}
 
 	render(container: HTMLElement): void {
+		// User Interface Section
+		new Setting(container).setName("User Interface").setHeading();
+
+		this.uiBuilder.addToggle(container, {
+			key: "showRibbonIcon",
+			name: "Show ribbon icon",
+			desc: "Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.",
+		});
+
+		this.uiBuilder.addToggle(container, {
+			key: "showViewSwitcherHeader",
+			name: "Show view switcher header",
+			desc: "Display the header with toggle button in the Nexus Properties view. Changes apply immediately.",
+		});
+
+		// Directory Scanning Section
+		new Setting(container).setName("Directory scanning").setHeading();
+
+		this.uiBuilder.addArrayManager(container, {
+			key: "directories",
+			name: "Directory scanning",
+			desc: 'Configure which directories to scan for files with relationships. Use "*" to scan all directories, or specify individual directories to limit scanning.',
+			placeholder: "Directory path (e.g., Projects or Notes/Work)",
+			addButtonText: "Add",
+			removeButtonText: "Remove",
+			emptyArrayFallback: "*",
+			preventEmpty: true,
+			itemDescriptionFn: (item: unknown) => {
+				const dir = String(item);
+				return dir === "*" ? "Scan all directories" : `Includes all subdirectories: ${dir}/**`;
+			},
+			onBeforeAdd: async (newItem: unknown, currentItems: unknown[]) => {
+				const newDir = String(newItem);
+				let newDirs = [...currentItems];
+
+				if (newDir !== "*" && newDirs.includes("*")) {
+					newDirs = newDirs.filter((dir) => dir !== "*");
+				}
+
+				if (!newDirs.includes(newDir)) {
+					newDirs.push(newDir);
+				}
+
+				return newDirs;
+			},
+			onBeforeRemove: async (itemToRemove: unknown, currentItems: unknown[]) => {
+				const newDirs = currentItems.filter((dir) => dir !== itemToRemove);
+				return newDirs.length === 0 ? ["*"] : newDirs;
+			},
+			quickActions: [
+				{
+					name: "Reset to scan all directories",
+					desc: "Clear all specific directories and scan the entire vault",
+					buttonText: "Scan all",
+					condition: (currentItems: unknown[]) => !currentItems.includes("*"),
+					action: async () => ["*"],
+				},
+			],
+		});
+
+		// Indexing Section
+		new Setting(container).setName("Manual indexing").setHeading();
+
+		const indexDescription = container.createDiv("setting-item-description");
+		indexDescription.setText(
+			"Manually index all files in your vault and assign relationship properties based on your configured settings. This process will scan all files in the configured directories and update their frontmatter with bidirectional and computed relationships."
+		);
+
+		new Setting(container)
+			.setName("Index and assign properties to all files")
+			.setDesc(
+				"Scan all files in configured directories and update their relationship properties. This may take some time for large vaults."
+			)
+			.addButton((button) => {
+				button
+					.setButtonText("Rescan Everything")
+					.setCta()
+					.onClick(async () => {
+						button.setDisabled(true);
+						button.setButtonText("Rescanning...");
+
+						try {
+							await this.plugin.triggerFullRescan();
+							button.setButtonText("✓ Complete!");
+							setTimeout(() => {
+								button.setButtonText("Rescan Everything");
+								button.setDisabled(false);
+							}, 2000);
+						} catch (error) {
+							console.error("Error during rescan:", error);
+							button.setButtonText("✗ Error");
+							setTimeout(() => {
+								button.setButtonText("Rescan Everything");
+								button.setDisabled(false);
+							}, 2000);
+						}
+					});
+			});
+
+		// Node Creation Section
 		new Setting(container).setName("Node creation shortcuts").setHeading();
 
 		container
@@ -26,13 +126,6 @@ export class NodeCreationSettingsSection implements SettingsSection {
 			.setText(
 				"Enable quick creation of Parent, Child, and Related nodes from the command palette. New nodes inherit frontmatter properties and automatically establish bidirectional relationships."
 			);
-
-		this.uiBuilder.addText(container, {
-			key: "zettelIdProp",
-			name: "Zettel ID property",
-			desc: "Property name for unique timestamp identifier assigned to new nodes",
-			placeholder: "_ZettelID",
-		});
 
 		const infoBox = container.createDiv("settings-info-box");
 		infoBox.createEl("strong", { text: "How it works:" });
