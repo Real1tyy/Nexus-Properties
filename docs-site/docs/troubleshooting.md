@@ -6,61 +6,6 @@ sidebar_position: 99
 
 Common issues and their solutions. If you don't find your issue here, check the [FAQ](faq) or [open an issue on GitHub](https://github.com/Real1tyy/Nexus-Properties/issues).
 
-## Installation Issues
-
-### Plugin Won't Enable
-
-**Symptoms**: Can't toggle the plugin on in Community Plugins
-
-**Solutions**:
-1. **Check Obsidian version**: Must be 1.6.0 or higher
-   - Help → About → Check version number
-   - Update Obsidian if needed
-2. **Check installation files**: Verify all files exist:
-   - `<vault>/.obsidian/plugins/nexus-properties/main.js`
-   - `<vault>/.obsidian/plugins/nexus-properties/manifest.json`
-   - `<vault>/.obsidian/plugins/nexus-properties/styles.css`
-3. **Check console for errors**:
-   - Press `Ctrl/Cmd+Shift+I`
-   - Look for error messages
-   - Share errors in GitHub issue if needed
-4. **Try reinstalling**:
-   - Disable plugin
-   - Delete plugin folder
-   - Reinstall from Community Plugins or manually
-
-### Commands Not Appearing
-
-**Symptoms**: Can't find Nexus Properties commands in command palette
-
-**Solutions**:
-1. **Check plugin is enabled**:
-   - Settings → Community plugins
-   - Nexus Properties should be toggled ON
-2. **Check file context**:
-   - Some commands only work when viewing files
-   - Commands like "Create Child Node" need active file
-   - File must be in indexed directory
-3. **Reload plugin**:
-   - Settings → Community plugins → Reload
-4. **Restart Obsidian**:
-   - Close completely and reopen
-
-### Ribbon Icon Not Showing
-
-**Symptoms**: No fork icon in left sidebar
-
-**Solutions**:
-1. **Check setting enabled**:
-   - Settings → Nexus Properties → User Interface
-   - "Show ribbon icon" must be ON
-2. **Restart required**:
-   - Close Obsidian completely
-   - Reopen to see icon
-3. **Check other plugins**:
-   - Too many plugins can hide icons
-   - Use command palette as alternative
-
 ## Graph Issues
 
 ### Graph Not Showing Any Nodes

@@ -9,6 +9,8 @@ const sidebars: SidebarsConfig = {
     },
     "installation",
     "quickstart",
+    "videos",
+    "screenshots",
     {
       type: "category",
       label: "Features",
@@ -29,12 +31,11 @@ const sidebars: SidebarsConfig = {
       ]
     },
     "configuration",
-    "videos",
     "faq",
     "troubleshooting",
     "contributing",
-    "changelog",
-    "support"
+    "support",
+    "changelog"
   ]
 };
 
