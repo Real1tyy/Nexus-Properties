@@ -3,8 +3,9 @@ import { cls } from "../../utils/css";
 import { InputFilterManager } from "./base";
 
 export class GraphFilter extends InputFilterManager {
-	private compiledFunc: ((...args: any[]) => boolean) | null = null;
+	private compiledFunc: ((...args: unknown[]) => boolean) | null = null;
 	private propertyMapping = new Map<string, string>();
+	private lastWarnedExpression: string | null = null;
 
 	constructor(
 		parentEl: HTMLElement,
@@ -26,6 +27,7 @@ export class GraphFilter extends InputFilterManager {
 		super.updateFilterValue(value);
 		this.compiledFunc = null;
 		this.propertyMapping.clear();
+		this.lastWarnedExpression = null;
 	}
 
 	setFilterValue(value: string): void {
@@ -39,23 +41,40 @@ export class GraphFilter extends InputFilterManager {
 		if (!this.currentValue) return true;
 
 		try {
-			if (this.propertyMapping.size === 0) {
-				this.propertyMapping = buildPropertyMapping(Object.keys(frontmatter));
+			const currentKeys = new Set(Object.keys(frontmatter));
+			const existingKeys = new Set(this.propertyMapping.keys());
+			const newKeys = [...currentKeys].filter((key) => !existingKeys.has(key));
+
+			if (newKeys.length > 0) {
+				const allKeys = new Set([...existingKeys, ...currentKeys]);
+				this.propertyMapping = buildPropertyMapping(Array.from(allKeys));
+				this.compiledFunc = null;
 			}
 
 			if (!this.compiledFunc) {
 				const sanitized = sanitizeExpression(this.currentValue, this.propertyMapping);
 				const params = Array.from(this.propertyMapping.values());
+				// eslint-disable-next-line @typescript-eslint/no-implied-eval -- Dynamic function creation for expression evaluation with sanitized input
 				this.compiledFunc = new Function(...params, `"use strict"; return ${sanitized};`) as (
-					...args: any[]
+					...args: unknown[]
 				) => boolean;
 			}
 
-			const values = Array.from(this.propertyMapping.keys()).map((key) => frontmatter[key]);
-			return this.compiledFunc(...values);
+			const values = Array.from(this.propertyMapping.keys()).map((key) => frontmatter[key] ?? undefined);
+			const result = this.compiledFunc(...values);
+			return result;
 		} catch (error) {
-			console.warn("Invalid filter expression:", this.currentValue, error);
-			return true;
+			if (error instanceof ReferenceError) {
+				const hasInequality = this.currentValue.includes("!==") || this.currentValue.includes("!=");
+				return hasInequality;
+			}
+
+			if (this.lastWarnedExpression !== this.currentValue) {
+				console.warn("Invalid filter expression:", this.currentValue, error);
+				this.lastWarnedExpression = this.currentValue;
+			}
+
+			return false;
 		}
 	}
 }
