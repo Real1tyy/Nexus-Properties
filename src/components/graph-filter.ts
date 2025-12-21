@@ -1,4 +1,5 @@
 import { buildPropertyMapping, sanitizeExpression } from "@real1ty-obsidian-plugins/utils";
+import { cls } from "../utils/css";
 import { InputFilterManager } from "./input-filter-manager";
 
 export class GraphFilter extends InputFilterManager {
@@ -14,7 +15,7 @@ export class GraphFilter extends InputFilterManager {
 		super(
 			parentEl,
 			"Filter nodes (e.g., status === 'active')",
-			"nexus-graph-filter-input",
+			cls("graph-filter-input"),
 			onFilterChange,
 			initiallyVisible,
 			onHide

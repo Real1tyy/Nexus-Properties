@@ -6,6 +6,7 @@ import type { Subscription } from "rxjs";
 import { GraphBuilder } from "../../core/graph-builder";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
+import { cls } from "../../utils/css";
 import { EdgeContextMenu } from "../edge-context-menu";
 import { GraphFilter } from "../graph-filter";
 import { GraphFilterPresetSelector } from "../graph-filter-preset-selector";
@@ -137,7 +138,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 	async render(): Promise<void> {
 		this.containerEl.empty();
-		this.containerEl.addClass("nexus-graph-view-content");
+		this.containerEl.addClass(cls("graph-view-content"));
 
 		this.header = new GraphHeader(this.containerEl, {
 			currentFileName: "No file selected",
@@ -164,7 +165,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		const showFilterBar = settings.showFilterBar;
 
 		// Create search row wrapper
-		const searchRowClasses = `nexus-graph-search-row${showSearchBar ? "" : " nexus-hidden"}`;
+		const searchRowClasses = showSearchBar ? cls("graph-search-row") : cls("graph-search-row", "hidden");
 		this.searchRowEl = this.containerEl.createEl("div", {
 			cls: searchRowClasses,
 		});
@@ -184,7 +185,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.graphSearch.setPersistentlyVisible(showSearchBar);
 
 		// Create filter preset selector and filter (in a row)
-		const filterRowClasses = `nexus-graph-filter-row${showFilterBar ? "" : " nexus-hidden"}`;
+		const filterRowClasses = showFilterBar ? cls("graph-filter-row") : cls("graph-filter-row", "hidden");
 		const filterRowEl = this.containerEl.createEl("div", {
 			cls: filterRowClasses,
 		});
@@ -216,12 +217,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		// Create a wrapper for zoom preview (sits between header and graph)
 		// This container will hold the zoom preview when active
 		this.previewWrapperEl = this.containerEl.createEl("div", {
-			cls: "nexus-graph-zoom-preview-wrapper",
+			cls: cls("graph-zoom-preview-wrapper"),
 		});
 
 		// Create graph container
 		this.graphContainerEl = this.containerEl.createEl("div", {
-			cls: "nexus-graph-view-container",
+			cls: cls("graph-view-container"),
 		});
 
 		// Register event listeners
@@ -518,28 +519,28 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 	private showSearchRow(): void {
 		if (this.searchRowEl) {
-			this.searchRowEl.removeClass("nexus-hidden");
+			this.searchRowEl.removeClass(cls("hidden"));
 		}
 		// Note: graphSearch is inside searchRowEl, so showing the row shows it automatically
 	}
 
 	private hideSearchRow(): void {
 		if (this.searchRowEl) {
-			this.searchRowEl.addClass("nexus-hidden");
+			this.searchRowEl.addClass(cls("hidden"));
 		}
 	}
 
 	private showFilterRow(): void {
-		const filterRow = this.containerEl.querySelector(".nexus-graph-filter-row");
+		const filterRow = this.containerEl.querySelector(`.${cls("graph-filter-row")}`);
 		if (filterRow) {
-			filterRow.removeClass("nexus-hidden");
+			filterRow.removeClass(cls("hidden"));
 		}
 	}
 
 	private hideFilterRow(): void {
-		const filterRow = this.containerEl.querySelector(".nexus-graph-filter-row");
+		const filterRow = this.containerEl.querySelector(`.${cls("graph-filter-row")}`);
 		if (filterRow) {
-			filterRow.addClass("nexus-hidden");
+			filterRow.addClass(cls("hidden"));
 		}
 		// Also explicitly hide the preset selector when hiding the filter row
 		this.graphFilterPresetSelector?.hide();
@@ -606,7 +607,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.graphContainerEl.empty();
 			this.graphContainerEl.createEl("div", {
 				text: message,
-				cls: "nexus-graph-empty-state",
+				cls: cls("graph-empty-state"),
 			});
 		}
 	}

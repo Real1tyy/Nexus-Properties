@@ -3,6 +3,7 @@ import { type App, Modal, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
+import { cls } from "../utils/css";
 import { PropertyRenderer } from "./property-renderer";
 
 export class NodePreviewModal extends Modal {
@@ -24,13 +25,13 @@ export class NodePreviewModal extends Modal {
 			this.app,
 			this.file,
 			{
-				containerClass: "node-preview-prop-item",
-				keyClass: "node-preview-prop-key",
-				valueClass: "node-preview-prop-value",
-				linkClass: "node-preview-prop-link",
-				textClass: "node-preview-prop-text",
-				emptyClass: "node-preview-prop-empty",
-				separatorClass: "node-preview-prop-separator",
+				containerClass: cls("node-preview-prop-item"),
+				keyClass: cls("node-preview-prop-key"),
+				valueClass: cls("node-preview-prop-value"),
+				linkClass: cls("node-preview-prop-link"),
+				textClass: cls("node-preview-prop-text"),
+				emptyClass: cls("node-preview-prop-empty"),
+				separatorClass: cls("node-preview-prop-separator"),
 			},
 			() => this.close()
 		);
@@ -38,7 +39,7 @@ export class NodePreviewModal extends Modal {
 
 	async onOpen(): Promise<void> {
 		const { contentEl } = this;
-		contentEl.addClass("node-preview-modal");
+		contentEl.addClass(cls("node-preview-modal"));
 
 		await this.loadFrontmatter();
 		this.renderPreview();
@@ -68,7 +69,7 @@ export class NodePreviewModal extends Modal {
 		contentEl.empty();
 
 		// Header with file name
-		const header = contentEl.createDiv("node-preview-header");
+		const header = contentEl.createDiv(cls("node-preview-header"));
 		const titleEl = header.createEl("h2", { text: this.file.basename });
 
 		// Make title clickable to open file
@@ -79,22 +80,22 @@ export class NodePreviewModal extends Modal {
 		};
 
 		// Frontmatter section
-		const section = contentEl.createDiv("node-preview-section");
+		const section = contentEl.createDiv(cls("node-preview-section"));
 
 		if (Object.keys(this.frontmatter).length === 0) {
 			section.createEl("p", {
 				text: "No frontmatter properties found.",
-				cls: "node-preview-empty",
+				cls: cls("node-preview-empty"),
 			});
 			return;
 		}
 
 		section.createEl("h3", {
 			text: "Frontmatter",
-			cls: "node-preview-section-title",
+			cls: cls("node-preview-section-title"),
 		});
 
-		const grid = section.createDiv("node-preview-props-grid");
+		const grid = section.createDiv(cls("node-preview-props-grid"));
 
 		const filteredProperties = filterPropertiesForDisplay(this.frontmatter, this.settings);
 

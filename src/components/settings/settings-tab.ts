@@ -3,6 +3,7 @@ import { type App, PluginSettingTab } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
+import { cls } from "../../utils/css";
 import { BasesViewSettingsSection } from "./sections/bases-view-section";
 import { GeneralSection } from "./sections/general-section";
 import { GraphDisplaySettingsSection } from "./sections/graph-display-section";
@@ -37,16 +38,16 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		containerEl.createEl("h1", { text: "Nexus Properties Settings" });
 
 		if (this.sections.length > 0) {
-			const navContainer = containerEl.createDiv("nexus-settings-nav");
+			const navContainer = containerEl.createDiv(cls("settings-nav"));
 
 			this.sections.forEach((section) => {
 				const button = navContainer.createEl("button", {
 					text: section.label,
-					cls: "nexus-settings-nav-button",
+					cls: cls("settings-nav-button"),
 				});
 
 				if (this.selectedSectionId === section.id) {
-					button.addClass("nexus-settings-nav-button-active");
+					button.addClass(cls("settings-nav-button-active"));
 				}
 
 				button.addEventListener("click", () => {
@@ -56,30 +57,30 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			});
 		}
 
-		this.sectionContainer = containerEl.createDiv({ cls: "nexus-settings-section-container" });
+		this.sectionContainer = containerEl.createDiv({ cls: cls("settings-section-container") });
 		this.renderSelectedSection();
 
-		const footer = containerEl.createDiv({ cls: "setting-item settings-footer" });
-		const linksContainer = footer.createDiv("settings-footer-links");
+		const footer = containerEl.createDiv({ cls: `setting-item ${cls("settings-footer")}` });
+		const linksContainer = footer.createDiv(cls("settings-footer-links"));
 
 		linksContainer.createEl("a", {
 			text: "Documentation",
 			href: DOCS_URL,
-			cls: "settings-support-link",
+			cls: cls("settings-support-link"),
 			attr: { target: "_blank", rel: "noopener" },
 		});
 
 		linksContainer.createEl("a", {
 			text: "Changelog",
 			href: CHANGELOG_URL,
-			cls: "settings-support-link",
+			cls: cls("settings-support-link"),
 			attr: { target: "_blank", rel: "noopener" },
 		});
 
 		linksContainer.createEl("a", {
 			text: "Support Nexus Properties Development",
 			href: SPONSOR_URL,
-			cls: "settings-support-link",
+			cls: cls("settings-support-link"),
 			attr: { target: "_blank", rel: "noopener" },
 		});
 	}

@@ -1,3 +1,5 @@
+import { cls } from "../utils/css";
+
 export interface GraphHeaderProps {
 	currentFileName: string;
 	renderRelated: boolean;
@@ -23,7 +25,7 @@ export class GraphHeader {
 		private containerEl: HTMLElement,
 		private props: GraphHeaderProps
 	) {
-		this.headerEl = this.containerEl.createEl("div", { cls: "nexus-graph-view-header" });
+		this.headerEl = this.containerEl.createEl("div", { cls: cls("graph-view-header") });
 		this.render();
 	}
 
@@ -42,21 +44,21 @@ export class GraphHeader {
 		// Title
 		this.titleEl = this.headerEl.createEl("h4", {
 			text: this.props.currentFileName || "No file selected",
-			cls: "nexus-graph-view-title",
+			cls: cls("graph-view-title"),
 		});
 
 		// Controls container
-		const controlsContainer = this.headerEl.createEl("div", { cls: "nexus-graph-controls-container" });
+		const controlsContainer = this.headerEl.createEl("div", { cls: cls("graph-controls-container") });
 
 		// Render Related checkbox
-		this.relatedToggleContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
+		this.relatedToggleContainer = controlsContainer.createEl("div", { cls: cls("graph-toggle-container") });
 		this.relatedCheckbox = this.relatedToggleContainer.createEl("input", { type: "checkbox" });
-		this.relatedCheckbox.addClass("nexus-graph-toggle-checkbox");
+		this.relatedCheckbox.addClass(cls("graph-toggle-checkbox"));
 		this.relatedCheckbox.checked = this.props.renderRelated;
 
 		this.relatedToggleContainer.createEl("label", {
 			text: "Render Related",
-			cls: "nexus-graph-toggle-label",
+			cls: cls("graph-toggle-label"),
 		});
 
 		this.relatedCheckbox.addEventListener("change", () => {
@@ -69,14 +71,14 @@ export class GraphHeader {
 		this.makeContainerClickable(this.relatedToggleContainer, this.relatedCheckbox);
 
 		// Include all related checkbox
-		this.includeAllContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
+		this.includeAllContainer = controlsContainer.createEl("div", { cls: cls("graph-toggle-container") });
 		this.includeAllCheckbox = this.includeAllContainer.createEl("input", { type: "checkbox" });
-		this.includeAllCheckbox.addClass("nexus-graph-toggle-checkbox");
+		this.includeAllCheckbox.addClass(cls("graph-toggle-checkbox"));
 		this.includeAllCheckbox.checked = this.props.includeAllRelated;
 
 		this.includeAllContainer.createEl("label", {
 			text: "All Related",
-			cls: "nexus-graph-toggle-label",
+			cls: cls("graph-toggle-label"),
 		});
 
 		this.includeAllCheckbox.addEventListener("change", () => {
@@ -86,14 +88,14 @@ export class GraphHeader {
 		this.makeContainerClickable(this.includeAllContainer, this.includeAllCheckbox);
 
 		// Start from current file checkbox
-		this.startFromCurrentContainer = controlsContainer.createEl("div", { cls: "nexus-graph-toggle-container" });
+		this.startFromCurrentContainer = controlsContainer.createEl("div", { cls: cls("graph-toggle-container") });
 		this.toggleCheckbox = this.startFromCurrentContainer.createEl("input", { type: "checkbox" });
-		this.toggleCheckbox.addClass("nexus-graph-toggle-checkbox");
+		this.toggleCheckbox.addClass(cls("graph-toggle-checkbox"));
 		this.toggleCheckbox.checked = this.props.startFromCurrent;
 
 		this.startFromCurrentContainer.createEl("label", {
 			text: "Current file only",
-			cls: "nexus-graph-toggle-label",
+			cls: cls("graph-toggle-label"),
 		});
 
 		this.toggleCheckbox.addEventListener("change", () => {
@@ -114,26 +116,26 @@ export class GraphHeader {
 	private updateVisibility(): void {
 		if (this.props.isFolderNote) {
 			if (this.relatedToggleContainer) {
-				this.relatedToggleContainer.toggleClass("nexus-hidden", false);
+				this.relatedToggleContainer.toggleClass(cls("hidden"), false);
 			}
 			if (this.startFromCurrentContainer) {
-				this.startFromCurrentContainer.toggleClass("nexus-hidden", true);
+				this.startFromCurrentContainer.toggleClass(cls("hidden"), true);
 			}
 			if (this.includeAllContainer) {
-				this.includeAllContainer.toggleClass("nexus-hidden", true);
+				this.includeAllContainer.toggleClass(cls("hidden"), true);
 			}
 			return;
 		}
 
 		// Normal visibility logic for non-folder notes
 		if (this.relatedToggleContainer) {
-			this.relatedToggleContainer.toggleClass("nexus-hidden", false);
+			this.relatedToggleContainer.toggleClass(cls("hidden"), false);
 		}
 		if (this.startFromCurrentContainer) {
-			this.startFromCurrentContainer.toggleClass("nexus-hidden", this.props.renderRelated);
+			this.startFromCurrentContainer.toggleClass(cls("hidden"), this.props.renderRelated);
 		}
 		if (this.includeAllContainer) {
-			this.includeAllContainer.toggleClass("nexus-hidden", !this.props.renderRelated);
+			this.includeAllContainer.toggleClass(cls("hidden"), !this.props.renderRelated);
 		}
 	}
 

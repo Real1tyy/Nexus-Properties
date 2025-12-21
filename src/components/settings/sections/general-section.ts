@@ -3,6 +3,7 @@ import { Setting } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
+import { cls } from "../../../utils/css";
 
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
@@ -258,7 +259,7 @@ export class GeneralSection implements SettingsSection {
 			const propertiesInput = createRuleInput(
 				rule.excludedProperties.join(", "),
 				"status, progress, date",
-				"excluded-properties-input",
+				cls("excluded-properties-input"),
 				async (value) => {
 					const propertiesArray = value
 						.split(",")

@@ -1,3 +1,5 @@
+import { cls } from "../utils/css";
+
 export type FilterChangeCallback = () => void;
 
 const DEFAULT_DEBOUNCE_MS = 150;
@@ -18,7 +20,7 @@ export abstract class InputFilterManager {
 		initiallyVisible: boolean,
 		onHide?: () => void
 	) {
-		const classes = `${cssClass}-container${initiallyVisible ? "" : " nexus-hidden"}`;
+		const classes = initiallyVisible ? `${cssClass}-container` : `${cssClass}-container ${cls("hidden")}`;
 		this.containerEl = this.parentEl.createEl("div", {
 			cls: classes,
 		});
@@ -80,7 +82,7 @@ export abstract class InputFilterManager {
 	}
 
 	show(): void {
-		this.containerEl.removeClass("nexus-hidden");
+		this.containerEl.removeClass(cls("hidden"));
 		this.inputEl?.focus();
 	}
 
@@ -89,7 +91,7 @@ export abstract class InputFilterManager {
 		if (this.persistentlyVisible) {
 			return;
 		}
-		this.containerEl.addClass("nexus-hidden");
+		this.containerEl.addClass(cls("hidden"));
 		if (this.inputEl) {
 			this.inputEl.value = "";
 		}
@@ -102,7 +104,7 @@ export abstract class InputFilterManager {
 	}
 
 	isVisible(): boolean {
-		return !this.containerEl.hasClass("nexus-hidden");
+		return !this.containerEl.hasClass(cls("hidden"));
 	}
 
 	setPersistentlyVisible(value: boolean): void {

@@ -1,5 +1,6 @@
 import { parseValue, serializeValue } from "@real1ty-obsidian-plugins/utils";
 import { type App, Modal, type TFile } from "obsidian";
+import { cls } from "../utils/css";
 
 interface PropertyRow {
 	key: string;
@@ -22,7 +23,7 @@ export class NodeEditModal extends Modal {
 
 	async onOpen(): Promise<void> {
 		const { contentEl } = this;
-		contentEl.addClass("node-edit-modal");
+		contentEl.addClass(cls("node-edit-modal"));
 
 		await this.loadFrontmatter();
 		this.renderEditForm();
@@ -50,12 +51,12 @@ export class NodeEditModal extends Modal {
 		contentEl.createEl("h2", { text: `Edit: ${this.file.basename}` });
 
 		// Properties section
-		const section = contentEl.createDiv("node-edit-section");
-		const headerContainer = section.createDiv("node-edit-header");
+		const section = contentEl.createDiv(cls("node-edit-section"));
+		const headerContainer = section.createDiv(cls("node-edit-header"));
 
 		headerContainer.createEl("h3", {
 			text: "Frontmatter Properties",
-			cls: "node-edit-section-title",
+			cls: cls("node-edit-section-title"),
 		});
 
 		const addButton = headerContainer.createEl("button", {
@@ -67,7 +68,7 @@ export class NodeEditModal extends Modal {
 		});
 
 		// Properties container
-		this.propertiesContainer = section.createDiv("node-edit-props-container");
+		this.propertiesContainer = section.createDiv(cls("node-edit-props-container"));
 
 		// Load existing properties
 		for (const [key, value] of Object.entries(this.originalFrontmatter)) {
@@ -80,25 +81,25 @@ export class NodeEditModal extends Modal {
 	}
 
 	private addPropertyRow(key: string, value: string): void {
-		const row = this.propertiesContainer.createDiv("node-edit-prop-row");
+		const row = this.propertiesContainer.createDiv(cls("node-edit-prop-row"));
 
 		row.createEl("input", {
 			type: "text",
 			placeholder: "Property name",
 			value: key,
-			cls: "node-edit-prop-key-input",
+			cls: cls("node-edit-prop-key-input"),
 		});
 
 		row.createEl("input", {
 			type: "text",
 			placeholder: "Value",
 			value: value,
-			cls: "node-edit-prop-value-input",
+			cls: cls("node-edit-prop-value-input"),
 		});
 
 		const removeButton = row.createEl("button", {
 			text: "×",
-			cls: "node-edit-remove-button",
+			cls: cls("node-edit-remove-button"),
 		});
 
 		removeButton.addEventListener("click", () => {
@@ -135,11 +136,11 @@ export class NodeEditModal extends Modal {
 		const updatedFrontmatter: Record<string, unknown> = {};
 
 		// Collect all properties from the DOM
-		const rows = this.propertiesContainer.querySelectorAll(".node-edit-prop-row");
+		const rows = this.propertiesContainer.querySelectorAll(`.${cls("node-edit-prop-row")}`);
 
 		for (const row of Array.from(rows)) {
-			const keyInput = row.querySelector(".node-edit-prop-key-input") as HTMLInputElement;
-			const valueInput = row.querySelector(".node-edit-prop-value-input") as HTMLInputElement;
+			const keyInput = row.querySelector(`.${cls("node-edit-prop-key-input")}`) as HTMLInputElement;
+			const valueInput = row.querySelector(`.${cls("node-edit-prop-value-input")}`) as HTMLInputElement;
 
 			if (keyInput?.value && valueInput?.value !== undefined) {
 				const key = keyInput.value.trim();

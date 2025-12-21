@@ -9,6 +9,7 @@ import type { App } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
+import { cls } from "../utils/css";
 export interface PropertyTooltipOptions {
 	settingsStore: SettingsStore;
 	currentFilePath?: string;
@@ -61,7 +62,7 @@ export class PropertyTooltip {
 		// Create tooltip element
 		this.hide();
 		this.tooltipEl = document.createElement("div");
-		this.tooltipEl.addClass("nexus-property-tooltip");
+		this.tooltipEl.addClass(cls("property-tooltip"));
 		this.tooltipEl.style.maxWidth = `${this.settings.graphTooltipWidth}px`;
 
 		// Keep tooltip open when hovering over it
@@ -76,12 +77,12 @@ export class PropertyTooltip {
 		// Add clickable title at the top
 		const displayName = extractDisplayName(filePath);
 		const titleEl = this.tooltipEl.createEl("div", {
-			cls: "nexus-property-tooltip-title",
+			cls: cls("property-tooltip-title"),
 		});
 
 		const titleLink = titleEl.createEl("a", {
 			text: displayName,
-			cls: "nexus-property-tooltip-title-link",
+			cls: cls("property-tooltip-title-link"),
 		});
 
 		titleLink.addEventListener("click", (e) => {
@@ -93,14 +94,14 @@ export class PropertyTooltip {
 		});
 
 		if (propertyData.length > 0) {
-			this.tooltipEl.createDiv("nexus-property-tooltip-separator");
+			this.tooltipEl.createDiv(cls("property-tooltip-separator"));
 		}
 
 		for (const { key, value } of propertyData) {
-			const propEl = this.tooltipEl.createDiv("nexus-property-tooltip-item");
-			const keyEl = propEl.createSpan("nexus-property-tooltip-key");
+			const propEl = this.tooltipEl.createDiv(cls("property-tooltip-item"));
+			const keyEl = propEl.createSpan(cls("property-tooltip-key"));
 			keyEl.setText(`${key}:`);
-			const valueEl = propEl.createSpan("nexus-property-tooltip-value");
+			const valueEl = propEl.createSpan(cls("property-tooltip-value"));
 
 			// Render value with clickable links
 			this.renderPropertyValue(valueEl, value);
@@ -177,7 +178,7 @@ export class PropertyTooltip {
 			// Render each item
 			for (let i = 0; i < stringValues.length; i++) {
 				if (i > 0) {
-					container.createSpan({ text: ", ", cls: "nexus-property-separator" });
+					container.createSpan({ text: ", ", cls: cls("property-separator") });
 				}
 				this.renderStringValue(container, stringValues[i]);
 			}
@@ -202,7 +203,7 @@ export class PropertyTooltip {
 			} else if (segment.type === "link" && segment.linkPath && segment.displayText) {
 				const linkEl = container.createEl("a", {
 					text: segment.displayText,
-					cls: "nexus-property-link",
+					cls: cls("property-link"),
 				});
 
 				linkEl.addEventListener("click", (e) => {

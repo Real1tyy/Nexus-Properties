@@ -1,3 +1,5 @@
+import { cls } from "../../utils/css";
+
 export type ToggleChangeHandler = (checked: boolean) => Promise<void>;
 export type InputUpdateHandler = (value: string) => Promise<void>;
 
@@ -51,7 +53,7 @@ export const createMoveButtons = ({ container, index, totalCount, onMoveUp, onMo
 		const moveUpButton = container.createEl("button", {
 			text: "↑",
 			attr: { title: "Move up" },
-			cls: "color-rule-btn",
+			cls: cls("color-rule-btn"),
 		});
 		moveUpButton.onclick = () => {
 			void onMoveUp();
@@ -62,7 +64,7 @@ export const createMoveButtons = ({ container, index, totalCount, onMoveUp, onMo
 		const moveDownButton = container.createEl("button", {
 			text: "↓",
 			attr: { title: "Move down" },
-			cls: "color-rule-btn",
+			cls: cls("color-rule-btn"),
 		});
 		moveDownButton.onclick = () => {
 			void onMoveDown();
@@ -78,7 +80,7 @@ export const createDeleteButton = (
 	const deleteButton = container.createEl("button", {
 		text: "×",
 		attr: { title: "Delete rule" },
-		cls: options?.buttonClass ?? "color-rule-btn color-rule-btn-delete",
+		cls: options?.buttonClass ?? cls("color-rule-btn", "color-rule-btn-delete"),
 	});
 	deleteButton.onclick = () => {
 		void onDelete();

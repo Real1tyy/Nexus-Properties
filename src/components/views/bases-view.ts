@@ -3,6 +3,7 @@ import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
+import { cls } from "../../utils/css";
 import { RegisteredEventsComponent } from "./component";
 
 export const VIEW_TYPE_BASES = "nexus-bases-view";
@@ -86,7 +87,7 @@ export class BasesView extends RegisteredEventsComponent {
 
 			// Clear and render
 			this.contentEl.empty();
-			this.contentEl.addClass("nexus-bases-view");
+			this.contentEl.addClass(cls("bases-view"));
 
 			if (!activeFile) {
 				this.renderEmptyState("No active file. Open a note to see its bases view.");
@@ -101,7 +102,7 @@ export class BasesView extends RegisteredEventsComponent {
 
 			// Create container for the rendered markdown
 			const markdownContainer = this.contentEl.createDiv({
-				cls: "nexus-bases-markdown-container",
+				cls: cls("bases-markdown-container"),
 			});
 
 			// Render the selected view
@@ -122,7 +123,7 @@ export class BasesView extends RegisteredEventsComponent {
 
 	private createViewSelector(): void {
 		this.viewSelectorEl = this.contentEl.createDiv({
-			cls: "nexus-bases-view-selector",
+			cls: cls("bases-view-selector"),
 		});
 
 		const viewTypes: { type: BaseViewType; label: string }[] = this.currentSettings.excludeArchived
@@ -143,7 +144,7 @@ export class BasesView extends RegisteredEventsComponent {
 		for (const { type, label } of viewTypes) {
 			const button = this.viewSelectorEl.createEl("button", {
 				text: label,
-				cls: "nexus-bases-view-button",
+				cls: cls("bases-view-button"),
 			});
 
 			if (type === this.selectedViewType) {
@@ -237,7 +238,7 @@ ${orderArray}
 	private renderEmptyState(message: string): void {
 		this.contentEl.createDiv({
 			text: message,
-			cls: "nexus-bases-empty-state",
+			cls: cls("bases-empty-state"),
 		});
 	}
 

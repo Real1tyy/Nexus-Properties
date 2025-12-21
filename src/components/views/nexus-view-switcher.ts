@@ -2,6 +2,7 @@ import { ItemView, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
+import { cls } from "../../utils/css";
 import { BasesView, type BaseViewType } from "./bases-view";
 import { RelationshipGraphView } from "./relationship-graph-view";
 
@@ -44,7 +45,7 @@ export class NexusViewSwitcher extends ItemView {
 	async onOpen(): Promise<void> {
 		const { contentEl } = this;
 		contentEl.empty();
-		contentEl.addClass("nexus-view-switcher-content");
+		contentEl.addClass(cls("view-switcher-content"));
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe(async (settings) => {
 			await this.handleSettingsChange(settings.showViewSwitcherHeader);
@@ -89,7 +90,7 @@ export class NexusViewSwitcher extends ItemView {
 
 	private async handleSettingsChange(showHeader: boolean): Promise<void> {
 		const { contentEl } = this;
-		const headerBar = contentEl.querySelector(".nexus-view-switcher-header");
+		const headerBar = contentEl.querySelector(`.${cls("view-switcher-header")}`);
 
 		if (showHeader && !headerBar) {
 			await this.renderView();
@@ -124,12 +125,12 @@ export class NexusViewSwitcher extends ItemView {
 
 		if (settings.showViewSwitcherHeader) {
 			const headerBar = contentEl.createEl("div", {
-				cls: "nexus-view-switcher-header",
+				cls: cls("view-switcher-header"),
 			});
 
 			this.toggleButton = headerBar.createEl("button", {
 				text: this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View",
-				cls: "nexus-view-toggle-button",
+				cls: cls("view-toggle-button"),
 			});
 
 			this.toggleButton.addEventListener("click", async () => {
@@ -147,7 +148,7 @@ export class NexusViewSwitcher extends ItemView {
 		const { contentEl } = this;
 
 		// Keep the header if it exists, clear the rest
-		const headerBar = contentEl.querySelector(".nexus-view-switcher-header");
+		const headerBar = contentEl.querySelector(`.${cls("view-switcher-header")}`);
 		Array.from(contentEl.children).forEach((child) => {
 			if (child !== headerBar) {
 				child.remove();
@@ -162,7 +163,7 @@ export class NexusViewSwitcher extends ItemView {
 
 			// Create graph container
 			this.graphContainerEl = contentEl.createEl("div", {
-				cls: "nexus-graph-container",
+				cls: cls("graph-container"),
 			});
 
 			// Create and render graph view
@@ -181,7 +182,7 @@ export class NexusViewSwitcher extends ItemView {
 
 			// Create bases container
 			this.basesContentEl = contentEl.createEl("div", {
-				cls: "nexus-bases-view-content",
+				cls: cls("bases-view-content"),
 			});
 
 			this.basesView = new BasesView(this.app, this.basesContentEl, this.plugin, this.lastBasesViewType, (viewType) => {

@@ -1,7 +1,7 @@
 /* Nexus Properties Plugin Styles */
 
 /* Settings info boxes */
-.settings-info-box {
+.nexus-properties-settings-info-box {
 	margin: 1em 0;
 	padding: 1em;
 	background-color: var(--background-secondary);
@@ -9,21 +9,21 @@
 	border-left: 3px solid var(--interactive-accent);
 }
 
-.settings-info-box h3,
-.settings-info-box h4 {
+.nexus-properties-settings-info-box h3,
+.nexus-properties-settings-info-box h4 {
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 	color: var(--text-normal);
 }
 
-.settings-info-box p {
+.nexus-properties-settings-info-box p {
 	margin: 0.5em 0;
 	color: var(--text-muted);
 	line-height: 1.5;
 }
 
 /* Code examples in settings */
-.settings-info-box-example {
+.nexus-properties-settings-info-box-example {
 	background-color: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
@@ -36,21 +36,21 @@
 }
 
 /* Example grid layout */
-.example-grid {
+.nexus-properties-example-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
 	gap: 1em;
 	margin: 1em 0;
 }
 
-.example-section h4 {
+.nexus-properties-example-section h4 {
 	margin-top: 0;
 	color: var(--text-normal);
 	font-size: 0.95em;
 }
 
 @media (max-width: 768px) {
-	.example-grid {
+	.nexus-properties-example-grid {
 		grid-template-columns: 1fr;
 	}
 }
@@ -76,13 +76,13 @@
 }
 
 /* Settings subsection container */
-.settings-subsection {
+.nexus-properties-settings-subsection {
 	margin-bottom: 0.5em;
 	padding-bottom: 0.25em;
 }
 
 /* Settings empty state */
-.settings-empty-state {
+.nexus-properties-settings-empty-state {
 	padding: 1.5em;
 	margin: 1em 0;
 	background-color: var(--background-secondary);
@@ -95,12 +95,12 @@
 }
 
 /* Directories list container */
-.directories-list {
+.nexus-properties-directories-list {
 	margin-bottom: 1em;
 }
 
 /* Settings info note box */
-.settings-info-note {
+.nexus-properties-settings-info-note {
 	margin-top: 1em;
 	padding: 1em;
 	background-color: var(--background-secondary);
@@ -108,7 +108,7 @@
 }
 
 /* Settings warning box */
-.settings-warning-box {
+.nexus-properties-settings-warning-box {
 	margin: 1em 0;
 	padding: 1em 1.2em;
 	background-color: rgba(255, 100, 100, 0.1);
@@ -117,14 +117,14 @@
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
 
-.settings-warning-box strong {
+.nexus-properties-settings-warning-box strong {
 	color: var(--text-error);
 	font-size: 1em;
 	display: block;
 	margin-bottom: 0.5em;
 }
 
-.settings-warning-box p {
+.nexus-properties-settings-warning-box p {
 	margin: 0.5em 0 0;
 	color: var(--text-normal);
 	line-height: 1.6;
@@ -132,7 +132,7 @@
 }
 
 /* Settings navigation tabs */
-.nexus-settings-nav {
+.nexus-properties-settings-nav {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
@@ -141,7 +141,7 @@
 	border-bottom: 2px solid var(--background-modifier-border);
 }
 
-.nexus-settings-nav-button {
+.nexus-properties-settings-nav-button {
 	padding: 8px 16px;
 	background-color: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border);
@@ -153,36 +153,36 @@
 	transition: all 0.2s ease;
 }
 
-.nexus-settings-nav-button:hover {
+.nexus-properties-settings-nav-button:hover {
 	background-color: var(--background-modifier-hover);
 	border-color: var(--interactive-accent);
 }
 
-.nexus-settings-nav-button-active {
+.nexus-properties-settings-nav-button-active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border-color: var(--interactive-accent);
 }
 
-.nexus-settings-nav-button-active:hover {
+.nexus-properties-settings-nav-button-active:hover {
 	background-color: var(--interactive-accent-hover);
 	border-color: var(--interactive-accent-hover);
 }
 
 /* Settings section container */
-.nexus-settings-section-container {
+.nexus-properties-settings-section-container {
 	margin-top: 1em;
 	padding-bottom: 0.5em;
 }
 
 /* Settings footer */
-.settings-footer {
+.nexus-properties-settings-footer {
 	margin-top: 0.5em;
 	padding-top: 1.5em;
 	border-top: 2px solid var(--background-modifier-border);
 }
 
-.settings-footer-links {
+.nexus-properties-settings-footer-links {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 1em;
@@ -190,7 +190,7 @@
 	justify-content: center;
 }
 
-.settings-support-link {
+.nexus-properties-settings-support-link {
 	padding: 0.6em 1.2em;
 	background-color: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border);
@@ -203,7 +203,7 @@
 	display: inline-block;
 }
 
-.settings-support-link:hover {
+.nexus-properties-settings-support-link:hover {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border-color: var(--interactive-accent);
@@ -211,29 +211,29 @@
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 }
 
-.settings-support-link:active {
+.nexus-properties-settings-support-link:active {
 	transform: translateY(0);
 }
 
 /* Color example list items */
-.color-example-item {
+.nexus-properties-color-example-item {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	margin-bottom: 6px;
 }
 
-.color-example-item .settings-info-box-example {
+.nexus-properties-color-example-item .nexus-properties-settings-info-box-example {
 	flex: 0 0 auto;
 }
 
-.color-arrow {
+.nexus-properties-color-arrow {
 	flex-shrink: 0;
 	color: var(--text-muted);
 }
 
 /* Color example dot in examples */
-.color-example-dot {
+.nexus-properties-color-example-dot {
 	display: inline-block;
 	width: 16px;
 	height: 16px;
@@ -244,13 +244,13 @@
 	flex-shrink: 0;
 }
 
-.color-example-description {
+.nexus-properties-color-example-description {
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 }
 
 /* Color rule items - Compact single row layout */
-.color-rule-item {
+.nexus-properties-color-rule-item {
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 6px;
 	padding: 8px 12px;
@@ -258,13 +258,13 @@
 	background-color: var(--background-secondary);
 }
 
-.color-rule-main-row {
+.nexus-properties-color-rule-main-row {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 }
 
-.color-rule-left {
+.nexus-properties-color-rule-left {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -272,7 +272,7 @@
 	min-width: 0;
 }
 
-.color-rule-order {
+.nexus-properties-color-rule-order {
 	font-size: 11px;
 	font-weight: bold;
 	color: var(--text-muted);
@@ -280,12 +280,12 @@
 	flex-shrink: 0;
 }
 
-.color-rule-left input[type="checkbox"] {
+.nexus-properties-color-rule-left input[type="checkbox"] {
 	flex-shrink: 0;
 	cursor: pointer;
 }
 
-.color-rule-expression-input {
+.nexus-properties-color-rule-expression-input {
 	flex: 1;
 	min-width: 0;
 	padding: 4px 8px;
@@ -297,12 +297,12 @@
 	font-size: var(--font-ui-small);
 }
 
-.color-rule-expression-input:focus {
+.nexus-properties-color-rule-expression-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
 
-.excluded-properties-input {
+.nexus-properties-excluded-properties-input {
 	min-width: 200px;
 	padding: 4px 8px;
 	border: 1px solid var(--background-modifier-border);
@@ -314,41 +314,41 @@
 	margin-right: 8px;
 }
 
-.excluded-properties-input:focus {
+.nexus-properties-excluded-properties-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
 
-.color-rule-right {
+.nexus-properties-color-rule-right {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	flex-shrink: 0;
 }
 
-.color-rule-picker-wrapper {
+.nexus-properties-color-rule-picker-wrapper {
 	display: flex;
 	align-items: center;
 }
 
-.color-rule-picker-wrapper .setting-item {
+.nexus-properties-color-rule-picker-wrapper .setting-item {
 	border: none;
 	padding: 0;
 	margin: 0;
 	background: transparent;
 }
 
-.color-rule-picker-wrapper .setting-item-control {
+.nexus-properties-color-rule-picker-wrapper .setting-item-control {
 	display: flex;
 	align-items: center;
 }
 
-.color-rule-controls {
+.nexus-properties-color-rule-controls {
 	display: flex;
 	gap: 4px;
 }
 
-.color-rule-btn {
+.nexus-properties-color-rule-btn {
 	padding: 4px 8px;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
@@ -360,21 +360,21 @@
 	transition: all 0.15s ease;
 }
 
-.color-rule-btn:hover {
+.nexus-properties-color-rule-btn:hover {
 	background-color: var(--background-modifier-hover);
 }
 
-.color-rule-btn-delete {
+.nexus-properties-color-rule-btn-delete {
 	color: var(--text-error);
 }
 
-.color-rule-btn-delete:hover {
+.nexus-properties-color-rule-btn-delete:hover {
 	background-color: var(--background-modifier-error);
 	border-color: var(--text-error);
 }
 
 /* Filter preset styles */
-.filter-preset-item {
+.nexus-properties-filter-preset-item {
 	display: flex;
 	align-items: center;
 	gap: 8px;
@@ -385,7 +385,7 @@
 	background-color: var(--background-secondary);
 }
 
-.filter-preset-name-input {
+.nexus-properties-filter-preset-name-input {
 	flex: 0 0 180px;
 	padding: 6px 10px;
 	background-color: var(--background-primary);
@@ -397,12 +397,12 @@
 	transition: border-color 0.2s ease;
 }
 
-.filter-preset-name-input:focus {
+.nexus-properties-filter-preset-name-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
 
-.filter-preset-expression-input {
+.nexus-properties-filter-preset-expression-input {
 	flex: 1;
 	min-width: 0;
 	padding: 6px 10px;
@@ -415,12 +415,12 @@
 	transition: border-color 0.2s ease;
 }
 
-.filter-preset-expression-input:focus {
+.nexus-properties-filter-preset-expression-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
 
-.filter-preset-btn-delete {
+.nexus-properties-filter-preset-btn-delete {
 	padding: 4px 10px;
 	background-color: transparent;
 	border: 1px solid var(--background-modifier-border);
@@ -433,18 +433,18 @@
 	flex-shrink: 0;
 }
 
-.filter-preset-btn-delete:hover {
+.nexus-properties-filter-preset-btn-delete:hover {
 	background-color: var(--background-modifier-error);
 	border-color: var(--text-error);
 }
 
 /* Settings array manager */
-.settings-array-manager-list {
+.nexus-properties-settings-array-manager-list {
 	margin-bottom: 1em;
 }
 
 /* Make array manager input fields wider */
-.settings-array-manager-list + .setting-item .setting-item-control input[type="text"] {
+.nexus-properties-settings-array-manager-list + .setting-item .setting-item-control input[type="text"] {
 	min-width: 400px;
 	flex: 1;
 }
@@ -455,17 +455,17 @@
 }
 
 /* Utility classes */
-.nexus-hidden {
+.nexus-properties-hidden {
 	display: none;
 }
 
 /* Override display for toggle containers when hidden */
-.nexus-graph-toggle-container.nexus-hidden {
+.nexus-properties-graph-toggle-container.nexus-properties-hidden {
 	display: none;
 }
 
 /* Relationship Graph View */
-.nexus-graph-view-content {
+.nexus-properties-graph-view-content {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
@@ -475,7 +475,7 @@
 	overflow: hidden;
 }
 
-.nexus-graph-view-header {
+.nexus-properties-graph-view-header {
 	display: flex;
 	flex-direction: row;
 	align-items: flex-start;
@@ -486,7 +486,7 @@
 	flex-shrink: 0;
 }
 
-.nexus-graph-view-title {
+.nexus-properties-graph-view-title {
 	margin: 0;
 	color: var(--text-normal);
 	font-size: 1.1em;
@@ -498,7 +498,7 @@
 	word-break: break-word;
 }
 
-.nexus-graph-controls-container {
+.nexus-properties-graph-controls-container {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
@@ -506,31 +506,31 @@
 	flex-shrink: 0;
 }
 
-.nexus-graph-toggle-container {
+.nexus-properties-graph-toggle-container {
 	display: flex;
 	align-items: center;
 	gap: 0.5em;
 	font-size: 0.9em;
 }
 
-.nexus-graph-toggle-checkbox {
+.nexus-properties-graph-toggle-checkbox {
 	cursor: pointer;
 	width: 16px;
 	height: 16px;
 }
 
-.nexus-graph-toggle-label {
+.nexus-properties-graph-toggle-label {
 	color: var(--text-muted);
 	cursor: pointer;
 	user-select: none;
 }
 
-.nexus-graph-toggle-label:hover {
+.nexus-properties-graph-toggle-label:hover {
 	color: var(--text-normal);
 }
 
 /* Search Row - contains search input (matches filter row structure) */
-.nexus-graph-search-row {
+.nexus-properties-graph-search-row {
 	display: flex;
 	gap: 0.5em;
 	padding: 0.75em 1em;
@@ -540,19 +540,19 @@
 	animation: slideDown 0.2s ease-out;
 }
 
-.nexus-graph-search-row.nexus-hidden {
+.nexus-properties-graph-search-row.nexus-properties-hidden {
 	display: none;
 }
 
 /* Search input container */
-.nexus-graph-search-input-container {
+.nexus-properties-graph-search-input-container {
 	flex: 1;
 }
 
 /* Shared input styling for consistency - force exact same height */
-.nexus-graph-view-content .nexus-graph-search-input,
-.nexus-graph-view-content .nexus-graph-filter-input,
-.nexus-graph-view-content .nexus-graph-filter-preset-select {
+.nexus-properties-graph-view-content .nexus-properties-graph-search-input,
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input,
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
 	width: 100%;
 	height: 2.8em; /* Fixed height to ensure consistency */
 	padding: 0.65em 1em;
@@ -574,21 +574,21 @@
 	-moz-appearance: none;
 }
 
-.nexus-graph-view-content .nexus-graph-search-input:focus,
-.nexus-graph-view-content .nexus-graph-filter-input:focus,
-.nexus-graph-view-content .nexus-graph-filter-preset-select:focus {
+.nexus-properties-graph-view-content .nexus-properties-graph-search-input:focus,
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input:focus,
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
 }
 
-.nexus-graph-view-content .nexus-graph-search-input::placeholder,
-.nexus-graph-view-content .nexus-graph-filter-input::placeholder {
+.nexus-properties-graph-view-content .nexus-properties-graph-search-input::placeholder,
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input::placeholder {
 	color: var(--text-faint);
 }
 
 /* Graph filter row - contains preset selector and filter input */
-.nexus-graph-filter-row {
+.nexus-properties-graph-filter-row {
 	display: flex;
 	gap: 0.5em;
 	padding: 0.75em 1em;
@@ -598,17 +598,17 @@
 	animation: slideDown 0.2s ease-out;
 }
 
-.nexus-graph-filter-row.nexus-hidden {
+.nexus-properties-graph-filter-row.nexus-properties-hidden {
 	display: none;
 }
 
 /* Preset selector container */
-.nexus-graph-filter-preset-container {
+.nexus-properties-graph-filter-preset-container {
 	flex-shrink: 0;
 	position: relative;
 }
 
-.nexus-graph-filter-preset-container::after {
+.nexus-properties-graph-filter-preset-container::after {
 	content: "▼";
 	position: absolute;
 	right: 0.85em;
@@ -621,50 +621,50 @@
 }
 
 /* Preset selector specific overrides */
-.nexus-graph-view-content .nexus-graph-filter-preset-select {
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
 	width: auto;
 	min-width: 120px;
 	padding: 0.65em 2.2em 0.65em 1em; /* Override padding for dropdown arrow space */
 	cursor: pointer;
 }
 
-.nexus-graph-filter-preset-select option {
+.nexus-properties-graph-filter-preset-select option {
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 	padding: 0.5em;
 }
 
-.nexus-graph-view-content .nexus-graph-filter-preset-select:hover {
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:hover {
 	border-color: var(--interactive-accent);
 }
 
-.nexus-graph-filter-preset-container:hover::after {
+.nexus-properties-graph-filter-preset-container:hover::after {
 	color: var(--text-normal);
 }
 
 /* Filter input container */
-.nexus-graph-filter-input-container {
+.nexus-properties-graph-filter-input-container {
 	flex: 1;
 }
 
 /* Filter input specific override - use monospace font for expressions */
-.nexus-graph-view-content .nexus-graph-filter-input {
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
 	font-family: var(--font-monospace);
 }
 
-.nexus-graph-view-content .nexus-graph-filter-input::placeholder {
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input::placeholder {
 	font-family: var(--font-text); /* Placeholder uses regular font */
 }
 
 /* Wrapper for zoom preview - sits between header and graph */
-.nexus-graph-zoom-preview-wrapper {
+.nexus-properties-graph-zoom-preview-wrapper {
 	width: 100%;
 	flex-shrink: 0;
 	position: relative;
 	z-index: 10;
 }
 
-.nexus-graph-view-container {
+.nexus-properties-graph-view-container {
 	flex: 1;
 	width: 100%;
 	min-height: 0;
@@ -673,7 +673,7 @@
 	background: var(--background-primary);
 }
 
-.nexus-graph-empty-state {
+.nexus-properties-graph-empty-state {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -685,32 +685,32 @@
 }
 
 /* Ensure Cytoscape renders properly */
-.nexus-graph-view-container > div {
+.nexus-properties-graph-view-container > div {
 	position: relative;
 	z-index: 1;
 }
 
 /* Node Preview Modal */
-.node-preview-modal .modal-content {
+.nexus-properties-node-preview-modal .modal-content {
 	max-width: 700px;
 }
 
-.node-preview-header h2 {
+.nexus-properties-node-preview-header h2 {
 	margin: 0 0 1.5em 0;
 	color: var(--text-normal);
 	cursor: pointer;
 	transition: color 0.2s;
 }
 
-.node-preview-header h2:hover {
+.nexus-properties-node-preview-header h2:hover {
 	color: var(--interactive-accent);
 }
 
-.node-preview-section {
+.nexus-properties-node-preview-section {
 	margin-bottom: 1.5em;
 }
 
-.node-preview-section-title {
+.nexus-properties-node-preview-section-title {
 	margin: 0 0 1em 0;
 	color: var(--text-muted);
 	font-size: 0.9em;
@@ -719,12 +719,12 @@
 	letter-spacing: 0.5px;
 }
 
-.node-preview-props-grid {
+.nexus-properties-node-preview-props-grid {
 	display: grid;
 	gap: 1em;
 }
 
-.node-preview-prop-item {
+.nexus-properties-node-preview-prop-item {
 	display: grid;
 	grid-template-columns: 150px 1fr;
 	gap: 1em;
@@ -734,40 +734,40 @@
 	border-left: 3px solid var(--background-modifier-border);
 }
 
-.node-preview-prop-key {
+.nexus-properties-node-preview-prop-key {
 	font-weight: 600;
 	color: var(--text-normal);
 	word-break: break-word;
 }
 
-.node-preview-prop-value {
+.nexus-properties-node-preview-prop-value {
 	color: var(--text-muted);
 	word-break: break-word;
 }
 
-.node-preview-prop-link {
+.nexus-properties-node-preview-prop-link {
 	color: var(--link-color);
 	text-decoration: none;
 	cursor: pointer;
 	transition: color 0.2s;
 }
 
-.node-preview-prop-link:hover {
+.nexus-properties-node-preview-prop-link:hover {
 	color: var(--link-color-hover);
 	text-decoration: underline;
 }
 
-.node-preview-prop-empty {
+.nexus-properties-node-preview-prop-empty {
 	color: var(--text-faint);
 	font-style: italic;
 }
 
-.node-preview-prop-separator {
+.nexus-properties-node-preview-prop-separator {
 	color: var(--text-faint);
 	margin: 0 0.25em;
 }
 
-.node-preview-empty {
+.nexus-properties-node-preview-empty {
 	color: var(--text-muted);
 	font-style: italic;
 	text-align: center;
@@ -775,15 +775,15 @@
 }
 
 /* Node Edit Modal */
-.node-edit-modal .modal-content {
+.nexus-properties-node-edit-modal .modal-content {
 	max-width: 800px;
 }
 
-.node-edit-section {
+.nexus-properties-node-edit-section {
 	margin-bottom: 1.5em;
 }
 
-.node-edit-header {
+.nexus-properties-node-edit-header {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -792,14 +792,14 @@
 	border-bottom: 1px solid var(--background-modifier-border);
 }
 
-.node-edit-section-title {
+.nexus-properties-node-edit-section-title {
 	margin: 0;
 	color: var(--text-normal);
 	font-size: 1em;
 	font-weight: 600;
 }
 
-.node-edit-props-container {
+.nexus-properties-node-edit-props-container {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5em;
@@ -810,7 +810,7 @@
 	border-radius: 6px;
 }
 
-.node-edit-prop-row {
+.nexus-properties-node-edit-prop-row {
 	display: grid;
 	grid-template-columns: 200px 1fr auto;
 	gap: 0.5em;
@@ -820,8 +820,8 @@
 	border-radius: 4px;
 }
 
-.node-edit-prop-key-input,
-.node-edit-prop-value-input {
+.nexus-properties-node-edit-prop-key-input,
+.nexus-properties-node-edit-prop-value-input {
 	width: 100%;
 	padding: 0.5em;
 	background-color: var(--background-primary);
@@ -831,13 +831,13 @@
 	font-family: var(--font-text);
 }
 
-.node-edit-prop-key-input:focus,
-.node-edit-prop-value-input:focus {
+.nexus-properties-node-edit-prop-key-input:focus,
+.nexus-properties-node-edit-prop-value-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
 
-.node-edit-remove-button {
+.nexus-properties-node-edit-remove-button {
 	padding: 0.25em 0.5em;
 	background-color: var(--background-modifier-error);
 	color: var(--text-on-accent);
@@ -849,12 +849,12 @@
 	transition: background-color 0.2s;
 }
 
-.node-edit-remove-button:hover {
+.nexus-properties-node-edit-remove-button:hover {
 	background-color: var(--background-modifier-error-hover);
 }
 
 /* Toggle containers */
-.nexus-graph-toggle-container {
+.nexus-properties-graph-toggle-container {
 	display: flex;
 	align-items: center;
 	gap: 0.5em;
@@ -869,23 +869,23 @@
 	user-select: none;
 }
 
-.nexus-graph-toggle-container:hover {
+.nexus-properties-graph-toggle-container:hover {
 	background-color: var(--background-secondary);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
 
-.nexus-graph-toggle-container:active {
+.nexus-properties-graph-toggle-container:active {
 	transform: scale(0.98);
 }
 
 /* Make label not selectable and clickable */
-.nexus-graph-toggle-container .nexus-graph-toggle-label {
+.nexus-properties-graph-toggle-container .nexus-properties-graph-toggle-label {
 	cursor: pointer;
 	user-select: none;
 }
 
 /* Zoom Mode Preview Overlay */
-.nexus-graph-zoom-preview {
+.nexus-properties-graph-zoom-preview {
 	position: relative;
 	width: 100%;
 	max-height: var(--zoom-preview-max-height, 280px);
@@ -911,7 +911,7 @@
 }
 
 /* Controls container - header and toggles in flexbox */
-.nexus-graph-zoom-preview-controls {
+.nexus-properties-graph-zoom-preview-controls {
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
@@ -921,7 +921,7 @@
 	gap: 1em;
 }
 
-.nexus-graph-zoom-preview-title {
+.nexus-properties-graph-zoom-preview-title {
 	margin: 0;
 	color: var(--text-normal);
 	font-size: 1.3em;
@@ -932,19 +932,19 @@
 	transition: color 0.2s ease;
 }
 
-.nexus-graph-zoom-preview-title:hover {
+.nexus-properties-graph-zoom-preview-title:hover {
 	color: var(--interactive-accent);
 }
 
 /* Toggles container - right side */
-.nexus-graph-zoom-preview-toggles {
+.nexus-properties-graph-zoom-preview-toggles {
 	display: flex;
 	gap: 0.75em;
 	align-items: center;
 }
 
 /* Body container that wraps frontmatter and content */
-.nexus-graph-zoom-preview-body {
+.nexus-properties-graph-zoom-preview-body {
 	flex: 1;
 	min-height: 0;
 	display: flex;
@@ -952,7 +952,7 @@
 	overflow: hidden;
 }
 
-.nexus-graph-zoom-preview-frontmatter {
+.nexus-properties-graph-zoom-preview-frontmatter {
 	padding: 0.7em 1.4em;
 	display: grid;
 	grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
@@ -965,7 +965,7 @@
 	font-size: 0.9em;
 }
 
-.nexus-graph-zoom-preview-property {
+.nexus-properties-graph-zoom-preview-property {
 	display: flex;
 	flex-direction: column;
 	gap: 0.25em;
@@ -975,7 +975,7 @@
 	border-left: 2px solid var(--interactive-accent);
 }
 
-.nexus-graph-zoom-preview-property-key {
+.nexus-properties-graph-zoom-preview-property-key {
 	font-size: 0.75em;
 	font-weight: 600;
 	color: var(--text-muted);
@@ -983,7 +983,7 @@
 	letter-spacing: 0.5px;
 }
 
-.nexus-graph-zoom-preview-property-value {
+.nexus-properties-graph-zoom-preview-property-value {
 	font-size: 0.9em;
 	color: var(--text-normal);
 	word-break: break-word;
@@ -992,38 +992,38 @@
 	gap: 0.25em;
 }
 
-.nexus-graph-zoom-preview-property-link {
+.nexus-properties-graph-zoom-preview-property-link {
 	color: var(--link-color);
 	text-decoration: none;
 	cursor: pointer;
 	transition: color 0.2s ease;
 }
 
-.nexus-graph-zoom-preview-property-link:hover {
+.nexus-properties-graph-zoom-preview-property-link:hover {
 	color: var(--link-color-hover);
 	text-decoration: underline;
 }
 
-.nexus-graph-zoom-preview-property-text {
+.nexus-properties-graph-zoom-preview-property-text {
 	color: var(--text-normal);
 }
 
-.nexus-graph-zoom-preview-property-empty {
+.nexus-properties-graph-zoom-preview-property-empty {
 	color: var(--text-faint);
 	font-style: italic;
 }
 
-.nexus-graph-zoom-preview-property-separator {
+.nexus-properties-graph-zoom-preview-property-separator {
 	color: var(--text-muted);
 }
 
-.nexus-graph-zoom-preview-empty {
+.nexus-properties-graph-zoom-preview-empty {
 	color: var(--text-muted);
 	font-style: italic;
 	padding: 0.5em 0;
 }
 
-.nexus-graph-zoom-preview-content {
+.nexus-properties-graph-zoom-preview-content {
 	flex: 1;
 	padding: 0.3em 2em 0.5em 2em;
 	overflow-y: auto;
@@ -1031,7 +1031,7 @@
 	min-height: 0;
 }
 
-.nexus-graph-zoom-preview-content-text {
+.nexus-properties-graph-zoom-preview-content-text {
 	color: var(--text-muted);
 	font-size: 0.95em;
 	line-height: 1.6;
@@ -1041,49 +1041,49 @@
 
 /* CSS overrides for hidden sections - MUST come after base styles for proper cascade */
 /* These have higher specificity (2 classes) than base styles (1 class) */
-.nexus-graph-zoom-preview-body.nexus-hidden {
+.nexus-properties-graph-zoom-preview-body.nexus-properties-hidden {
 	display: none;
 }
 
-.nexus-graph-zoom-preview-frontmatter.nexus-hidden {
+.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden {
 	display: none;
 }
 
-.nexus-graph-zoom-preview-content.nexus-hidden {
+.nexus-properties-graph-zoom-preview-content.nexus-properties-hidden {
 	display: none;
 }
 
 /* When frontmatter is hidden, content should only take needed space */
-.nexus-graph-zoom-preview-body:has(.nexus-graph-zoom-preview-frontmatter.nexus-hidden)
-.nexus-graph-zoom-preview-content {
+.nexus-properties-graph-zoom-preview-body:has(.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden)
+.nexus-properties-graph-zoom-preview-content {
 	flex: 0 1 auto;
 }
 
 /* Scrollbar styling for preview */
-.nexus-graph-zoom-preview-frontmatter::-webkit-scrollbar,
-.nexus-graph-zoom-preview-content::-webkit-scrollbar {
+.nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar,
+.nexus-properties-graph-zoom-preview-content::-webkit-scrollbar {
 	width: 8px;
 }
 
-.nexus-graph-zoom-preview-frontmatter::-webkit-scrollbar-track,
-.nexus-graph-zoom-preview-content::-webkit-scrollbar-track {
+.nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar-track,
+.nexus-properties-graph-zoom-preview-content::-webkit-scrollbar-track {
 	background: var(--background-secondary);
 	border-radius: 4px;
 }
 
-.nexus-graph-zoom-preview-frontmatter::-webkit-scrollbar-thumb,
-.nexus-graph-zoom-preview-content::-webkit-scrollbar-thumb {
+.nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar-thumb,
+.nexus-properties-graph-zoom-preview-content::-webkit-scrollbar-thumb {
 	background: var(--background-modifier-border);
 	border-radius: 4px;
 }
 
-.nexus-graph-zoom-preview-frontmatter::-webkit-scrollbar-thumb:hover,
-.nexus-graph-zoom-preview-content::-webkit-scrollbar-thumb:hover {
+.nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar-thumb:hover,
+.nexus-properties-graph-zoom-preview-content::-webkit-scrollbar-thumb:hover {
 	background: var(--text-faint);
 }
 
 /* Property Tooltip */
-.nexus-property-tooltip {
+.nexus-properties-property-tooltip {
 	position: fixed;
 	z-index: 1000;
 	background-color: var(--background-primary);
@@ -1096,14 +1096,14 @@
 	pointer-events: auto;
 }
 
-.nexus-property-tooltip-title {
+.nexus-properties-property-tooltip-title {
 	margin-bottom: 0.5em;
 	word-wrap: break-word;
 	word-break: break-word;
 	overflow-wrap: break-word;
 }
 
-.nexus-property-tooltip-title-link {
+.nexus-properties-property-tooltip-title-link {
 	color: var(--text-normal);
 	font-size: 1.1em;
 	font-weight: 600;
@@ -1112,55 +1112,55 @@
 	transition: color 0.2s;
 }
 
-.nexus-property-tooltip-title-link:hover {
+.nexus-properties-property-tooltip-title-link:hover {
 	color: var(--link-color);
 }
 
-.nexus-property-tooltip-separator {
+.nexus-properties-property-tooltip-separator {
 	height: 1px;
 	background-color: var(--background-modifier-border);
 	margin: 0.5em -0.85em 0.65em -0.85em;
 }
 
-.nexus-property-tooltip-item {
+.nexus-properties-property-tooltip-item {
 	display: flex;
 	gap: 0.5em;
 	margin-bottom: 0.25em;
 }
 
-.nexus-property-tooltip-item:last-child {
+.nexus-properties-property-tooltip-item:last-child {
 	margin-bottom: 0;
 }
 
-.nexus-property-tooltip-key {
+.nexus-properties-property-tooltip-key {
 	color: var(--text-muted);
 	font-weight: 600;
 	flex-shrink: 0;
 }
 
-.nexus-property-tooltip-value {
+.nexus-properties-property-tooltip-value {
 	color: var(--text-normal);
 	word-break: break-word;
 }
 
-.nexus-property-link {
+.nexus-properties-property-link {
 	color: var(--link-color);
 	text-decoration: none;
 	cursor: pointer;
 	transition: color 0.2s;
 }
 
-.nexus-property-link:hover {
+.nexus-properties-property-link:hover {
 	color: var(--link-color-hover);
 	text-decoration: underline;
 }
 
-.nexus-property-separator {
+.nexus-properties-property-separator {
 	color: var(--text-muted);
 }
 
 /* View Switcher Styles */
-.nexus-view-switcher-header {
+.nexus-properties-view-switcher-header {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1170,7 +1170,7 @@
 	flex-shrink: 0;
 }
 
-.nexus-view-toggle-button {
+.nexus-properties-view-toggle-button {
 	padding: 0.4em 1em;
 	background-color: var(--interactive-normal);
 	color: var(--text-normal);
@@ -1183,18 +1183,18 @@
 		border-color 0.2s;
 }
 
-.nexus-view-toggle-button:hover {
+.nexus-properties-view-toggle-button:hover {
 	background-color: var(--interactive-hover);
 	border-color: var(--interactive-accent);
 }
 
-.nexus-view-toggle-button:active {
+.nexus-properties-view-toggle-button:active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 }
 
 /* Graph container when inside switcher */
-.nexus-graph-container {
+.nexus-properties-graph-container {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
@@ -1203,7 +1203,7 @@
 }
 
 /* Bases View Styles */
-.nexus-bases-view-content {
+.nexus-properties-bases-view-content {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
@@ -1212,7 +1212,7 @@
 	overflow: auto;
 }
 
-.nexus-bases-view {
+.nexus-properties-bases-view {
 	display: flex;
 	flex-direction: column;
 	flex: 1;
@@ -1220,7 +1220,7 @@
 	height: 100%;
 }
 
-.nexus-bases-view-selector {
+.nexus-properties-bases-view-selector {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
@@ -1229,7 +1229,7 @@
 	background-color: var(--background-secondary);
 }
 
-.nexus-bases-view-button {
+.nexus-properties-bases-view-button {
 	flex: 1;
 	min-width: 120px;
 	padding: 8px 12px;
@@ -1244,24 +1244,24 @@
 	text-align: center;
 }
 
-.nexus-bases-view-button:hover {
+.nexus-properties-bases-view-button:hover {
 	background-color: var(--background-modifier-hover);
 	border-color: var(--interactive-accent);
 }
 
-.nexus-bases-view-button.is-active {
+.nexus-properties-bases-view-button.is-active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 	border-color: var(--interactive-accent);
 }
 
-.nexus-bases-markdown-container {
+.nexus-properties-bases-markdown-container {
 	padding: 1em;
 	overflow-y: auto;
 	flex: 1;
 }
 
-.nexus-bases-empty-state {
+.nexus-properties-bases-empty-state {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1271,7 +1271,7 @@
 	text-align: center;
 }
 
-.nexus-bases-placeholder {
+.nexus-properties-bases-placeholder {
 	display: flex;
 	align-items: center;
 	justify-content: center;
@@ -1281,34 +1281,34 @@
 }
 
 /* Dataview table styling in bases view */
-.nexus-bases-markdown-container .dataview {
+.nexus-properties-bases-markdown-container .dataview {
 	margin: 1em 0;
 }
 
-.nexus-bases-markdown-container .dataview table {
+.nexus-properties-bases-markdown-container .dataview table {
 	width: 100%;
 	border-collapse: collapse;
 }
 
-.nexus-bases-markdown-container .dataview th,
-.nexus-bases-markdown-container .dataview td {
+.nexus-properties-bases-markdown-container .dataview th,
+.nexus-properties-bases-markdown-container .dataview td {
 	padding: 0.5em;
 	border: 1px solid var(--background-modifier-border);
 	text-align: left;
 }
 
-.nexus-bases-markdown-container .dataview th {
+.nexus-properties-bases-markdown-container .dataview th {
 	background-color: var(--background-secondary);
 	font-weight: 600;
 }
 
 /* Bases View Section Styles */
-.nexus-bases-section {
+.nexus-properties-bases-section {
 	margin-bottom: 2em;
 	padding: 0 1em;
 }
 
-.nexus-bases-section-header {
+.nexus-properties-bases-section-header {
 	margin: 0 0 1em 0;
 	padding-bottom: 0.5em;
 	font-size: 1.1em;
@@ -1317,7 +1317,7 @@
 	border-bottom: 2px solid var(--background-modifier-border);
 }
 
-.nexus-bases-empty-section {
+.nexus-properties-bases-empty-section {
 	padding: 1em;
 	color: var(--text-muted);
 	font-style: italic;
@@ -1326,13 +1326,13 @@
 	border-radius: 4px;
 }
 
-.nexus-bases-file-list {
+.nexus-properties-bases-file-list {
 	display: flex;
 	flex-direction: column;
 	gap: 0.5em;
 }
 
-.nexus-bases-file-item {
+.nexus-properties-bases-file-item {
 	padding: 0.6em 1em;
 	background-color: var(--background-primary-alt);
 	border: 1px solid var(--background-modifier-border);
@@ -1343,13 +1343,13 @@
 		transform 0.1s;
 }
 
-.nexus-bases-file-item:hover {
+.nexus-properties-bases-file-item:hover {
 	background-color: var(--background-secondary);
 	border-color: var(--interactive-accent);
 	transform: translateX(2px);
 }
 
-.nexus-bases-file-link {
+.nexus-properties-bases-file-link {
 	color: var(--text-normal);
 	text-decoration: none;
 	font-size: 0.95em;
@@ -1357,6 +1357,6 @@
 	cursor: pointer;
 }
 
-.nexus-bases-file-link:hover {
+.nexus-properties-bases-file-link:hover {
 	color: var(--interactive-accent);
 }

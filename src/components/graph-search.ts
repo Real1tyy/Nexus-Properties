@@ -1,8 +1,9 @@
+import { cls } from "../utils/css";
 import { InputFilterManager } from "./input-filter-manager";
 
 export class GraphSearch extends InputFilterManager {
 	constructor(parentEl: HTMLElement, onSearchChange: () => void, initiallyVisible: boolean, onHide?: () => void) {
-		super(parentEl, "Search nodes by name...", "nexus-graph-search-input", onSearchChange, initiallyVisible, onHide);
+		super(parentEl, "Search nodes by name...", cls("graph-search-input"), onSearchChange, initiallyVisible, onHide);
 	}
 
 	shouldInclude(nodeName: string): boolean {

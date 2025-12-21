@@ -4,6 +4,7 @@ import { Setting } from "obsidian";
 import type NexusPropertiesPlugin from "src/main";
 import { SETTINGS_DEFAULTS } from "src/types/constants";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
+import { cls } from "../../../utils/css";
 
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
@@ -102,7 +103,7 @@ export class RulesSection implements SettingsSection {
 				button.setButtonText("Add Rule");
 				button.onClick(async () => {
 					const newRule = {
-						id: `color-rule-${Date.now()}`,
+						id: `${cls("color-rule")}-${Date.now()}`,
 						expression: "",
 						color: "hsl(200, 70%, 50%)",
 						enabled: true,
@@ -263,13 +264,13 @@ export class RulesSection implements SettingsSection {
 		}
 
 		colorRules.forEach((rule, index) => {
-			const ruleContainer = this.colorRulesListContainer!.createDiv("color-rule-item");
-			const mainRow = ruleContainer.createDiv("color-rule-main-row");
-			const leftSection = mainRow.createDiv("color-rule-left");
+			const ruleContainer = this.colorRulesListContainer!.createDiv(cls("color-rule-item"));
+			const mainRow = ruleContainer.createDiv(cls("color-rule-main-row"));
+			const leftSection = mainRow.createDiv(cls("color-rule-left"));
 
 			leftSection.createEl("span", {
 				text: `#${index + 1}`,
-				cls: "color-rule-order",
+				cls: cls("color-rule-order"),
 			});
 
 			const enableToggle = createRuleToggle(rule.enabled, async (checked) => {
@@ -285,7 +286,7 @@ export class RulesSection implements SettingsSection {
 			const expressionInput = createRuleInput(
 				rule.expression,
 				"fm.Status === 'Active'",
-				"color-rule-expression-input",
+				cls("color-rule-expression-input"),
 				async (value) => {
 					await this.plugin.settingsStore.updateSettings((current) => ({
 						...current,
@@ -297,8 +298,8 @@ export class RulesSection implements SettingsSection {
 			);
 			leftSection.appendChild(expressionInput);
 
-			const rightSection = mainRow.createDiv("color-rule-right");
-			const colorPickerWrapper = rightSection.createDiv("color-rule-picker-wrapper");
+			const rightSection = mainRow.createDiv(cls("color-rule-right"));
+			const colorPickerWrapper = rightSection.createDiv(cls("color-rule-picker-wrapper"));
 
 			new Setting(colorPickerWrapper).addColorPicker((colorPicker) => {
 				colorPicker.setValue(rule.color);
@@ -312,7 +313,7 @@ export class RulesSection implements SettingsSection {
 				});
 			});
 
-			const controlsSection = rightSection.createDiv("color-rule-controls");
+			const controlsSection = rightSection.createDiv(cls("color-rule-controls"));
 
 			createMoveButtons({
 				container: controlsSection,
@@ -359,13 +360,13 @@ export class RulesSection implements SettingsSection {
 		}
 
 		filterPresets.forEach((preset, index) => {
-			const presetContainer = this.filterPresetsContainer!.createDiv("filter-preset-item");
+			const presetContainer = this.filterPresetsContainer!.createDiv(cls("filter-preset-item"));
 
 			const nameInput = presetContainer.createEl("input", {
 				type: "text",
 				value: preset.name,
 				placeholder: "Preset name (e.g., 'Active Tasks', 'Projects')",
-				cls: "filter-preset-name-input",
+				cls: cls("filter-preset-name-input"),
 			});
 
 			const updateName = async () => {
@@ -391,7 +392,7 @@ export class RulesSection implements SettingsSection {
 				type: "text",
 				value: preset.expression,
 				placeholder: "Filter expression (e.g., Status === 'Active')",
-				cls: "filter-preset-expression-input",
+				cls: cls("filter-preset-expression-input"),
 			});
 
 			const updateExpression = async () => {
@@ -416,7 +417,7 @@ export class RulesSection implements SettingsSection {
 			const deleteButton = presetContainer.createEl("button", {
 				text: "×",
 				attr: { title: "Delete preset" },
-				cls: "filter-preset-btn-delete",
+				cls: cls("filter-preset-btn-delete"),
 			});
 
 			deleteButton.onclick = () => {

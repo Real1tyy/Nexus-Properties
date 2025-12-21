@@ -1,4 +1,5 @@
 import type { FilterPreset } from "../types/settings";
+import { cls } from "../utils/css";
 
 export class GraphFilterPresetSelector {
 	private containerEl: HTMLElement;
@@ -10,7 +11,9 @@ export class GraphFilterPresetSelector {
 		private onPresetSelected: (expression: string) => void,
 		initiallyVisible: boolean
 	) {
-		const classes = `nexus-graph-filter-preset-container${initiallyVisible ? "" : " nexus-hidden"}`;
+		const classes = initiallyVisible
+			? cls("graph-filter-preset-container")
+			: cls("graph-filter-preset-container", "hidden");
 		this.containerEl = this.parentEl.createEl("div", {
 			cls: classes,
 		});
@@ -20,7 +23,7 @@ export class GraphFilterPresetSelector {
 
 	private render(): void {
 		this.selectEl = this.containerEl.createEl("select", {
-			cls: "nexus-graph-filter-preset-select",
+			cls: cls("graph-filter-preset-select"),
 		});
 
 		this.rebuildSelectOptions();
@@ -78,11 +81,11 @@ export class GraphFilterPresetSelector {
 	}
 
 	show(): void {
-		this.containerEl.removeClass("nexus-hidden");
+		this.containerEl.removeClass(cls("hidden"));
 	}
 
 	hide(): void {
-		this.containerEl.addClass("nexus-hidden");
+		this.containerEl.addClass(cls("hidden"));
 	}
 
 	focus(): void {
@@ -98,7 +101,7 @@ export class GraphFilterPresetSelector {
 	}
 
 	isVisible(): boolean {
-		return !this.containerEl.hasClass("nexus-hidden");
+		return !this.containerEl.hasClass(cls("hidden"));
 	}
 
 	destroy(): void {
