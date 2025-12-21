@@ -1,8 +1,8 @@
 import { type App, Menu, Modal, Notice, Setting, TFile } from "obsidian";
-import type { SettingsStore } from "../core/settings-store";
-import type { RelationshipType } from "../types/constants";
-import { NodeEditModal } from "./node-edit-modal";
-import { NodePreviewModal } from "./node-preview-modal";
+import type { SettingsStore } from "../../core/settings-store";
+import type { RelationshipType } from "../../types/constants";
+import { NodeEditModal } from "../node-edit-modal";
+import { NodePreviewModal } from "../node-preview-modal";
 
 export interface NodeContextMenuCallbacks {
 	onStartRelationship: (sourceNodePath: string, relationshipType: RelationshipType) => void;

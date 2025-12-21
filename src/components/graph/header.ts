@@ -1,4 +1,4 @@
-import { cls } from "../utils/css";
+import { cls } from "../../utils/css";
 
 export interface GraphHeaderProps {
 	currentFileName: string;

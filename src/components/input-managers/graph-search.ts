@@ -1,5 +1,5 @@
-import { cls } from "../utils/css";
-import { InputFilterManager } from "./input-filter-manager";
+import { cls } from "../../utils/css";
+import { InputFilterManager } from "./base";
 
 export class GraphSearch extends InputFilterManager {
 	constructor(parentEl: HTMLElement, onSearchChange: () => void, initiallyVisible: boolean, onHide?: () => void) {

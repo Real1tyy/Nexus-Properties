@@ -1,8 +1,8 @@
 import type { Core } from "cytoscape";
 import type { App } from "obsidian";
 import { TFile } from "obsidian";
-import type { SettingsStore } from "../core/settings-store";
-import type { GraphZoomPreview } from "./graph-zoom-preview";
+import type { SettingsStore } from "../../core/settings-store";
+import type { GraphZoomPreview } from "./zoom-preview";
 
 export interface ZoomConfig {
 	getCy: () => Core;

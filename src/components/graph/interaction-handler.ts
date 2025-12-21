@@ -3,8 +3,8 @@ import type { App } from "obsidian";
 import { TFile } from "obsidian";
 import type { EdgeContextMenu } from "./edge-context-menu";
 import type { NodeContextMenu } from "./node-context-menu";
-import type { PropertyTooltip } from "./property-tooltip";
-import type { RelationshipAdder } from "./relationship-adder";
+import type { PropertyTooltip } from "../property-tooltip";
+import type { RelationshipAdder } from "../relationship-adder";
 
 export interface GraphInteractionConfig {
 	getCy: () => Core;

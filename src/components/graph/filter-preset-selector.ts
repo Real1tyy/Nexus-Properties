@@ -1,5 +1,5 @@
-import type { FilterPreset } from "../types/settings";
-import { cls } from "../utils/css";
+import type { FilterPreset } from "../../types/settings";
+import { cls } from "../../utils/css";
 
 export class GraphFilterPresetSelector {
 	private containerEl: HTMLElement;
