@@ -1,10 +1,10 @@
 import type { Core } from "cytoscape";
 import type { App } from "obsidian";
 import { TFile } from "obsidian";
-import type { EdgeContextMenu } from "./edge-context-menu";
-import type { NodeContextMenu } from "./node-context-menu";
 import type { PropertyTooltip } from "../property-tooltip";
 import type { RelationshipAdder } from "../relationship-adder";
+import type { EdgeContextMenu } from "./edge-context-menu";
+import type { NodeContextMenu } from "./node-context-menu";
 
 export interface GraphInteractionConfig {
 	getCy: () => Core;
