@@ -14,6 +14,7 @@ import {
 import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
+import { compareFrontmatter, type FrontmatterDiff } from "../utils/frontmatter-diff";
 
 export interface FileRelationships {
 	filePath: string;
@@ -31,6 +32,8 @@ export interface IndexerEvent {
 	filePath: string;
 	oldRelationships?: FileRelationships;
 	newRelationships?: FileRelationships;
+	oldFrontmatter?: Frontmatter;
+	frontmatterDiff?: FrontmatterDiff;
 }
 
 type VaultEvent = "create" | "modify" | "delete" | "rename";
@@ -44,6 +47,7 @@ export class Indexer {
 	private metadataCache: MetadataCache;
 	private scanEventsSubject = new Subject<IndexerEvent>();
 	private relationshipsCache = new Map<string, FileRelationships>();
+	private frontmatterCache = new Map<string, Frontmatter>();
 
 	public readonly events$: Observable<IndexerEvent>;
 
@@ -76,6 +80,7 @@ export class Indexer {
 		this.settingsSubscription = null;
 
 		this.relationshipsCache.clear();
+		this.frontmatterCache.clear();
 	}
 
 	private async buildInitialCache(): Promise<void> {
@@ -87,6 +92,7 @@ export class Indexer {
 			if (frontmatter) {
 				const relationships = this.extractRelationships(file, frontmatter);
 				this.relationshipsCache.set(file.path, relationships);
+				this.frontmatterCache.set(file.path, { ...frontmatter });
 			}
 		}
 	}
@@ -195,12 +201,15 @@ export class Indexer {
 			switchMap((intent) => {
 				if (intent.kind === "deleted") {
 					const oldRelationships = this.relationshipsCache.get(intent.path);
+					const oldFrontmatter = this.frontmatterCache.get(intent.path);
 					this.relationshipsCache.delete(intent.path);
+					this.frontmatterCache.delete(intent.path);
 
 					return of<IndexerEvent>({
 						type: "file-deleted",
 						filePath: intent.path,
 						oldRelationships,
+						oldFrontmatter,
 					});
 				}
 				return from(this.buildEvent(intent.file)).pipe(filter((e): e is IndexerEvent => e !== null));
@@ -210,6 +219,7 @@ export class Indexer {
 
 	private handleRename(newFile: TFile, oldPath: string): void {
 		const oldRelationships = this.relationshipsCache.get(oldPath);
+		const oldFrontmatter = this.frontmatterCache.get(oldPath);
 		const frontmatter = this.metadataCache.getFileCache(newFile)?.frontmatter;
 
 		if (!frontmatter || !oldRelationships) {
@@ -221,12 +231,19 @@ export class Indexer {
 		this.relationshipsCache.delete(oldPath);
 		this.relationshipsCache.set(newFile.path, newRelationships);
 
+		const frontmatterDiff = oldFrontmatter ? compareFrontmatter(oldFrontmatter, frontmatter) : undefined;
+
+		this.frontmatterCache.delete(oldPath);
+		this.frontmatterCache.set(newFile.path, { ...frontmatter });
+
 		// Emit event for the renamed file itself
 		this.scanEventsSubject.next({
 			type: "file-changed",
 			filePath: newFile.path,
 			oldRelationships,
 			newRelationships,
+			oldFrontmatter,
+			frontmatterDiff,
 		});
 
 		// Collect affected files from old relationships
@@ -257,8 +274,13 @@ export class Indexer {
 			if (!fm) continue;
 
 			const oldRel = this.relationshipsCache.get(filePath);
+			const oldFrontmatter = this.frontmatterCache.get(filePath);
 			const updatedRelationships = this.extractRelationships(file, fm);
 			this.relationshipsCache.set(filePath, updatedRelationships);
+
+			const frontmatterDiff = oldFrontmatter ? compareFrontmatter(oldFrontmatter, fm) : undefined;
+
+			this.frontmatterCache.set(filePath, { ...fm });
 
 			// Emit event for each affected file
 			this.scanEventsSubject.next({
@@ -266,6 +288,8 @@ export class Indexer {
 				filePath: filePath,
 				oldRelationships: oldRel,
 				newRelationships: updatedRelationships,
+				oldFrontmatter,
+				frontmatterDiff,
 			});
 		}
 	}
@@ -277,16 +301,22 @@ export class Indexer {
 		}
 
 		const oldRelationships = this.relationshipsCache.get(file.path);
+		const oldFrontmatter = this.frontmatterCache.get(file.path);
 		const newRelationships = this.extractRelationships(file, frontmatter);
 
-		// Update cache with new relationships
+		const frontmatterDiff = oldFrontmatter ? compareFrontmatter(oldFrontmatter, frontmatter) : undefined;
+
+		// Update cache with new relationships and frontmatter
 		this.relationshipsCache.set(file.path, newRelationships);
+		this.frontmatterCache.set(file.path, { ...frontmatter });
 
 		return {
 			type: "file-changed",
 			filePath: file.path,
 			oldRelationships,
 			newRelationships,
+			oldFrontmatter,
+			frontmatterDiff,
 		};
 	}
 
