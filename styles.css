@@ -177,42 +177,22 @@
 
 /* Settings footer */
 .nexus-properties-settings-footer {
-	margin-top: 0.5em;
-	padding-top: 1.5em;
-	border-top: 2px solid var(--background-modifier-border);
+	margin-top: 2rem;
+	text-align: center;
+	font-size: var(--font-ui-smaller);
+	color: var(--text-faint);
 }
 
 .nexus-properties-settings-footer-links {
 	display: flex;
-	flex-wrap: wrap;
-	gap: 1em;
-	align-items: center;
 	justify-content: center;
+	gap: 1rem;
+	flex-wrap: wrap;
 }
 
 .nexus-properties-settings-support-link {
-	padding: 0.6em 1.2em;
-	background-color: var(--background-secondary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 6px;
-	color: var(--text-normal);
 	text-decoration: none;
-	font-size: 0.9em;
-	font-weight: 500;
-	transition: all 0.2s ease;
-	display: inline-block;
-}
-
-.nexus-properties-settings-support-link:hover {
-	background-color: var(--interactive-accent);
-	color: var(--text-on-accent);
-	border-color: var(--interactive-accent);
-	transform: translateY(-2px);
-	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-}
-
-.nexus-properties-settings-support-link:active {
-	transform: translateY(0);
+	color: var(--text-accent);
 }
 
 /* Color example list items */
@@ -628,10 +608,16 @@
 	cursor: pointer;
 }
 
-.nexus-properties-graph-filter-preset-select option {
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:focus {
+	outline: none;
+	background-color: var(--interactive-hover);
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select option {
 	background-color: var(--background-primary);
 	color: var(--text-normal);
-	padding: 0.5em;
 }
 
 .nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:hover {

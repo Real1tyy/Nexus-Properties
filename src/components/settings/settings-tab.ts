@@ -14,6 +14,7 @@ import type { SettingsSection } from "./types";
 const DOCS_URL = "https://real1tyy.github.io/Nexus-Properties/";
 const CHANGELOG_URL = "https://real1tyy.github.io/Nexus-Properties/changelog";
 const SPONSOR_URL = "https://github.com/Real1tyy#-support-my-work";
+const VIDEO_URL = "https://www.youtube.com/watch?v=Im0SfuBHamo";
 
 export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	plugin: NexusPropertiesPlugin;
@@ -60,8 +61,8 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		this.sectionContainer = containerEl.createDiv({ cls: cls("settings-section-container") });
 		this.renderSelectedSection();
 
-		const footer = containerEl.createDiv({ cls: `setting-item ${cls("settings-footer")}` });
-		const linksContainer = footer.createDiv(cls("settings-footer-links"));
+		const footerEl = containerEl.createDiv({ cls: `setting-item ${cls("settings-footer")}` });
+		const linksContainer = footerEl.createDiv(cls("settings-footer-links"));
 
 		linksContainer.createEl("a", {
 			text: "Documentation",
@@ -78,7 +79,14 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		});
 
 		linksContainer.createEl("a", {
-			text: "Support Nexus Properties Development",
+			text: "Video Tutorials",
+			href: VIDEO_URL,
+			cls: cls("settings-support-link"),
+			attr: { target: "_blank", rel: "noopener" },
+		});
+
+		linksContainer.createEl("a", {
+			text: "Support",
 			href: SPONSOR_URL,
 			cls: cls("settings-support-link"),
 			attr: { target: "_blank", rel: "noopener" },
