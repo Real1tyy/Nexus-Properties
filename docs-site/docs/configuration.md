@@ -385,6 +385,120 @@ Automatically mark nodes as related when they share the same parent (siblings ar
 
 ---
 
+## Frontmatter Propagation
+
+Configure how frontmatter changes propagate from parent files to their children in the hierarchy.
+
+:::info Automatic Propagation
+When you modify frontmatter properties in a parent file, these changes can automatically propagate to all child files (and recursively to their children). This keeps your hierarchy synchronized.
+:::
+
+### Propagate Frontmatter to Children
+
+**Default**: `false`
+
+Automatically propagate frontmatter changes from parent files to all their children (recursively).
+
+**Enabled**: Changes propagate automatically without confirmation
+**Disabled**: No automatic propagation (use "Ask Before Propagating" for manual control)
+
+**How it works**:
+- When you modify frontmatter in a parent file, changes are detected
+- After a debounce delay, changes automatically apply to all children
+- Changes propagate recursively through the entire child hierarchy
+- Only non-excluded properties are propagated (see "Excluded Propagated Properties")
+
+**Example**:
+```yaml
+# parent-note.md (you change Status from "Draft" to "Published")
+Status: Published
+Priority: High
+```
+
+All child files automatically get updated:
+```yaml
+# child-note.md (automatically updated)
+Status: Published  # ← Propagated from parent
+Priority: High     # ← Propagated from parent
+```
+
+### Ask Before Propagating Frontmatter
+
+**Default**: `false`
+
+Show a confirmation modal before propagating frontmatter changes to children.
+
+**Enabled**: Modal appears asking if you want to propagate changes
+**Disabled**: No modal (use "Propagate Frontmatter to Children" for automatic propagation)
+
+**When enabled**:
+- A modal appears when frontmatter changes are detected in a parent file
+- Shows which properties changed and how many children will be affected
+- You can confirm or cancel the propagation
+- If confirmed, changes propagate recursively to all children
+
+**Use cases**:
+- Review changes before applying them
+- Selective propagation based on context
+- Prevent accidental propagation of sensitive changes
+
+:::tip Both Settings Disabled
+If both "Propagate Frontmatter to Children" and "Ask Before Propagating Frontmatter" are disabled, no propagation occurs. You can still manually update child files.
+:::
+
+### Excluded Propagated Properties
+
+**Default**: `""` (empty)
+
+Comma-separated list of property names that should NOT be propagated to children, even when propagation is enabled.
+
+**Examples**:
+- `Status, Priority` - Don't propagate status or priority changes
+- `_ZettelID, CreatedDate` - Don't propagate system properties
+- `Author, LastModified` - Don't propagate metadata fields
+
+**How it works**:
+- Properties listed here are excluded from propagation
+- Relationship properties (`Parent`, `Child`, `Related`) are always excluded automatically
+- Excluded properties remain unchanged in child files
+- Useful for properties that should differ between parent and children
+
+**Example**:
+```
+Excluded Propagated Properties: Status, Priority
+```
+
+If you change `Status` and `Priority` in a parent file, these changes won't propagate to children, but other properties will still propagate.
+
+### Propagation Debounce Delay
+
+**Default**: `1000ms`
+**Range**: 100ms - 10000ms
+
+Delay in milliseconds before propagating changes. This prevents excessive propagation when making multiple rapid edits.
+
+**How it works**:
+- When you make changes, propagation waits for this delay
+- If you make more changes within the delay, the timer resets
+- After the delay expires with no new changes, propagation occurs
+- All changes made during the delay are merged and propagated together
+
+**Recommended values**:
+- **100-500ms** - Fast propagation for quick edits
+- **1000ms** - Balanced (recommended for most users)
+- **2000-5000ms** - Slower propagation, better for careful editing
+- **10000ms** - Very slow, only propagate when you're completely done editing
+
+**Example**:
+If debounce is set to 1000ms and you:
+1. Change `Status` at 0ms
+2. Change `Priority` at 500ms
+3. Change `Tags` at 800ms
+
+All three changes are merged and propagated together after 1800ms (1000ms after the last change).
+
+---
+
 ## Node Creation Shortcuts
 
 Configure how new nodes are created using command palette shortcuts.
