@@ -34,8 +34,7 @@ export class NodeEditModal extends Modal {
 			const cache = this.app.metadataCache.getFileCache(this.file);
 			if (cache?.frontmatter) {
 				// Copy all frontmatter except Obsidian's internal properties
-				// biome-ignore lint/correctness/noUnusedVariables: Using rest operator to exclude position
-				const { position, ...userFrontmatter } = cache.frontmatter;
+				const { position: _position, ...userFrontmatter } = cache.frontmatter;
 				this.originalFrontmatter = userFrontmatter;
 			}
 		} catch (error) {

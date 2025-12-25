@@ -193,8 +193,7 @@ export class GraphZoomPreview {
 
 		// Frontmatter section
 		const cache = this.app.metadataCache.getFileCache(this.props.file);
-		// biome-ignore lint/correctness/noUnusedVariables: Using rest operator to exclude position
-		const { position, ...frontmatter } = cache?.frontmatter ?? {};
+		const { position: _position, ...frontmatter } = cache?.frontmatter ?? {};
 
 		this.frontmatterSection = this.bodyContainer.createEl("div", {
 			cls: cls("graph-zoom-preview-frontmatter"),

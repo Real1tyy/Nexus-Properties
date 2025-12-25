@@ -239,12 +239,14 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			}
 		});
 
-		setTimeout(() => {
+		// Use requestAnimationFrame to ensure DOM is fully attached before initializing Cytoscape
+		// This prevents "container is not attached to DOM" errors
+		requestAnimationFrame(() => {
 			const activeFile = this.app.workspace.getActiveFile();
 			if (activeFile) {
 				this.onFileOpen(activeFile);
 			}
-		}, 100);
+		});
 
 		// Set up resize observer with debouncing
 		this.setupResizeObserver();
@@ -369,9 +371,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				window.clearTimeout(this.resizeDebounceTimer);
 			}
 
-			// Set new timer to re-render after 1 second of no resize
+			// Use requestAnimationFrame for better performance
+			// This schedules the resize for the next frame, avoiding forced reflows
 			this.resizeDebounceTimer = window.setTimeout(() => {
-				this.handleResize();
+				requestAnimationFrame(() => {
+					this.handleResize();
+				});
 			}, 100);
 		});
 
@@ -379,11 +384,16 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	}
 
 	private handleResize(): void {
-		if (!this.cy) return;
+		if (!this.cy || !this.graphContainerEl?.isConnected) return;
 
 		const skipFitOnce = this.zoomManager.shouldSuppressNextResizeFit();
 
-		// Always notify cytoscape of size changes
+		// Batch layout reads and writes to prevent forced reflows
+		// Read phase: check dimensions
+		const rect = this.graphContainerEl.getBoundingClientRect();
+		if (rect.width === 0 || rect.height === 0) return;
+
+		// Write phase: update Cytoscape
 		this.cy.resize();
 
 		// Re-fit and re-center the graph using the shared helper (unless suppressed)
@@ -671,9 +681,15 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	}
 
 	private initializeCytoscape(): void {
-		// Ensure container is valid and attached to DOM
-		if (!this.graphContainerEl || !this.graphContainerEl.isConnected) {
-			console.error("Cannot initialize Cytoscape: container is not attached to DOM");
+		// Silently return if container is not ready yet
+		// This can happen during hot-reload or rapid view switching
+		if (!this.graphContainerEl?.isConnected || !document.body.contains(this.graphContainerEl)) {
+			return;
+		}
+
+		// Ensure container has dimensions before initializing
+		const rect = this.graphContainerEl.getBoundingClientRect();
+		if (rect.width === 0 || rect.height === 0) {
 			return;
 		}
 
