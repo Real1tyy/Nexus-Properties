@@ -18,8 +18,8 @@
 
 ### Full Tutorial — Zero to Mastery
 
-<a href="https://www.youtube.com/watch?v=VIDEO_ID_HERE" target="_blank">
-  <img src="https://img.youtube.com/vi/VIDEO_ID_HERE/maxresdefault.jpg" alt="Nexus Properties - Full Tutorial" style="width:100%;">
+<a href="https://www.youtube.com/watch?v=Im0SfuBHamo" target="_blank">
+  <img src="https://img.youtube.com/vi/Im0SfuBHamo/maxresdefault.jpg" alt="Nexus Properties - Full Tutorial" style="width:100%;">
 </a>
 
 **Complete Workflow Guide**: In this full tutorial, I walk you through exactly how to use Nexus Properties in practice — from installation and creating your first relationships, to bidirectional sync, graph views, color rules, filtering, and more.
