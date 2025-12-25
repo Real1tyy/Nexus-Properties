@@ -7,7 +7,7 @@ import type * as Preset from '@docusaurus/preset-classic';
 const config: Config = {
   title: 'Nexus Properties',
   tagline: 'Automated property management and interactive relationship visualization for Obsidian.',
-  favicon: 'img/nexus-properties.png',
+  favicon: 'img/logo.png',
 
   // Set the production url of your site here
   url: 'https://Real1tyy.github.io',
@@ -73,7 +73,7 @@ const config: Config = {
 
   themeConfig: {
     // Replace with your project's social card
-    image: 'img/nexus-properties.png',
+    image: 'img/logo.png',
     colorMode: {
       defaultMode: 'dark',
       respectPrefersColorScheme: true,
@@ -82,7 +82,7 @@ const config: Config = {
       title: 'Nexus Properties',
       logo: {
         alt: 'Nexus Properties Logo',
-        src: 'img/nexus-properties.png',
+        src: 'img/logo.png',
         href: '/', // Fix: Make logo/title link to root
       },
       items: [
