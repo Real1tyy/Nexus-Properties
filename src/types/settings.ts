@@ -10,7 +10,7 @@ export const ColorRuleSchema = z
 		color: z.string(),
 		enabled: z.boolean(),
 	})
-	.loose();
+	.strip();
 
 export type ColorRule = z.infer<typeof ColorRuleSchema>;
 
@@ -19,7 +19,7 @@ export const FilterPresetSchema = z
 		name: z.string(),
 		expression: z.string(),
 	})
-	.loose();
+	.strip();
 
 export type FilterPreset = z.infer<typeof FilterPresetSchema>;
 
@@ -30,7 +30,7 @@ export const PathExcludedPropertiesSchema = z
 		excludedProperties: z.array(z.string()),
 		enabled: z.boolean(),
 	})
-	.loose();
+	.strip();
 
 export type PathExcludedProperties = z.infer<typeof PathExcludedPropertiesSchema>;
 
@@ -41,7 +41,7 @@ export const PathIncludedPropertiesSchema = z
 		includedProperties: z.array(z.string()),
 		enabled: z.boolean(),
 	})
-	.loose();
+	.strip();
 
 export type PathIncludedProperties = z.infer<typeof PathIncludedPropertiesSchema>;
 
@@ -125,6 +125,6 @@ export const NexusPropertiesSettingsSchema = z
 		basesCustomFormulas: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_BASES_CUSTOM_FORMULAS),
 		basesCustomSort: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_BASES_CUSTOM_SORT),
 	})
-	.loose();
+	.strip();
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;
