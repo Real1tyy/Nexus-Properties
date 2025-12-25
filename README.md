@@ -12,6 +12,27 @@
 
 ---
 
+## 👥 Who is this for?
+
+Nexus Properties is built for **system builders** with large, long-lived vaults who want structured PKM workflows and think in hierarchies and networks.
+
+**Perfect for you if:**
+- You manage complex knowledge systems with hundreds or thousands of notes
+- You think in hierarchies, relationships, and networks
+- You want structured workflows with consistent metadata
+- You need automatic synchronization to maintain consistency
+- You value visual navigation of your knowledge structure
+
+**Probably not for you if:**
+- You prefer minimal notes with no metadata
+- You want a lightweight, simple note-taking experience
+- You don't use frontmatter or structured properties
+- You prefer manual relationship management
+
+If you're building a structured knowledge system, Nexus Properties will feel like a natural extension of your workflow. If you prefer minimal, unstructured notes, this will likely feel like overkill — and that's intentional.
+
+---
+
 ## 🎬 Video Tutorials
 
 **[View All Video Tutorials →](https://real1tyy.github.io/Nexus-Properties/videos)**

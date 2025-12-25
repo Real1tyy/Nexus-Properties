@@ -6,6 +6,20 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.2.0
+
+### New Features
+
+#### Frontmatter Propagation
+- **Automatic Propagation**: Automatically propagate frontmatter changes from parent files to all their children (recursively). Keep your hierarchy synchronized without manual updates.
+- **Ask Before Propagating**: Optional confirmation modal that shows which properties changed and how many children will be affected before propagating changes.
+- **Excluded Properties**: Configure specific properties that should never be propagated, even when propagation is enabled. Useful for properties that should differ between parent and children.
+- **Debounce Delay**: Configurable delay (100ms-10000ms) before propagation occurs, preventing excessive updates during rapid editing sessions. All changes made within the delay are merged and propagated together.
+- **Recursive Propagation**: Changes propagate through the entire child hierarchy automatically, ensuring consistency across all descendant files.
+- **Smart Change Detection**: Only propagates when actual frontmatter changes are detected, avoiding unnecessary updates.
+
+---
+
 ## 1.1.0
 
 ### New Features
