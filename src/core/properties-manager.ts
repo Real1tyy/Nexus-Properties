@@ -1,7 +1,13 @@
 import {
 	addLinkToProperty,
+	applyFrontmatterChanges,
+	type FrontmatterChange,
+	type FrontmatterDiff,
+	FrontmatterPropagationModal,
 	formatWikiLink,
 	getFileContext,
+	mergeFrontmatterDiffs,
+	parseExcludedProps,
 	parsePropertyLinks,
 	withFileContext,
 } from "@real1ty-obsidian-plugins/utils";
@@ -9,11 +15,15 @@ import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
+import { getChildrenRecursively } from "../utils/hierarchy";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 
 export class PropertiesManager {
 	private subscription: Subscription | null = null;
+	private propagationDebounceTimers: Map<string, NodeJS.Timeout> = new Map();
+	private accumulatedDiffs: Map<string, FrontmatterDiff[]> = new Map();
+	private filesBeingPropagated: Set<string> = new Set();
 
 	constructor(
 		private app: App,
@@ -26,6 +36,10 @@ export class PropertiesManager {
 				this.handleFileDeletion(event.filePath, event.oldRelationships);
 			} else if (event.type === "file-changed" && event.oldRelationships && event.newRelationships) {
 				this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
+
+				if (!this.filesBeingPropagated.has(event.filePath)) {
+					this.handleFrontmatterPropagation(event.filePath, event.newRelationships, event.frontmatterDiff);
+				}
 			}
 		});
 	}
@@ -33,6 +47,14 @@ export class PropertiesManager {
 	stop(): void {
 		this.subscription?.unsubscribe();
 		this.subscription = null;
+
+		// Clear all debounce timers
+		for (const timer of this.propagationDebounceTimers.values()) {
+			clearTimeout(timer);
+		}
+		this.propagationDebounceTimers.clear();
+		this.accumulatedDiffs.clear();
+		this.filesBeingPropagated.clear();
 	}
 
 	async rescanAndAssignPropertiesForAllFiles(indexer: Indexer): Promise<void> {
@@ -175,5 +197,107 @@ export class PropertiesManager {
 				fm[propertyName] = filteredLinks.map((path) => formatWikiLink(path));
 			});
 		});
+	}
+
+	private handleFrontmatterPropagation(
+		filePath: string,
+		relationships: FileRelationships,
+		frontmatterDiff?: FrontmatterDiff
+	): void {
+		if (
+			(!this.settings.propagateFrontmatterToChildren && !this.settings.askBeforePropagatingFrontmatter) ||
+			!frontmatterDiff?.hasChanges
+		) {
+			return;
+		}
+
+		const childrenPaths = getChildrenRecursively(this.app, relationships, this.settings);
+		if (childrenPaths.length === 0) {
+			return;
+		}
+
+		const existingTimer = this.propagationDebounceTimers.get(filePath);
+		if (existingTimer) {
+			clearTimeout(existingTimer);
+		}
+
+		const existingDiffs = this.accumulatedDiffs.get(filePath) || [];
+		existingDiffs.push(frontmatterDiff);
+		this.accumulatedDiffs.set(filePath, existingDiffs);
+
+		const timer = setTimeout(() => {
+			this.propagationDebounceTimers.delete(filePath);
+			const diffs = this.accumulatedDiffs.get(filePath) || [];
+			this.accumulatedDiffs.delete(filePath);
+
+			const mergedDiff = mergeFrontmatterDiffs(diffs);
+
+			if (this.settings.propagateFrontmatterToChildren) {
+				void this.propagateFrontmatterToChildren(childrenPaths, relationships, mergedDiff);
+			} else if (this.settings.askBeforePropagatingFrontmatter) {
+				const fileContext = getFileContext(this.app, filePath);
+				new FrontmatterPropagationModal(this.app, {
+					eventTitle: fileContext.baseName,
+					diff: mergedDiff,
+					instanceCount: childrenPaths.length,
+					onConfirm: () => this.propagateFrontmatterToChildren(childrenPaths, relationships, mergedDiff),
+				}).open();
+			}
+		}, this.settings.propagationDebounceMs);
+
+		this.propagationDebounceTimers.set(filePath, timer);
+	}
+
+	private async propagateFrontmatterToChildren(
+		childrenPaths: string[],
+		relationships: FileRelationships,
+		frontmatterDiff: FrontmatterDiff
+	): Promise<void> {
+		if (childrenPaths.length === 0) {
+			return;
+		}
+
+		const allChanges = [...frontmatterDiff.added, ...frontmatterDiff.modified, ...frontmatterDiff.deleted];
+		if (allChanges.length === 0) {
+			return;
+		}
+
+		const excludedProps = parseExcludedProps(this.settings);
+
+		// Filter changes to only include non-excluded properties
+		const filteredAdded = frontmatterDiff.added.filter((change: FrontmatterChange) => !excludedProps.has(change.key));
+		const filteredModified = frontmatterDiff.modified.filter(
+			(change: FrontmatterChange) => !excludedProps.has(change.key)
+		);
+		const filteredDeleted = frontmatterDiff.deleted.filter(
+			(change: FrontmatterChange) => !excludedProps.has(change.key)
+		);
+
+		if (filteredAdded.length === 0 && filteredModified.length === 0 && filteredDeleted.length === 0) {
+			return;
+		}
+
+		for (const childPath of childrenPaths) {
+			this.filesBeingPropagated.add(childPath);
+		}
+
+		try {
+			const filteredChanges = [...filteredAdded, ...filteredModified, ...filteredDeleted];
+			await Promise.all(
+				childrenPaths.map((childPath) =>
+					applyFrontmatterChanges(this.app, childPath, relationships.frontmatter, {
+						added: filteredAdded,
+						modified: filteredModified,
+						deleted: filteredDeleted,
+						changes: filteredChanges,
+						hasChanges: filteredChanges.length > 0,
+					})
+				)
+			);
+		} finally {
+			for (const childPath of childrenPaths) {
+				this.filesBeingPropagated.delete(childPath);
+			}
+		}
 	}
 }

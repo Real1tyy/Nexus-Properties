@@ -1,8 +1,11 @@
+import {
+	compareFrontmatter,
+	type FrontmatterChange,
+	formatChangeForDisplay,
+	mergeFrontmatterDiffs,
+} from "@real1ty-obsidian-plugins/utils";
 import { describe, expect, it } from "vitest";
-
 import type { Frontmatter } from "../src/types/settings";
-
-import { compareFrontmatter, formatChangeForDisplay, mergeFrontmatterDiffs } from "../src/utils/frontmatter-diff";
 
 describe("compareFrontmatter", () => {
 	it("should detect no changes when frontmatter is identical", () => {
@@ -96,9 +99,9 @@ describe("compareFrontmatter", () => {
 
 		expect(diff.hasChanges).toBe(true);
 		expect(diff.modified).toHaveLength(2);
-		expect(diff.modified.some((c) => c.key === "start")).toBe(false);
-		expect(diff.modified.some((c) => c.key === "title")).toBe(true);
-		expect(diff.modified.some((c) => c.key === "category")).toBe(true);
+		expect(diff.modified.some((c: FrontmatterChange) => c.key === "start")).toBe(false);
+		expect(diff.modified.some((c: FrontmatterChange) => c.key === "title")).toBe(true);
+		expect(diff.modified.some((c: FrontmatterChange) => c.key === "category")).toBe(true);
 	});
 
 	it("should handle array values correctly", () => {
@@ -149,8 +152,8 @@ describe("compareFrontmatter", () => {
 
 		expect(diff.hasChanges).toBe(true);
 		expect(diff.modified).toHaveLength(2);
-		expect(diff.modified.some((c) => c.key === "a")).toBe(true);
-		expect(diff.modified.some((c) => c.key === "b")).toBe(true);
+		expect(diff.modified.some((c: FrontmatterChange) => c.key === "a")).toBe(true);
+		expect(diff.modified.some((c: FrontmatterChange) => c.key === "b")).toBe(true);
 	});
 
 	it("should handle empty frontmatter objects", () => {
@@ -639,13 +642,13 @@ describe("mergeFrontmatterDiffs", () => {
 		expect(merged.modified).toHaveLength(2);
 		expect(merged.deleted).toHaveLength(1);
 
-		const categoryChange = merged.modified.find((c) => c.key === "category");
+		const categoryChange = merged.modified.find((c: FrontmatterChange) => c.key === "category");
 		expect(categoryChange).toBeDefined();
 		expect(categoryChange?.oldValue).toBe(undefined);
 		expect(categoryChange?.newValue).toBe("personal");
 		expect(categoryChange?.changeType).toBe("modified");
 
-		const priorityChange = merged.modified.find((c) => c.key === "priority");
+		const priorityChange = merged.modified.find((c: FrontmatterChange) => c.key === "priority");
 		expect(priorityChange).toBeDefined();
 		expect(priorityChange?.oldValue).toBe(1);
 		expect(priorityChange?.newValue).toBe(2);

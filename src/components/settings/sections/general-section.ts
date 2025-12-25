@@ -137,6 +137,67 @@ export class GeneralSection implements SettingsSection {
 		list.createEl("li", { text: "Bidirectional relationships are established automatically" });
 		list.createEl("li", { text: "Commands are only available for files in indexed directories" });
 
+		// Frontmatter Propagation Section
+		new Setting(container).setName("Frontmatter propagation").setHeading();
+
+		container
+			.createDiv("setting-item-description")
+			.setText(
+				"Configure how frontmatter changes in parent files are propagated to all child files recursively. When you update custom properties in a parent file, those changes can automatically cascade down to all descendants."
+			);
+
+		new Setting(container)
+			.setName("Propagate frontmatter to children")
+			.setDesc(
+				"Automatically propagate frontmatter changes from parent files to all child files recursively. When you update custom properties (like status, priority, tags) in a parent file, all descendants are updated immediately."
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settingsStore.currentSettings.propagateFrontmatterToChildren)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							propagateFrontmatterToChildren: value,
+							askBeforePropagatingFrontmatter: value ? false : s.askBeforePropagatingFrontmatter,
+						}));
+						this.render(container.parentElement!);
+					});
+			});
+
+		new Setting(container)
+			.setName("Ask before propagating")
+			.setDesc(
+				"Show a confirmation modal before propagating frontmatter changes to children. Allows you to review changes before applying them to all descendant files."
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settingsStore.currentSettings.askBeforePropagatingFrontmatter)
+					.onChange(async (value) => {
+						await this.plugin.settingsStore.updateSettings((s) => ({
+							...s,
+							askBeforePropagatingFrontmatter: value,
+							propagateFrontmatterToChildren: value ? false : s.propagateFrontmatterToChildren,
+						}));
+						this.render(container.parentElement!);
+					});
+			});
+
+		this.uiBuilder.addText(container, {
+			key: "excludedPropagatedProps",
+			name: "Excluded propagation properties",
+			desc: "Comma-separated list of frontmatter property names to exclude from propagation. These properties will not be copied to child files. Relationship properties (Parent, Child, Related, _ZettelID) are always excluded automatically.",
+			placeholder: "status, archived, date",
+		});
+
+		this.uiBuilder.addSlider(container, {
+			key: "propagationDebounceMs",
+			name: "Propagation debounce delay",
+			desc: "Delay in milliseconds before propagating frontmatter changes to children. Multiple rapid changes within this window will be accumulated and applied together.",
+			min: 100,
+			max: 10000,
+			step: 100,
+		});
+
 		new Setting(container).setName("Excluded properties").setHeading();
 
 		this.uiBuilder.addTextArray(container, {

@@ -124,6 +124,17 @@ export const NexusPropertiesSettingsSchema = z
 		// Custom sorting for bases view
 		basesCustomFormulas: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_BASES_CUSTOM_FORMULAS),
 		basesCustomSort: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_BASES_CUSTOM_SORT),
+
+		// Frontmatter propagation settings
+		propagateFrontmatterToChildren: z.boolean().catch(SETTINGS_DEFAULTS.PROPAGATE_FRONTMATTER_TO_CHILDREN),
+		askBeforePropagatingFrontmatter: z.boolean().catch(SETTINGS_DEFAULTS.ASK_BEFORE_PROPAGATING_FRONTMATTER),
+		excludedPropagatedProps: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_EXCLUDED_PROPAGATED_PROPS),
+		propagationDebounceMs: z
+			.number()
+			.int()
+			.min(100)
+			.max(10000)
+			.catch(SETTINGS_DEFAULTS.DEFAULT_PROPAGATION_DEBOUNCE_MS),
 	})
 	.strip();
 
