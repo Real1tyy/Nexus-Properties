@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@real1ty-obsidian-plugins/utils':
-        specifier: ^2.14.0
-        version: 2.14.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)
+        specifier: ^2.15.0
+        version: 2.15.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)
       cytoscape:
         specifier: ^3.33.1
         version: 3.33.1
@@ -63,8 +63,8 @@ importers:
 
 packages:
 
-  '@acemir/cssom@0.9.29':
-    resolution: {integrity: sha512-G90x0VW+9nW4dFajtjCoT+NM0scAfH9Mb08IcjgFHYbfiL/lU04dTF9JuVOi3/OH+DJCQdcIseSXkdCB9Ky6JA==}
+  '@acemir/cssom@0.9.30':
+    resolution: {integrity: sha512-9CnlMCI0LmCIq0olalQqdWrJHPzm0/tw3gzOA9zJSgvFX7Xau3D24mAGa4BtwxwY69nsuJW6kQqqCzf/mEcQgg==}
 
   '@asamuzakjp/css-color@4.1.1':
     resolution: {integrity: sha512-B0Hv6G3gWGMn0xKJ0txEi/jM5iFpT3MfDxmhZFb4W047GvytCf1DHQ1D69W3zHI4yWe2aTZAA0JnbMZ7Xc8DuQ==}
@@ -484,8 +484,8 @@ packages:
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
 
-  '@real1ty-obsidian-plugins/utils@2.14.0':
-    resolution: {integrity: sha512-lod3R6E4JCS9+h+NeB543r72EH1nwcSt2mde4O0Poj9RAmykIeS49Hoy8qxO/3+cajqKwrZWurPG4yfRDcZc0Q==}
+  '@real1ty-obsidian-plugins/utils@2.15.0':
+    resolution: {integrity: sha512-JFpXe386QLOPCou2xY5TucVuxNhmeQbuHtsTfDrCwoiGfEMQKK1IzAqhCIcaVWL3zNqvs1Z4QdlrO+MA/emivw==}
 
   '@rollup/rollup-android-arm-eabi@4.54.0':
     resolution: {integrity: sha512-OywsdRHrFvCdvsewAInDKCNyR3laPA2mc9bRYJ6LBp5IyvF3fvXbbNR0bSzHlZVFtn6E0xw2oZlyjg4rKCVcng==}
@@ -1114,7 +1114,7 @@ packages:
 
 snapshots:
 
-  '@acemir/cssom@0.9.29': {}
+  '@acemir/cssom@0.9.30': {}
 
   '@asamuzakjp/css-color@4.1.1':
     dependencies:
@@ -1362,7 +1362,7 @@ snapshots:
 
   '@marijn/find-cluster-break@1.0.2': {}
 
-  '@real1ty-obsidian-plugins/utils@2.14.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)':
+  '@real1ty-obsidian-plugins/utils@2.15.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)':
     dependencies:
       colord: 2.9.3
       gray-matter: 4.0.3
@@ -1705,7 +1705,7 @@ snapshots:
 
   jsdom@27.3.0:
     dependencies:
-      '@acemir/cssom': 0.9.29
+      '@acemir/cssom': 0.9.30
       '@asamuzakjp/dom-selector': 6.7.6
       cssstyle: 5.3.5
       data-urls: 6.0.0
