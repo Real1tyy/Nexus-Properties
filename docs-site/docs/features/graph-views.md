@@ -55,7 +55,6 @@ Large constellations can be slow. Reduce max depth if needed.
 ## Next Steps
 
 - [Node Layout](node-layout) - How nodes are positioned
-- [Search](search) - Find nodes quickly
 - [Filtering](filtering) - Focus on subsets
 - [Zoom Mode](zoom-mode) - Explore nodes in detail
 - [Color Rules](color-rules) - Visual categories

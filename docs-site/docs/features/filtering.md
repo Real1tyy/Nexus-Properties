@@ -79,5 +79,4 @@ Equivalent to: `type === 'project' && status === 'active' && priority === 'high'
 ## Next Steps
 
 - [Color Rules](color-rules) - Combine with filtering
-- [Search](search) - Find specific nodes
 - [Graph Views](graph-views) - Apply filters in different modes

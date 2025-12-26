@@ -18,7 +18,7 @@ Hover over nodes to see frontmatter properties instantly.
 
 **Displays**:
 - Node title (file name)
-- All frontmatter properties (key-value pairs)
+- Properties configured in [Display Properties in Nodes](../configuration#graph-display) setting
 - Wiki links (clickable)
 - Arrays (formatted as lists)
 - Objects (nested display)

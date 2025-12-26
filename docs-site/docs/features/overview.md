@@ -30,8 +30,11 @@ Right-click nodes/edges for quick actions: open, add relationships, edit, previe
 ### 💬 [Tooltips](tooltips)
 Hover nodes to see properties. Clickable wiki links, configurable width.
 
-### 🔎 [Search](search)
-Real-time search by filename/path. Highlights matches, dims non-matches.
+### 🔎 Search
+Real-time search by filename/path. Highlights matches, dims non-matches. Command: "Toggle Graph Search"
+
+**Searches**: File names and paths (case-insensitive, partial matching)
+**Does NOT search**: Frontmatter properties (use [Filtering](filtering)), note content, or tags
 
 ### ⚡ [Node Creation](node-creation)
 Create parent/child/related nodes with property inheritance and bidirectional linking.
