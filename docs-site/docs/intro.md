@@ -82,8 +82,9 @@ Create parent, child, or related nodes instantly from the command palette. New n
 Ready to start building your knowledge network?
 
 1. [Install the plugin](installation)
-2. [Configure your settings](configuration)
-3. [Follow the quickstart guide](quickstart)
+2. [Watch the full video tutorial](videos) 🎬
+3. [Configure your settings](configuration)
+4. [Follow the quickstart guide](quickstart)
 
 ## Support & Community
 
