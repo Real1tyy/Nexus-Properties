@@ -46,10 +46,15 @@ Large constellations can be slow. Reduce max depth if needed.
 ## Interaction
 
 **Single click**: Enter [Zoom Mode](zoom-mode)
+
 **Double click**: Open in new tab
+
 **Right-click**: [Context Menu](context-menus)
+
 **Hover**: [Tooltip](tooltips) after 1 second
+
 **Drag**: Pan graph or move nodes (not saved)
+
 **Scroll**: Zoom in/out
 
 ## Next Steps

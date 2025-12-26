@@ -5,7 +5,9 @@ List-based view of the current note's relationships. Shows children, parent, and
 ## Sections
 
 **Children**: Notes with current note as parent
+
 **Parent**: Notes with current note as child
+
 **Related**: Notes with mutual related connections
 
 **Auto-filtering**: Excludes notes with `_Archived: true`
@@ -13,6 +15,7 @@ List-based view of the current note's relationships. Shows children, parent, and
 ## Usage
 
 **Switch views**: Click "Switch to Bases View" / "Switch to Graph View" button
+
 **Navigate**: Click any note name to open it
 
 ## Custom Sorting

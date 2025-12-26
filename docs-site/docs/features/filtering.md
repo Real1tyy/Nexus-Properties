@@ -57,7 +57,9 @@ Equivalent to: `type === 'project' && status === 'active' && priority === 'high'
 ## Filter Presets
 
 **Create**: Settings → Nexus Properties → Graph filtering → Add Preset
+
 **Use**: Command "Toggle Graph Filter (Preset Selector)" → Select preset
+
 **Pre-fill on startup**: Settings → Pre-fill filter preset
 
 **Difference**:
@@ -73,7 +75,9 @@ Equivalent to: `type === 'project' && status === 'active' && priority === 'high'
 ## Combining Features
 
 **Filtering + Color Rules**: Color by category, filter to focus
+
 **Filtering + View Modes**: Works in all modes
+
 **Filtering + Search**: Filter first, then search within results
 
 ## Next Steps

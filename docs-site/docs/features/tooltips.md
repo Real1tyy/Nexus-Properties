@@ -9,7 +9,9 @@ Hover over nodes to see frontmatter properties instantly.
 ## Usage
 
 **Show**: Hover over node for 1 second
+
 **Hide**: Move mouse away
+
 **Toggle**: Settings → Show node tooltips, or assign hotkey to "Toggle Tooltips"
 
 **Disabled in zoom mode**: Prevents overlap with zoom preview
@@ -30,6 +32,7 @@ Hover over nodes to see frontmatter properties instantly.
 ## Clickable Links
 
 **Wiki links**: Navigate to linked node, tooltip updates
+
 **External links**: Open in browser
 
 **Tip**: Chain-navigate through multiple tooltips without clicking nodes!

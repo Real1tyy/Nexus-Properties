@@ -9,7 +9,9 @@ Apply conditional colors to nodes based on frontmatter properties using JavaScri
 ## How It Works
 
 **Evaluation**: Rules evaluated top to bottom, first match wins
+
 **Expression context**: Access frontmatter properties directly by name
+
 **Default color**: Applied if no rules match ([configure](../configuration))
 
 ## Creating Rules
@@ -69,7 +71,9 @@ Result: Urgent notes are red, all other notes with status are blue.
 ## Managing Rules
 
 **Enable/Disable**: Toggle checkbox (useful for testing)
+
 **Reorder**: Use ↑/↓ buttons
+
 **Delete**: Click × button (permanent, no undo)
 
 ## Next Steps

@@ -9,7 +9,9 @@ Preview notes inline by clicking any node in the graph. View frontmatter and con
 ## Entering & Exiting
 
 **Enter**: Click any node
+
 **Switch focus**: Click another node while in zoom mode
+
 **Exit**: Click the focused node again, or click outside the graph
 
 **Focus indicator**: Focused node has a thick blue border (3px, `#2563eb`)
@@ -49,10 +51,13 @@ The preview panel appears at the bottom with two sections:
 
 ### Clicking
 
-- **Wiki links**: Navigate to linked node, stay in zoom mode
-- **Other nodes**: Switch focus instantly
-- **Edges**: Focus on target node
-- **External links**: Open in browser
+**Wiki links**: Navigate to linked node, stay in zoom mode
+
+**Other nodes**: Switch focus instantly
+
+**Edges**: Focus on target node
+
+**External links**: Open in browser
 
 ### Keyboard
 

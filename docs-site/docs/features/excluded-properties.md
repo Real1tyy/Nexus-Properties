@@ -63,7 +63,9 @@ Exclude additional properties for files in specific directories.
 ## Managing Rules
 
 **Enable/Disable**: Toggle checkbox (useful for testing)
+
 **Reorder**: Use ↑/↓ buttons (specific paths above general)
+
 **Delete**: Click × button (permanent, no undo)
 
 :::tip Rule Order

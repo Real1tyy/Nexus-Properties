@@ -9,7 +9,9 @@ Create parent, child, or related nodes instantly from commands. New nodes inheri
 ## Commands
 
 **Create Parent Node**: Creates parent, sets bidirectional relationship
+
 **Create Child Node**: Creates child, sets bidirectional relationship
+
 **Create Related Node**: Creates related, sets bidirectional relationship
 
 **Availability**: Only when viewing a file in an indexed directory

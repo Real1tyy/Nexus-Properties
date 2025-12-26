@@ -29,13 +29,17 @@ Related: ["[[note-1]]"]
 ## Relationship Types
 
 **Parent**: Single value, bidirectional with Child
+
 **Child**: Array (multiple values), bidirectional with Parent
+
 **Related**: Array (multiple values), bidirectional with Related (self)
 
 ## Recursive Relationships
 
 **All Parents**: Shows all ancestors, not just immediate parent
+
 **All Children**: Shows all descendants, not just direct children
+
 **All Related (Constellations)**: Shows all notes connected through `Related` recursively
 
 **Recursion depth**: Controlled by [All Related Max Depth](../configuration#all-related-recursion-depth)
@@ -65,7 +69,9 @@ Related: ["[[Task 1]]"]
 ## Automatic Maintenance
 
 **File deletion**: All references removed from other notes
+
 **File rename**: All references updated automatically
+
 **Relationship removal**: Reverse relationship removed automatically
 
 ## Common Patterns

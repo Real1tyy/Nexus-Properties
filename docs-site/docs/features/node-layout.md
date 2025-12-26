@@ -11,15 +11,21 @@ Automatic node positioning using different algorithms based on view mode.
 ### Dagre (Hierarchical)
 
 **Used in**: Hierarchical mode
+
 **Structure**: Top-to-bottom tree
+
 **Features**: Parent at top, children below, automatic spacing, prevents overlap
+
 **Best for**: Projects, org charts, taxonomies
 
 ### Constellation (Related Networks)
 
 **Used in**: Related and All Related modes
+
 **Structure**: Organic network
+
 **Features**: Source in center, radial distribution, clustering, collision detection
+
 **Best for**: Knowledge networks, cross-referenced concepts
 
 ## Constellations
@@ -44,6 +50,7 @@ Higher depths show more connections but impact performance. Start with 5-10.
 ## Collision Detection
 
 **System**: Automatically prevents node overlap
+
 **Process**: Detects overlaps → Calculates separation → Applies repulsion → Re-checks
 
 **Manual adjustment**: Drag nodes (positions not saved, reset on view change)
@@ -59,7 +66,9 @@ Higher depths show more connections but impact performance. Start with 5-10.
 ## View-Specific Layouts
 
 **Hierarchical**: Root at top center, tree grows downward, balanced left-right
+
 **Related**: Source in center, related in circle with equal angular spacing
+
 **All Related**: Source center-left, constellation clusters grouped by connection distance
 
 ## Next Steps
