@@ -1,4 +1,5 @@
-import { Notice, Plugin, TFile } from "obsidian";
+import type { WorkspaceLeaf } from "obsidian";
+import { MarkdownView, Notice, Plugin, TFile } from "obsidian";
 import { NexusPropertiesSettingsTab } from "./components";
 import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/views/nexus-view-switcher";
 import { Indexer } from "./core/indexer";
@@ -231,6 +232,8 @@ export default class NexusPropertiesPlugin extends Plugin {
 			if (newFile) {
 				const leaf = this.app.workspace.getLeaf("tab");
 				await leaf.openFile(newFile);
+				await this.focusInlineTitle(leaf);
+
 				new Notice(`✅ Created ${typeLabel} node: ${newFile.basename}`);
 			} else {
 				new Notice(`❌ Failed to create ${typeLabel} node`);
@@ -238,6 +241,27 @@ export default class NexusPropertiesPlugin extends Plugin {
 		} catch (error) {
 			console.error(`Error creating ${typeLabel} node:`, error);
 			new Notice(`❌ Error creating ${typeLabel} node: ${error}`);
+		}
+	}
+
+	private async focusInlineTitle(leaf: WorkspaceLeaf): Promise<void> {
+		await new Promise((resolve) => setTimeout(resolve, 100));
+
+		const view = leaf.view;
+		if (!(view instanceof MarkdownView)) return;
+
+		const inlineTitle = view.containerEl.querySelector(".inline-title") as HTMLElement;
+		if (!inlineTitle || inlineTitle.contentEditable !== "true") return;
+
+		inlineTitle.focus();
+
+		const range = document.createRange();
+		const selection = window.getSelection();
+		if (selection) {
+			range.selectNodeContents(inlineTitle);
+			range.collapse(false);
+			selection.removeAllRanges();
+			selection.addRange(range);
 		}
 	}
 }
