@@ -75,6 +75,11 @@
 	line-height: 1.4;
 }
 
+/* Section description with bottom spacing */
+.nexus-properties-section-description {
+	padding-bottom: 1em;
+}
+
 /* Settings subsection container */
 .nexus-properties-settings-subsection {
 	margin-bottom: 0.5em;

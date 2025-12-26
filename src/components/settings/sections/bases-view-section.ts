@@ -22,7 +22,7 @@ export class BasesViewSettingsSection implements SettingsSection {
 		new Setting(container).setName("Bases view configuration").setHeading();
 
 		container
-			.createDiv("setting-item-description")
+			.createDiv("setting-item-description nexus-properties-section-description")
 			.setText(
 				"Configure which frontmatter properties appear as columns in the Bases view tables. Properties are displayed in the order specified."
 			);
@@ -50,7 +50,7 @@ export class BasesViewSettingsSection implements SettingsSection {
 		new Setting(container).setName("Custom sorting").setHeading();
 
 		container
-			.createDiv("setting-item-description")
+			.createDiv("setting-item-description nexus-properties-section-description")
 			.setText(
 				"Define custom formulas and sort rules for advanced sorting in Bases view tables. Formulas map property values to numeric priorities, and sort rules specify how rows should be ordered."
 			);

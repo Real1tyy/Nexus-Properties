@@ -115,9 +115,6 @@ export class GeneralSection implements SettingsSection {
 		// Frontmatter Propagation Section
 		new Setting(container).setName("Frontmatter propagation").setHeading();
 
-		container
-			.createDiv("setting-item-description")
-
 		new Setting(container)
 			.setName("Propagate frontmatter to children")
 			.setDesc(

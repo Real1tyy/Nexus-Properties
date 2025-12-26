@@ -39,7 +39,7 @@ export class PropertiesSection implements SettingsSection {
 		new Setting(container).setName("Direct Relationships").setHeading();
 
 		container
-			.createDiv("setting-item-description")
+			.createDiv("setting-item-description nexus-properties-section-description")
 			.setText(
 				"Configure property names for direct bidirectional relationships. When you set a relationship in one direction, the plugin automatically updates the reverse relationship."
 			);
