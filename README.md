@@ -251,6 +251,6 @@ MIT-licensed. PRs welcome! See [Contributing Guide](https://real1tyy.github.io/N
 
 ## Credits & Acknowledgments
 
-Nexus Properties is built using [Cytoscape.js](https://js.cytoscape.org/), a powerful and flexible graph visualization library. Cytoscape.js provides the robust graph rendering engine that powers Nexus Properties' interactive visualizations. We're grateful to the Cytoscape.js team for creating such an excellent foundation.
+Nexus Properties is built using [Cytoscape.js](https://js.cytoscape.org/), a powerful and flexible graph visualization library. Cytoscape.js provides the robust graph rendering engine that powers Nexus Properties' interactive visualizations, including the hierarchical layouts (via the Dagre extension) and constellation-based network views.
 
 ---

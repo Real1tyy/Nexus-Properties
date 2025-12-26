@@ -20,7 +20,7 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 **Best for**: Projects, outlines, taxonomies
 
 **Node labels**: Automatically strips redundant parent name prefixes
-- "Females Addictions" → "Addictions" under "Females"
+- "Health Nutrition" → "Nutrition" under "Health"
 - "Parent-Child" → "Child" under "Parent"
 
 **Start from Current**: Enable to show only subtree from current file (excludes ancestors)
@@ -51,16 +51,6 @@ Large constellations can be slow. Reduce max depth if needed.
 **Hover**: [Tooltip](tooltips) after 1 second
 **Drag**: Pan graph or move nodes (not saved)
 **Scroll**: Zoom in/out
-
-## Comparison
-
-| | Hierarchical | Related | All Related |
-|---|---|---|---|
-| **Shows parent-child** | ✅ Full tree | ❌ | ⚠️ If in constellation |
-| **Shows related** | ⚠️ Optional | ✅ Direct only | ✅ Recursive |
-| **Depth** | Unlimited | 1 hop | Configurable (1-20) |
-| **Layout** | Tree | Radial | Constellation |
-| **Performance** | Fast | Fast | Can be slow |
 
 ## Next Steps
 

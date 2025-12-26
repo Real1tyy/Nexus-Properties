@@ -22,54 +22,38 @@ Apply conditional colors to nodes based on frontmatter properties using JavaScri
 - **Enabled**: Toggle on/off
 - **Order**: ↑/↓ buttons to reorder
 
-## Expression Syntax
-
-```javascript
-// Simple
-status === 'complete'
-priority === 'high'
-
-// Numeric
-progress > 50
-count <= 10
-
-// Boolean
-completed === true
-!archived
-
-// Arrays
-Array.isArray(tags) && tags.includes('important')
-tags.length > 3
-
-// Strings
-title.includes('Project')
-title.startsWith('DRAFT')
-
-// Complex
-status === 'complete' && priority === 'high'
-type === 'project' || type === 'task'
-```
-
 ## Example Rules
 
 ```javascript
-// Status colors
+// Simple equality
 status === 'complete'  → #22c55e (green)
 status === 'in-progress'  → #f59e0b (orange)
 status === 'pending'  → #ef4444 (red)
 
-// Type colors
+// Type-based
 type === 'project'  → #3b82f6 (blue)
 type === 'task'  → #10b981 (green)
 type === 'note'  → #6366f1 (purple)
 
-// Priority
-priority === 'urgent'  → #dc2626 (dark red)
-priority === 'high'  → #f59e0b (orange)
-priority === 'low'  → #6b7280 (gray)
+// Numeric comparison
+progress > 50  → #22c55e (green)
+priority >= 8  → #dc2626 (red)
 
-// Tags
+// Boolean
+completed === true  → #9ca3af (gray)
+!archived  → #22c55e (green)
+
+// Arrays
 Array.isArray(tags) && tags.includes('important')  → #ef4444 (red)
+tags.length > 3  → #f59e0b (orange)
+
+// Strings
+title.includes('Project')  → #3b82f6 (blue)
+title.startsWith('DRAFT')  → #eab308 (yellow)
+
+// Complex conditions
+status === 'complete' && priority === 'high'  → #059669 (dark green)
+type === 'project' || type === 'task'  → #3b82f6 (blue)
 ```
 
 ## Rule Order
@@ -87,12 +71,6 @@ Result: Urgent notes are red, all other notes with status are blue.
 **Enable/Disable**: Toggle checkbox (useful for testing)
 **Reorder**: Use ↑/↓ buttons
 **Delete**: Click × button (permanent, no undo)
-
-## Common Patterns
-
-**GTD**: `status === 'next'` (green), `status === 'waiting'` (orange), `status === 'done'` (gray)
-**Project lifecycle**: `phase === 'planning'` (yellow), `phase === 'active'` (green), `phase === 'complete'` (blue)
-**Knowledge maturity**: `maturity === 'seedling'` (light green), `maturity === 'evergreen'` (dark green)
 
 ## Next Steps
 

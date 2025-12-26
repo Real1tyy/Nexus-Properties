@@ -62,17 +62,6 @@ Higher depths show more connections but impact performance. Start with 5-10.
 **Related**: Source in center, related in circle with equal angular spacing
 **All Related**: Source center-left, constellation clusters grouped by connection distance
 
-## Technical Details
-
-**Engine**: Cytoscape.js with Dagre extension
-**Algorithm**: Modified force-directed layout
-**Optimization**: Incremental updates, not full re-layout
-
-**Performance**:
-- Small (< 50 nodes): < 100ms
-- Medium (50-200 nodes): 100-500ms
-- Large (200+ nodes): 500ms-2s
-
 ## Next Steps
 
 - [Graph Views](graph-views) - When each layout is used

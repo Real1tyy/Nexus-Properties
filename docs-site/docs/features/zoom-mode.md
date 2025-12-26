@@ -66,10 +66,6 @@ The preview panel appears at the bottom with two sections:
 - **⏎ Enter**: Next tree root (wraps around)
 - **⇧ Shift+Enter**: Previous tree root (wraps around)
 
-:::tip
-Keyboard shortcuts disabled when typing in search/filter inputs
-:::
-
 ## Next Steps
 
 - [Tooltips](tooltips) - Hover-based previews

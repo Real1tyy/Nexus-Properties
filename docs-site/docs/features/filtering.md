@@ -18,10 +18,9 @@ Filter nodes using JavaScript expressions. Only nodes where ALL expressions retu
 Source node always visible, even if doesn't match filters.
 :::
 
-## Expression Syntax
+## Examples
 
-Access frontmatter properties directly:
-
+**Single expressions**:
 ```javascript
 // Equality
 status === 'active'
@@ -31,7 +30,7 @@ type !== 'archived'
 progress > 50
 priority >= 'high'
 
-// Logical
+// Logical operators
 status === 'active' && priority === 'high'
 status === 'active' || status === 'pending'
 
@@ -43,42 +42,33 @@ tags.length > 0
 title.includes('Project')
 title.startsWith('DRAFT')
 
-// Existence
+// Existence check
 typeof status !== 'undefined'
 ```
 
-## Multi-Expression (AND Logic)
-
-One expression per line. All must be true:
-
+**Multi-expression (AND logic)** - One per line, all must be true:
 ```javascript
 type === 'project'
 status === 'active'
 priority === 'high'
 ```
-
 Equivalent to: `type === 'project' && status === 'active' && priority === 'high'`
 
 ## Filter Presets
 
 **Create**: Settings → Nexus Properties → Graph filtering → Add Preset
-
 **Use**: Command "Toggle Graph Filter (Preset Selector)" → Select preset
-
 **Pre-fill on startup**: Settings → Pre-fill filter preset
 
 **Difference**:
 - **Filter Expressions** (default): Permanently applied, users can't clear
 - **Pre-fill Preset**: Initial suggestion, users can modify/clear
 
-## Example Presets
-
-| Name | Expression | Description |
-|------|------------|-------------|
-| Active Tasks | `status === 'active'` | Only active items |
-| High Priority | `priority === 'high'` | High-priority notes |
-| Work Notes | `Array.isArray(tags) && tags.includes('work')` | Work-related |
-| Incomplete | `status !== 'complete'` | Not yet completed |
+**Common presets**:
+- `status === 'active'` - Active Tasks
+- `priority === 'high'` - High Priority
+- `Array.isArray(tags) && tags.includes('work')` - Work Notes
+- `status !== 'complete'` - Incomplete
 
 ## Combining Features
 

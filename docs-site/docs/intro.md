@@ -92,6 +92,10 @@ Ready to start building your knowledge network?
 - **Feature Requests**: [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions)
 - **Sponsor Development**: [GitHub Sponsors](https://github.com/sponsors/Real1tyy)
 
+## Credits & Acknowledgments
+
+Nexus Properties is built using [Cytoscape.js](https://js.cytoscape.org/), a powerful and flexible graph visualization library. Cytoscape.js provides the robust graph rendering engine that powers Nexus Properties' interactive visualizations, including the hierarchical layouts (via the Dagre extension) and constellation-based network views.
+
 ## License
 
 Nexus Properties is open source software licensed under the [MIT License](https://github.com/Real1tyy/Nexus-Properties/blob/main/LICENSE).
