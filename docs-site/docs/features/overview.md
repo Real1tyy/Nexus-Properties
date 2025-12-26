@@ -49,6 +49,7 @@ Control which properties copy to new nodes. Default and path-based rules.
 
 1. [Bidirectional Sync](bidirectional-sync) - Understand relationship management
 2. [Graph Views](graph-views) - Explore visualization modes
-3. [Color Rules](color-rules) - Add visual categories
-4. [Filtering](filtering) - Focus on subsets
-5. [Configuration](../configuration) - Customize settings
+3. [Hotkeys](../hotkeys) - Set up keyboard shortcuts
+4. [Color Rules](color-rules) - Add visual categories
+5. [Filtering](filtering) - Focus on subsets
+6. [Configuration](../configuration) - Customize settings

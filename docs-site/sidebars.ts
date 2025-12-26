@@ -30,6 +30,7 @@ const sidebars: SidebarsConfig = {
         "features/bases-view"
       ]
     },
+    "hotkeys",
     "configuration",
     "faq",
     "troubleshooting",

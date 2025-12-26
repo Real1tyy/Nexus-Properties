@@ -83,8 +83,9 @@ Ready to start building your knowledge network?
 
 1. [Install the plugin](installation)
 2. [Watch the full video tutorial](videos) 🎬
-3. [Configure your settings](configuration)
-4. [Follow the quickstart guide](quickstart)
+3. [Set up hotkeys](hotkeys) for quick access
+4. [Configure your settings](configuration)
+5. [Follow the quickstart guide](quickstart)
 
 ## Support & Community
 

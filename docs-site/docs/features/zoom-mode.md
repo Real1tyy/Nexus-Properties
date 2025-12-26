@@ -47,6 +47,8 @@ The preview panel appears at the bottom with two sections:
 
 **Default visibility**: [Configure in settings](../configuration#zoom-hide-frontmatter-by-default)
 
+**Tip**: [Assign hotkeys](../hotkeys) for quick toggling
+
 ## Navigation
 
 ### Clicking

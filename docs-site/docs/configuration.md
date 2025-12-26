@@ -220,16 +220,9 @@ Related: ["[[note-2]]", "[[note-3]]"]
 
 ## Hotkeys
 
-Assign in Settings → Hotkeys → Search "Nexus Properties"
+All commands support custom hotkey assignment.
 
-**Recommended**:
-- Show Relationship Graph: `Ctrl+Shift+G`
-- Toggle Graph Search: `Ctrl+K`
-- Toggle Graph Filter: `Ctrl+F`
-- Enlarge Graph: `Ctrl+Shift+E`
-- Create Child Node: `Ctrl+Shift+C`
-- Create Parent Node: `Ctrl+Shift+P`
-- Create Related Node: `Ctrl+Shift+R`
+[View all available commands and recommended hotkeys →](hotkeys)
 
 ## Performance Tips
 
