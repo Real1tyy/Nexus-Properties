@@ -73,37 +73,6 @@ A unique timestamp-based identifier (`YYYYMMDDHHmmss`) assigned to each new node
 
 ---
 
-## Troubleshooting
-
-### How do I reset all settings to defaults?
-
-1. Close Obsidian
-2. Navigate to `<vault>/.obsidian/plugins/nexus-properties/`
-3. Delete or rename `data.json`
-4. Restart Obsidian
-
-:::warning
-This resets ALL settings including color rules, filters, and exclusions.
-:::
-
-### Can I use this with Dataview?
-
-Yes! Relationships are stored in frontmatter, so Dataview can query them:
-
-```dataview
-LIST
-WHERE Parent = [[Project Overview]]
-```
-
-### Can I uninstall without breaking my vault?
-
-Yes! Relationships are stored as frontmatter. If you uninstall:
-- Frontmatter remains intact
-- Relationships still readable by humans
-- You can reinstall later or use another tool
-
----
-
 ## Get Help
 
 - [Troubleshooting Guide](troubleshooting)
