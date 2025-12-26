@@ -6,6 +6,26 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.3.0
+
+### New Features
+
+#### Automatic Node Label Prefix Stripping
+- **Cleaner Graph Labels**: Child node labels automatically strip redundant parent name prefixes in hierarchical views, making the graph cleaner and easier to read.
+- **Smart Pattern Matching**: Handles three common naming patterns:
+  - Parent name + space (e.g., "Females Addictions" → "Addictions")
+  - Parent name + " - " (e.g., "Cold Approaching - Only Repels" → "Only Repels")
+  - Parent name + "-" (e.g., "Cold Approaching-Real1ty" → "Real1ty")
+- **Automatic Application**: Works automatically in hierarchical graph views - no configuration needed.
+- **Reduced Visual Clutter**: Eliminates repetitive parent names in child node labels, making relationships clearer at a glance.
+
+#### Improved Node Creation Commands
+- **Dash-Based Naming**: Node creation commands (Create Child/Parent/Related Node) now use a dash separator in the filename (e.g., "Current File - " instead of "Current File Child"), making it easier to continue typing meaningful names.
+- **Automatic Title Focus**: After creating a new node, the inline title input is automatically focused and the cursor is positioned at the end, allowing you to immediately start typing without clicking.
+- **Faster Workflow**: Streamlined node creation process - create and name nodes in one fluid motion.
+
+---
+
 ## 1.2.1
 
 ### Bug Fixes

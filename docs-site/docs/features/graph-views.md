@@ -51,6 +51,13 @@ Shows the complete hierarchy starting from the root (topmost parent) down throug
    Subtask 1.1
 ```
 
+**Node Label Display**: Child node labels automatically strip redundant parent name prefixes to reduce visual clutter. For example:
+- "Females Addictions" displays as "Addictions" under "Females"
+- "Cold Approaching - Only Repels" displays as "Only Repels" under "Cold Approaching"
+- "Parent-Child" displays as "Child" under "Parent"
+
+This makes relationships clearer and the graph easier to scan.
+
 :::tip Start from Current
 Enable "Start from Current" to begin the hierarchy at the currently open file instead of traversing up to the root. This is useful for viewing just a subtree.
 :::

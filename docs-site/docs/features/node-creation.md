@@ -146,16 +146,18 @@ Set the Zettel ID property name to empty string in settings to disable automatic
 
 ### File Naming
 
-New files are named: `[source-name]-untitled-[number].md`
+New files are named: `[source-name] - .md`
 
 **Examples**:
 - Source: `Project Overview.md`
-- New child: `Project Overview-untitled-1.md`
-- Next child: `Project Overview-untitled-2.md`
+- New child: `Project Overview - .md`
+- Next child: `Project Overview - 1.md` (if first name exists)
 
-**Auto-increment**: Numbers increase to avoid conflicts
+**Dash separator**: Uses a dash (` - `) to separate the parent name from the new node name, making it easy to continue typing.
 
-**Rename encouraged**: Files open immediately for editing - rename to something meaningful!
+**Auto-increment**: Numbers are appended if a file with the same name already exists.
+
+**Automatic focus**: The inline title input is automatically focused after creation, with the cursor positioned at the end, so you can immediately start typing the node name without clicking.
 
 ### File Location
 
