@@ -134,39 +134,27 @@
 /* Settings navigation tabs */
 .nexus-properties-settings-nav {
 	display: flex;
-	flex-wrap: wrap;
 	gap: 8px;
-	margin: 1.5em 0;
-	padding-bottom: 1em;
-	border-bottom: 2px solid var(--background-modifier-border);
+	flex-wrap: wrap;
 }
 
 .nexus-properties-settings-nav-button {
 	padding: 8px 16px;
-	background-color: var(--background-secondary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 6px;
+	background-color: var(--background-secondary);
 	color: var(--text-normal);
 	cursor: pointer;
-	font-size: 0.95em;
-	font-weight: 500;
 	transition: all 0.2s ease;
 }
 
-.nexus-properties-settings-nav-button:hover {
-	background-color: var(--background-modifier-hover);
-	border-color: var(--interactive-accent);
-}
-
-.nexus-properties-settings-nav-button-active {
+.nexus-properties-settings-nav-button.nexus-properties-settings-nav-button-active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
-	border-color: var(--interactive-accent);
 }
 
-.nexus-properties-settings-nav-button-active:hover {
-	background-color: var(--interactive-accent-hover);
-	border-color: var(--interactive-accent-hover);
+.nexus-properties-settings-nav-button:hover:not(.nexus-properties-settings-nav-button-active) {
+	background-color: var(--background-modifier-hover);
 }
 
 /* Settings section container */
