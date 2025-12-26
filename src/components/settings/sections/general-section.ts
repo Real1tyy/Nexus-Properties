@@ -38,9 +38,6 @@ export class GeneralSection implements SettingsSection {
 			desc: "Display the header with toggle button in the Nexus Properties view. Changes apply immediately.",
 		});
 
-		// Directory Scanning Section
-		new Setting(container).setName("Directory scanning").setHeading();
-
 		this.uiBuilder.addArrayManager(container, {
 			key: "directories",
 			name: "Directory scanning",
@@ -86,16 +83,9 @@ export class GeneralSection implements SettingsSection {
 		// Indexing Section
 		new Setting(container).setName("Manual indexing").setHeading();
 
-		const indexDescription = container.createDiv("setting-item-description");
-		indexDescription.setText(
-			"Manually index all files in your vault and assign relationship properties based on your configured settings. This process will scan all files in the configured directories and update their frontmatter with bidirectional and computed relationships."
-		);
-
 		new Setting(container)
 			.setName("Index and assign properties to all files")
-			.setDesc(
-				"Scan all files in configured directories and update their relationship properties. This may take some time for large vaults."
-			)
+			.setDesc("Scan all files in configured directories and update their relationship properties.")
 			.addButton((button) => {
 				button
 					.setButtonText("Rescan Everything")
@@ -122,32 +112,11 @@ export class GeneralSection implements SettingsSection {
 					});
 			});
 
-		// Node Creation Section
-		new Setting(container).setName("Node creation shortcuts").setHeading();
-
-		container
-			.createDiv("setting-item-description")
-			.setText(
-				"Enable quick creation of Parent, Child, and Related nodes from the command palette. New nodes inherit frontmatter properties and automatically establish bidirectional relationships."
-			);
-
-		const infoBox = container.createDiv("settings-info-box");
-		infoBox.createEl("strong", { text: "How it works:" });
-		const list = infoBox.createEl("ul");
-		list.createEl("li", { text: "New nodes are created in the same folder as the source file" });
-		list.createEl("li", { text: "All frontmatter properties are inherited (except excluded properties)" });
-		list.createEl("li", { text: "A new Zettel ID is generated automatically (timestamp-based)" });
-		list.createEl("li", { text: "Bidirectional relationships are established automatically" });
-		list.createEl("li", { text: "Commands are only available for files in indexed directories" });
-
 		// Frontmatter Propagation Section
 		new Setting(container).setName("Frontmatter propagation").setHeading();
 
 		container
 			.createDiv("setting-item-description")
-			.setText(
-				"Configure how frontmatter changes in parent files are propagated to all child files recursively. When you update custom properties in a parent file, those changes can automatically cascade down to all descendants."
-			);
 
 		new Setting(container)
 			.setName("Propagate frontmatter to children")
@@ -214,46 +183,15 @@ export class GeneralSection implements SettingsSection {
 
 		const description = excludedPropertiesContainer.createDiv("setting-item-description");
 		description.createEl("p", {
-			text: "Define path-based rules to exclude ADDITIONAL properties for files in specific directories. The default excluded properties above are always excluded. Rules are evaluated in order - the first matching path's properties are ADDED to the default exclusion list.",
-		});
-
-		const examplesContainer = description.createDiv("settings-info-box");
-		examplesContainer.createEl("strong", { text: "Example path-based exclusion rules:" });
-		const examplesList = examplesContainer.createEl("ul");
-
-		const examples = [
-			{
-				path: "Projects/",
-				properties: "status, progress",
-				description: "Exclude status and progress from files in Projects/",
-			},
-			{
-				path: "Daily Notes/2024/",
-				properties: "date, weekday",
-				description: "Exclude date fields from files in Daily Notes/2024/",
-			},
-		];
-
-		for (const example of examples) {
-			const listItem = examplesList.createEl("li", { cls: "color-example-item" });
-			listItem.createEl("code", { text: example.path, cls: "settings-info-box-example" });
-			listItem.createSpan({ text: "→", cls: "color-arrow" });
-			listItem.createEl("code", { text: example.properties, cls: "settings-info-box-example" });
-			listItem.createSpan({ text: `: ${example.description}`, cls: "color-example-description" });
-		}
-
-		const warning = description.createDiv("settings-warning-box");
-		warning.createEl("strong", { text: "⚠️ Important:" });
-		warning.createEl("p", {
-			text: "Path matching uses startsWith - a file matches if its path starts with the rule's path. Default excluded properties are ALWAYS excluded. Path rules ADD additional properties to exclude on top of the defaults.",
+			text: "Add rules to exclude extra properties for files in specific folders. These rules add to the default excluded properties above.",
 		});
 
 		this.excludedPropertyRulesContainer = excludedPropertiesContainer.createDiv();
 		this.renderExcludedPropertyRulesList();
 
 		new Setting(excludedPropertiesContainer)
-			.setName("Add path-based exclusion rule")
-			.setDesc("Add a new rule to exclude properties for files in a specific path")
+			.setName("Add exclusion rule")
+			.setDesc("Exclude additional properties for files in a specific folder")
 			.addButton((button) => {
 				button.setButtonText("Add Rule");
 				button.onClick(async () => {
@@ -292,8 +230,7 @@ export class GeneralSection implements SettingsSection {
 
 		if (pathExcludedProperties.length === 0) {
 			const emptyState = this.excludedPropertyRulesContainer.createDiv("settings-empty-state");
-			emptyState.textContent =
-				"No path-based exclusion rules defined. Click 'Add Rule' to create one. Default excluded properties will be used for all files.";
+			emptyState.textContent = "No rules defined. Click 'Add Rule' to create one.";
 			return;
 		}
 
