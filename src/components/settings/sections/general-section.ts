@@ -13,6 +13,7 @@ export class GeneralSection implements SettingsSection {
 	readonly label = "General";
 
 	private excludedPropertyRulesContainer: HTMLElement | null = null;
+	private container: HTMLElement | null = null;
 
 	constructor(
 		private readonly plugin: NexusPropertiesPlugin,
@@ -20,6 +21,8 @@ export class GeneralSection implements SettingsSection {
 	) {}
 
 	render(container: HTMLElement): void {
+		this.container = container;
+
 		// User Interface Section
 		new Setting(container).setName("User Interface").setHeading();
 
@@ -160,7 +163,7 @@ export class GeneralSection implements SettingsSection {
 							propagateFrontmatterToChildren: value,
 							askBeforePropagatingFrontmatter: value ? false : s.askBeforePropagatingFrontmatter,
 						}));
-						this.render(container.parentElement!);
+						this.rerender();
 					});
 			});
 
@@ -178,7 +181,7 @@ export class GeneralSection implements SettingsSection {
 							askBeforePropagatingFrontmatter: value,
 							propagateFrontmatterToChildren: value ? false : s.propagateFrontmatterToChildren,
 						}));
-						this.render(container.parentElement!);
+						this.rerender();
 					});
 			});
 
@@ -269,6 +272,14 @@ export class GeneralSection implements SettingsSection {
 					this.renderExcludedPropertyRulesList();
 				});
 			});
+	}
+
+	private rerender(): void {
+		if (!this.container) {
+			return;
+		}
+		this.container.empty();
+		this.render(this.container);
 	}
 
 	private renderExcludedPropertyRulesList(): void {

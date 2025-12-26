@@ -6,6 +6,16 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.2.1
+
+### Bug Fixes
+
+#### Settings UI Improvements
+- **Fixed Toggle Synchronization**: Fixed issue where "Propagate frontmatter to children" and "Ask before propagating" toggles were not properly synchronized in the settings UI. The toggles now correctly reflect their mutually exclusive state.
+- **Fixed Settings Duplication**: Resolved issue where settings sections were being duplicated when toggles were changed. Settings now re-render cleanly without duplication.
+
+---
+
 ## 1.2.0
 
 ### New Features
