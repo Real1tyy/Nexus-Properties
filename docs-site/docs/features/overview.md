@@ -150,12 +150,6 @@ Create parent, child, or related nodes instantly from commands.
 - **Create Child Node** - Creates a child with bidirectional link
 - **Create Related Node** - Creates a related node with bidirectional link
 
-All new nodes:
-- Inherit frontmatter properties (except excluded)
-- Get unique Zettel IDs automatically
-- Establish bidirectional relationships
-- Open immediately for editing
-
 **[Learn more →](node-creation)**
 
 ---
@@ -192,24 +186,6 @@ Control which properties are copied when creating new nodes.
 
 ---
 
-## Integration Features
-
-### Directory Scanning
-
-- Scan entire vault or specific directories
-- Automatic indexing of new files
-- Real-time relationship updates
-- Manual rescan option for full vault sync
-
-### Command Palette Integration
-
-All major features accessible via command palette:
-- Show/hide graph view
-- Toggle search, filter, presets
-- Enlarge graph
-- Create nodes
-- Toggle zoom features
-
 ### Hotkey Support
 
 Assign custom hotkeys to any command:
@@ -218,73 +194,6 @@ Assign custom hotkeys to any command:
 - Navigate graph
 - Create nodes
 - And more...
-
----
-
-## View Modes Comparison
-
-| Mode | Purpose | Best For |
-|------|---------|----------|
-| **Hierarchical** | Show parent-child trees | Project hierarchies, outlines |
-| **Related** | Show direct related links | Exploring connections |
-| **All Related** | Show entire constellations | Discovering indirect connections |
-| **Start from Current** | Focus on current file | Limiting scope to one node |
-| **Bases View** | List current note's relationships | Focused navigation, quick review |
-
----
-
-## Technical Features
-
-### Performance Optimizations
-
-- Incremental graph updates
-- Lazy loading for large networks
-- Configurable animation duration
-- Efficient collision detection
-- Debounced resize handling
-
-### Data Consistency
-
-- Automatic bidirectional sync
-- Orphaned relationship cleanup
-- File deletion handling
-- Rename/move tracking
-- Transaction-based updates
-
-### Extensibility
-
-- JavaScript expression engine
-- Custom color rules
-- Filter presets
-- Property-based customization
-- Directory-based configurations
-
----
-
-## Feature Matrix
-
-| Feature | Free | Description |
-|---------|------|-------------|
-| Bidirectional Sync | ✅ | Automatic relationship synchronization |
-| Graph Visualization | ✅ | Interactive relationship graph |
-| Multiple View Modes | ✅ | Hierarchical, Related, All Related |
-| Bases View | ✅ | List-based relationship view |
-| Color Rules | ✅ | Unlimited conditional node colors |
-| Filtering | ✅ | Expression-based filtering |
-| Filter Presets | ✅ | Named filter shortcuts |
-| Zoom Mode | ✅ | Inline node preview |
-| Context Menus | ✅ | Right-click actions |
-| Tooltips | ✅ | Property previews on hover |
-| Search | ✅ | Real-time node search |
-| Node Creation | ✅ | Quick parent/child/related creation |
-| Layout Optimization | ✅ | Automatic constellation layout |
-| Property Exclusion | ✅ | Control property inheritance |
-| Directory Scanning | ✅ | Selective vault indexing |
-| Hotkey Support | ✅ | Custom keyboard shortcuts |
-
-:::info Open Source
-All features are free and open source under the MIT license!
-:::
 
 ---
 

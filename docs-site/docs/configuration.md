@@ -34,114 +34,73 @@ Configure how the relationship graph is displayed and behaves.
 
 **Default**: `true`
 
-Display the search bar in the graph view when it loads. You can still toggle it with the command "Toggle Graph Search" even if this is disabled.
+Display the search bar when the graph view opens. Can always be toggled with the "Toggle Graph Search" command.
 
 ### Show Filter Bar by Default
 
 **Default**: `true`
 
-Display the filter bar (preset selector and expression input) in the graph view when it loads. You can still toggle it with commands even if this is disabled.
+Display the filter bar when the graph view opens. Can always be toggled with filter commands.
 
 ### Graph Enlarged Width
 
-**Default**: `75%`
-**Range**: 50% - 100%
+**Default**: `75%` | **Range**: 50% - 100%
 
-Percentage of window width when the graph is enlarged using the "Enlarge Graph" command.
-
-- **50%** - Half screen width
-- **75%** - Three-quarters width (recommended)
-- **100%** - Full screen width
+Window width percentage when graph is enlarged with the "Enlarge Graph" command.
 
 ### Zoom Preview Height
 
-**Default**: `280px`
-**Range**: 120px - 700px
+**Default**: `280px` | **Range**: 120px - 700px
 
-Maximum height in pixels for the zoom preview panel that appears when you click a node.
-
-- **Small vaults**: 200-280px
-- **Large vaults**: 400-700px for more content visibility
+Maximum height for the zoom preview panel when clicking a node. Increase for more content visibility.
 
 ### Zoom Preview Frontmatter Height
 
-**Default**: `90px`
-**Range**: 50px - 300px
+**Default**: `90px` | **Range**: 50px - 300px
 
-Maximum height in pixels for the frontmatter section within the zoom preview.
-
-- **Minimal frontmatter**: 50-90px
-- **Extensive frontmatter**: 150-300px
+Maximum height for the frontmatter section within zoom preview. Increase if you have many properties.
 
 ### Graph Animation Duration
 
-**Default**: `800ms`
-**Range**: 0ms - 2000ms
+**Default**: `800ms` | **Range**: 0ms - 2000ms
 
-Duration of graph layout animations in milliseconds.
-
-- **0ms** - Instant layout (performance mode)
-- **400ms** - Fast animations
-- **800ms** - Smooth animations (recommended)
-- **1500ms+** - Slow, cinematic animations
+Duration of graph layout animations. Set to 0ms for instant updates (better performance).
 
 ### All Related Recursion Depth
 
-**Default**: `10`
-**Range**: 1 - 20
+**Default**: `10` | **Range**: 1 - 20
 
-Maximum number of constellation levels to traverse when "All Related" mode is enabled. Higher values show more distant relationships but may impact performance.
-
-- **1-3** - Immediate connections only
-- **5-10** - Medium-sized constellations (recommended)
-- **15-20** - Very large networks (may be slow)
+Maximum levels to traverse when "All Related" mode is enabled. Higher values show more distant relationships but may impact performance.
 
 :::tip Performance
-If the graph becomes slow with "All Related" enabled, reduce this value.
+If the graph becomes slow, reduce this value.
 :::
 
 ### Hierarchy Traversal Depth
 
-**Default**: `10`
-**Range**: 1 - 50
+**Default**: `10` | **Range**: 1 - 50
 
-Maximum number of levels to traverse in hierarchy mode. Controls how deep the parent-child tree will be displayed.
-
-- **1-5** - Shallow hierarchies
-- **10-20** - Medium hierarchies (recommended)
-- **30-50** - Very deep hierarchies
+Maximum levels to traverse in hierarchy mode. Controls depth of the parent-child tree.
 
 ### Display Properties in Nodes
 
 **Default**: `[]` (empty)
 
-Comma-separated list of property names to display inside graph nodes. Properties are shown in a compact format below the node title.
+Comma-separated list of property names to display inside graph nodes below the title.
 
-**Examples**:
-- `status, priority` - Show task status and priority
-- `type, tags` - Show note type and tags
-- `date, author` - Show metadata
-
-**Empty** = No properties displayed in nodes (only in tooltips)
+**Examples**: `status, priority` or `type, tags` or `date, author`
 
 ### Show Node Tooltips
 
 **Default**: `true`
 
-Display property tooltips when hovering over nodes in the graph. Tooltips show all frontmatter properties of the node.
-
-Can also be toggled with a hotkey (configurable in Obsidian settings).
+Display property tooltips when hovering over nodes. Shows all frontmatter properties. Can be toggled with a hotkey.
 
 ### Tooltip Width
 
-**Default**: `255px`
-**Range**: 150px - 500px
+**Default**: `255px` | **Range**: 150px - 500px
 
-Maximum width of node tooltips in pixels.
-
-- **150-200px** - Compact tooltips
-- **250-300px** - Balanced (recommended)
-- **400-500px** - Wide tooltips for extensive properties
+Maximum width of node tooltips. Increase for properties with longer values.
 
 ---
 
@@ -155,32 +114,23 @@ Configure how properties are displayed in tooltips, previews, and zoom mode.
 
 Hide properties with empty, null, or undefined values in tooltips and previews.
 
-**Enabled**: Only properties with values are shown
-**Disabled**: All properties are shown, even if empty
-
 ### Hide Underscore Properties
 
 **Default**: `true`
 
-Hide properties that start with an underscore (`_`) in tooltips and previews.
-
-Useful for hiding internal/system properties like `_ZettelID`.
+Hide properties starting with underscore (`_`) in tooltips and previews. Useful for internal/system properties like `_ZettelID`.
 
 ### Zoom: Hide Frontmatter by Default
 
 **Default**: `false`
 
-When entering zoom preview, frontmatter section starts hidden by default.
-
-You can still toggle frontmatter visibility using the eye icon.
+Start zoom preview with frontmatter section hidden. Can still toggle with the eye icon.
 
 ### Zoom: Hide Content by Default
 
 **Default**: `false`
 
-When entering zoom preview, file content starts hidden by default.
-
-You can still toggle content visibility using the eye icon.
+Start zoom preview with file content hidden. Can still toggle with the eye icon.
 
 ---
 
@@ -328,21 +278,15 @@ When you add a specific directory, `"*"` is automatically removed. To scan all d
 
 ## Direct Relationship Properties
 
-Configure property names for direct bidirectional relationships.
-
-:::info Bidirectional Sync
-When you set a relationship in one direction, the plugin automatically updates the reverse relationship.
-:::
+Configure property names for direct bidirectional relationships. When you set a relationship in one direction, the reverse is automatically updated.
 
 ### Parent Property
 
 **Default**: `Parent`
 
-Property name for parent reference (bidirectional with children).
+Property name for parent references (syncs with children).
 
-**Example**:
 ```yaml
-# child-note.md
 Parent: "[[parent-note]]"
 ```
 
@@ -350,25 +294,21 @@ Parent: "[[parent-note]]"
 
 **Default**: `Child`
 
-Property name for children references (bidirectional with parent).
+Property name for children references (syncs with parent).
 
-**Example**:
 ```yaml
-# parent-note.md
 Child:
-  - "[[child-note-1]]"
-  - "[[child-note-2]]"
+  - "[[child-1]]"
+  - "[[child-2]]"
 ```
 
 ### Related Property
 
 **Default**: `Related`
 
-Property name for related files (bidirectional - automatically syncs between linked files).
+Property name for related files (bidirectional sync between linked files).
 
-**Example**:
 ```yaml
-# note-1.md
 Related:
   - "[[note-2]]"
   - "[[note-3]]"
@@ -378,124 +318,152 @@ Related:
 
 **Default**: `true`
 
-Automatically mark nodes as related when they share the same parent (siblings are related to each other).
-
-**Enabled**: Siblings automatically get related relationships
-**Disabled**: Only explicitly defined related relationships exist
+Automatically mark nodes as related when they share the same parent.
 
 ---
 
 ## Frontmatter Propagation
 
-Configure how frontmatter changes propagate from parent files to their children in the hierarchy.
-
-:::info Automatic Propagation
-When you modify frontmatter properties in a parent file, these changes can automatically propagate to all child files (and recursively to their children). This keeps your hierarchy synchronized.
-:::
+Configure how frontmatter changes propagate from parent files to their children. When you modify properties in a parent, changes can automatically sync to all children recursively.
 
 ### Propagate Frontmatter to Children
 
 **Default**: `false`
 
-Automatically propagate frontmatter changes from parent files to all their children (recursively).
-
-**Enabled**: Changes propagate automatically without confirmation
-**Disabled**: No automatic propagation (use "Ask Before Propagating" for manual control)
-
-**How it works**:
-- When you modify frontmatter in a parent file, changes are detected
-- After a debounce delay, changes automatically apply to all children
-- Changes propagate recursively through the entire child hierarchy
-- Only non-excluded properties are propagated (see "Excluded Propagated Properties")
-
-**Example**:
-```yaml
-# parent-note.md (you change Status from "Draft" to "Published")
-Status: Published
-Priority: High
-```
-
-All child files automatically get updated:
-```yaml
-# child-note.md (automatically updated)
-Status: Published  # ← Propagated from parent
-Priority: High     # ← Propagated from parent
-```
+Automatically propagate frontmatter changes from parent files to all children (recursively) without confirmation.
 
 ### Ask Before Propagating Frontmatter
 
 **Default**: `false`
 
-Show a confirmation modal before propagating frontmatter changes to children.
-
-**Enabled**: Modal appears asking if you want to propagate changes
-**Disabled**: No modal (use "Propagate Frontmatter to Children" for automatic propagation)
-
-**When enabled**:
-- A modal appears when frontmatter changes are detected in a parent file
-- Shows which properties changed and how many children will be affected
-- You can confirm or cancel the propagation
-- If confirmed, changes propagate recursively to all children
-
-**Use cases**:
-- Review changes before applying them
-- Selective propagation based on context
-- Prevent accidental propagation of sensitive changes
+Show a confirmation modal before propagating changes. Modal displays which properties changed and how many children will be affected.
 
 :::tip Both Settings Disabled
-If both "Propagate Frontmatter to Children" and "Ask Before Propagating Frontmatter" are disabled, no propagation occurs. You can still manually update child files.
+If both are disabled, no propagation occurs. You must manually update child files.
 :::
 
 ### Excluded Propagated Properties
 
 **Default**: `""` (empty)
 
-Comma-separated list of property names that should NOT be propagated to children, even when propagation is enabled.
+Comma-separated list of properties to exclude from propagation. Relationship properties (`Parent`, `Child`, `Related`) are always excluded automatically.
 
-**Examples**:
-- `Status, Priority` - Don't propagate status or priority changes
-- `_ZettelID, CreatedDate` - Don't propagate system properties
-- `Author, LastModified` - Don't propagate metadata fields
-
-**How it works**:
-- Properties listed here are excluded from propagation
-- Relationship properties (`Parent`, `Child`, `Related`) are always excluded automatically
-- Excluded properties remain unchanged in child files
-- Useful for properties that should differ between parent and children
-
-**Example**:
-```
-Excluded Propagated Properties: Status, Priority
-```
-
-If you change `Status` and `Priority` in a parent file, these changes won't propagate to children, but other properties will still propagate.
+**Examples**: `Status, Priority` or `_ZettelID, CreatedDate`
 
 ### Propagation Debounce Delay
 
-**Default**: `1000ms`
-**Range**: 100ms - 10000ms
+**Default**: `1000ms` | **Range**: 100ms - 10000ms
 
-Delay in milliseconds before propagating changes. This prevents excessive propagation when making multiple rapid edits.
+Delay before propagating changes. Prevents excessive propagation during rapid edits. Timer resets with each new change.
 
-**How it works**:
-- When you make changes, propagation waits for this delay
-- If you make more changes within the delay, the timer resets
-- After the delay expires with no new changes, propagation occurs
-- All changes made during the delay are merged and propagated together
+---
 
-**Recommended values**:
-- **100-500ms** - Fast propagation for quick edits
-- **1000ms** - Balanced (recommended for most users)
-- **2000-5000ms** - Slower propagation, better for careful editing
-- **10000ms** - Very slow, only propagate when you're completely done editing
+## Bases View
+
+Configure how files are displayed in table format with the Bases view feature.
+
+### Enable Archived Filtering
+
+**Default**: `false`
+
+When enabled, the Bases view shows separate sections for archived and non-archived files. When disabled, all files are shown together without filtering.
+
+**Enabled**: Files are split into "Archived" and "Active" sections based on the archived property
+**Disabled**: All files shown in a single unified view
+
+### Archived Property Name
+
+**Default**: `Archived`
+
+Name of the frontmatter property used to mark files as archived. Only used when "Enable Archived Filtering" is enabled.
+
+**Examples**:
+- `Archived` - Standard property name
+- `_Archived` - Hidden property (starts with underscore)
+- `Status` - Use existing status property
+
+### Default Included Properties
+
+**Default**: `[]` (empty)
+
+Comma-separated list of frontmatter properties to display as columns in Bases view tables. The file name (`file.name`) is always shown as the first column.
+
+**Examples**:
+- `status, priority, tags` - Project management properties
+- `date, author, type` - Content metadata
+- `deadline, assignee` - Task tracking
+
+**Empty** = Only file name column is shown
+
+### Custom Formulas
+
+**Default**: `""` (empty)
+
+Define custom formulas for advanced sorting. Enter YAML content that defines how to map property values to numeric sort priorities.
+
+**Format**: Enter only the content that goes AFTER `formulas:` (don't include `formulas:` itself)
 
 **Example**:
-If debounce is set to 1000ms and you:
-1. Change `Status` at 0ms
-2. Change `Priority` at 500ms
-3. Change `Tags` at 800ms
+```yaml
+  _priority_sort: |-
+    [
+      ["Very High", 1],
+      ["High", 2],
+      ["Medium", 3],
+      ["Low", 4],
+      ["null", 5]
+    ].filter(value[0] == Priority.toString())[0][1]
+```
 
-All three changes are merged and propagated together after 1800ms (1000ms after the last change).
+This example creates a formula named `_priority_sort` that maps priority values to numbers for sorting.
+
+### Custom Sort Configuration
+
+**Default**: `""` (empty)
+
+Define how table rows should be sorted. Enter YAML content that specifies sort rules.
+
+**Format**: Enter only the content that goes AFTER `sort:` (don't include `sort:` itself)
+
+**Example**:
+```yaml
+      - property: formula._priority_sort
+        direction: ASC
+      - property: file.mtime
+        direction: DESC
+```
+
+This example sorts by priority (ascending) first, then by modification time (descending).
+
+### Path-Based Inclusion Rules
+
+Define rules to include ADDITIONAL properties as columns for files in specific directories. Default properties are always included - path rules ADD extra columns on top.
+
+Rules are evaluated in order - the first matching path's additional properties are added to the default list.
+
+Each rule has:
+- **Path** - Directory path (uses `startsWith` matching)
+- **Included Properties** - Comma-separated properties to add as columns
+- **Enabled** - Toggle to enable/disable the rule
+- **Order** - Use ↑/↓ buttons to reorder rules
+
+**Example Rules**:
+
+| Path | Included Properties | Description |
+|------|---------------------|-------------|
+| `Projects/` | `deadline, assignee` | Add deadline and assignee columns for project files |
+| `Daily Notes/` | `mood, weather` | Add mood and weather columns for daily notes |
+
+**Column Order**:
+1. `file.name` (always first)
+2. Default included properties (in order specified)
+3. Path-specific properties (in order specified)
+
+:::warning Path Matching
+Path matching uses `startsWith` - a file matches if its path starts with the rule's path. Default properties are ALWAYS included. Path rules ADD additional columns.
+:::
+
+[Learn more about Bases View →](features/bases-view)
 
 ---
 
@@ -507,19 +475,17 @@ Configure how new nodes are created using command palette shortcuts.
 
 **Default**: `_ZettelID`
 
-Property name for unique timestamp identifier assigned to new nodes.
-
-Format: `YYYYMMDDHHmmss` (e.g., `20250125143022`)
+Property name for unique timestamp identifier assigned to new nodes (format: `YYYYMMDDHHmmss`).
 
 ### How It Works
 
-When you use commands like "Create Child Node":
+When using commands like "Create Child Node":
 
-1. New node is created in the same folder as the source file
-2. All frontmatter properties are inherited (except excluded properties)
-3. A new Zettel ID is generated automatically
-4. Bidirectional relationships are established automatically
-5. Commands are only available for files in indexed directories
+1. New node created in same folder as source file
+2. All frontmatter inherited (except excluded properties)
+3. New Zettel ID generated automatically
+4. Bidirectional relationships established automatically
+5. Only available for files in indexed directories
 
 [Learn more about Node Creation →](features/node-creation)
 
@@ -533,34 +499,27 @@ Configure which frontmatter properties should NOT be copied when creating new no
 
 **Default**: `["Parent", "Child", "Related", "_ZettelID"]`
 
-Comma-separated list of properties to ALWAYS exclude from copying. These are excluded regardless of any path-based rules.
-
-**Common exclusions**:
-- Relationship properties: `Parent`, `Child`, `Related`
-- System properties: `_ZettelID`, `_CreatedDate`
-- File-specific: `date`, `created`, `modified`
+Properties to ALWAYS exclude from copying, regardless of path rules. Common exclusions include relationship properties, system properties, and file-specific metadata.
 
 ### Path-Based Exclusion Rules
 
-Define rules to exclude ADDITIONAL properties for files in specific directories. The default excluded properties are always excluded. Rules are evaluated in order - the first matching path's properties are ADDED to the default exclusion list.
+Define rules to exclude ADDITIONAL properties for files in specific directories. Default excluded properties are always excluded - path rules ADD more exclusions.
+
+Rules are evaluated in order - the first matching path adds its properties to the exclusion list.
 
 Each rule has:
 - **Path** - Directory path (uses `startsWith` matching)
 - **Excluded Properties** - Comma-separated properties to exclude
 - **Enabled** - Toggle to enable/disable the rule
-- **Order** - Use ↑/↓ buttons to reorder rules
+- **Order** - Use ↑/↓ buttons to reorder
 
 **Example Rules**:
 
 | Path | Excluded Properties | Description |
 |------|---------------------|-------------|
 | `Projects/` | `status, progress` | Don't copy status/progress for projects |
-| `Daily Notes/2024/` | `date, weekday` | Don't copy date fields from daily notes |
+| `Daily Notes/` | `date, weekday` | Don't copy date fields |
 | `Templates/` | `template-version` | Don't copy template metadata |
-
-:::warning Path Matching
-Path matching uses `startsWith` - a file matches if its path starts with the rule's path. Default excluded properties are ALWAYS excluded. Path rules ADD additional properties to exclude.
-:::
 
 [Learn more about Property Exclusion →](features/excluded-properties)
 
