@@ -24,10 +24,10 @@ const sidebars: SidebarsConfig = {
         "features/filtering",
         "features/zoom-mode",
         "features/tooltips",
-        "features/search",
         "features/context-menus",
         "features/node-creation",
-        "features/excluded-properties"
+        "features/excluded-properties",
+        "features/bases-view"
       ]
     },
     "configuration",
