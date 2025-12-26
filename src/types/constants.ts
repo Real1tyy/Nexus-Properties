@@ -1,6 +1,6 @@
 import type { NexusPropertiesSettings } from "./settings";
 
-export const PLUGIN_ID = "nexus-properties";
+const _PLUGIN_ID = "nexus-properties";
 
 export const SETTINGS_VERSION = 1;
 
@@ -59,7 +59,7 @@ export const SCAN_CONCURRENCY = 10;
 
 export type RelationshipType = "parent" | "children" | "related";
 
-export interface RelationshipConfig {
+interface RelationshipConfig {
 	type: RelationshipType;
 	getProp: (settings: NexusPropertiesSettings) => string;
 	getReverseProp: (settings: NexusPropertiesSettings) => string;

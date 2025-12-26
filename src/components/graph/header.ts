@@ -1,6 +1,6 @@
 import { cls } from "../../utils/css";
 
-export interface GraphHeaderProps {
+interface GraphHeaderProps {
 	currentFileName: string;
 	renderRelated: boolean;
 	includeAllRelated: boolean;

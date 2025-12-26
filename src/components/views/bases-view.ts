@@ -6,7 +6,7 @@ import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
 import { RegisteredEventsComponent } from "./component";
 
-export const VIEW_TYPE_BASES = "nexus-bases-view";
+const _VIEW_TYPE_BASES = "nexus-bases-view";
 
 export type BaseViewType =
 	| "children"

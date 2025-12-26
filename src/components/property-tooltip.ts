@@ -10,7 +10,8 @@ import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { cls } from "../utils/css";
-export interface PropertyTooltipOptions {
+
+interface PropertyTooltipOptions {
 	settingsStore: SettingsStore;
 	currentFilePath?: string;
 	onFileOpen?: (filePath: string, event: MouseEvent) => void;

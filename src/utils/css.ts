@@ -23,7 +23,7 @@ export function cls(...classNames: string[]): string {
  * @example
  * addCls(element, "active", "selected")
  */
-export function addCls(element: HTMLElement, ...classNames: string[]): void {
+function _addCls(element: HTMLElement, ...classNames: string[]): void {
 	const classes = cls(...classNames);
 	if (classes) {
 		element.classList.add(...classes.split(/\s+/));
@@ -36,7 +36,7 @@ export function addCls(element: HTMLElement, ...classNames: string[]): void {
  * @example
  * removeCls(element, "active", "selected")
  */
-export function removeCls(element: HTMLElement, ...classNames: string[]): void {
+function _removeCls(element: HTMLElement, ...classNames: string[]): void {
 	const classes = cls(...classNames);
 	if (classes) {
 		element.classList.remove(...classes.split(/\s+/));
@@ -49,7 +49,7 @@ export function removeCls(element: HTMLElement, ...classNames: string[]): void {
  * @example
  * toggleCls(element, "active")
  */
-export function toggleCls(element: HTMLElement, className: string, force?: boolean): boolean {
+function _toggleCls(element: HTMLElement, className: string, force?: boolean): boolean {
 	return element.classList.toggle(cls(className), force);
 }
 
@@ -59,6 +59,6 @@ export function toggleCls(element: HTMLElement, className: string, force?: boole
  * @example
  * hasCls(element, "active")
  */
-export function hasCls(element: HTMLElement, className: string): boolean {
+function _hasCls(element: HTMLElement, className: string): boolean {
 	return element.classList.contains(cls(className));
 }

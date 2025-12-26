@@ -3,7 +3,7 @@ import { SETTINGS_DEFAULTS, SETTINGS_VERSION } from "./constants";
 
 export type Frontmatter = Record<string, unknown>;
 
-export const ColorRuleSchema = z
+const ColorRuleSchema = z
 	.object({
 		id: z.string(),
 		expression: z.string(),
@@ -12,9 +12,7 @@ export const ColorRuleSchema = z
 	})
 	.strip();
 
-export type ColorRule = z.infer<typeof ColorRuleSchema>;
-
-export const FilterPresetSchema = z
+const FilterPresetSchema = z
 	.object({
 		name: z.string(),
 		expression: z.string(),
@@ -23,7 +21,7 @@ export const FilterPresetSchema = z
 
 export type FilterPreset = z.infer<typeof FilterPresetSchema>;
 
-export const PathExcludedPropertiesSchema = z
+const PathExcludedPropertiesSchema = z
 	.object({
 		id: z.string(),
 		path: z.string(),
@@ -32,9 +30,7 @@ export const PathExcludedPropertiesSchema = z
 	})
 	.strip();
 
-export type PathExcludedProperties = z.infer<typeof PathExcludedPropertiesSchema>;
-
-export const PathIncludedPropertiesSchema = z
+const PathIncludedPropertiesSchema = z
 	.object({
 		id: z.string(),
 		path: z.string(),
@@ -42,8 +38,6 @@ export const PathIncludedPropertiesSchema = z
 		enabled: z.boolean(),
 	})
 	.strip();
-
-export type PathIncludedProperties = z.infer<typeof PathIncludedPropertiesSchema>;
 
 export const NexusPropertiesSettingsSchema = z
 	.object({

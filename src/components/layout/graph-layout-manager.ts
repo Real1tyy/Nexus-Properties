@@ -4,14 +4,14 @@ import { CollisionDetector } from "./collision-detector";
 import { ConstellationPositioner } from "./constellation-positioner";
 import { type Bounds, NodeOrganizer, type TreeBounds } from "./node-organizer";
 
-export interface LayoutConfig {
+interface LayoutConfig {
 	animationDuration: number;
 	isFolderNote: boolean;
 	renderRelated: boolean;
 	includeAllRelated: boolean;
 }
 
-export interface GraphLayoutManagerConfig {
+interface GraphLayoutManagerConfig {
 	getCy: () => Core;
 }
 

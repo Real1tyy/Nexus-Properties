@@ -1,7 +1,7 @@
 import { formatValue, parseWikiLinkWithDisplay } from "@real1ty-obsidian-plugins/utils";
 import type { App, TFile } from "obsidian";
 
-export interface PropertyRendererOptions {
+interface PropertyRendererOptions {
 	containerClass: string;
 	keyClass: string;
 	valueClass: string;

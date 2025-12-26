@@ -1,7 +1,7 @@
 import { cls } from "../../utils/css";
 
-export type ToggleChangeHandler = (checked: boolean) => Promise<void>;
-export type InputUpdateHandler = (value: string) => Promise<void>;
+type ToggleChangeHandler = (checked: boolean) => Promise<void>;
+type InputUpdateHandler = (value: string) => Promise<void>;
 
 export const createRuleToggle = (checked: boolean, onChange: ToggleChangeHandler): HTMLInputElement => {
 	const toggle = document.createElement("input");

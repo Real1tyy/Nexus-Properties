@@ -6,7 +6,7 @@ import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
 import { PropertyRenderer } from "../property-renderer";
 
-export interface GraphZoomPreviewProps {
+interface GraphZoomPreviewProps {
 	file: TFile;
 	onExit: () => void;
 	settingsStore: SettingsStore;

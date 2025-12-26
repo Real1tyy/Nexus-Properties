@@ -4,7 +4,7 @@ import type { RelationshipType } from "../../types/constants";
 import { NodeEditModal } from "../node-edit-modal";
 import { NodePreviewModal } from "../node-preview-modal";
 
-export interface NodeContextMenuCallbacks {
+interface NodeContextMenuCallbacks {
 	onStartRelationship: (sourceNodePath: string, relationshipType: RelationshipType) => void;
 }
 

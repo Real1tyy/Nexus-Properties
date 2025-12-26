@@ -23,7 +23,7 @@ import { RegisteredEventsComponent } from "./component";
 
 cytoscape.use(cytoscapeDagre);
 
-export const VIEW_TYPE_RELATIONSHIP_GRAPH = "nexus-relationship-graph-view";
+const VIEW_TYPE_RELATIONSHIP_GRAPH = "nexus-relationship-graph-view";
 
 /**
  * Graph rendering component (not an ItemView)

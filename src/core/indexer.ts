@@ -20,7 +20,7 @@ export interface FileRelationships {
 	frontmatter: Frontmatter;
 }
 
-export type IndexerEventType = "file-changed" | "file-deleted";
+type IndexerEventType = "file-changed" | "file-deleted";
 
 export interface IndexerEvent {
 	type: IndexerEventType;

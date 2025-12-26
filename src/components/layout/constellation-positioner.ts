@@ -2,7 +2,7 @@ import type { Core, ElementDefinition } from "cytoscape";
 import { CollisionDetector } from "./collision-detector";
 import { NodeOrganizer } from "./node-organizer";
 
-export interface ConstellationConfig {
+interface ConstellationConfig {
 	baseOrbitalRadius: number;
 	minNodeDistance: number;
 	radiusIncrement?: number;

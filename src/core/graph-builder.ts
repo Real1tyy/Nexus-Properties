@@ -14,24 +14,24 @@ import type { NexusPropertiesSettings } from "../types/settings";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
 
-export interface GraphData {
+interface GraphData {
 	nodes: ElementDefinition[];
 	edges: ElementDefinition[];
 }
 
-export interface ConstellationNode {
+interface ConstellationNode {
 	center: string; // file path of center node
 	orbitals: string[]; // file paths of nodes in orbit
 	level: number; // depth in hierarchy (0 = root)
 }
 
-export interface ConstellationGraphData {
+interface ConstellationGraphData {
 	constellations: ConstellationNode[];
 	allNodePaths: Set<string>; // all unique node paths
 	edges: ElementDefinition[]; // only center-to-orbital edges
 }
 
-export interface GraphBuilderOptions {
+interface GraphBuilderOptions {
 	sourcePath: string;
 	renderRelated: boolean;
 	includeAllRelated: boolean;

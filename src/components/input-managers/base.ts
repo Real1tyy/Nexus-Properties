@@ -1,6 +1,6 @@
 import { cls } from "../../utils/css";
 
-export type FilterChangeCallback = () => void;
+type FilterChangeCallback = () => void;
 
 const DEFAULT_DEBOUNCE_MS = 150;
 

@@ -4,7 +4,7 @@ import type { FileRelationships } from "../core/indexer";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 
-export interface HierarchyTraversalOptions {
+interface HierarchyTraversalOptions {
 	maxDepth?: number;
 	includeRoot?: boolean;
 }

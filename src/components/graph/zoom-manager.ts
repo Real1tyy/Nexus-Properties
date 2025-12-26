@@ -4,7 +4,7 @@ import { TFile } from "obsidian";
 import type { SettingsStore } from "../../core/settings-store";
 import type { GraphZoomPreview } from "./zoom-preview";
 
-export interface ZoomConfig {
+interface ZoomConfig {
 	getCy: () => Core;
 	getPreviewWrapperEl: () => HTMLElement;
 	settingsStore: SettingsStore;

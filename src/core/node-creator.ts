@@ -50,9 +50,8 @@ export class NodeCreator {
 		}
 	}
 
-	private generateFileName(sourceBasename: string, type: NodeCreationType): string {
-		const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
-		return `${sourceBasename} ${typeLabel}`;
+	private generateFileName(sourceBasename: string, _type: NodeCreationType): string {
+		return `${sourceBasename} - `;
 	}
 
 	private async setupFrontmatter(

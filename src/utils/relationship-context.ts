@@ -3,13 +3,13 @@ import type { FileRelationships } from "../core/indexer";
 import type { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 
-export interface RelationshipContext {
+interface RelationshipContext {
 	propName: string;
 	reversePropName: string;
 	paths: string[];
 }
 
-export interface RelationshipDiff {
+interface RelationshipDiff {
 	oldPaths: string[];
 	newPaths: string[];
 	oldSet: Set<string>;

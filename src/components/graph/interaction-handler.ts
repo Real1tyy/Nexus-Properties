@@ -6,7 +6,7 @@ import type { RelationshipAdder } from "../relationship-adder";
 import type { EdgeContextMenu } from "./edge-context-menu";
 import type { NodeContextMenu } from "./node-context-menu";
 
-export interface GraphInteractionConfig {
+interface GraphInteractionConfig {
 	getCy: () => Core;
 	viewType: string;
 	getCurrentFile: () => TFile | null;

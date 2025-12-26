@@ -1,5 +1,3 @@
-import { vi } from "vitest";
-
 export class Plugin {
 	app: any;
 	manifest: any;
@@ -93,20 +91,6 @@ export class TFile {
 		this.extension = "md";
 		this.stat = { mtime: Date.now() };
 	}
-}
-
-export class Vault {
-	on = vi.fn();
-	off = vi.fn();
-	getMarkdownFiles = vi.fn(() => []);
-	read = vi.fn(() => Promise.resolve(""));
-	modify = vi.fn(() => Promise.resolve());
-}
-
-export class MetadataCache {
-	on = vi.fn();
-	off = vi.fn();
-	getFileCache = vi.fn(() => null);
 }
 
 /**
