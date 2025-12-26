@@ -6,6 +6,9 @@ sidebar_position: 7
 
 Preview notes inline by clicking any node in the graph. View frontmatter and content without leaving the visualization.
 
+![Zoom Mode](/img/screenshots/zoom-mode.png)
+*Zoom preview showing frontmatter and content*
+
 ## Entering & Exiting
 
 **Enter**: Click any node

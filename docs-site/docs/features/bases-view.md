@@ -2,6 +2,9 @@
 
 List-based view of the current note's relationships. Shows children, parent, and related notes.
 
+![Bases View](/img/screenshots/bases-view.png)
+*List-based view of relationships*
+
 ## Sections
 
 **Children**: Notes with current note as parent

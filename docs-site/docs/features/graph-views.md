@@ -6,6 +6,9 @@ sidebar_position: 3
 
 Visualize relationships with multiple viewing modes. Each mode reveals different aspects of your knowledge network.
 
+![Hierarchical View](/img/screenshots/hierarchical-view.png)
+*Hierarchical view with parent-child tree structure*
+
 ## Opening the Graph
 
 - **Ribbon icon**: Fork icon in left sidebar
@@ -30,14 +33,24 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 ### Related
 
 **Shows**: Source file + directly related notes (1 hop)
+
 **Layout**: Radial with source in center
+
 **Best for**: Exploring immediate connections
+
+![Related View](/img/screenshots/related-view.png)
+*Related view with radial layout*
 
 ### All Related
 
 **Shows**: Entire constellation recursively up to [max depth](../configuration#all-related-recursion-depth)
+
 **Layout**: Constellation clusters
+
 **Best for**: Discovering indirect connections, full networks
+
+![All Related View](/img/screenshots/all-related-view.png)
+*All Related view showing entire constellation*
 
 :::warning Performance
 Large constellations can be slow. Reduce max depth if needed.

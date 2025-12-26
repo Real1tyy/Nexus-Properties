@@ -6,6 +6,9 @@ sidebar_position: 8
 
 Hover over nodes to see frontmatter properties instantly.
 
+![Node Tooltips](/img/screenshots/tooltips.png)
+*Hover tooltip showing configured properties*
+
 ## Usage
 
 **Show**: Hover over node for 1 second

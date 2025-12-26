@@ -46,33 +46,8 @@ Zoom commands only work when graph view is open and zoom mode is active
 Node creation commands only available when viewing a file in an indexed directory
 :::
 
-## Recommended Hotkeys
-
-| Command | Suggested Hotkey | Usage |
-|---------|------------------|-------|
-| Show Relationship Graph | `Ctrl+Shift+G` | Quick access to graph |
-| Toggle Graph Search | `Ctrl+K` | Find nodes quickly |
-| Toggle Graph Filter | `Ctrl+F` | Apply filters |
-| Enlarge Graph | `Ctrl+Shift+E` | Full-screen graph |
-| Create Child Node | `Ctrl+Shift+C` | Rapid hierarchy building |
-| Create Parent Node | `Ctrl+Shift+P` | Bottom-up structure |
-| Create Related Node | `Ctrl+Shift+R` | Build constellations |
-
-## Assigning Hotkeys
-
-1. Open **Settings → Hotkeys**
-2. Search for **"Nexus Properties"**
-3. Click **+** button next to desired command
-4. Press your key combination
-5. Click outside to save
-
-:::tip Conflicts
-If a hotkey is already assigned, Obsidian will warn you. Choose a different combination or reassign the conflicting hotkey.
-:::
-
 ## Next Steps
 
 - [Features Overview](features/overview) - See what each command does
 - [Graph Views](features/graph-views) - Understand graph navigation
 - [Node Creation](features/node-creation) - Learn about node creation workflow
-

@@ -6,6 +6,9 @@ sidebar_position: 6
 
 Filter nodes using JavaScript expressions. Only nodes where ALL expressions return `true` are shown.
 
+![Graph Filtering](/img/screenshots/filtering.png)
+*Active filtering with JavaScript expressions*
+
 ## Using Filters
 
 **Show filter bar**: Command "Toggle Graph Filter (Expression Input)" or [enable by default](../configuration#show-filter-bar-by-default)

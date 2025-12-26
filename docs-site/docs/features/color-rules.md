@@ -18,6 +18,9 @@ Apply conditional colors to nodes based on frontmatter properties using JavaScri
 
 **Access**: Settings → Nexus Properties → Node colors → Add Rule
 
+![Color Rules Settings](/img/screenshots/color-rules-settings.png)
+*Color rule configuration interface*
+
 **Components**:
 - **Expression**: JavaScript returning boolean (e.g., `status === 'complete'`)
 - **Color**: Hex (`#3b82f6`), HSL (`hsl(200, 70%, 50%)`), or named (`steelblue`)

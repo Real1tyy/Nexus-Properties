@@ -6,6 +6,9 @@ sidebar_position: 10
 
 Right-click nodes or edges for quick actions.
 
+![Node Context Menu](/img/screenshots/node-context-menu.png)
+*Node context menu with quick actions*
+
 ## Node Context Menu
 
 **Open File**: Opens in current tab
@@ -27,6 +30,9 @@ Right-click nodes or edges for quick actions.
 **Navigate to Source**: Focuses on source node
 
 **Navigate to Target**: Focuses on target node
+
+![Edge Context Menu](/img/screenshots/edge-context-menu.png)
+*Edge context menu for relationship management*
 
 ## Relationship Adder
 
