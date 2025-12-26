@@ -1,22 +1,13 @@
 import {
-	compareFrontmatter,
 	type FrontmatterDiff,
+	Indexer as GenericIndexer,
+	type IndexerEvent as GenericIndexerEvent,
+	type IndexerConfig,
 	normalizeProperty,
-	parseWikiLinkWithDisplay,
 } from "@real1ty-obsidian-plugins/utils";
-import { type App, type MetadataCache, type TAbstractFile, TFile, type Vault } from "obsidian";
-import {
-	type BehaviorSubject,
-	from,
-	fromEventPattern,
-	lastValueFrom,
-	merge,
-	type Observable,
-	of,
-	Subject,
-	type Subscription,
-} from "rxjs";
-import { debounceTime, filter, groupBy, map, mergeMap, switchMap, toArray } from "rxjs/operators";
+import type { App, TFile } from "obsidian";
+import type { Observable, Subscription } from "rxjs";
+import { BehaviorSubject, Subject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
 
@@ -40,288 +31,110 @@ export interface IndexerEvent {
 	frontmatterDiff?: FrontmatterDiff;
 }
 
-type VaultEvent = "create" | "modify" | "delete" | "rename";
-type FileIntent = { kind: "changed"; file: TFile; path: string } | { kind: "deleted"; path: string };
-
+/**
+ * Wrapper around the generic Indexer from utils that adds relationship tracking.
+ * Listens to generic indexer events and enhances them with relationship data.
+ */
 export class Indexer {
 	private settings: NexusPropertiesSettings;
-	private fileSub: Subscription | null = null;
+	private genericIndexer: GenericIndexer;
 	private settingsSubscription: Subscription | null = null;
-	private vault: Vault;
-	private metadataCache: MetadataCache;
 	private scanEventsSubject = new Subject<IndexerEvent>();
 	private relationshipsCache = new Map<string, FileRelationships>();
-	private frontmatterCache = new Map<string, Frontmatter>();
 
 	public readonly events$: Observable<IndexerEvent>;
 
-	constructor(app: App, settingsStore: BehaviorSubject<NexusPropertiesSettings>) {
-		this.vault = app.vault;
-		this.metadataCache = app.metadataCache;
+	constructor(
+		private app: App,
+		settingsStore: BehaviorSubject<NexusPropertiesSettings>
+	) {
 		this.settings = settingsStore.value;
+
+		const configStore = new BehaviorSubject<IndexerConfig>(this.buildIndexerConfig());
+		this.genericIndexer = new GenericIndexer(app, configStore);
+		this.genericIndexer.events$.subscribe((genericEvent) => {
+			this.handleGenericEvent(genericEvent);
+		});
 
 		this.settingsSubscription = settingsStore.subscribe((newSettings) => {
 			this.settings = newSettings;
+			configStore.next(this.buildIndexerConfig());
 		});
 
 		this.events$ = this.scanEventsSubject.asObservable();
 	}
 
-	async start(): Promise<void> {
-		await this.buildInitialCache();
+	private buildIndexerConfig(): IndexerConfig {
+		return {
+			includeFile: this.shouldIndexFile.bind(this),
+			scanConcurrency: SCAN_CONCURRENCY,
+			debounceMs: 300,
+		};
+	}
 
-		const fileSystemEvents$ = this.buildFileSystemEvents$();
-		this.fileSub = fileSystemEvents$.subscribe((event) => {
-			this.scanEventsSubject.next(event);
-		});
+	async start(): Promise<void> {
+		await this.genericIndexer.start();
 	}
 
 	stop(): void {
-		this.fileSub?.unsubscribe();
-		this.fileSub = null;
-
+		this.genericIndexer.stop();
 		this.settingsSubscription?.unsubscribe();
 		this.settingsSubscription = null;
-
 		this.relationshipsCache.clear();
-		this.frontmatterCache.clear();
-	}
-
-	private async buildInitialCache(): Promise<void> {
-		const allFiles = this.vault.getMarkdownFiles();
-		const relevantFiles = allFiles.filter((file) => this.shouldIndexFile(file.path));
-
-		for (const file of relevantFiles) {
-			const frontmatter = this.metadataCache.getFileCache(file)?.frontmatter;
-			if (frontmatter) {
-				const relationships = this.extractRelationships(file, frontmatter);
-				this.relationshipsCache.set(file.path, relationships);
-				this.frontmatterCache.set(file.path, { ...frontmatter });
-			}
-		}
 	}
 
 	async scanAllFiles(): Promise<void> {
-		const allFiles = this.vault.getMarkdownFiles();
-		const relevantFiles = allFiles.filter((file) => this.shouldIndexFile(file.path));
-
-		const events$ = from(relevantFiles).pipe(
-			mergeMap(async (file) => {
-				try {
-					return await this.buildEvent(file);
-				} catch (error) {
-					console.error(`Error processing file ${file.path}:`, error);
-					return null;
-				}
-			}, SCAN_CONCURRENCY),
-			filter((event): event is IndexerEvent => event !== null),
-			toArray()
-		);
-
-		try {
-			const allEvents = await lastValueFrom(events$);
-
-			for (const event of allEvents) {
-				this.scanEventsSubject.next(event);
-			}
-		} catch (error) {
-			console.error("❌ Error during file scanning:", error);
-		}
-	}
-
-	private fromVaultEvent(eventName: VaultEvent): Observable<any> {
-		return fromEventPattern(
-			(handler) => this.vault.on(eventName as any, handler),
-			(handler) => this.vault.off(eventName as any, handler)
-		);
-	}
-
-	private static isMarkdownFile(f: TAbstractFile): f is TFile {
-		return f instanceof TFile && f.extension === "md";
+		await this.genericIndexer.resync();
 	}
 
 	shouldIndexFile(filePath: string): boolean {
 		const { directories } = this.settings;
 
-		// If directories contains "*", scan all files
 		if (directories.includes("*")) {
 			return true;
 		}
 
-		// Check if file path starts with any of the configured directories
 		return directories.some((dir) => {
-			// Normalize directory path (remove trailing slash if present)
 			const normalizedDir = dir.endsWith("/") ? dir.slice(0, -1) : dir;
-
-			// Check if file path starts with the directory path
 			return filePath === normalizedDir || filePath.startsWith(`${normalizedDir}/`);
 		});
 	}
 
-	private toRelevantFiles<T extends TAbstractFile>() {
-		return (source: Observable<T>) =>
-			source.pipe(
-				filter(Indexer.isMarkdownFile),
-				filter((f) => this.shouldIndexFile(f.path))
-			);
-	}
+	private handleGenericEvent(genericEvent: GenericIndexerEvent): void {
+		if (genericEvent.type === "file-deleted") {
+			const oldRelationships = this.relationshipsCache.get(genericEvent.filePath);
+			const oldFrontmatter = oldRelationships?.frontmatter;
 
-	private debounceByPath<T>(ms: number, key: (x: T) => string) {
-		return (source: Observable<T>) =>
-			source.pipe(
-				groupBy(key),
-				mergeMap((g$) => g$.pipe(debounceTime(ms)))
-			);
-	}
+			this.relationshipsCache.delete(genericEvent.filePath);
 
-	private buildFileSystemEvents$(): Observable<IndexerEvent> {
-		const created$ = this.fromVaultEvent("create").pipe(this.toRelevantFiles());
-		const modified$ = this.fromVaultEvent("modify").pipe(this.toRelevantFiles());
-		const deleted$ = this.fromVaultEvent("delete").pipe(this.toRelevantFiles());
-		const renamed$ = this.fromVaultEvent("rename");
-
-		const changedIntents$ = merge(created$, modified$).pipe(
-			this.debounceByPath(300, (f) => f.path),
-			map((file): FileIntent => ({ kind: "changed", file, path: file.path }))
-		);
-
-		const deletedIntents$ = deleted$.pipe(map((file): FileIntent => ({ kind: "deleted", path: file.path })));
-
-		// Handle renames by updating the cache internally without emitting events
-		// Obsidian automatically updates all wiki links, so we just sync the cache
-		// Debounce by 1.5 seconds to let Obsidian finish updating all links
-		renamed$
-			.pipe(
-				filter(([f]) => Indexer.isMarkdownFile(f)),
-				debounceTime(1000)
-			)
-			.subscribe(([newFile, oldPath]) => {
-				this.handleRename(newFile, oldPath);
+			this.scanEventsSubject.next({
+				type: "file-deleted",
+				filePath: genericEvent.filePath,
+				oldRelationships,
+				oldFrontmatter,
 			});
-
-		const intents$ = merge(changedIntents$, deletedIntents$);
-
-		return intents$.pipe(
-			switchMap((intent) => {
-				if (intent.kind === "deleted") {
-					const oldRelationships = this.relationshipsCache.get(intent.path);
-					const oldFrontmatter = this.frontmatterCache.get(intent.path);
-					this.relationshipsCache.delete(intent.path);
-					this.frontmatterCache.delete(intent.path);
-
-					return of<IndexerEvent>({
-						type: "file-deleted",
-						filePath: intent.path,
-						oldRelationships,
-						oldFrontmatter,
-					});
-				}
-				return from(this.buildEvent(intent.file)).pipe(filter((e): e is IndexerEvent => e !== null));
-			})
-		);
-	}
-
-	private handleRename(newFile: TFile, oldPath: string): void {
-		const oldRelationships = this.relationshipsCache.get(oldPath);
-		const oldFrontmatter = this.frontmatterCache.get(oldPath);
-		const frontmatter = this.metadataCache.getFileCache(newFile)?.frontmatter;
-
-		if (!frontmatter || !oldRelationships) {
 			return;
 		}
 
-		// Update cache for renamed file
-		const newRelationships = this.extractRelationships(newFile, frontmatter);
-		this.relationshipsCache.delete(oldPath);
-		this.relationshipsCache.set(newFile.path, newRelationships);
+		if (genericEvent.type === "file-changed" && genericEvent.source) {
+			const { filePath, source, oldFrontmatter, frontmatterDiff } = genericEvent;
+			const file = this.app.vault.getFileByPath(filePath);
+			if (!file) return;
 
-		const frontmatterDiff = oldFrontmatter ? compareFrontmatter(oldFrontmatter, frontmatter) : undefined;
+			const oldRelationships = this.relationshipsCache.get(filePath);
+			const newRelationships = this.extractRelationships(file, source.frontmatter);
 
-		this.frontmatterCache.delete(oldPath);
-		this.frontmatterCache.set(newFile.path, { ...frontmatter });
+			this.relationshipsCache.set(filePath, newRelationships);
 
-		// Emit event for the renamed file itself
-		this.scanEventsSubject.next({
-			type: "file-changed",
-			filePath: newFile.path,
-			oldRelationships,
-			newRelationships,
-			oldFrontmatter,
-			frontmatterDiff,
-		});
-
-		// Collect affected files from old relationships
-		const affectedFiles = new Set<string>();
-
-		const addAffectedFiles = (wikiLinks: string[]) => {
-			wikiLinks
-				.map((wikiLink) => parseWikiLinkWithDisplay(wikiLink))
-				.filter((parsed) => parsed?.linkPath)
-				.map((parsed) => this.vault.getFileByPath(`${parsed!.linkPath}.md`))
-				.filter((file) => file !== null)
-				.forEach((file) => {
-					affectedFiles.add(file.path);
-				});
-		};
-
-		addAffectedFiles(oldRelationships.parent);
-		addAffectedFiles(oldRelationships.children);
-		addAffectedFiles(oldRelationships.related);
-
-		// Re-extract relationships from frontmatter for all affected files
-		// Obsidian has already updated their frontmatter with the new file name
-		for (const filePath of affectedFiles) {
-			const file = this.vault.getFileByPath(filePath);
-			if (file === null) continue;
-
-			const fm = this.metadataCache.getFileCache(file)?.frontmatter;
-			if (!fm) continue;
-
-			const oldRel = this.relationshipsCache.get(filePath);
-			const oldFrontmatter = this.frontmatterCache.get(filePath);
-			const updatedRelationships = this.extractRelationships(file, fm);
-			this.relationshipsCache.set(filePath, updatedRelationships);
-
-			const frontmatterDiff = oldFrontmatter ? compareFrontmatter(oldFrontmatter, fm) : undefined;
-
-			this.frontmatterCache.set(filePath, { ...fm });
-
-			// Emit event for each affected file
 			this.scanEventsSubject.next({
 				type: "file-changed",
-				filePath: filePath,
-				oldRelationships: oldRel,
-				newRelationships: updatedRelationships,
+				filePath,
+				oldRelationships,
+				newRelationships,
 				oldFrontmatter,
 				frontmatterDiff,
 			});
 		}
-	}
-
-	private async buildEvent(file: TFile): Promise<IndexerEvent | null> {
-		const frontmatter = this.metadataCache.getFileCache(file)?.frontmatter;
-		if (!frontmatter) {
-			return null;
-		}
-
-		const oldRelationships = this.relationshipsCache.get(file.path);
-		const oldFrontmatter = this.frontmatterCache.get(file.path);
-		const newRelationships = this.extractRelationships(file, frontmatter);
-
-		const frontmatterDiff = oldFrontmatter ? compareFrontmatter(oldFrontmatter, frontmatter) : undefined;
-
-		// Update cache with new relationships and frontmatter
-		this.relationshipsCache.set(file.path, newRelationships);
-		this.frontmatterCache.set(file.path, { ...frontmatter });
-
-		return {
-			type: "file-changed",
-			filePath: file.path,
-			oldRelationships,
-			newRelationships,
-			oldFrontmatter,
-			frontmatterDiff,
-		};
 	}
 
 	extractRelationships(file: TFile, frontmatter: Frontmatter): FileRelationships {
@@ -337,18 +150,7 @@ export class Indexer {
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const propName = config.getProp(this.settings);
 			const normalizedValue = normalizeProperty(frontmatter[propName], propName);
-
-			switch (config.type) {
-				case "parent":
-					relationships.parent = normalizedValue;
-					break;
-				case "children":
-					relationships.children = normalizedValue;
-					break;
-				case "related":
-					relationships.related = normalizedValue;
-					break;
-			}
+			relationships[config.type] = normalizedValue;
 		}
 
 		return relationships;
