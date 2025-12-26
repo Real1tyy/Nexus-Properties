@@ -175,6 +175,16 @@ Related:
 ---
 ```
 
+## 📱 Mobile Support
+
+**Current Status**: Mobile support is currently limited and not fully optimized.
+
+The plugin is primarily designed for desktop use, and while it may function on mobile devices, the experience is not yet polished.
+
+**Future Plans**: Mobile support is a priority for future development. We're committed to improving the mobile experience over time.
+
+**Stay Updated**: Keep an eye on the [Changelog](changelog) for mobile improvements as they're released. If you encounter specific mobile issues or have suggestions, please [open an issue](https://github.com/Real1tyy/Nexus-Properties/issues) — your feedback helps prioritize mobile enhancements.
+
 ## Troubleshooting Installation
 
 ### Plugin Not Appearing
