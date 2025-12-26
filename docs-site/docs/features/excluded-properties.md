@@ -53,25 +53,6 @@ Exclude additional properties for files in specific directories.
 - Path rule (`Projects/`): `status, progress`
 - Total for Projects files: `Parent, Child, Related, _ZettelID, status, progress`
 
-## Example Configurations
-
-**Daily Notes**: Path `Daily Notes/`, Exclude `date, weekday, journal-entry, mood`
-**Projects**: Path `Projects/`, Exclude `status, progress, deadline, budget`
-**Templates**: Path `Templates/`, Exclude `template-version, template-author, is-template`
-**Meetings**: Path `Meetings/`, Exclude `meeting-date, attendees, agenda, minutes`
-
-## Managing Rules
-
-**Enable/Disable**: Toggle checkbox (useful for testing)
-
-**Reorder**: Use ↑/↓ buttons (specific paths above general)
-
-**Delete**: Click × button (permanent, no undo)
-
-:::tip Rule Order
-Place specific paths above general paths. Example: `Projects/Work/` before `Projects/`
-:::
-
 ## Next Steps
 
 - [Node Creation](node-creation) - See exclusions in action

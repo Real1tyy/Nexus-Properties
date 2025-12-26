@@ -48,14 +48,6 @@ _priority_sort: |-
 Enter only the content AFTER `formulas:` and `sort:` keywords. The plugin adds these automatically.
 :::
 
-## Bases View vs Graph View
-
-| | Bases View | Graph View |
-|---|---|---|
-| **Focus** | Single note | Network |
-| **Format** | List | Visual |
-| **Best For** | Quick navigation | Overall structure |
-
 ## Next Steps
 
 - [Graph Views](graph-views) - Visual network exploration

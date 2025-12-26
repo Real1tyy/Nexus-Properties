@@ -40,18 +40,6 @@ Right-click nodes or edges for quick actions.
 
 **Validation**: Prevents circular relationships and duplicates
 
-## Quick Actions
-
-**Restructure hierarchy**: Right-click child → "Add Parent" → Click new parent
-
-**Link concepts**: Right-click concept → "Add Related" → Click related concept
-
-**Clean up**: Right-click edge → "Remove Relationship"
-
-**Preview**: Right-click node → "View Node Preview"
-
-**Copy reference**: Right-click node → "Copy Node Path"
-
 ## Next Steps
 
 - [Node Creation](node-creation) - Create new related nodes

@@ -69,21 +69,6 @@ Create parent, child, or related nodes instantly from commands. New nodes inheri
 
 **Path-based exclusion**: [Learn more](excluded-properties)
 
-## Workflow Examples
-
-**Bottom-up hierarchy**: Open task → Create Parent → Rename to project
-**Top-down breakdown**: Open project → Create Child (repeat) → Rename to tasks
-**Constellation building**: Open concept → Create Related → Repeat from new note
-**Rapid brainstorming**: Start with seed → Create Related repeatedly
-
-## Hotkey Recommendations
-
-- `Ctrl+Shift+P` - Create Parent Node
-- `Ctrl+Shift+C` - Create Child Node
-- `Ctrl+Shift+R` - Create Related Node
-
-Assign in Settings → Hotkeys → Nexus Properties
-
 ## Next Steps
 
 - [Excluded Properties](excluded-properties) - Control inheritance
