@@ -68,14 +68,6 @@ Related: ["[[Task 1]]"]
 **File rename**: All references updated automatically
 **Relationship removal**: Reverse relationship removed automatically
 
-## Best Practices
-
-1. **Choose one direction**: Set relationships in parent notes, let plugin sync
-2. **Use wiki links**: Always use `[[note name]]` format
-3. **Consistent property names**: Stick with defaults or customize once
-4. **Let plugin work**: Don't manually sync relationships
-5. **Rescan if needed**: Settings → "Index and assign properties to all files"
-
 ## Common Patterns
 
 **Project management**:
