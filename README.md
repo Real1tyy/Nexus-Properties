@@ -30,34 +30,37 @@
 
 ## 📸 Screenshots
 
-### Relationship Graph View
+### Hierarchical View
 
-![Relationship Graph View](docs-site/static/img/graph_view.png)
+![Hierarchical View](docs-site/static/img/screenshots/hierarchical-view.png)
 
-*Interactive graph visualization with hierarchical layout, color-coded nodes, and powerful filtering*
+*Parent-child tree structure with automatic hierarchical layout*
 
-### Zoom Mode & Node Preview
+### Related View
 
-![Zoom Mode](docs-site/static/img/zoom_mode.png)
+![Related View](docs-site/static/img/screenshots/related-view.png)
 
-*Click any node to preview its content, frontmatter, and navigate relationships*
+*Direct related connections in radial layout*
 
-### Context Menus & Node Creation
+### All Related View
 
-<p align="center">
-<img src="docs-site/static/img/context_menu.png" alt="Context Menu" width="45%">
-<img src="docs-site/static/img/node_creation.png" alt="Node Creation" width="45%">
-</p>
+![All Related View](docs-site/static/img/screenshots/all-related-view.png)
 
-*Right-click for quick actions and create child/parent/related nodes with property inheritance*
+*Entire constellation of related notes with recursive traversal*
 
-### Color Rules & Filtering
+### Bases View
 
-![Color Rules](docs-site/static/img/color_rules.png)
+![Bases View](docs-site/static/img/screenshots/bases-view.png)
 
-*JavaScript-powered color rules and filtering for intelligent graph visualization*
+*List-based view of current note's relationships*
 
-Check out the [complete screenshots gallery](https://real1tyy.github.io/Nexus-Properties/screenshots) in the documentation to see all the plugin's visuals, including graph views, zoom mode, tooltips, settings, and more.
+### Zoom Mode
+
+![Zoom Mode](docs-site/static/img/screenshots/zoom-mode.png)
+
+*Click any node to preview content and frontmatter inline*
+
+Check out the [complete screenshots gallery](https://real1tyy.github.io/Nexus-Properties/screenshots) in the documentation to see all features in detail.
 
 ---
 
