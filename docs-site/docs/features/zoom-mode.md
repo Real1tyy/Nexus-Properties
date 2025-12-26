@@ -4,390 +4,74 @@ sidebar_position: 7
 
 # Zoom Mode
 
-Zoom Mode allows you to preview any note directly within the graph view without leaving the visualization. Click any node to enter zoom mode and see its content inline.
+Preview notes inline by clicking any node in the graph. View frontmatter and content without leaving the visualization.
 
-## Entering Zoom Mode
+## Entering & Exiting
 
-### Click a Node
+**Enter**: Click any node
+**Switch focus**: Click another node while in zoom mode
+**Exit**: Click the focused node again, or click outside the graph
 
-**From normal view**:
-1. Click any node in the graph
-2. Zoom mode activates
-3. Preview panel appears at bottom
-4. Node is highlighted with focus indicator
+**Focus indicator**: Focused node has a thick blue border (3px, `#2563eb`)
 
-**Already in zoom mode**:
-1. Click a different node
-2. Focus switches to that node
-3. Preview updates instantly
-4. No need to exit and re-enter
+## Preview Panel
 
-### Focus Indicator
-
-The focused node is highlighted with:
-- **Thicker border** (3px)
-- **Bright blue border** (`#2563eb`)
-- **Higher z-index** (appears above other nodes)
-
-## Exiting Zoom Mode
-
-Three ways to exit zoom mode:
-
-1. **Click focused node again** - Click the same node that's currently focused
-2. **Command**: "Toggle Focus Content" or "Toggle Focus Frontmatter"
-3. **Click outside** the graph and preview area
-
-## Zoom Preview Panel
-
-The preview panel appears at the bottom of the graph view and contains two sections:
+The preview panel appears at the bottom with two sections:
 
 ### Frontmatter Section
 
-Shows the node's frontmatter properties in a formatted view.
-
-**Features**:
-- **Property names** on the left
-- **Property values** on the right
-- **Wiki links** are clickable
-- **Arrays** shown as bulleted lists
-- **Objects** shown as nested properties
-- **Empty properties** hidden (if setting enabled)
-- **Underscore properties** hidden (if setting enabled)
-
-**Height**: Controlled by [Zoom Preview Frontmatter Height](../configuration#zoom-preview-frontmatter-height)
+- Property key-value pairs
+- Clickable wiki links
+- Arrays as bulleted lists
+- Respects [property display settings](../configuration#property-display)
+- Height: [Zoom Preview Frontmatter Height](../configuration#zoom-preview-frontmatter-height) (50-300px, default 90px)
 
 ### Content Section
 
-Shows the note's markdown content (body text, excluding frontmatter).
+- Rendered markdown
+- Clickable links
+- Scrollable
+- Height: [Zoom Preview Height](../configuration#zoom-preview-height) (120-700px, default 280px)
 
-**Features**:
-- **Rendered markdown** - Headings, lists, etc. are formatted
-- **Clickable links** - Wiki links and external links work
-- **Scrollable** - For long content
-- **Readable formatting** - Proper line spacing and typography
+## Toggling Sections
 
-**Height**: Controlled by [Zoom Preview Height](../configuration#zoom-preview-height)
+**Eye icons** in header toggle visibility:
+- Left icon: Frontmatter
+- Right icon: Content
 
-## Toggling Visibility
+**Commands**:
+- "Toggle Focus Content (Zoom Preview)"
+- "Toggle Focus Frontmatter (Zoom Preview)"
 
-Each section (frontmatter and content) can be toggled independently.
+**Default visibility**: [Configure in settings](../configuration#zoom-hide-frontmatter-by-default)
 
-### Eye Icons
+## Navigation
 
-Two eye icons appear in the zoom preview header:
+### Clicking
 
-- **Left icon**: Toggle frontmatter visibility
-- **Right icon**: Toggle content visibility
+- **Wiki links**: Navigate to linked node, stay in zoom mode
+- **Other nodes**: Switch focus instantly
+- **Edges**: Focus on target node
+- **External links**: Open in browser
 
-**Click to toggle**:
-- **Open eye** (👁️) - Section is visible
-- **Closed eye** (👁️‍🗨️) - Section is hidden
+### Keyboard
 
-### Default Visibility
+**Arrow keys**:
+- **⬆️ Up**: Navigate to parent
+- **⬇️ Down**: Navigate to child
+- **⬅️ Left**: Navigate to left node (spatial)
+- **➡️ Right**: Navigate to right node (spatial)
 
-Configure default visibility in settings:
+**Tree navigation** (hierarchical mode only):
+- **⏎ Enter**: Next tree root (wraps around)
+- **⇧ Shift+Enter**: Previous tree root (wraps around)
 
-**[Zoom: Hide Frontmatter by Default](../configuration#zoom-hide-frontmatter-by-default)**
-- `true` - Frontmatter starts hidden
-- `false` - Frontmatter starts visible (default)
-
-**[Zoom: Hide Content by Default](../configuration#zoom-hide-content-by-default)**
-- `true` - Content starts hidden
-- `false` - Content starts visible (default)
-
-### Commands
-
-You can also toggle visibility with commands:
-
-**"Toggle Focus Content (Zoom Preview)"**
-- Shows/hides the content section
-- Only works when in zoom mode
-
-**"Toggle Focus Frontmatter (Zoom Preview)"**
-- Shows/hides the frontmatter section
-- Only works when in zoom mode
-
-:::tip Hotkeys
-Assign hotkeys to these commands for quick toggling (Settings → Hotkeys → Nexus Properties)
+:::tip
+Keyboard shortcuts disabled when typing in search/filter inputs
 :::
-
-## Navigating in Zoom Mode
-
-### Clicking Links
-
-**Wiki links** in frontmatter or content are clickable:
-
-**In frontmatter**:
-- Click a wiki link
-- Graph switches focus to that node
-- Preview updates to show the linked note
-- Stays in zoom mode
-
-**In content**:
-- Click a wiki link
-- Same behavior as frontmatter links
-- Navigate through your notes without leaving zoom mode
-
-**External links**:
-- Open in browser
-- Zoom mode stays active
-
-### Clicking Other Nodes
-
-While in zoom mode:
-1. Click any other node in the graph
-2. Focus immediately switches
-3. Preview updates instantly
-4. No need to exit/re-enter
-
-### Clicking Edges
-
-**Click an edge** (line between nodes):
-1. Focus switches to the target node
-2. Preview updates
-3. Stays in zoom mode
-
-Useful for quickly navigating relationships.
-
-### Keyboard Navigation
-
-**Navigate with arrow keys** while in zoom mode:
-
-**⬆️ Up Arrow** - Navigate to parent node
-- Follows incoming edges (parent-child relationships)
-- Moves to the source of the first incoming edge
-- Useful for moving up hierarchies
-
-**⬇️ Down Arrow** - Navigate to child node
-- Follows outgoing edges (parent-child relationships)
-- Moves to the target of the first outgoing edge
-- Useful for exploring children and descendants
-
-**⬅️ Left Arrow** - Navigate to node on the left
-- Finds the closest node positioned to the left
-- Uses spatial positioning in the graph
-- Prioritizes horizontal distance
-
-**➡️ Right Arrow** - Navigate to node on the right
-- Finds the closest node positioned to the right
-- Uses spatial positioning in the graph
-- Prioritizes horizontal distance
-
-#### Tree Navigation (Folder Notes Only)
-
-**⏎ Enter** - Navigate to next tree root (right)
-- Only works in folder notes graphs (hierarchical mode)
-- Jumps to the root of the next tree to the right
-- Wraps around to the first tree when at the last tree
-- Useful for reviewing multiple independent hierarchies
-
-**⇧ Shift+Enter** - Navigate to previous tree root (left)
-- Only works in folder notes graphs (hierarchical mode)
-- Jumps to the root of the previous tree to the left
-- Wraps around to the last tree when at the first tree
-- Complements Enter for bidirectional tree traversal
-
-**How it works**:
-1. Enter zoom mode by clicking any node
-2. Use arrow keys to navigate between nodes
-3. Use Enter/Shift+Enter to jump between tree roots (folder notes only)
-4. Preview updates automatically as you navigate
-5. Keyboard shortcuts are disabled when typing in search/filter inputs
-
-## Zoom Preview Configuration
-
-### Panel Height
-
-Control how much space the preview takes:
-
-**Zoom Preview Height** (120px - 700px, default 280px):
-- Smaller: More graph visible, less content shown
-- Larger: Less graph visible, more content shown
-- Adjust based on your screen size and workflow
-
-**Zoom Preview Frontmatter Height** (50px - 300px, default 90px):
-- Smaller: Fewer properties visible, more scrolling
-- Larger: More properties visible, takes more space
-- Adjust based on typical frontmatter size
-
-[Configure in settings](../configuration#zoom-preview-height)
-
-### Property Display
-
-**Hide Empty Properties**:
-- Enabled: Empty/null values don't show in preview
-- Disabled: All properties shown, even if empty
-
-**Hide Underscore Properties**:
-- Enabled: Properties starting with `_` are hidden
-- Disabled: All properties shown, including internal ones
-
-[Configure in settings](../configuration#property-display)
-
-## Use Cases
-
-### Quick Reference
-
-**Scenario**: Reviewing project tasks
-
-1. View project in "Hierarchical" mode
-2. Click each task to preview details
-3. Check status, notes, links
-4. No need to open each file
-
-**Benefit**: Fast overview of entire project
-
-### Note Navigation
-
-**Scenario**: Following a trail of connected ideas
-
-1. Start at a concept note
-2. Enter zoom mode
-3. Click links in frontmatter/content
-4. Navigate through related concepts
-5. Stay in graph context
-
-**Benefit**: Visual navigation path, never lose context
-
-### Content Review
-
-**Scenario**: Reviewing notes for completeness
-
-1. Filter to show specific notes
-2. Enter zoom mode on first note
-3. Review frontmatter and content
-4. Click next node to continue
-5. Toggle sections as needed
-
-**Benefit**: Efficient batch review
-
-### Relationship Exploration
-
-**Scenario**: Understanding connections
-
-1. View in "All Related" mode
-2. Click each node to preview
-3. See what properties they share
-4. Understand why they're related
-5. Follow links to dig deeper
-
-**Benefit**: Discover patterns and connections
-
-## Tips & Tricks
-
-### Keyboard Navigation
-
-1. **Use arrow keys** for hands-free navigation:
-   - Up/Down: Navigate parent-child relationships
-   - Left/Right: Navigate spatially positioned nodes
-   - Fast traversal without mouse
-2. **Use Enter/Shift+Enter in folder notes**:
-   - Enter: Jump to next tree root (right)
-   - Shift+Enter: Jump to previous tree root (left)
-   - Quickly review multiple independent hierarchies
-3. **Assign hotkeys** to toggle commands:
-   - Toggle Focus Content
-   - Toggle Focus Frontmatter
-4. **Combine keyboard and mouse**:
-   - Arrow keys for quick traversal
-   - Enter/Shift+Enter for tree jumping (folder notes)
-   - Mouse clicks for jumping to distant nodes
-5. **Efficient workflow** without constantly reaching for mouse
-
-### Two-Panel Workflow
-
-1. **Keep zoom mode open** for preview
-2. **Double-click nodes** to open in new tab
-3. **Edit in tab**, preview in graph
-4. **Best of both worlds**
-
-### Hide Distractions
-
-1. **Hide frontmatter** if you only care about content
-2. **Hide content** if you only care about properties
-3. **Toggle as needed** for focused viewing
-
-### Size Optimization
-
-**Small screens**:
-- Reduce preview height (180-220px)
-- Reduce frontmatter height (60-80px)
-- More graph space
-
-**Large screens**:
-- Increase preview height (400-500px)
-- Increase frontmatter height (150-200px)
-- See more at once
-
-### Performance
-
-**For large files**:
-- Hide content section when not needed
-- Reduces rendering overhead
-- Faster node switching
-
-## Troubleshooting
-
-### Preview Not Showing
-
-**Check zoom mode active**:
-- Look for highlighted node (blue border)
-- Click node to enter zoom mode
-
-**Check panel height**:
-- May be set too small
-- Increase in settings
-- Minimum 120px
-
-**Check file exists**:
-- Deleted files can't be previewed
-- Orphaned nodes have no content
-
-### Content Not Rendering
-
-**Check markdown syntax**:
-- Invalid markdown may not render
-- Check file directly in Obsidian
-
-**Check file not empty**:
-- Empty files show blank preview
-- Check that content exists
-
-**Check visibility toggle**:
-- Eye icon may be closed
-- Click to show content section
-
-### Links Not Clickable
-
-**Check link format**:
-- Must be valid wiki links `[[note]]`
-- Or valid markdown links `[text](url)`
-
-**Check link target exists**:
-- Broken links may not be clickable
-- Verify target file exists
-
-**Check not in edit mode**:
-- Links only clickable in preview mode
-- Zoom mode is always preview mode
-
-### Slow Performance
-
-**Large files**:
-- Hide content section when not needed
-- Or reduce preview height
-
-**Many properties**:
-- Enable "Hide empty properties"
-- Hide frontmatter when not needed
-
-**Frequent switching**:
-- Normal - rendering takes time
-- Consider increasing animation duration for smoother feel
 
 ## Next Steps
 
-- [Learn about Tooltips](tooltips) for hover-based previews
-- [Use Context Menus](context-menus) for quick actions
-- [Configure Zoom Settings](../configuration#zoom-preview-height)
-- [Explore Graph Views](graph-views) in zoom mode
+- [Tooltips](tooltips) - Hover-based previews
+- [Context Menus](context-menus) - Quick actions
+- [Graph Views](graph-views) - View modes

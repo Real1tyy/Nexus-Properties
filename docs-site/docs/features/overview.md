@@ -4,208 +4,48 @@ sidebar_position: 1
 
 # Features Overview
 
-Nexus Properties provides a comprehensive suite of features for managing and visualizing relationships in your Obsidian vault. This page gives you a bird's-eye view of what the plugin can do.
-
 ## Core Features
 
-### 🔗 Bidirectional Relationship Management
+### 🔗 [Bidirectional Sync](bidirectional-sync)
+Set relationships in one direction, plugin syncs the reverse automatically. Optional sibling auto-linking.
 
-Automatically synchronize parent-child and related relationships across your vault.
+### 📊 [Graph Views](graph-views)
+Visualize relationships with **Hierarchical** (trees), **Related** (direct connections), and **All Related** (constellations) modes.
 
-- Set a child in one file, parent is auto-updated in the other
-- Create related connections that sync bidirectionally
-- Automatic sibling linking (optional)
-- Recursive tree computation
+### 📝 [Bases View](bases-view)
+List-based view of current note's relationships. Shows children, parent, and related notes with custom sorting.
 
-**[Learn more →](bidirectional-sync)**
+### 🎨 [Color Rules](color-rules)
+Apply conditional colors using JavaScript expressions. First matching rule wins.
 
----
+### 🔍 [Filtering](filtering)
+JavaScript expression-based filtering with named presets. Multi-expression AND logic.
 
-### 📊 Interactive Relationship Graph
+### 🔬 [Zoom Mode](zoom-mode)
+Click nodes to preview frontmatter and content inline. Navigate with arrow keys or by clicking links.
 
-Visualize your knowledge network with multiple viewing modes and layouts.
+### 🎯 [Context Menus](context-menus)
+Right-click nodes/edges for quick actions: open, add relationships, edit, preview, copy path.
 
-**View Modes:**
-- **Hierarchical** - Parent-child tree structures
-- **Related** - Direct related connections
-- **All Related** - Entire constellations of related notes
-- **Start from Current** - Focus on specific nodes
+### 💬 [Tooltips](tooltips)
+Hover nodes to see properties. Clickable wiki links, configurable width.
 
-**[Learn more →](graph-views)**
+### 🔎 [Search](search)
+Real-time search by filename/path. Highlights matches, dims non-matches.
 
----
+### ⚡ [Node Creation](node-creation)
+Create parent/child/related nodes with property inheritance and bidirectional linking.
 
-### 📝 Bases View
+### 🗂️ [Node Layout](node-layout)
+Automatic positioning: Dagre for hierarchies, constellation for networks. Collision detection included.
 
-A focused, list-based view of the current note's relationships.
+### ⚙️ [Property Exclusion](excluded-properties)
+Control which properties copy to new nodes. Default and path-based rules.
 
-**Features:**
-- **Children** - Notes that reference the current note as a parent
-- **Parent** - Notes that reference the current note as a child
-- **Related** - Notes with mutual related connections
-- Automatically filters out archived notes
-- Real-time updates when switching notes
-- Clean, linear navigation interface
+## Quick Start
 
-Perfect for focused work on a single note's context without visual clutter.
-
-**[Learn more →](bases-view)**
-
----
-
-### 🎨 Node Color Rules
-
-Apply conditional colors to nodes based on frontmatter properties.
-
-- Create JavaScript expressions to define color rules
-- Unlimited custom rules with priority ordering
-- Visual categories for instant identification
-- Supports hex, HSL, and named CSS colors
-
-**[Learn more →](color-rules)**
-
----
-
-### 🔍 Filtering System
-
-Focus on relevant parts of your knowledge network with powerful filtering.
-
-- JavaScript expression-based filtering
-- Named filter presets for quick access
-- Multi-expression AND logic
-- Filter persists across sessions
-
-**[Learn more →](filtering)**
-
----
-
-### 🔬 Zoom Mode
-
-Deep-dive into any node with inline preview.
-
-- Click any node to enter zoom mode
-- View frontmatter and content inline
-- Navigate between nodes without leaving the graph
-- Use arrow keys for keyboard navigation (Up/Down for parent/child, Left/Right for spatial)
-- Toggle visibility of frontmatter/content sections
-
-**[Learn more →](zoom-mode)**
-
----
-
-### 🎯 Context Menus
-
-Right-click any node or edge for quick actions.
-
-**Node Context Menu:**
-- Open file
-- Open in new tab
-- Add parent/child/related relationships
-- Edit node frontmatter
-- View node preview
-- Copy node path
-
-**Edge Context Menu:**
-- Remove relationship
-- Navigate to connected nodes
-- View relationship details
-
-**[Learn more →](context-menus)**
-
----
-
-### 💬 Property Tooltips
-
-Hover over nodes to see their properties instantly.
-
-- Shows all frontmatter properties
-- Clickable wiki links in tooltips
-- Configurable width
-- Respects hide empty/underscore settings
-- Can be toggled with hotkey
-
-**[Learn more →](tooltips)**
-
----
-
-### 🔎 Graph Search
-
-Quickly find and highlight nodes in the graph.
-
-- Real-time search as you type
-- Highlights matching nodes
-- Dims non-matching nodes
-- Keyboard-accessible
-- Toggle with command
-
-**[Learn more →](search)**
-
----
-
-### ⚡ Quick Node Creation
-
-Create parent, child, or related nodes instantly from commands.
-
-- **Create Parent Node** - Creates a parent with bidirectional link
-- **Create Child Node** - Creates a child with bidirectional link
-- **Create Related Node** - Creates a related node with bidirectional link
-
-**[Learn more →](node-creation)**
-
----
-
-### 🗂️ Smart Layout System
-
-Automatic organization of nodes for optimal visualization.
-
-**Constellation-Based:**
-- Groups of related notes form constellations
-- Automatic spacing and collision detection
-- Hierarchical arrangement for parent-child
-- Radial arrangement for related networks
-
-**Layout Modes:**
-- **Dagre** - Tree layout for hierarchies
-- **Constellation** - Grouped layout for related networks
-- Automatic switching based on view mode
-
-**[Learn more →](node-layout)**
-
----
-
-### ⚙️ Property Exclusion
-
-Control which properties are copied when creating new nodes.
-
-- Default exclusion list applies to all nodes
-- Path-based rules for specific directories
-- Exclude relationship and system properties
-- Customizable per-directory rules
-
-**[Learn more →](excluded-properties)**
-
----
-
-### Hotkey Support
-
-Assign custom hotkeys to any command:
-- Show relationship graph
-- Toggle features
-- Navigate graph
-- Create nodes
-- And more...
-
----
-
-## What's Next?
-
-Explore each feature in detail:
-
-1. **Start with the basics**: [Bidirectional Sync](bidirectional-sync)
-2. **Master the graph**: [Graph Views](graph-views)
-3. **Add visual categories**: [Color Rules](color-rules)
-4. **Focus your view**: [Filtering](filtering)
-5. **Dive deeper**: [Zoom Mode](zoom-mode)
-6. **Speed up your workflow**: [Node Creation](node-creation)
-
-Or jump to [Configuration](../configuration) to customize everything!
+1. [Bidirectional Sync](bidirectional-sync) - Understand relationship management
+2. [Graph Views](graph-views) - Explore visualization modes
+3. [Color Rules](color-rules) - Add visual categories
+4. [Filtering](filtering) - Focus on subsets
+5. [Configuration](../configuration) - Customize settings
