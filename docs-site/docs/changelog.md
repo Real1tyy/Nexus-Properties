@@ -13,11 +13,15 @@ All notable changes to Nexus Properties will be documented here.
 #### Empty Graph When Switching Views
 - **Fixed Graph Not Rendering**: Fixed issue where the graph would sometimes appear empty when opening a note with the sidebar collapsed, then opening the sidebar. The graph now automatically renders when the view becomes visible.
 
+#### Reduced Console Noise
+- **Suppressed Unnecessary Warnings**: Eliminated console warnings about null or empty frontmatter properties. Empty properties are now silently handled without logging.
+
 #### Graph Relationship Resolution
 - **Improved Link Resolution**: Enhanced link resolution to properly handle files in folders using Obsidian's `getFirstLinkpathDest()` API, which respects folder context when resolving relative links. This allows users to use relative link paths for notes.
 
 #### Best Practice Recommendation
 - **Use Absolute Paths**: When manually creating wiki links in frontmatter (e.g., `[[Test/Child]]` instead of `[[Child]]`), use absolute paths to avoid ambiguity when multiple files have the same name in different folders.
+
 
 ---
 

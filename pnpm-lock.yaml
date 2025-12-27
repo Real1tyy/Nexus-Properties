@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@real1ty-obsidian-plugins/utils':
-        specifier: ^2.19.1
-        version: 2.19.1(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)
+        specifier: ^2.19.2
+        version: 2.19.2(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)
       cytoscape:
         specifier: ^3.33.1
         version: 3.33.1
@@ -617,8 +617,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@real1ty-obsidian-plugins/utils@2.19.1':
-    resolution: {integrity: sha512-dRpyvFi1AECennwkPJC2TzDpY5zrSPO06wFlMSTO+eYNFpW5nBtjwpIpevlwpJlxGAPQflmSgLbK1bJX4fi8nw==}
+  '@real1ty-obsidian-plugins/utils@2.19.2':
+    resolution: {integrity: sha512-ggQQI9SsF6k0ZJaxeWF+ECV+YzdOx550N+OWZtzC4kaKxaJfazhWf6G2M1W+sYRkTmsCkMCH0TIKlr4urkODEA==}
 
   '@rollup/rollup-android-arm-eabi@4.54.0':
     resolution: {integrity: sha512-OywsdRHrFvCdvsewAInDKCNyR3laPA2mc9bRYJ6LBp5IyvF3fvXbbNR0bSzHlZVFtn6E0xw2oZlyjg4rKCVcng==}
@@ -1681,7 +1681,7 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@11.16.2':
     optional: true
 
-  '@real1ty-obsidian-plugins/utils@2.19.1(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)':
+  '@real1ty-obsidian-plugins/utils@2.19.2(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)':
     dependencies:
       colord: 2.9.3
       gray-matter: 4.0.3
