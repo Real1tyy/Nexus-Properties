@@ -70,6 +70,12 @@ Large constellations can be slow. Reduce max depth if needed.
 
 **Scroll**: Zoom in/out
 
+**Double left-click**: Zoom in toward clicked position (on background)
+
+**Double right-click**: Zoom out from clicked position (on background)
+
+**Zoom indicator**: Click the zoom level display (in filter row) to type a specific zoom percentage
+
 **Center on Source**: Use the "Center on Source Node" command to quickly return to the original source file's position (or switch zoom focus if in zoom mode)
 
 ## Next Steps

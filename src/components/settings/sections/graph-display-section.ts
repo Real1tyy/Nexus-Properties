@@ -24,6 +24,12 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 			desc: "Display the filter bar (preset selector and expression input) in the graph view when it loads. You can still toggle it with commands.",
 		});
 
+		this.uiBuilder.addToggle(container, {
+			key: "showZoomIndicator",
+			name: "Show zoom indicator",
+			desc: "Display the zoom level indicator in the filter row. Shows current zoom percentage and allows typing a specific zoom level.",
+		});
+
 		this.uiBuilder.addSlider(container, {
 			key: "graphEnlargedWidthPercent",
 			name: "Graph enlarged width",

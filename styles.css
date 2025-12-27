@@ -671,6 +671,36 @@
 	z-index: 1;
 }
 
+/* Zoom Indicator */
+.nexus-properties-zoom-indicator {
+	display: flex;
+	align-items: center;
+	margin-left: 8px;
+	padding: 4px 10px;
+	background-color: var(--background-secondary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	flex-shrink: 0;
+}
+
+.nexus-properties-zoom-indicator-input {
+	width: 60px;
+	padding: 2px 6px;
+	background-color: transparent;
+	border: none;
+	color: var(--text-normal);
+	font-size: 0.85em;
+	font-family: var(--font-monospace);
+	text-align: center;
+	outline: none;
+	cursor: text;
+}
+
+.nexus-properties-zoom-indicator-input:focus {
+	background-color: var(--background-primary);
+	border-radius: 4px;
+}
+
 /* Node Preview Modal */
 .nexus-properties-node-preview-modal .modal-content {
 	max-width: 700px;

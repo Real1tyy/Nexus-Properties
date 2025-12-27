@@ -12,6 +12,7 @@ import { GraphFilterPresetSelector } from "../graph/filter-preset-selector";
 import { GraphHeader } from "../graph/header";
 import { GraphInteractionHandler } from "../graph/interaction-handler";
 import { NodeContextMenu } from "../graph/node-context-menu";
+import { ZoomIndicator } from "../graph/zoom-indicator";
 import { GraphZoomManager } from "../graph/zoom-manager";
 import { GraphZoomPreview } from "../graph/zoom-preview";
 import { GraphFilter } from "../input-managers/graph-filter";
@@ -52,9 +53,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	private searchRowEl: HTMLElement | null = null;
 	private graphFilter: GraphFilter | null = null;
 	private graphFilterPresetSelector: GraphFilterPresetSelector | null = null;
+	private filterRowEl: HTMLElement | null = null;
 	private zoomManager: GraphZoomManager;
 	private interactionHandler: GraphInteractionHandler;
 	private layoutManager: GraphLayoutManager;
+	private zoomIndicator: ZoomIndicator | null = null;
 	private pendingGraphData: { nodes: ElementDefinition[]; edges: ElementDefinition[] } | null = null;
 
 	constructor(
@@ -216,6 +219,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		);
 		this.graphFilter.setPersistentlyVisible(showFilterBar);
 
+		this.filterRowEl = filterRowEl;
 		this.applyPreFillFilter();
 
 		// Create a wrapper for zoom preview (sits between header and graph)
@@ -358,6 +362,14 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				this.hideFilterRow();
 			}
 
+			// Show/hide zoom indicator based on settings
+			if (settings.showZoomIndicator && !this.zoomIndicator && this.cy && this.filterRowEl) {
+				this.zoomIndicator = new ZoomIndicator(this.filterRowEl, this.cy);
+			} else if (!settings.showZoomIndicator && this.zoomIndicator) {
+				this.zoomIndicator.destroy();
+				this.zoomIndicator = null;
+			}
+
 			if (this.currentFile && !this.isUpdating) {
 				this.updateGraph();
 			}
@@ -469,6 +481,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.currentFile = null;
 		this.graphContainerEl = null;
 		this.previewWrapperEl = null;
+		this.filterRowEl = null;
 		this.pendingGraphData = null;
 	}
 
@@ -682,6 +695,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	}
 
 	private destroyGraph(): void {
+		if (this.zoomIndicator) {
+			this.zoomIndicator.destroy();
+			this.zoomIndicator = null;
+		}
+
 		if (this.cy) {
 			// Stop all ongoing animations before destroying
 			this.cy.stop();
@@ -842,6 +860,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.cy.edges().addClass("core");
 
 		this.interactionHandler.setupInteractions();
+
+		const settings = this.plugin.settingsStore.settings$.value;
+		if (this.filterRowEl && settings.showZoomIndicator) {
+			this.zoomIndicator = new ZoomIndicator(this.filterRowEl, this.cy);
+		}
 	}
 
 	private renderGraph(nodes: ElementDefinition[], edges: ElementDefinition[]): void {

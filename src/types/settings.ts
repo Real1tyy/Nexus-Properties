@@ -92,6 +92,7 @@ export const NexusPropertiesSettingsSchema = z
 		showSearchBar: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_SEARCH_BAR),
 		showFilterBar: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_FILTER_BAR),
 		showViewSwitcherHeader: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_VIEW_SWITCHER_HEADER),
+		showZoomIndicator: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_ZOOM_INDICATOR),
 
 		// Graph filtering settings
 		filterExpressions: z.array(z.string()).catch([]),

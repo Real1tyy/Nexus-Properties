@@ -23,6 +23,17 @@ All notable changes to Nexus Properties will be documented here.
   - **In zoom mode**: Switches zoom focus to the source node while staying in zoom mode.
 - **Smooth Animation**: Uses your configured [Graph Animation Duration](configuration#graph-animation-duration) for consistent transitions.
 
+#### Double-Click Zoom Controls
+- **Double Left-Click**: Zoom in toward the clicked position on the graph background.
+- **Double Right-Click**: Zoom out from the clicked position on the graph background.
+- **Fast and Intuitive**: Quick way to navigate the graph without using scroll wheel or zoom buttons.
+
+#### Zoom Level Indicator
+- **Visual Feedback**: Displays current zoom level (e.g., "100%") in the filter row, to the right of filter controls.
+- **Editable Input**: Click the zoom indicator to type a specific zoom level.
+- **Quick Zoom**: Press Enter to apply or Escape to cancel.
+- **Smart Clamping**: Automatically clamps values to valid zoom range (30%-300%).
+
 ### Improvements
 
 #### Smart Node Creation Workflow

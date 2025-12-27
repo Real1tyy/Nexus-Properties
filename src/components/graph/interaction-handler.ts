@@ -29,9 +29,13 @@ export class GraphInteractionHandler {
 		private readonly config: GraphInteractionConfig
 	) {}
 
-	// Track background taps to detect double left-clicks for quick zoom
+	// Track background taps to detect double left-clicks for zoom in
 	private lastBackgroundTapTime = 0;
 	private lastBackgroundTapRenderedPos: { x: number; y: number } | null = null;
+
+	// Track background right-clicks to detect double right-clicks for zoom out
+	private lastBackgroundRightClickTime = 0;
+	private lastBackgroundRightClickRenderedPos: { x: number; y: number } | null = null;
 
 	// Track the child node we came from when navigating to parent
 	// This allows intelligent backtracking: up then down returns to same child
@@ -155,55 +159,85 @@ export class GraphInteractionHandler {
 	}
 
 	private setupDoubleClickZoom(): void {
+		const DOUBLE_TAP_MS = 300;
+		const MAX_DISTANCE_PX = 24;
+		const ZOOM_FACTOR = 1.6;
+
 		// Double left-click (double tap) on background zooms in toward clicked position
 		this.cy.on("tap", (evt) => {
-			// Only act on background taps to avoid interfering with node/edge interactions
 			if (evt.target !== this.cy) return;
 
 			const originalEvent = evt.originalEvent as MouseEvent | undefined;
-			// Respect only left mouse button when available
 			if (originalEvent && typeof originalEvent.button === "number" && originalEvent.button !== 0) return;
 
-			const now = Date.now();
-			const renderedPos = evt.renderedPosition;
-			if (!renderedPos) return;
+			this.handleDoubleClick(evt, "in", DOUBLE_TAP_MS, MAX_DISTANCE_PX, ZOOM_FACTOR);
+		});
 
-			const DOUBLE_TAP_MS = 300;
-			const MAX_DISTANCE_PX = 24;
+		// Double right-click (double cxttap) on background zooms out from clicked position
+		this.cy.on("cxttap", (evt) => {
+			if (evt.target !== this.cy) return;
 
-			const withinTime = now - this.lastBackgroundTapTime <= DOUBLE_TAP_MS;
-			const withinDistance = this.lastBackgroundTapRenderedPos
-				? Math.hypot(
-						this.lastBackgroundTapRenderedPos.x - renderedPos.x,
-						this.lastBackgroundTapRenderedPos.y - renderedPos.y
-					) <= MAX_DISTANCE_PX
-				: false;
+			this.handleDoubleClick(evt, "out", DOUBLE_TAP_MS, MAX_DISTANCE_PX, ZOOM_FACTOR);
+		});
+	}
 
-			if (withinTime && withinDistance) {
-				// Reset tracking
+	private handleDoubleClick(
+		evt: any,
+		direction: "in" | "out",
+		doubleTapMs: number,
+		maxDistancePx: number,
+		zoomFactor: number
+	): void {
+		const now = Date.now();
+		const renderedPos = evt.renderedPosition;
+		if (!renderedPos) return;
+
+		const isZoomIn = direction === "in";
+		const lastTime = isZoomIn ? this.lastBackgroundTapTime : this.lastBackgroundRightClickTime;
+		const lastPos = isZoomIn ? this.lastBackgroundTapRenderedPos : this.lastBackgroundRightClickRenderedPos;
+
+		const withinTime = now - lastTime <= doubleTapMs;
+		const withinDistance = lastPos
+			? Math.hypot(lastPos.x - renderedPos.x, lastPos.y - renderedPos.y) <= maxDistancePx
+			: false;
+
+		if (withinTime && withinDistance) {
+			// Reset tracking
+			if (isZoomIn) {
 				this.lastBackgroundTapTime = 0;
 				this.lastBackgroundTapRenderedPos = null;
-
-				// Compute target zoom and pan to center the clicked model position
-				const currentZoom = this.cy.zoom();
-				const ZOOM_FACTOR = 1.6; // slightly aggressive to feel faster than wheel
-				const targetZoom = Math.min(currentZoom * ZOOM_FACTOR, this.cy.maxZoom());
-				const modelPos = evt.position;
-				if (!modelPos) return;
-
-				const viewportCenter = { x: this.cy.width() / 2, y: this.cy.height() / 2 };
-				const targetPan = {
-					x: viewportCenter.x - modelPos.x * targetZoom,
-					y: viewportCenter.y - modelPos.y * targetZoom,
-				};
-
-				this.cy.stop();
-				this.cy.animate({ zoom: targetZoom, pan: targetPan }, { duration: 160, easing: "ease-out" });
 			} else {
+				this.lastBackgroundRightClickTime = 0;
+				this.lastBackgroundRightClickRenderedPos = null;
+			}
+
+			// Compute target zoom and pan to center the clicked model position
+			const currentZoom = this.cy.zoom();
+			const targetZoom = isZoomIn
+				? Math.min(currentZoom * zoomFactor, this.cy.maxZoom())
+				: Math.max(currentZoom / zoomFactor, this.cy.minZoom());
+
+			const modelPos = evt.position;
+			if (!modelPos) return;
+
+			const viewportCenter = { x: this.cy.width() / 2, y: this.cy.height() / 2 };
+			const targetPan = {
+				x: viewportCenter.x - modelPos.x * targetZoom,
+				y: viewportCenter.y - modelPos.y * targetZoom,
+			};
+
+			this.cy.stop();
+			this.cy.animate({ zoom: targetZoom, pan: targetPan }, { duration: 160, easing: "ease-out" });
+		} else {
+			// Update tracking
+			if (isZoomIn) {
 				this.lastBackgroundTapTime = now;
 				this.lastBackgroundTapRenderedPos = { x: renderedPos.x, y: renderedPos.y };
+			} else {
+				this.lastBackgroundRightClickTime = now;
+				this.lastBackgroundRightClickRenderedPos = { x: renderedPos.x, y: renderedPos.y };
 			}
-		});
+		}
 	}
 
 	private addSparkleAnimations(): void {
