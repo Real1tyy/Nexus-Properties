@@ -9,6 +9,7 @@ import type { App, TFile } from "obsidian";
 import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
+import { getUniqueParentFilePath } from "../utils/file-utils";
 
 type NodeCreationType = "parent" | "child" | "related";
 
@@ -35,9 +36,8 @@ export class NodeCreator {
 				throw new Error(`No frontmatter found for ${sourceFile.basename}`);
 			}
 
-			const fileName = this.generateFileName(sourceFile.basename, type);
 			const folder = sourceFile.parent?.path || "";
-			const filePath = getUniqueFilePath(this.app, folder, fileName);
+			const filePath = this.getUniqueFilePathForType(folder, sourceFile.basename, type);
 
 			const newFile = await this.app.vault.create(filePath, "");
 
@@ -50,8 +50,26 @@ export class NodeCreator {
 		}
 	}
 
-	private generateFileName(sourceBasename: string, _type: NodeCreationType): string {
-		return `${sourceBasename} - `;
+	private getUniqueFilePathForType(folder: string, sourceBasename: string, type: NodeCreationType): string {
+		// For parent nodes, we need custom logic to place numbers before the dash
+		if (type === "parent") {
+			return getUniqueParentFilePath(this.app, folder, sourceBasename);
+		}
+
+		// For child and related, use standard getUniqueFilePath
+		const fileName = this.generateFileName(sourceBasename, type);
+		return getUniqueFilePath(this.app, folder, fileName);
+	}
+
+	private generateFileName(sourceBasename: string, type: NodeCreationType): string {
+		switch (type) {
+			case "child":
+				return `${sourceBasename} - `;
+			case "parent":
+				return ` - ${sourceBasename}`; // Not used for parent, handled separately
+			case "related":
+				return `${sourceBasename} `;
+		}
 	}
 
 	private async setupFrontmatter(

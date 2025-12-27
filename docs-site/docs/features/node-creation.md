@@ -22,7 +22,7 @@ Create parent, child, or related nodes instantly from commands. New nodes inheri
 2. Inherits frontmatter (except [excluded properties](excluded-properties))
 3. Sets bidirectional relationship
 4. Generates unique Zettel ID (if configured)
-5. Opens file for editing with cursor at end of inline title
+5. Opens file for editing with cursor intelligently positioned based on node type
 
 ## Property Inheritance
 
@@ -52,14 +52,27 @@ Create parent, child, or related nodes instantly from commands. New nodes inheri
 
 ## File Naming
 
-**Pattern**: `[source-name] - .md`
+**Smart Naming Patterns**: Each node type uses an optimized naming pattern and cursor position for efficient workflow.
 
-**Examples**:
-- Source: `Project Overview.md`
-- New child: `Project Overview - .md`
-- Next child: `Project Overview - 1.md` (auto-increment)
+### Create Child Node
+- **Pattern**: `[source-name] - .md`
+- **Example**: `Project Overview.md` → `Project Overview - .md`
+- **Cursor**: Positioned at the **end** (after the dash) to type the child name
+- **Auto-increment**: `Project Overview - 1.md`, `Project Overview - 2.md`, etc.
 
-**Auto-focus**: Inline title input automatically focused, cursor at end
+### Create Parent Node
+- **Pattern**: ` - [source-name].md`
+- **Example**: `Task List.md` → ` - Task List.md`
+- **Cursor**: Positioned at the **very beginning** (before the dash) to type the parent name
+- **Auto-increment**: `1 - Task List.md`, `2 - Task List.md`, etc.
+
+### Create Related Node
+- **Pattern**: `[source-name] .md`
+- **Example**: `Meeting Notes.md` → `Meeting Notes .md`
+- **Cursor**: Positioned at the **end** (after the space) to type the related name
+- **Auto-increment**: `Meeting Notes  1.md`, `Meeting Notes  2.md`, etc.
+
+**Fast Focus**: Inline title is automatically focused
 
 ## Configuration
 

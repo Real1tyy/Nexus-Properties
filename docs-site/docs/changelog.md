@@ -8,6 +8,16 @@ All notable changes to Nexus Properties will be documented here.
 
 ## 1.4.0
 
+### Improvements
+
+#### Smart Node Creation Workflow
+- **Type-Specific Naming**: Node creation now uses intelligent naming patterns based on relationship type:
+  - **Create Child Node**: Adds ` - ` at the end (e.g., "Parent - ") with cursor positioned to type the child name
+  - **Create Parent Node**: Adds ` - ` at the start (e.g., " - Child") with cursor positioned at the very beginning to type the parent name
+  - **Create Related Node**: Adds a space only (e.g., "Note ") with cursor at the end for immediate typing
+- **Context-Aware Cursor Positioning**: Cursor automatically positions at the optimal location for each node type, making the naming workflow intuitive and efficient
+- **Faster Response**: Reduced focus delay from 100ms to 30ms for snappier interaction
+
 ### Bug Fixes
 
 #### Empty Graph When Switching Views

@@ -126,17 +126,25 @@ Now that you have a basic network, let's explore the graph features:
 
 ## Step 6: Create Nodes Quickly
 
-Nexus Properties provides commands to quickly create related nodes:
+Nexus Properties provides commands to quickly create related nodes with smart naming:
 
 1. Open `Project Overview.md`
 2. Open command palette (`Ctrl/Cmd+P`)
 3. Search for "Create Child Node"
 4. A new child note will be created with:
+   - Name starting as `Project Overview - ` (cursor positioned at the end to type child name)
    - All properties inherited from the parent
    - Automatic bidirectional relationship
    - A unique Zettel ID
+5. **Instantly start typing** - the inline title is auto-focused for immediate editing
 
-Try the same with "Create Parent Node" and "Create Related Node"!
+### Smart Naming by Node Type
+
+- **Create Child Node**: `Parent - ` (cursor at end)
+- **Create Parent Node**: ` - Child` (cursor at beginning)
+- **Create Related Node**: `Note ` (cursor at end)
+
+Each command positions your cursor optimally so you can start typing the new name right away!
 
 ## Step 7: Add Visual Categories with Color Rules
 

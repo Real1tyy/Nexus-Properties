@@ -232,7 +232,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 			if (newFile) {
 				const leaf = this.app.workspace.getLeaf("tab");
 				await leaf.openFile(newFile);
-				await this.focusInlineTitle(leaf);
+				await this.focusInlineTitle(leaf, type);
 
 				new Notice(`✅ Created ${typeLabel} node: ${newFile.basename}`);
 			} else {
@@ -244,8 +244,8 @@ export default class NexusPropertiesPlugin extends Plugin {
 		}
 	}
 
-	private async focusInlineTitle(leaf: WorkspaceLeaf): Promise<void> {
-		await new Promise((resolve) => setTimeout(resolve, 100));
+	private async focusInlineTitle(leaf: WorkspaceLeaf, type: "parent" | "child" | "related"): Promise<void> {
+		await new Promise((resolve) => setTimeout(resolve, 30));
 
 		const view = leaf.view;
 		if (!(view instanceof MarkdownView)) return;
@@ -259,7 +259,16 @@ export default class NexusPropertiesPlugin extends Plugin {
 		const selection = window.getSelection();
 		if (selection) {
 			range.selectNodeContents(inlineTitle);
-			range.collapse(false);
+
+			// Position cursor based on node type
+			if (type === "parent") {
+				// Focus at the very start (before the dash)
+				range.collapse(true);
+			} else {
+				// Focus at the end for child and related
+				range.collapse(false);
+			}
+
 			selection.removeAllRanges();
 			selection.addRange(range);
 		}
