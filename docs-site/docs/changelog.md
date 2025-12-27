@@ -11,9 +11,9 @@ All notable changes to Nexus Properties will be documented here.
 ### Bug Fixes
 
 #### Mobile Graph Rendering
-- **Fixed Graph Not Rendering on Mobile**: Graph view now properly renders on mobile devices using responsive CSS with explicit viewport-based height calculations.
-- **Responsive Media Queries**: Added mobile-specific styles that ensure proper container dimensions for mobile viewports.
-- **Automatic Sizing**: Graph container now uses explicit height calculations to work reliably across different mobile devices.
+- **Fixed Graph Not Rendering on Mobile**: Graph view now properly renders on mobile devices by ensuring the container respects the viewport height (`height: 100%`).
+- **Responsive Layout**: Disabled the enlarge/expand functionality on mobile to prevent layout conflicts and ensure the graph fits naturally within the mobile sidebar.
+- **Robust Sizing**: Added explicit height properties to graph containers to guarantee they fill the available space in the mobile interface.
 
 ## 1.4.0
 

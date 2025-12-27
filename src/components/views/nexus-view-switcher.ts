@@ -1,4 +1,4 @@
-import { ItemView, type WorkspaceLeaf } from "obsidian";
+import { ItemView, Platform, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
@@ -218,6 +218,10 @@ export class NexusViewSwitcher extends ItemView {
 	 * Toggle enlargement of the view (expand/collapse sidebar)
 	 */
 	toggleEnlargement(): void {
+		if (Platform.isMobile) {
+			return;
+		}
+
 		// Find the current view's leaf
 		const leaves = this.app.workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
 		if (leaves.length === 0) return;
