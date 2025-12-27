@@ -938,6 +938,31 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.zoomManager.toggleHideFrontmatter();
 	}
 
+	public centerOnSource(): void {
+		if (!this.cy || !this.currentFile) return;
+
+		const sourcePath = this.currentFile.path;
+		const settings = this.plugin.settingsStore.settings$.value;
+
+		if (this.zoomManager.isInZoomMode()) {
+			this.focusOnNode(sourcePath);
+		} else {
+			const sourceNode = this.cy.nodes().filter((node) => node.data("isSource") === true);
+
+			if (sourceNode.length > 0) {
+				this.cy.animate({
+					center: { eles: sourceNode },
+					fit: { eles: this.cy.elements(), padding: 50 },
+					duration: settings.graphAnimationDuration,
+					easing: "ease-out",
+				});
+			} else {
+				this.cy.fit();
+				this.cy.center();
+			}
+		}
+	}
+
 	private openFile(linkPath: string, event: MouseEvent): void {
 		// Resolve the file
 		const file = this.app.metadataCache.getFirstLinkpathDest(linkPath, this.currentFile?.path || "");

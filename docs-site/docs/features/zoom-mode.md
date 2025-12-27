@@ -76,6 +76,10 @@ The preview panel appears at the bottom with two sections:
 - **⏎ Enter**: Next tree root (wraps around)
 - **⇧ Shift+Enter**: Previous tree root (wraps around)
 
+**Quick return to source**:
+- **Center on Source Node** command: Returns focus to the original source file in zoom mode
+- [Assign a hotkey](../hotkeys) for quick access
+
 ## Next Steps
 
 - [Tooltips](tooltips) - Hover-based previews

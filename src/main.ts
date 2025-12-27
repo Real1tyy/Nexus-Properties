@@ -73,6 +73,12 @@ export default class NexusPropertiesPlugin extends Plugin {
 		});
 
 		this.addCommand({
+			id: "center-on-source",
+			name: "Center on Source Node",
+			callback: () => this.executeGraphViewMethod("centerOnSource", "Open the Relationship Graph to center on source"),
+		});
+
+		this.addCommand({
 			id: "create-parent-node",
 			name: "Create Parent Node",
 			checkCallback: (checking: boolean) => this.handleNodeCreationCommand(checking, "parent"),

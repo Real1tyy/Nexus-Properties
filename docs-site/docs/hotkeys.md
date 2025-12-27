@@ -24,6 +24,8 @@ All Nexus Properties commands support custom hotkey assignment. Assign hotkeys i
 
 **Toggle Graph Filter (Preset Selector)**: Show/hide preset dropdown for saved filters
 
+**Center on Source Node**: Re-center the graph on the source node (or switch zoom focus to source if in zoom mode)
+
 ### Zoom Mode
 
 **Toggle Focus Content (Zoom Preview)**: Show/hide content section in zoom preview

@@ -70,6 +70,8 @@ Large constellations can be slow. Reduce max depth if needed.
 
 **Scroll**: Zoom in/out
 
+**Center on Source**: Use the "Center on Source Node" command to quickly return to the original source file's position (or switch zoom focus if in zoom mode)
+
 ## Next Steps
 
 - [Node Layout](node-layout) - How nodes are positioned

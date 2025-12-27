@@ -12,9 +12,16 @@ All notable changes to Nexus Properties will be documented here.
 
 #### Render as Root
 - **Context Menu Action**: Right-click any node and select "Render as Root" to make it the new root of the hierarchy.
-- **Remove Parent Nodes**: Automatically removes all ancestor nodes (parents, grandparents, etc.) above the selected node.
-- **Focus on Subtrees**: Quickly isolate and focus on a specific branch of your hierarchy by removing everything above it.
-- **Clean Visualization**: The graph re-centers and fits the remaining nodes for optimal viewing.
+- **Subtree Isolation**: Removes all nodes except the selected node and its complete descendant tree.
+- **Clean Focus**: Eliminates parent branches, sibling branches, and all unrelated nodes from view.
+- **Automatic Re-centering**: The graph automatically re-centers and fits the remaining subtree for optimal viewing.
+
+#### Center on Source Node
+- **Command**: New "Center on Source Node" command to quickly return focus to the original source file.
+- **Context-Aware Behavior**:
+  - **Not in zoom mode**: Re-centers and fits the entire graph, highlighting the source node.
+  - **In zoom mode**: Switches zoom focus to the source node while staying in zoom mode.
+- **Smooth Animation**: Uses your configured [Graph Animation Duration](configuration#graph-animation-duration) for consistent transitions.
 
 ### Improvements
 
