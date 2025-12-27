@@ -176,7 +176,7 @@ export class GeneralSection implements SettingsSection {
 			placeholder: "e.g., Parent, Child, Related, _ZettelID",
 		});
 
-		const excludedPropertiesContainer = container.createDiv("settings-subsection");
+		const excludedPropertiesContainer = container.createDiv(cls("settings-subsection"));
 
 		const description = excludedPropertiesContainer.createDiv("setting-item-description");
 		description.createEl("p", {
@@ -226,19 +226,19 @@ export class GeneralSection implements SettingsSection {
 		const { pathExcludedProperties } = this.plugin.settingsStore.currentSettings;
 
 		if (pathExcludedProperties.length === 0) {
-			const emptyState = this.excludedPropertyRulesContainer.createDiv("settings-empty-state");
+			const emptyState = this.excludedPropertyRulesContainer.createDiv(cls("settings-empty-state"));
 			emptyState.textContent = "No rules defined. Click 'Add Rule' to create one.";
 			return;
 		}
 
 		pathExcludedProperties.forEach((rule, index) => {
-			const ruleContainer = this.excludedPropertyRulesContainer!.createDiv("color-rule-item");
-			const mainRow = ruleContainer.createDiv("color-rule-main-row");
-			const leftSection = mainRow.createDiv("color-rule-left");
+			const ruleContainer = this.excludedPropertyRulesContainer!.createDiv(cls("color-rule-item"));
+			const mainRow = ruleContainer.createDiv(cls("color-rule-main-row"));
+			const leftSection = mainRow.createDiv(cls("color-rule-left"));
 
 			leftSection.createEl("span", {
 				text: `#${index + 1}`,
-				cls: "color-rule-order",
+				cls: cls("color-rule-order"),
 			});
 
 			const toggle = createRuleToggle(rule.enabled, async (checked) => {
@@ -251,7 +251,7 @@ export class GeneralSection implements SettingsSection {
 			});
 			leftSection.appendChild(toggle);
 
-			const pathInput = createRuleInput(rule.path, "Projects/", "color-rule-expression-input", async (value) => {
+			const pathInput = createRuleInput(rule.path, "Projects/", cls("color-rule-expression-input"), async (value) => {
 				await this.plugin.settingsStore.updateSettings((current) => ({
 					...current,
 					pathExcludedProperties: current.pathExcludedProperties.map((existingRule) =>
@@ -261,7 +261,7 @@ export class GeneralSection implements SettingsSection {
 			});
 			leftSection.appendChild(pathInput);
 
-			const rightSection = mainRow.createDiv("color-rule-right");
+			const rightSection = mainRow.createDiv(cls("color-rule-right"));
 			const propertiesInput = createRuleInput(
 				rule.excludedProperties.join(", "),
 				"status, progress, date",
@@ -282,7 +282,7 @@ export class GeneralSection implements SettingsSection {
 			);
 			rightSection.appendChild(propertiesInput);
 
-			const controlsSection = rightSection.createDiv("color-rule-controls");
+			const controlsSection = rightSection.createDiv(cls("color-rule-controls"));
 			createMoveButtons({
 				container: controlsSection,
 				index,

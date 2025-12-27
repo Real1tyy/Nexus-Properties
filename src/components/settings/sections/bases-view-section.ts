@@ -3,6 +3,7 @@ import { Setting } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
+import { cls } from "../../../utils/css";
 
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
@@ -105,14 +106,14 @@ export class BasesViewSettingsSection implements SettingsSection {
 				text.inputEl.rows = 6;
 			});
 
-		const includedPropertiesContainer = container.createDiv("settings-subsection");
+		const includedPropertiesContainer = container.createDiv(cls("settings-subsection"));
 
 		const description = includedPropertiesContainer.createDiv("setting-item-description");
 		description.createEl("p", {
 			text: "Define path-based rules to include ADDITIONAL properties as columns for files in specific directories. The default properties above are always included. Rules are evaluated in order - the first matching path's properties are ADDED to the default list.",
 		});
 
-		const examplesContainer = description.createDiv("settings-info-box");
+		const examplesContainer = description.createDiv(cls("settings-info-box"));
 		examplesContainer.createEl("strong", { text: "Example path-based inclusion rules:" });
 		const examplesList = examplesContainer.createEl("ul");
 
@@ -130,21 +131,21 @@ export class BasesViewSettingsSection implements SettingsSection {
 		];
 
 		for (const example of examples) {
-			const listItem = examplesList.createEl("li", { cls: "color-example-item" });
-			listItem.createEl("code", { text: example.path, cls: "settings-info-box-example" });
-			listItem.createSpan({ text: "→", cls: "color-arrow" });
-			listItem.createEl("code", { text: example.properties, cls: "settings-info-box-example" });
-			listItem.createSpan({ text: `: ${example.description}`, cls: "color-example-description" });
+			const listItem = examplesList.createEl("li", { cls: cls("color-example-item") });
+			listItem.createEl("code", { text: example.path, cls: cls("settings-info-box-example") });
+			listItem.createSpan({ text: "→", cls: cls("color-arrow") });
+			listItem.createEl("code", { text: example.properties, cls: cls("settings-info-box-example") });
+			listItem.createSpan({ text: `: ${example.description}`, cls: cls("color-example-description") });
 		}
 
-		const infoBox = description.createDiv("settings-info-box");
+		const infoBox = description.createDiv(cls("settings-info-box"));
 		infoBox.createEl("strong", { text: "Column order:" });
 		const orderList = infoBox.createEl("ol");
 		orderList.createEl("li", { text: "file.name (always first)" });
 		orderList.createEl("li", { text: "Default included properties (in order specified)" });
 		orderList.createEl("li", { text: "Path-specific properties (in order specified)" });
 
-		const warning = description.createDiv("settings-warning-box");
+		const warning = description.createDiv(cls("settings-warning-box"));
 		warning.createEl("strong", { text: "⚠️ Important:" });
 		warning.createEl("p", {
 			text: "Path matching uses startsWith - a file matches if its path starts with the rule's path. Default properties are ALWAYS included. Path rules ADD additional columns on top of the defaults.",
@@ -185,20 +186,20 @@ export class BasesViewSettingsSection implements SettingsSection {
 		const { pathBasesIncludedProperties } = this.plugin.settingsStore.currentSettings;
 
 		if (pathBasesIncludedProperties.length === 0) {
-			const emptyState = this.includedPropertyRulesContainer.createDiv("settings-empty-state");
+			const emptyState = this.includedPropertyRulesContainer.createDiv(cls("settings-empty-state"));
 			emptyState.textContent =
 				"No path-based inclusion rules defined. Click 'Add Rule' to create one. Default included properties will be used for all files.";
 			return;
 		}
 
 		pathBasesIncludedProperties.forEach((rule, index) => {
-			const ruleContainer = this.includedPropertyRulesContainer!.createDiv("color-rule-item");
-			const mainRow = ruleContainer.createDiv("color-rule-main-row");
-			const leftSection = mainRow.createDiv("color-rule-left");
+			const ruleContainer = this.includedPropertyRulesContainer!.createDiv(cls("color-rule-item"));
+			const mainRow = ruleContainer.createDiv(cls("color-rule-main-row"));
+			const leftSection = mainRow.createDiv(cls("color-rule-left"));
 
 			leftSection.createEl("span", {
 				text: `#${index + 1}`,
-				cls: "color-rule-order",
+				cls: cls("color-rule-order"),
 			});
 
 			const toggle = createRuleToggle(rule.enabled, async (checked) => {
@@ -211,7 +212,7 @@ export class BasesViewSettingsSection implements SettingsSection {
 			});
 			leftSection.appendChild(toggle);
 
-			const pathInput = createRuleInput(rule.path, "Projects/", "color-rule-expression-input", async (value) => {
+			const pathInput = createRuleInput(rule.path, "Projects/", cls("color-rule-expression-input"), async (value) => {
 				await this.plugin.settingsStore.updateSettings((current) => ({
 					...current,
 					pathBasesIncludedProperties: current.pathBasesIncludedProperties.map((existingRule) =>
@@ -221,11 +222,11 @@ export class BasesViewSettingsSection implements SettingsSection {
 			});
 			leftSection.appendChild(pathInput);
 
-			const rightSection = mainRow.createDiv("color-rule-right");
+			const rightSection = mainRow.createDiv(cls("color-rule-right"));
 			const propertiesInput = createRuleInput(
 				rule.includedProperties.join(", "),
 				"status, priority, tags",
-				"included-properties-input",
+				cls("included-properties-input"),
 				async (value) => {
 					const propertiesArray = value
 						.split(",")
@@ -242,7 +243,7 @@ export class BasesViewSettingsSection implements SettingsSection {
 			);
 			rightSection.appendChild(propertiesInput);
 
-			const controlsSection = rightSection.createDiv("color-rule-controls");
+			const controlsSection = rightSection.createDiv(cls("color-rule-controls"));
 			createMoveButtons({
 				container: controlsSection,
 				index,

@@ -45,13 +45,13 @@ export class RulesSection implements SettingsSection {
 				});
 			});
 
-		const colorRulesContainer = container.createDiv("settings-subsection");
+		const colorRulesContainer = container.createDiv(cls("settings-subsection"));
 		const descriptionContainer = colorRulesContainer.createDiv("setting-item-description");
 		descriptionContainer.createEl("p", {
 			text: "Define color rules based on frontmatter properties. Rules are evaluated in order - the first matching rule determines the node color.",
 		});
 
-		const examplesContainer = descriptionContainer.createDiv("settings-info-box");
+		const examplesContainer = descriptionContainer.createDiv(cls("settings-info-box"));
 		examplesContainer.createEl("strong", { text: "Example color rules:" });
 		const examplesList = examplesContainer.createEl("ul");
 
@@ -79,15 +79,15 @@ export class RulesSection implements SettingsSection {
 		];
 
 		for (const example of examples) {
-			const listItem = examplesList.createEl("li", { cls: "color-example-item" });
-			listItem.createEl("code", { text: example.expression, cls: "settings-info-box-example" });
-			listItem.createSpan({ text: "→", cls: "color-arrow" });
-			const colorSpan = listItem.createEl("span", { cls: "color-example-dot" });
+			const listItem = examplesList.createEl("li", { cls: cls("color-example-item") });
+			listItem.createEl("code", { text: example.expression, cls: cls("settings-info-box-example") });
+			listItem.createSpan({ text: "→", cls: cls("color-arrow") });
+			const colorSpan = listItem.createEl("span", { cls: cls("color-example-dot") });
 			colorSpan.style.setProperty("--example-color", example.color);
-			listItem.createSpan({ text: example.description, cls: "color-example-description" });
+			listItem.createSpan({ text: example.description, cls: cls("color-example-description") });
 		}
 
-		const warningContainer = descriptionContainer.createDiv("settings-warning-box");
+		const warningContainer = descriptionContainer.createDiv(cls("settings-warning-box"));
 		warningContainer.createEl("strong", { text: "⚠️ Important:" });
 		warningContainer.createEl("p", {
 			text: "Access frontmatter properties directly by name. Invalid expressions will be ignored. Colors can be CSS color names, hex codes, or HSL values.",
@@ -121,7 +121,7 @@ export class RulesSection implements SettingsSection {
 
 	private addPreFillPresetSelector(container: HTMLElement): void {
 		// Create info box explaining the difference
-		const infoContainer = container.createDiv("settings-info-box");
+		const infoContainer = container.createDiv(cls("settings-info-box"));
 		infoContainer.createEl("strong", { text: "Pre-fill vs Default Filters:" });
 		const infoList = infoContainer.createEl("ul");
 		infoList.createEl("li", {
@@ -177,7 +177,7 @@ export class RulesSection implements SettingsSection {
 			text: "Show only nodes (and their edges) whose frontmatter matches ALL expressions. Each line should be a JavaScript expression returning true/false. Access frontmatter properties directly by name. The source node is always shown.",
 		});
 
-		const examplesContainer = description.createDiv("settings-info-box");
+		const examplesContainer = description.createDiv(cls("settings-info-box"));
 		examplesContainer.createEl("strong", { text: "Example filter expressions:" });
 		const examplesList = examplesContainer.createEl("ul");
 
@@ -197,13 +197,13 @@ export class RulesSection implements SettingsSection {
 		];
 
 		for (const example of examples) {
-			const listItem = examplesList.createEl("li", { cls: "color-example-item" });
-			listItem.createEl("code", { text: example.expression, cls: "settings-info-box-example" });
-			listItem.createSpan({ text: "→", cls: "color-arrow" });
-			listItem.createSpan({ text: example.description, cls: "color-example-description" });
+			const listItem = examplesList.createEl("li", { cls: cls("color-example-item") });
+			listItem.createEl("code", { text: example.expression, cls: cls("settings-info-box-example") });
+			listItem.createSpan({ text: "→", cls: cls("color-arrow") });
+			listItem.createSpan({ text: example.description, cls: cls("color-example-description") });
 		}
 
-		const warningContainer = description.createDiv("settings-warning-box");
+		const warningContainer = description.createDiv(cls("settings-warning-box"));
 		warningContainer.createEl("strong", { text: "⚠️ Important:" });
 		warningContainer.createEl("p", {
 			text: "Access frontmatter properties directly by name. Invalid expressions will be ignored. All expressions must evaluate to true for a node to be shown.",
@@ -258,7 +258,7 @@ export class RulesSection implements SettingsSection {
 		const { colorRules } = this.plugin.settingsStore.currentSettings;
 
 		if (colorRules.length === 0) {
-			const emptyState = this.colorRulesListContainer.createDiv("settings-empty-state");
+			const emptyState = this.colorRulesListContainer.createDiv(cls("settings-empty-state"));
 			emptyState.textContent = "No color rules defined. Click 'Add Rule' to create one.";
 			return;
 		}
@@ -354,7 +354,7 @@ export class RulesSection implements SettingsSection {
 		const { filterPresets } = this.plugin.settingsStore.settings$.value;
 
 		if (filterPresets.length === 0) {
-			const emptyState = this.filterPresetsContainer.createDiv("settings-empty-state");
+			const emptyState = this.filterPresetsContainer.createDiv(cls("settings-empty-state"));
 			emptyState.textContent = "No filter presets defined. Click 'Add Preset' to create one.";
 			return;
 		}
