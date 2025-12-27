@@ -12,8 +12,8 @@ importers:
   .:
     dependencies:
       '@real1ty-obsidian-plugins/utils':
-        specifier: ^2.19.0
-        version: 2.19.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)
+        specifier: ^2.19.1
+        version: 2.19.1(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)
       cytoscape:
         specifier: ^3.33.1
         version: 3.33.1
@@ -42,18 +42,15 @@ importers:
       esbuild:
         specifier: 0.25.11
         version: 0.25.11
-      fast-check:
-        specifier: ^4.5.2
-        version: 4.5.2
       jsdom:
         specifier: ^27.4.0
         version: 27.4.0
       knip:
-        specifier: ^5.77.2
-        version: 5.77.2(@types/node@24.10.4)(typescript@5.9.3)
+        specifier: ^5.77.4
+        version: 5.77.4(@types/node@24.10.4)(typescript@5.9.3)
       obsidian:
         specifier: 1.10.0
-        version: 1.10.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)
+        version: 1.10.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)
       tslib:
         specifier: 2.8.1
         version: 2.8.1
@@ -134,8 +131,8 @@ packages:
   '@codemirror/state@6.5.2':
     resolution: {integrity: sha512-FVqsPqtPWKVVL3dPSxy8wEF/ymIEuVzF1PK3VbUgrxXpJUSHQWWZz4JMToquRxnkw+36LTamCZG2iua2Ptq0fA==}
 
-  '@codemirror/view@6.38.6':
-    resolution: {integrity: sha512-qiS0z1bKs5WOvHIAC0Cybmv4AJSkAXgX5aD6Mqd2epSLlVJsQl8NG23jCVouIgkh4All/mrbdsf2UOLFnJw0tw==}
+  '@codemirror/view@6.38.1':
+    resolution: {integrity: sha512-RmTOkE7hRU3OVREqFVITWHz6ocgBjv08GoePscAakgVQfciA3SGCEk7mb9IzwW61cKKmlTpHXG6DUE5Ubx+MGQ==}
 
   '@csstools/color-helpers@5.1.0':
     resolution: {integrity: sha512-S11EXWJyy0Mz5SYvRmY8nJYTFFd1LCNV+7cXyAgQtOOuzb4EsgfqDufL+9esx72/eLhsRdGZwaldu/h+E4t4BA==}
@@ -620,8 +617,8 @@ packages:
     cpu: [x64]
     os: [win32]
 
-  '@real1ty-obsidian-plugins/utils@2.19.0':
-    resolution: {integrity: sha512-AjVxm424OV4aTRiadcUL9gMm3OvRj+EKxPBapUkA+bp5a5wDo0qZ3HrJNNGY3roDZBNGYhbjPCIWQmYgGSrsnw==}
+  '@real1ty-obsidian-plugins/utils@2.19.1':
+    resolution: {integrity: sha512-dRpyvFi1AECennwkPJC2TzDpY5zrSPO06wFlMSTO+eYNFpW5nBtjwpIpevlwpJlxGAPQflmSgLbK1bJX4fi8nw==}
 
   '@rollup/rollup-android-arm-eabi@4.54.0':
     resolution: {integrity: sha512-OywsdRHrFvCdvsewAInDKCNyR3laPA2mc9bRYJ6LBp5IyvF3fvXbbNR0bSzHlZVFtn6E0xw2oZlyjg4rKCVcng==}
@@ -902,10 +899,6 @@ packages:
     resolution: {integrity: sha512-zCnTtlxNoAiDc3gqY2aYAWFx7XWWiasuF2K8Me5WbN8otHKTUKBwjPtNpRs/rbUZm7KxWAaNj7P1a/p52GbVug==}
     engines: {node: '>=0.10.0'}
 
-  fast-check@4.5.2:
-    resolution: {integrity: sha512-tOzL01LMrDIWPLfvMiGUMH0AjqnOelHQPmgvYkW/aRO4Yaw+pBQqWmyebNzAEbKOigoCN8HkRWUZXFkjmiaXMQ==}
-    engines: {node: '>=12.17.0'}
-
   fast-glob@3.3.3:
     resolution: {integrity: sha512-7MptL8U0cqcFdzIzwOTHoilX9x5BrNqye7Z/LuC7kCMRio1EMSyqRK3BEAUD7sXRq4iT4AzTVuZdhgQ2TCvYLg==}
     engines: {node: '>=8.6.0'}
@@ -1009,8 +1002,8 @@ packages:
     resolution: {integrity: sha512-dcS1ul+9tmeD95T+x28/ehLgd9mENa3LsvDTtzm3vyBEO7RPptvAD+t44WVXaUjTBRcrpFeFlC8WCruUR456hw==}
     engines: {node: '>=0.10.0'}
 
-  knip@5.77.2:
-    resolution: {integrity: sha512-72qngCK+RKOq0pSM82O7HH/ZCCSelT20RJn/AR24gYVN0xcbOgjIQBf6RjjHdlS1zMBZdPYP6QGX3q6bzbXcJA==}
+  knip@5.77.4:
+    resolution: {integrity: sha512-CmRd3UabOBqA4lDUAMA8CJeepIoQPD2qRqq0wCnLz9Z3FTlG1iucZ7puwe+i3zV0gUaIWVYgC8cXoDMZEC+DyA==}
     engines: {node: '>=18.18.0'}
     hasBin: true
     peerDependencies:
@@ -1096,9 +1089,6 @@ packages:
   punycode@2.3.1:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
-
-  pure-rand@7.0.1:
-    resolution: {integrity: sha512-oTUZM/NAZS8p7ANR3SHh30kXB+zK2r2BPcEn/awJIbOvq82WoMN4p62AWWp3Hhw50G0xMsw1mhIBLqHw64EcNQ==}
 
   queue-microtask@1.2.3:
     resolution: {integrity: sha512-NuaNSa6flKT5JaSYQzJok04JzTL1CA6aGhv5rfLW3PgqA+M2ChpZQnAC8h8i4ZFkBS8X5RqkDBHA7r4hej3K9A==}
@@ -1403,7 +1393,7 @@ snapshots:
     dependencies:
       '@marijn/find-cluster-break': 1.0.2
 
-  '@codemirror/view@6.38.6':
+  '@codemirror/view@6.38.1':
     dependencies:
       '@codemirror/state': 6.5.2
       crelt: 1.0.6
@@ -1691,12 +1681,12 @@ snapshots:
   '@oxc-resolver/binding-win32-x64-msvc@11.16.2':
     optional: true
 
-  '@real1ty-obsidian-plugins/utils@2.19.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)':
+  '@real1ty-obsidian-plugins/utils@2.19.1(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)':
     dependencies:
       colord: 2.9.3
       gray-matter: 4.0.3
       luxon: 3.7.2
-      obsidian: 1.10.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6)
+      obsidian: 1.10.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)
       rxjs: 7.8.2
       tslib: 2.8.1
       zod: 4.2.1
@@ -1988,10 +1978,6 @@ snapshots:
     dependencies:
       is-extendable: 0.1.1
 
-  fast-check@4.5.2:
-    dependencies:
-      pure-rand: 7.0.1
-
   fast-glob@3.3.3:
     dependencies:
       '@nodelib/fs.stat': 2.0.5
@@ -2113,7 +2099,7 @@ snapshots:
 
   kind-of@6.0.3: {}
 
-  knip@5.77.2(@types/node@24.10.4)(typescript@5.9.3):
+  knip@5.77.4(@types/node@24.10.4)(typescript@5.9.3):
     dependencies:
       '@nodelib/fs.walk': 1.2.8
       '@types/node': 24.10.4
@@ -2159,10 +2145,10 @@ snapshots:
 
   nanoid@3.3.11: {}
 
-  obsidian@1.10.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.6):
+  obsidian@1.10.0(@codemirror/state@6.5.2)(@codemirror/view@6.38.1):
     dependencies:
       '@codemirror/state': 6.5.2
-      '@codemirror/view': 6.38.6
+      '@codemirror/view': 6.38.1
       '@types/codemirror': 5.60.8
       moment: 2.29.4
 
@@ -2210,8 +2196,6 @@ snapshots:
       source-map-js: 1.2.1
 
   punycode@2.3.1: {}
-
-  pure-rand@7.0.1: {}
 
   queue-microtask@1.2.3: {}
 

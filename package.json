@@ -45,13 +45,14 @@
 		"builtin-modules": "5.0.0",
 		"esbuild": "0.25.11",
 		"jsdom": "^27.4.0",
-		"knip": "^5.77.2",
+		"knip": "^5.77.4",
+		"obsidian": "1.10.0",
 		"tslib": "2.8.1",
 		"typescript": "5.9.3",
 		"vitest": "^3.2.4"
 	},
 	"dependencies": {
-		"@real1ty-obsidian-plugins/utils": "^2.19.0",
+		"@real1ty-obsidian-plugins/utils": "^2.19.1",
 		"cytoscape": "^3.33.1",
 		"cytoscape-dagre": "^2.5.0",
 		"rxjs": "^7.8.2",
