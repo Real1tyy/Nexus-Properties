@@ -71,6 +71,9 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			onStartRelationship: (sourceNodePath, relationshipType) => {
 				this.relationshipAdder.startSelection(sourceNodePath, relationshipType);
 			},
+			onRenderAsRoot: (nodeId) => {
+				this.renderNodeAsRoot(nodeId);
+			},
 		});
 		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore, () => {
 			this.updateGraph();
@@ -949,5 +952,47 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				this.app.workspace.getLeaf(false).openFile(file);
 			}
 		}
+	}
+
+	private renderNodeAsRoot(nodeId: string): void {
+		if (!this.cy) return;
+
+		const targetNode = this.cy.getElementById(nodeId);
+		if (!targetNode.length) return;
+
+		const nodesToKeep = new Set<string>([nodeId]);
+		const visited = new Set<string>();
+
+		const collectDescendants = (currentNodeId: string): void => {
+			if (visited.has(currentNodeId)) return;
+			visited.add(currentNodeId);
+
+			const currentNode = this.cy!.getElementById(currentNodeId);
+			if (!currentNode.length) return;
+
+			// Get all outgoing edges (edges FROM this node to children)
+			const outgoingEdges = currentNode.outgoers("edge");
+
+			outgoingEdges.forEach((edge) => {
+				const targetId = edge.target().id();
+				// Add this child to nodes to keep
+				nodesToKeep.add(targetId);
+				// Recursively collect descendants of this child
+				collectDescendants(targetId);
+			});
+		};
+
+		collectDescendants(nodeId);
+
+		this.cy.nodes().forEach((node) => {
+			const nodeId = node.id();
+			if (!nodesToKeep.has(nodeId)) {
+				node.remove();
+			}
+		});
+
+		this.cy.resize();
+		this.cy.fit();
+		this.cy.center();
 	}
 }

@@ -17,6 +17,8 @@ Right-click nodes or edges for quick actions.
 
 **Add Parent/Child/Related**: Activates relationship adder mode
 
+**Render as Root**: Removes all parent nodes above the selected node, making it the new root of the hierarchy
+
 **Edit Node**: Opens frontmatter editor modal (not implemented yet)
 
 **View Node Preview**: Opens read-only preview modal (alternative: [Zoom Mode](zoom-mode))

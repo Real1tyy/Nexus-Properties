@@ -8,6 +8,14 @@ All notable changes to Nexus Properties will be documented here.
 
 ## 1.4.0
 
+### New Features
+
+#### Render as Root
+- **Context Menu Action**: Right-click any node and select "Render as Root" to make it the new root of the hierarchy.
+- **Remove Parent Nodes**: Automatically removes all ancestor nodes (parents, grandparents, etc.) above the selected node.
+- **Focus on Subtrees**: Quickly isolate and focus on a specific branch of your hierarchy by removing everything above it.
+- **Clean Visualization**: The graph re-centers and fits the remaining nodes for optimal viewing.
+
 ### Improvements
 
 #### Smart Node Creation Workflow

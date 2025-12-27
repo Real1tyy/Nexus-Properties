@@ -6,6 +6,7 @@ import { NodePreviewModal } from "../node-preview-modal";
 
 interface NodeContextMenuCallbacks {
 	onStartRelationship: (sourceNodePath: string, relationshipType: RelationshipType) => void;
+	onRenderAsRoot: (nodeId: string) => void;
 }
 
 export class NodeContextMenu {
@@ -76,6 +77,17 @@ export class NodeContextMenu {
 				.setIcon("arrow-down")
 				.onClick(() => {
 					this.callbacks.onStartRelationship(filePath, "children");
+				});
+		});
+
+		menu.addSeparator();
+
+		menu.addItem((item) => {
+			item
+				.setTitle("Render as Root")
+				.setIcon("git-branch")
+				.onClick(() => {
+					this.callbacks.onRenderAsRoot(filePath);
 				});
 		});
 
