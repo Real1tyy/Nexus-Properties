@@ -6,6 +6,18 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.4.0
+
+### Bug Fixes
+
+#### Graph Relationship Resolution
+- **Improved Link Resolution**: Enhanced link resolution to properly handle files in folders using Obsidian's `getFirstLinkpathDest()` API, which respects folder context when resolving relative links. This allows users to use relative link paths for notes.
+
+#### Best Practice Recommendation
+- **Use Absolute Paths**: When manually creating wiki links in frontmatter (e.g., `[[Test/Child]]` instead of `[[Child]]`), use absolute paths to avoid ambiguity when multiple files have the same name in different folders.
+
+---
+
 ## 1.3.0
 
 ### New Features

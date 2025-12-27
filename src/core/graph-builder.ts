@@ -72,11 +72,17 @@ export class GraphBuilder {
 		});
 	}
 
-	private resolveValidContexts(wikiLinks: string[], excludePaths: Set<string>): ValidFileContext[] {
+	private resolveValidContexts(wikiLinks: string[], excludePaths: Set<string>, sourcePath: string): ValidFileContext[] {
 		return wikiLinks
 			.map((wikiLink) => {
-				const path = extractFilePath(wikiLink);
-				const fileContext = getFileContext(this.app, path);
+				const linkPath = extractFilePath(wikiLink);
+				const resolvedFile = this.app.metadataCache.getFirstLinkpathDest(linkPath, sourcePath);
+
+				if (!resolvedFile) {
+					return { wikiLink, file: null, frontmatter: null, path: "", pathWithExt: "" };
+				}
+
+				const fileContext = getFileContext(this.app, resolvedFile.path);
 				return { wikiLink, ...fileContext };
 			})
 			.filter((ctx): ctx is ValidFileContext => {
@@ -155,9 +161,9 @@ export class GraphBuilder {
 
 		const relations = this.indexer.extractRelationships(file, frontmatter);
 
-		const validContexts = this.resolveValidContexts(relations.related, processedPaths);
+		const validContexts = this.resolveValidContexts(relations.related, processedPaths, sourcePath);
 
-		const relatedNodes = validContexts.map((ctx) => this.createNodeElement(ctx.wikiLink, 1, false));
+		const relatedNodes = validContexts.map((ctx) => this.createNodeElement(ctx.pathWithExt, 1, false));
 
 		const edges = validContexts.map((ctx) => ({ data: { source: sourcePath, target: ctx.path } }));
 
@@ -196,11 +202,11 @@ export class GraphBuilder {
 			if (currentLevel + 1 >= this.hierarchyMaxDepth) continue;
 
 			const relations = this.indexer.extractRelationships(file, frontmatter);
-			const validChildren = this.resolveValidContexts(relations.children, processedPaths);
+			const validChildren = this.resolveValidContexts(relations.children, processedPaths, currentPath);
 
 			const childNodes = validChildren.map((ctx) =>
 				this.createNodeElement(
-					ctx.wikiLink,
+					ctx.pathWithExt,
 					currentLevel + 1,
 					allowSourceHighlight && ctx.path === sourcePath,
 					parentDisplayName
@@ -239,7 +245,7 @@ export class GraphBuilder {
 			if (!file || !frontmatter) return;
 
 			const relations = this.indexer.extractRelationships(file, frontmatter);
-			const validParents = this.resolveValidContexts(relations.parent, visited);
+			const validParents = this.resolveValidContexts(relations.parent, visited, filePath);
 
 			validParents.forEach((ctx) => {
 				dfsUpwards(ctx.path, currentLevel + 1);
@@ -268,7 +274,7 @@ export class GraphBuilder {
 			if (!file || !frontmatter) continue;
 
 			const relations = this.indexer.extractRelationships(file, frontmatter);
-			const validOrbitals = this.resolveValidContexts(relations.related, allNodePaths);
+			const validOrbitals = this.resolveValidContexts(relations.related, allNodePaths, centerPath);
 
 			// Create constellation if there are orbitals
 			if (validOrbitals.length > 0 || level === 0) {

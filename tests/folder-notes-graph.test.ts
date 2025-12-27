@@ -6,7 +6,8 @@ import type { SettingsStore } from "../src/core/settings-store";
 
 describe("Folder Notes Graph Building", () => {
 	const createMockApp = (files: { path: string; frontmatter?: Record<string, any> }[]): App => {
-		const fileMap = new Map(files.map((f) => [f.path, f]));
+		// Create case-insensitive map (store with normalized lowercase keys, but preserve original paths)
+		const fileMap = new Map(files.map((f) => [f.path.toLowerCase(), { ...f, originalPath: f.path }]));
 
 		return {
 			vault: {
@@ -17,18 +18,40 @@ describe("Folder Notes Graph Building", () => {
 					}))
 				),
 				getAbstractFileByPath: vi.fn((path) => {
-					const file = fileMap.get(path);
-					return file ? { path } : null;
+					const file = fileMap.get(path.toLowerCase());
+					return file ? { path: file.originalPath } : null;
 				}),
 				getFileByPath: vi.fn((path) => {
-					const file = fileMap.get(path);
-					return file ? { path } : null;
+					const file = fileMap.get(path.toLowerCase());
+					return file ? { path: file.originalPath } : null;
 				}),
 			},
 			metadataCache: {
 				getFileCache: vi.fn((file) => {
-					const fileData = fileMap.get(file.path);
+					const fileData = fileMap.get(file.path.toLowerCase());
 					return fileData?.frontmatter ? { frontmatter: fileData.frontmatter } : null;
+				}),
+				getFirstLinkpathDest: vi.fn((linkPath: string, _sourcePath: string) => {
+					// Strip .md extension if present for matching
+					const normalizedLink = linkPath.replace(/\.md$/, "").toLowerCase();
+
+					// Try exact match first (note: fileMap keys are already lowercase)
+					for (const [normalizedPath, data] of fileMap) {
+						const pathWithoutExt = normalizedPath.replace(/\.md$/, "");
+						if (pathWithoutExt === normalizedLink || normalizedPath === linkPath.toLowerCase()) {
+							return { path: data.originalPath };
+						}
+					}
+
+					// Try basename match (for short links like [[Child]])
+					for (const [normalizedPath, data] of fileMap) {
+						const basename = normalizedPath.split("/").pop()?.replace(/\.md$/, "");
+						if (basename === normalizedLink) {
+							return { path: data.originalPath };
+						}
+					}
+
+					return null;
 				}),
 			},
 		} as any;
@@ -441,6 +464,139 @@ describe("Folder Notes Graph Building", () => {
 			expect(task1?.data?.level).toBe(0);
 			expect(task2?.data?.level).toBe(1);
 			expect(task3?.data?.level).toBe(2);
+		});
+	});
+
+	describe("Wiki Link Resolution with Folders (Bug Fix)", () => {
+		it("should resolve short wiki links [[Child]] when files are in same folder", () => {
+			const files = [
+				{ path: "Test/Parent.md", frontmatter: { Child: ["[[Child]]"] } },
+				{ path: "Test/Child.md", frontmatter: { Parent: ["[[Parent]]"] } },
+			];
+
+			const mockApp = createMockApp(files);
+			const mockIndexer = createMockIndexer((file: any, fm: any) => {
+				const parent = fm.Parent || [];
+				const children = fm.Child || [];
+
+				return {
+					filePath: file.path,
+					mtime: 0,
+					parent,
+					children,
+					related: [],
+					frontmatter: fm,
+				};
+			});
+			const mockSettingsStore = createMockSettingsStore();
+
+			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
+			const result = graphBuilder.buildGraph({
+				sourcePath: "Test/Parent.md",
+				renderRelated: false,
+				includeAllRelated: false,
+				startFromCurrent: true,
+			});
+
+			const nodeIds = result.nodes.map((n) => n.data?.id);
+
+			// Should resolve short links and show both nodes
+			expect(nodeIds).toContain("Test/Parent.md");
+			expect(nodeIds).toContain("Test/Child.md");
+
+			// Should have edge between them
+			expect(result.edges).toHaveLength(1);
+			expect(result.edges[0].data).toEqual({
+				source: "Test/Parent.md",
+				target: "Test/Child.md",
+			});
+		});
+
+		it("should resolve short wiki links when files are in different folders", () => {
+			const files = [
+				{ path: "Folder1/Parent.md", frontmatter: { Child: ["[[Child]]"] } },
+				{ path: "Folder2/Child.md", frontmatter: { Parent: ["[[Parent]]"] } },
+			];
+
+			const mockApp = createMockApp(files);
+			const mockIndexer = createMockIndexer((file: any, fm: any) => {
+				const parent = fm.Parent || [];
+				const children = fm.Child || [];
+
+				return {
+					filePath: file.path,
+					mtime: 0,
+					parent,
+					children,
+					related: [],
+					frontmatter: fm,
+				};
+			});
+			const mockSettingsStore = createMockSettingsStore();
+
+			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
+			const result = graphBuilder.buildGraph({
+				sourcePath: "Folder1/Parent.md",
+				renderRelated: false,
+				includeAllRelated: false,
+				startFromCurrent: true,
+			});
+
+			const nodeIds = result.nodes.map((n) => n.data?.id);
+
+			// Should resolve short links across folders
+			expect(nodeIds).toContain("Folder1/Parent.md");
+			expect(nodeIds).toContain("Folder2/Child.md");
+
+			// Should have edge between them
+			expect(result.edges).toHaveLength(1);
+			expect(result.edges[0].data).toEqual({
+				source: "Folder1/Parent.md",
+				target: "Folder2/Child.md",
+			});
+		});
+
+		it("should handle related view with short wiki links in folders", () => {
+			const files = [
+				{ path: "Test/Parent.md", frontmatter: { Related: ["[[Child]]"] } },
+				{ path: "Test/Child.md", frontmatter: { Related: ["[[Parent]]"] } },
+			];
+
+			const mockApp = createMockApp(files);
+			const mockIndexer = createMockIndexer((file: any, fm: any) => {
+				const related = fm.Related || [];
+
+				return {
+					filePath: file.path,
+					mtime: 0,
+					parent: [],
+					children: [],
+					related,
+					frontmatter: fm,
+				};
+			});
+			const mockSettingsStore = createMockSettingsStore();
+
+			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
+			const result = graphBuilder.buildGraph({
+				sourcePath: "Test/Parent.md",
+				renderRelated: true,
+				includeAllRelated: false,
+				startFromCurrent: true,
+			});
+
+			const nodeIds = result.nodes.map((n) => n.data?.id);
+
+			// Should resolve short links in related view
+			expect(nodeIds).toContain("Test/Parent.md");
+			expect(nodeIds).toContain("Test/Child.md");
+
+			// Should have edge between them
+			expect(result.edges).toHaveLength(1);
+			expect(result.edges[0].data).toEqual({
+				source: "Test/Parent.md",
+				target: "Test/Child.md",
+			});
 		});
 	});
 });

@@ -97,6 +97,10 @@ export class TFile {
  * Normalizes a file path using Obsidian's path normalization rules.
  * This is a simplified mock version that handles basic path normalization.
  */
+/**
+ * Normalizes a file path using Obsidian's path normalization rules.
+ * This is a simplified mock version that handles basic path normalization.
+ */
 export function normalizePath(path: string): string {
 	if (!path) return "";
 
@@ -116,4 +120,14 @@ export function normalizePath(path: string): string {
 	normalized = normalized.toLowerCase();
 
 	return normalized;
+}
+
+export class Notice {}
+
+export class Menu {
+	addItem(_cb: (item: any) => void): this {
+		return this;
+	}
+
+	showAtMouseEvent(_event: MouseEvent): void {}
 }
