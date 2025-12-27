@@ -17,6 +17,10 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 
 **Show Filter Bar by Default** (default: `true`): Display filter bar on graph open
 
+**Show Zoom Indicator** (default: `true`): Display zoom level indicator in filter row
+- Shows current zoom percentage (e.g., "100%")
+- Click to type a specific zoom level
+
 **Graph Enlarged Width** (default: `75%`, range: 50-100%): Window width when enlarged
 
 **Zoom Preview Height** (default: `280px`, range: 120-700px): Max height for zoom preview panel

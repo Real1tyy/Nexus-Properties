@@ -33,6 +33,7 @@ All notable changes to Nexus Properties will be documented here.
 - **Editable Input**: Click the zoom indicator to type a specific zoom level.
 - **Quick Zoom**: Press Enter to apply or Escape to cancel.
 - **Smart Clamping**: Automatically clamps values to valid zoom range (30%-300%).
+- **Configurable**: Can be hidden via Settings → Graph → "Show zoom indicator" (enabled by default).
 
 ### Improvements
 
