@@ -1,6 +1,6 @@
 {
 	"name": "nexus-properties",
-	"version": "1.4.1",
+	"version": "1.4.2",
 	"description": "Automated property management plugin for Obsidian that syncs parent-child and related relationships bidirectionally with recursive tree properties.",
 	"main": "main.js",
 	"scripts": {
