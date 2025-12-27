@@ -55,6 +55,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	private zoomManager: GraphZoomManager;
 	private interactionHandler: GraphInteractionHandler;
 	private layoutManager: GraphLayoutManager;
+	private pendingGraphData: { nodes: ElementDefinition[]; edges: ElementDefinition[] } | null = null;
 
 	constructor(
 		private readonly app: App,
@@ -239,14 +240,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			}
 		});
 
-		// Use requestAnimationFrame to ensure DOM is fully attached before initializing Cytoscape
-		// This prevents "container is not attached to DOM" errors
-		requestAnimationFrame(() => {
+		setTimeout(() => {
 			const activeFile = this.app.workspace.getActiveFile();
 			if (activeFile) {
 				this.onFileOpen(activeFile);
 			}
-		});
+		}, 50);
 
 		// Set up resize observer with debouncing
 		this.setupResizeObserver();
@@ -371,10 +370,18 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				window.clearTimeout(this.resizeDebounceTimer);
 			}
 
-			// Use requestAnimationFrame for better performance
-			// This schedules the resize for the next frame, avoiding forced reflows
 			this.resizeDebounceTimer = window.setTimeout(() => {
 				requestAnimationFrame(() => {
+					if (this.pendingGraphData && !this.cy) {
+						const rect = this.graphContainerEl?.getBoundingClientRect();
+						if (rect && rect.width > 0 && rect.height > 0) {
+							this.initializeCytoscape();
+							if (this.cy && this.pendingGraphData) {
+								this.renderAndFitGraph(this.pendingGraphData.nodes, this.pendingGraphData.edges);
+								this.pendingGraphData = null;
+							}
+						}
+					}
 					this.handleResize();
 				});
 			}, 100);
@@ -459,6 +466,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.currentFile = null;
 		this.graphContainerEl = null;
 		this.previewWrapperEl = null;
+		this.pendingGraphData = null;
 	}
 
 	toggleSearch(): void {
@@ -627,46 +635,47 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		this.isUpdating = true;
 
-		try {
-			const isFolder = isFolderNote(this.currentFile.path);
-			if (this.header) {
-				this.header.update({
-					currentFileName: this.currentFile.basename,
-					isFolderNote: isFolder,
-				});
-			}
-
-			const searchQuery = this.graphSearch?.getCurrentValue() || "";
-			const filterEvaluator = this.graphFilter?.getCurrentValue()
-				? (frontmatter: Record<string, any>) => this.graphFilter!.shouldInclude(frontmatter)
-				: undefined;
-
-			const { nodes, edges } = this.graphBuilder.buildGraph({
-				sourcePath: this.currentFile.path,
-				renderRelated: this.renderRelated,
-				includeAllRelated: this.includeAllRelated,
-				startFromCurrent: this.ignoreTopmostParent,
-				searchQuery: searchQuery,
-				filterEvaluator: filterEvaluator,
+		const isFolder = isFolderNote(this.currentFile.path);
+		if (this.header) {
+			this.header.update({
+				currentFileName: this.currentFile.basename,
+				isFolderNote: isFolder,
 			});
-
-			this.destroyGraph();
-
-			if (this.graphContainerEl) {
-				this.graphContainerEl.empty();
-			}
-
-			this.initializeCytoscape();
-			this.renderGraph(nodes, edges);
-			// Ensure viewport aligns with container right after initial render
-			if (this.cy) {
-				this.cy.resize();
-				this.cy.fit();
-				this.cy.center();
-			}
-		} finally {
-			this.isUpdating = false;
 		}
+
+		const searchQuery = this.graphSearch?.getCurrentValue() || "";
+		const filterEvaluator = this.graphFilter?.getCurrentValue()
+			? (frontmatter: Record<string, any>) => this.graphFilter!.shouldInclude(frontmatter)
+			: undefined;
+
+		const { nodes, edges } = this.graphBuilder.buildGraph({
+			sourcePath: this.currentFile.path,
+			renderRelated: this.renderRelated,
+			includeAllRelated: this.includeAllRelated,
+			startFromCurrent: this.ignoreTopmostParent,
+			searchQuery: searchQuery,
+			filterEvaluator: filterEvaluator,
+		});
+
+		this.destroyGraph();
+
+		if (this.graphContainerEl) {
+			this.graphContainerEl.empty();
+		}
+
+		this.initializeCytoscape();
+
+		// If initialization failed, store the graph data and wait for container to become visible
+		// The ResizeObserver will automatically render it when the view gets dimensions
+		if (!this.cy) {
+			this.pendingGraphData = { nodes, edges };
+			this.isUpdating = false;
+			return;
+		}
+
+		this.renderAndFitGraph(nodes, edges);
+		this.pendingGraphData = null;
+		this.isUpdating = false;
 	}
 
 	private destroyGraph(): void {
@@ -681,13 +690,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	}
 
 	private initializeCytoscape(): void {
-		// Silently return if container is not ready yet
-		// This can happen during hot-reload or rapid view switching
+		if (this.cy) return;
+
 		if (!this.graphContainerEl?.isConnected || !document.body.contains(this.graphContainerEl)) {
 			return;
 		}
 
-		// Ensure container has dimensions before initializing
 		const rect = this.graphContainerEl.getBoundingClientRect();
 		if (rect.width === 0 || rect.height === 0) {
 			return;
@@ -851,6 +859,15 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		});
 	}
 
+	private renderAndFitGraph(nodes: ElementDefinition[], edges: ElementDefinition[]): void {
+		if (!this.cy) return;
+
+		this.renderGraph(nodes, edges);
+		this.cy.resize();
+		this.cy.fit();
+		this.cy.center();
+	}
+
 	// Ensure the graph is centered/fit in its container, and handle zoom-mode centering
 	private ensureCentered(): void {
 		if (!this.cy || this.isUpdating) return;
@@ -875,7 +892,6 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				}
 			}
 
-			// Fit entire graph and ensure it's centered in view
 			this.cy.fit();
 			this.cy.center();
 		});

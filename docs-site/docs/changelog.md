@@ -10,6 +10,9 @@ All notable changes to Nexus Properties will be documented here.
 
 ### Bug Fixes
 
+#### Empty Graph When Switching Views
+- **Fixed Graph Not Rendering**: Fixed issue where the graph would sometimes appear empty when opening a note with the sidebar collapsed, then opening the sidebar. The graph now automatically renders when the view becomes visible.
+
 #### Graph Relationship Resolution
 - **Improved Link Resolution**: Enhanced link resolution to properly handle files in folders using Obsidian's `getFirstLinkpathDest()` API, which respects folder context when resolving relative links. This allows users to use relative link paths for notes.
 
