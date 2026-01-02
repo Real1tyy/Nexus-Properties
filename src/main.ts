@@ -1,6 +1,5 @@
-import type { WorkspaceLeaf } from "obsidian";
-import { MarkdownView, Notice, Plugin, TFile } from "obsidian";
-import { NexusPropertiesSettingsTab } from "./components";
+import { Notice, Plugin, TFile } from "obsidian";
+import { NexusPropertiesSettingsTab, NodeCreationModal } from "./components";
 import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/views/nexus-view-switcher";
 import { Indexer } from "./core/indexer";
 import { NodeCreator } from "./core/node-creator";
@@ -225,20 +224,33 @@ export default class NexusPropertiesPlugin extends Plugin {
 			return true;
 		}
 
-		this.createNodeAndOpen(activeFile, type);
+		this.showNodeCreationModal(activeFile, type);
 		return true;
 	}
 
-	private async createNodeAndOpen(sourceFile: TFile, type: "parent" | "child" | "related"): Promise<void> {
+	private showNodeCreationModal(sourceFile: TFile, type: "parent" | "child" | "related"): void {
+		const prefillText = this.nodeCreator.generateAutoNodeName(sourceFile.basename, type);
+
+		const modal = new NodeCreationModal(this.app, type, prefillText, async (nodeName) => {
+			await this.createNodeAndOpen(sourceFile, type, nodeName);
+		});
+
+		modal.open();
+	}
+
+	private async createNodeAndOpen(
+		sourceFile: TFile,
+		type: "parent" | "child" | "related",
+		nodeName: string
+	): Promise<void> {
 		const typeLabel = type.charAt(0).toUpperCase() + type.slice(1);
 
 		try {
-			const newFile = await this.nodeCreator.createRelatedNode(sourceFile, type);
+			const newFile = await this.nodeCreator.createRelatedNodeWithName(sourceFile, type, nodeName);
 
 			if (newFile) {
 				const leaf = this.app.workspace.getLeaf("tab");
 				await leaf.openFile(newFile);
-				await this.focusInlineTitle(leaf, type);
 
 				new Notice(`✅ Created ${typeLabel} node: ${newFile.basename}`);
 			} else {
@@ -247,46 +259,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 		} catch (error) {
 			console.error(`Error creating ${typeLabel} node:`, error);
 			new Notice(`❌ Error creating ${typeLabel} node: ${error}`);
-		}
-	}
-
-	private async focusInlineTitle(leaf: WorkspaceLeaf, type: "parent" | "child" | "related"): Promise<void> {
-		const MAX_ATTEMPTS = 10;
-		const RETRY_DELAY = 30;
-
-		for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
-			try {
-				await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
-
-				const view = leaf.view;
-				if (!(view instanceof MarkdownView)) continue;
-
-				const inlineTitle = view.containerEl.querySelector(".inline-title") as HTMLElement;
-				if (!inlineTitle || inlineTitle.contentEditable !== "true") continue;
-
-				inlineTitle.focus();
-
-				const selection = window.getSelection();
-				if (!selection) continue;
-
-				const textNode = inlineTitle.firstChild;
-				if (!textNode || textNode.nodeType !== Node.TEXT_NODE) continue;
-
-				const range = document.createRange();
-				const textContent = textNode.textContent || "";
-
-				if (type === "parent") {
-					range.setStart(textNode, 0);
-					range.setEnd(textNode, 0);
-				} else {
-					range.setStart(textNode, textContent.length);
-					range.setEnd(textNode, textContent.length);
-				}
-
-				selection.removeAllRanges();
-				selection.addRange(range);
-				return;
-			} catch {}
 		}
 	}
 }

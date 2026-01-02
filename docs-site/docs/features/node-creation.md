@@ -4,25 +4,28 @@ sidebar_position: 11
 
 # Node Creation
 
-Create parent, child, or related nodes instantly from commands. New nodes inherit properties, establish bidirectional relationships, and open for editing.
+Create parent, child, or related nodes instantly from commands using a clean modal interface. New nodes inherit properties, establish bidirectional relationships, and open for editing.
 
 ## Commands
 
-**Create Parent Node**: Creates parent, sets bidirectional relationship
+**Create Parent Node**: Opens modal to name parent, creates it with bidirectional relationship
 
-**Create Child Node**: Creates child, sets bidirectional relationship
+**Create Child Node**: Opens modal to name child, creates it with bidirectional relationship
 
-**Create Related Node**: Creates related, sets bidirectional relationship
+**Create Related Node**: Opens modal to name related node, creates it with bidirectional relationship
 
 **Availability**: Only when viewing a file in an indexed directory
 
 ## How It Works
 
-1. Creates new file in same folder as current file
-2. Inherits frontmatter (except [excluded properties](excluded-properties))
-3. Sets bidirectional relationship
-4. Generates unique Zettel ID (if configured)
-5. Opens file for editing with cursor intelligently positioned based on node type
+1. **Modal appears** with pre-filled naming pattern
+2. **Type the name** (cursor positioned optimally for each node type)
+3. **Press Enter** to create or **Escape** to cancel
+4. **File is created** in same folder as current file
+5. **Inherits frontmatter** (except [excluded properties](excluded-properties))
+6. **Sets bidirectional relationship** automatically
+7. **Generates unique Zettel ID** (if configured)
+8. **Opens file** for editing
 
 ## Property Inheritance
 
@@ -50,29 +53,35 @@ Create parent, child, or related nodes instantly from commands. New nodes inheri
 - New file: `Related: ["[[source-file]]"]`
 - Source file: Adds to `Related` array
 
-## File Naming
+## Modal Interface
 
-**Smart Naming Patterns**: Each node type uses an optimized naming pattern and cursor position for efficient workflow.
+**Clean Dialog**: A centered modal dialog appears when you trigger any node creation command.
+
+**Pre-filled Naming**: The input field is pre-filled with an intelligent pattern based on the node type you're creating.
+
+**Keyboard Shortcuts**:
+- **Enter**: Create the node with the entered name
+- **Escape**: Cancel and close the modal
 
 ### Create Child Node
-- **Pattern**: `[source-name] - .md`
-- **Example**: `Project Overview.md` → `Project Overview - .md`
-- **Cursor**: Positioned at the **end** (after the dash) to type the child name
-- **Auto-increment**: `Project Overview - 1.md`, `Project Overview - 2.md`, etc.
+- **Pre-filled**: `Project Overview - `
+- **Cursor**: Positioned at the **end** (ready to type child name)
+- **You type**: `Implementation Plan`
+- **Result**: `Project Overview - Implementation Plan.md`
 
 ### Create Parent Node
-- **Pattern**: ` - [source-name].md`
-- **Example**: `Task List.md` → ` - Task List.md`
-- **Cursor**: Positioned at the **very beginning** (before the dash) to type the parent name
-- **Auto-increment**: `1 - Task List.md`, `2 - Task List.md`, etc.
+- **Pre-filled**: ` - Task List`
+- **Cursor**: Positioned at the **beginning** (ready to type parent name)
+- **You type**: `Q1 Goals`
+- **Result**: `Q1 Goals - Task List.md`
 
 ### Create Related Node
-- **Pattern**: `[source-name] .md`
-- **Example**: `Meeting Notes.md` → `Meeting Notes .md`
-- **Cursor**: Positioned at the **end** (after the space) to type the related name
-- **Auto-increment**: `Meeting Notes  1.md`, `Meeting Notes  2.md`, etc.
+- **Pre-filled**: `Meeting Notes `
+- **Cursor**: Positioned at the **end** (ready to type related name)
+- **You type**: `Action Items`
+- **Result**: `Meeting Notes Action Items.md`
 
-**Fast Focus**: Inline title is automatically focused
+**Duplicate Handling**: If a file with the same name exists, a number is automatically appended (`Name 1.md`, `Name 2.md`, etc.)
 
 ## Configuration
 

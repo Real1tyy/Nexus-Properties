@@ -1,15 +1,15 @@
 import {
 	ExcludedPropertiesEvaluator,
 	formatWikiLink,
+	generateUniqueFilePath,
 	generateZettelId,
-	getUniqueFilePath,
 	normalizeProperty,
 } from "@real1ty-obsidian-plugins/utils";
 import type { App, TFile } from "obsidian";
 import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { buildFilePathForWikiLink, getUniqueParentFilePath } from "../utils/file-utils";
+import { buildFilePathForWikiLink } from "../utils/file-utils";
 
 type NodeCreationType = "parent" | "child" | "related";
 
@@ -30,14 +30,17 @@ export class NodeCreator {
 	}
 
 	async createRelatedNode(sourceFile: TFile, type: NodeCreationType): Promise<TFile | null> {
+		const autoName = this.generateAutoNodeName(sourceFile.basename, type);
+		return this.createRelatedNodeWithName(sourceFile, type, autoName);
+	}
+
+	async createRelatedNodeWithName(sourceFile: TFile, type: NodeCreationType, nodeName: string): Promise<TFile | null> {
 		try {
 			const frontmatter = this.app.metadataCache.getFileCache(sourceFile)?.frontmatter || {};
 
 			const folder = sourceFile.parent?.path || "";
-			const filePath = this.getUniqueFilePathForType(folder, sourceFile.basename, type);
-
-			const newFile = await this.app.vault.create(filePath, "");
-
+			const finalPath = generateUniqueFilePath(this.app, folder, nodeName);
+			const newFile = await this.app.vault.create(finalPath, "");
 			await this.setupFrontmatter(sourceFile, newFile, frontmatter, type);
 
 			return newFile;
@@ -47,23 +50,12 @@ export class NodeCreator {
 		}
 	}
 
-	private getUniqueFilePathForType(folder: string, sourceBasename: string, type: NodeCreationType): string {
-		// For parent nodes, we need custom logic to place numbers before the dash
-		if (type === "parent") {
-			return getUniqueParentFilePath(this.app, folder, sourceBasename);
-		}
-
-		// For child and related, use standard getUniqueFilePath
-		const fileName = this.generateFileName(sourceBasename, type);
-		return getUniqueFilePath(this.app, folder, fileName);
-	}
-
-	private generateFileName(sourceBasename: string, type: NodeCreationType): string {
+	generateAutoNodeName(sourceBasename: string, type: NodeCreationType): string {
 		switch (type) {
+			case "parent":
+				return ` - ${sourceBasename}`;
 			case "child":
 				return `${sourceBasename} - `;
-			case "parent":
-				return ` - ${sourceBasename}`; // Not used for parent, handled separately
 			case "related":
 				return `${sourceBasename} `;
 		}

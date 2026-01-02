@@ -8,23 +8,22 @@ All notable changes to Nexus Properties will be documented here.
 
 ## 1.5.0
 
-### Bug Fixes
-
-#### File Rename Relationship Link Updates
-
-Fixed issue where relationship links (Parent/Child/Related) were not properly updated when renaming files via the inline title editor after node creation. Obsidian's built-in link update system now correctly handles all wiki link updates during renames, ensuring bidirectional relationships remain intact.
-
-#### Root Directory Wiki Link Generation
-
-Fixed double slash issue in wiki links for files in the root directory.
-**Before:** `[[//Parent|Parent]]`
-**After:** `[[/Parent|Parent]]`
-
-#### Inline Title Focus for Node Creation
-
-Fixed race condition errors when creating nodes by adding retry mechanism to handle Obsidian's internal rendering conflicts.
-
 ### New Features
+
+#### Modal-Based Node Creation
+
+Node creation (Parent/Child/Related) now uses a clean modal dialog instead of automatic inline title editing. This provides a more reliable and user-friendly experience:
+
+- **Name Before Create**: Enter the node name in a modal dialog before the file is created
+- **No Race Conditions**: Eliminates timing issues with file creation and renaming
+- **Cleaner UX**: Clear, centered modal with large input field
+- **Keyboard Shortcuts**: Press Enter to create, Escape to cancel
+- **Stable Links**: Bidirectional relationship links are created correctly every time
+
+The modal pre-fills with the appropriate pattern based on node type:
+- **Parent**: ` - CurrentName` (cursor at start)
+- **Child**: `CurrentName - ` (cursor at end)
+- **Related**: `CurrentName ` (cursor at end)
 
 #### Multi-Row Layout for Large Hierarchies
 
@@ -64,6 +63,18 @@ Simplified the bases view interface with a new archived toggle checkbox.
 - Maintains full archived filtering functionality
 
 See [Bases View Documentation](features/bases-view#archived-toggle) for details.
+
+### Bug Fixes
+
+#### File Rename Relationship Link Updates
+
+Fixed issue where relationship links (Parent/Child/Related) were not properly updated when renaming files. The plugin now correctly handles all wiki link updates during renames, ensuring bidirectional relationships remain intact.
+
+#### Root Directory Wiki Link Generation
+
+Fixed double slash issue in wiki links for files in the root directory.
+**Before:** `[[//Parent|Parent]]`
+**After:** `[[/Parent|Parent]]`
 
 #### Complete Mobile Optimization
 
