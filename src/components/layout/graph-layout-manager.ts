@@ -333,12 +333,10 @@ export class GraphLayoutManager {
 
 		layout.run();
 
-		// Apply multi-row layout if enabled
 		if (useMultiRowLayout && maxChildrenPerRow && nodes && edges) {
 			this.applyMultiRowChildLayout(nodes, edges, maxChildrenPerRow);
 		}
 
-		// Now fit and animate if needed
 		this.runLayoutWithAnimationHandling(
 			() =>
 				this.cy.layout({

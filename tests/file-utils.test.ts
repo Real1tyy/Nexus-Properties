@@ -1,5 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
-import { getUniqueParentFilePath } from "../src/utils/file-utils";
+import { buildFilePathForWikiLink, getUniqueParentFilePath } from "../src/utils/file-utils";
 
 describe("getUniqueParentFilePath", () => {
 	describe("no folder path", () => {
@@ -206,6 +206,174 @@ describe("getUniqueParentFilePath", () => {
 			const result = getUniqueParentFilePath(mockApp, "", "Item");
 
 			expect(result).toBe("124 - Item.md");
+		});
+	});
+});
+
+describe("buildFilePathForWikiLink", () => {
+	describe("root directory handling", () => {
+		it("should return path with leading slash when parent path is /", () => {
+			const mockFile = {
+				basename: "Parent",
+				parent: {
+					path: "/",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("/Parent");
+			expect(result).not.toContain("//");
+		});
+
+		it("should return path with leading slash when parent path is empty string", () => {
+			const mockFile = {
+				basename: "RootNote",
+				parent: {
+					path: "",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("/RootNote");
+		});
+
+		it("should return path with leading slash when parent is null", () => {
+			const mockFile = {
+				basename: "Orphan",
+				parent: null,
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("/Orphan");
+		});
+
+		it("should return path with leading slash when parent is undefined", () => {
+			const mockFile = {
+				basename: "NoParent",
+				parent: undefined,
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("/NoParent");
+		});
+	});
+
+	describe("subdirectory handling", () => {
+		it("should return full path for file in subdirectory", () => {
+			const mockFile = {
+				basename: "Child",
+				parent: {
+					path: "Projects",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("Projects/Child");
+		});
+
+		it("should return full path for file in nested subdirectory", () => {
+			const mockFile = {
+				basename: "Task",
+				parent: {
+					path: "Work/Projects/Active",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("Work/Projects/Active/Task");
+		});
+
+		it("should handle single-level folder", () => {
+			const mockFile = {
+				basename: "Note",
+				parent: {
+					path: "Notes",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("Notes/Note");
+		});
+	});
+
+	describe("edge cases", () => {
+		it("should handle basename with spaces", () => {
+			const mockFile = {
+				basename: "My Important Note",
+				parent: {
+					path: "folder",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("folder/My Important Note");
+		});
+
+		it("should handle basename with special characters", () => {
+			const mockFile = {
+				basename: "Note (Draft)",
+				parent: {
+					path: "drafts",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).toBe("drafts/Note (Draft)");
+		});
+
+		it("should handle folder path with trailing slash", () => {
+			const mockFile = {
+				basename: "File",
+				parent: {
+					path: "folder/",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			// Should handle trailing slash gracefully without duplicating
+			expect(result).toBe("folder/File");
+			expect(result).not.toContain("//");
+		});
+	});
+
+	describe("prevents double-slash bug", () => {
+		it("should NOT create //Parent for root directory files", () => {
+			const mockFile = {
+				basename: "Parent",
+				parent: {
+					path: "/",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			// This is the bug we're fixing - should be single slash, not double
+			expect(result).not.toBe("//Parent");
+			expect(result).toBe("/Parent");
+		});
+
+		it("should NOT create //Child for root directory files", () => {
+			const mockFile = {
+				basename: "Child",
+				parent: {
+					path: "/",
+				},
+			} as any;
+
+			const result = buildFilePathForWikiLink(mockFile);
+
+			expect(result).not.toContain("//");
+			expect(result).toBe("/Child");
 		});
 	});
 });

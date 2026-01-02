@@ -9,7 +9,7 @@ import type { App, TFile } from "obsidian";
 import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { getUniqueParentFilePath } from "../utils/file-utils";
+import { buildFilePathForWikiLink, getUniqueParentFilePath } from "../utils/file-utils";
 
 type NodeCreationType = "parent" | "child" | "related";
 
@@ -75,10 +75,8 @@ export class NodeCreator {
 		sourceFrontmatter: Frontmatter,
 		type: NodeCreationType
 	): Promise<void> {
-		const sourceFilePath = sourceFile.parent?.path
-			? `${sourceFile.parent.path}/${sourceFile.basename}`
-			: sourceFile.basename;
-		const newFilePath = newFile.parent?.path ? `${newFile.parent.path}/${newFile.basename}` : newFile.basename;
+		const sourceFilePath = buildFilePathForWikiLink(sourceFile);
+		const newFilePath = buildFilePathForWikiLink(newFile);
 
 		const sourceLink = formatWikiLink(sourceFilePath);
 		const newFileLink = formatWikiLink(newFilePath);
