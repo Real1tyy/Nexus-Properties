@@ -15,12 +15,15 @@ export class NexusViewSwitcher extends ItemView {
 	private graphView: RelationshipGraphView | null = null;
 	private basesView: BasesView | null = null;
 	private toggleButton: HTMLButtonElement | null = null;
+	private archivedToggleContainer: HTMLElement | null = null;
+	private archivedCheckbox: HTMLInputElement | null = null;
 	private basesContentEl: HTMLElement | null = null;
 	private graphContainerEl: HTMLElement | null = null;
 	private isEnlarged = false;
 	private originalWidth: number | null = null;
 	private settingsSubscription: Subscription | null = null;
 	private lastBasesViewType: BaseViewType = "children";
+	private showArchived = false;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -112,7 +115,18 @@ export class NexusViewSwitcher extends ItemView {
 			this.toggleButton.textContent = this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View";
 		}
 
+		this.updateArchivedToggleVisibility();
 		await this.renderViewContent();
+	}
+
+	private updateArchivedToggleVisibility(): void {
+		if (this.archivedToggleContainer) {
+			if (this.currentMode === "bases") {
+				this.archivedToggleContainer.style.display = "flex";
+			} else {
+				this.archivedToggleContainer.style.display = "none";
+			}
+		}
 	}
 
 	private async renderView(): Promise<void> {
@@ -136,8 +150,31 @@ export class NexusViewSwitcher extends ItemView {
 			this.toggleButton.addEventListener("click", async () => {
 				await this.toggleView();
 			});
+
+			if (settings.excludeArchived) {
+				this.archivedToggleContainer = headerBar.createEl("label", {
+					cls: cls("view-switcher-archived-toggle"),
+				});
+
+				this.archivedCheckbox = this.archivedToggleContainer.createEl("input", {
+					type: "checkbox",
+					cls: cls("view-switcher-archived-checkbox"),
+				});
+				this.archivedCheckbox.checked = this.showArchived;
+
+				this.archivedToggleContainer.createSpan({
+					text: "Archived",
+					cls: cls("view-switcher-archived-label"),
+				});
+
+				this.archivedCheckbox.addEventListener("change", async () => {
+					this.showArchived = this.archivedCheckbox!.checked;
+					await this.renderViewContent();
+				});
+			}
 		}
 
+		this.updateArchivedToggleVisibility();
 		await this.renderViewContent();
 	}
 
@@ -185,9 +222,16 @@ export class NexusViewSwitcher extends ItemView {
 				cls: cls("bases-view-content"),
 			});
 
-			this.basesView = new BasesView(this.app, this.basesContentEl, this.plugin, this.lastBasesViewType, (viewType) => {
-				this.lastBasesViewType = viewType;
-			});
+			this.basesView = new BasesView(
+				this.app,
+				this.basesContentEl,
+				this.plugin,
+				this.lastBasesViewType,
+				this.showArchived,
+				(viewType) => {
+					this.lastBasesViewType = viewType;
+				}
+			);
 
 			await this.basesView.render();
 		}

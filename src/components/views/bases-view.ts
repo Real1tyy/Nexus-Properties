@@ -8,13 +8,7 @@ import { RegisteredEventsComponent } from "./component";
 
 const _VIEW_TYPE_BASES = "nexus-bases-view";
 
-export type BaseViewType =
-	| "children"
-	| "parent"
-	| "related"
-	| "archived-children"
-	| "archived-parent"
-	| "archived-related";
+export type BaseViewType = "children" | "parent" | "related";
 
 /**
  * Bases view component that uses Obsidian's Bases API to render
@@ -29,6 +23,7 @@ export class BasesView extends RegisteredEventsComponent {
 	private settingsSubscription: Subscription | null = null;
 	private currentSettings: NexusPropertiesSettings;
 	private selectedViewType: BaseViewType = "children";
+	private showArchived = false;
 	private viewSelectorEl: HTMLElement | null = null;
 	private onViewTypeChange?: (viewType: BaseViewType) => void;
 	private lastFilePath: string | null = null;
@@ -39,6 +34,7 @@ export class BasesView extends RegisteredEventsComponent {
 		containerEl: HTMLElement,
 		plugin: NexusPropertiesPlugin,
 		initialViewType?: BaseViewType,
+		initialShowArchived?: boolean,
 		onViewTypeChange?: (viewType: BaseViewType) => void
 	) {
 		super();
@@ -53,6 +49,10 @@ export class BasesView extends RegisteredEventsComponent {
 
 		if (initialViewType) {
 			this.selectedViewType = initialViewType;
+		}
+
+		if (initialShowArchived !== undefined) {
+			this.showArchived = initialShowArchived;
 		}
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
@@ -113,11 +113,8 @@ export class BasesView extends RegisteredEventsComponent {
 	}
 
 	private validateSelectedViewType(): void {
-		const isArchivedView = this.selectedViewType.startsWith("archived-");
-
-		if (isArchivedView && !this.currentSettings.excludeArchived) {
-			const baseType = this.selectedViewType.replace("archived-", "") as BaseViewType;
-			this.selectedViewType = baseType;
+		if (this.showArchived && !this.currentSettings.excludeArchived) {
+			this.showArchived = false;
 		}
 	}
 
@@ -126,20 +123,11 @@ export class BasesView extends RegisteredEventsComponent {
 			cls: cls("bases-view-selector"),
 		});
 
-		const viewTypes: { type: BaseViewType; label: string }[] = this.currentSettings.excludeArchived
-			? [
-					{ type: "children", label: "Children" },
-					{ type: "parent", label: "Parent" },
-					{ type: "related", label: "Related" },
-					{ type: "archived-children", label: "Archived Children" },
-					{ type: "archived-parent", label: "Archived Parent" },
-					{ type: "archived-related", label: "Archived Related" },
-				]
-			: [
-					{ type: "children", label: "Children" },
-					{ type: "parent", label: "Parent" },
-					{ type: "related", label: "Related" },
-				];
+		const viewTypes: { type: BaseViewType; label: string }[] = [
+			{ type: "children", label: "Children" },
+			{ type: "parent", label: "Parent" },
+			{ type: "related", label: "Related" },
+		];
 
 		for (const { type, label } of viewTypes) {
 			const button = this.viewSelectorEl.createEl("button", {
@@ -169,7 +157,7 @@ export class BasesView extends RegisteredEventsComponent {
 		const orderArray = includedProperties.map((prop) => `      - ${prop}`).join("\n");
 
 		const viewConfig = this.getViewConfig(this.selectedViewType);
-		const archivedFilter = this.getArchivedFilter(this.selectedViewType);
+		const archivedFilter = this.getArchivedFilter();
 
 		const formulasSection = this.buildFormulasSection();
 		const sortSection = this.buildSortSection();
@@ -208,31 +196,25 @@ ${orderArray}
 	}
 
 	private getViewConfig(viewType: BaseViewType): { name: string; prop: string } {
+		const prefix = this.showArchived ? "Archived " : "";
 		switch (viewType) {
 			case "children":
-				return { name: "Children", prop: this.currentSettings.childrenProp };
+				return { name: `${prefix}Children`, prop: this.currentSettings.childrenProp };
 			case "parent":
-				return { name: "Parent", prop: this.currentSettings.parentProp };
+				return { name: `${prefix}Parent`, prop: this.currentSettings.parentProp };
 			case "related":
-				return { name: "Related", prop: this.currentSettings.relatedProp };
-			case "archived-children":
-				return { name: "Archived Children", prop: this.currentSettings.childrenProp };
-			case "archived-parent":
-				return { name: "Archived Parent", prop: this.currentSettings.parentProp };
-			case "archived-related":
-				return { name: "Archived Related", prop: this.currentSettings.relatedProp };
+				return { name: `${prefix}Related`, prop: this.currentSettings.relatedProp };
 		}
 	}
 
-	private getArchivedFilter(viewType: BaseViewType): string {
+	private getArchivedFilter(): string {
 		if (!this.currentSettings.excludeArchived) {
 			return "";
 		}
 
 		const archivedProp = this.currentSettings.archivedProp;
-		const isArchivedView = viewType.startsWith("archived-");
 
-		return `\n        - ${archivedProp} ${isArchivedView ? "==" : "!="} true`;
+		return `\n        - ${archivedProp} ${this.showArchived ? "==" : "!="} true`;
 	}
 
 	private renderEmptyState(message: string): void {

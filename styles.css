@@ -794,55 +794,16 @@
 	}
 
 	body .nexus-properties-bases-view-selector button {
-		padding: 0.2em 0.35em;
-		font-size: 0.6em;
-		border-radius: 3px;
+		padding: 0.24em 0.42em;
+		font-size: 0.72em;
+		border-radius: 3.6px;
 		flex: 0 0 auto;
 		min-width: 0;
-		max-width: calc(33.333% - 0.17em); /* 3 per row with gap */
+		max-width: calc(33.333% - 0.204em); /* 3 per row with gap */
 		white-space: nowrap;
 		overflow: hidden;
 		text-overflow: ellipsis;
-		border-width: 1px;
-	}
-
-	/* Replace button text with abbreviations on mobile */
-	body .nexus-properties-bases-view-selector button {
-		font-size: 0;
-	}
-
-	body .nexus-properties-bases-view-selector button::before {
-		font-size: 1rem;
-	}
-
-	/* Children button */
-	body .nexus-properties-bases-view-selector button:nth-child(1)::before {
-		content: "C";
-	}
-
-	/* Parent button */
-	body .nexus-properties-bases-view-selector button:nth-child(2)::before {
-		content: "P";
-	}
-
-	/* Related button */
-	body .nexus-properties-bases-view-selector button:nth-child(3)::before {
-		content: "R";
-	}
-
-	/* Archived Children button */
-	body .nexus-properties-bases-view-selector button:nth-child(4)::before {
-		content: "A-C";
-	}
-
-	/* Archived Parent button */
-	body .nexus-properties-bases-view-selector button:nth-child(5)::before {
-		content: "A-P";
-	}
-
-	/* Archived Related button */
-	body .nexus-properties-bases-view-selector button:nth-child(6)::before {
-		content: "A-R";
+		border-width: 1.2px;
 	}
 
 	/* ===== FORCE FULL-WIDTH SIDEBAR ON MOBILE ===== */
@@ -1608,6 +1569,34 @@ button.nexus-properties-view-toggle-button:active {
 	padding: 12px;
 	border-bottom: 1px solid var(--background-modifier-border);
 	background-color: var(--background-secondary);
+	align-items: center;
+}
+
+/* View Switcher Header Archived Toggle */
+.nexus-properties-view-switcher-archived-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	position: absolute;
+	right: 12px;
+	cursor: pointer;
+	padding: 0.4em 0.8em;
+	border-radius: 4px;
+	transition: background-color 0.2s;
+}
+
+.nexus-properties-view-switcher-archived-toggle:hover {
+	background-color: var(--background-modifier-hover);
+}
+
+.nexus-properties-view-switcher-archived-checkbox {
+	cursor: pointer;
+}
+
+.nexus-properties-view-switcher-archived-label {
+	font-size: 0.9em;
+	color: var(--text-normal);
+	user-select: none;
 }
 
 button.nexus-properties-bases-view-button {

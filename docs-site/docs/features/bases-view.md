@@ -5,7 +5,9 @@ List-based view of the current note's relationships. Shows children, parent, and
 ![Bases View](/img/screenshots/bases-view.png)
 *List-based view of relationships*
 
-## Sections
+## View Types
+
+Bases view offers three relationship perspectives:
 
 **Children**: Notes with current note as parent
 
@@ -13,7 +15,18 @@ List-based view of the current note's relationships. Shows children, parent, and
 
 **Related**: Notes with mutual related connections
 
-**Auto-filtering**: Excludes notes with `_Archived: true`
+## Archived Toggle
+
+When the "Exclude Archived" setting is enabled in Settings → Bases View, an **Archived** checkbox toggle appears on the right side of the view selector.
+
+**How it works**:
+- **Unchecked** (default): Shows only non-archived files for the selected view type
+- **Checked**: Shows only archived files for the selected view type
+
+**Example**:
+- Select "Children" view with archived toggle OFF → Shows non-archived children
+- Select "Children" view with archived toggle ON → Shows archived children
+- Select "Parent" view with archived toggle ON → Shows archived parent (if archived)
 
 ## Usage
 

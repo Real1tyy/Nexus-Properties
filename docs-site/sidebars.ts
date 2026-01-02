@@ -9,6 +9,7 @@ const sidebars: SidebarsConfig = {
     },
     "installation",
     "quickstart",
+    "mobile",
     "videos",
     "screenshots",
     {

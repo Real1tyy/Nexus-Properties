@@ -10,9 +10,25 @@ All notable changes to Nexus Properties will be documented here.
 
 ### New Features
 
+#### Bases View Archived Toggle
+
+Simplified the bases view interface with a new archived toggle checkbox.
+
+- **Single Toggle**: New "Archived" checkbox on the right side of the view selector replaces separate archived view buttons
+- **Cleaner Interface**: Reduced from six buttons (Children, Parent, Related, Archived Children, Archived Parent, Archived Related) to three buttons + one toggle
+- **How it Works**: Toggle between regular and archived files for any selected view type (Children, Parent, or Related)
+- **Conditional Display**: Only appears when "Exclude Archived" setting is enabled
+
+**Benefits**:
+- Saves significant screen space, especially on mobile
+- More intuitive interface
+- Maintains full archived filtering functionality
+
+See [Bases View Documentation](features/bases-view#archived-toggle) for details.
+
 #### Complete Mobile Optimization
 
-Nexus Properties now provides a fully optimized mobile experience with comprehensive UI improvements for phones and tablets.
+Nexus Properties now provides a fully optimized mobile experience with comprehensive UI improvements for phones.
 
 **Graph View Mobile Layout**:
 - **Fixed Rendering Issues**: Graph now displays properly on all mobile screen sizes without layout problems
@@ -21,9 +37,8 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 - **Combined Search & Filter**: Search and filter inputs merged into one row with reduced size
 - **Hidden Zoom Indicator**: Zoom percentages removed on mobile to reduce clutter
 
-**Bases View Mobile Layout**:
-- **Abbreviated Buttons**: View buttons show single letters (C, P, R, A-C, A-P, A-R) instead of full names
-- **Compact View Switcher**: Toggle button between Graph and Bases views is 30% smaller
+**Mobile Layout Optimizations**:
+- **Compact View Switcher**: Toggle button between Graph and Bases views is 30% smaller on mobile
 - **Optimized Spacing**: Tighter padding and gaps throughout for maximum content visibility
 
 **Zoom Preview Optimizations**:

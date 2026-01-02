@@ -1,3 +1,7 @@
+---
+sidebar_position: 4
+---
+
 # Mobile Support
 
 Nexus Properties is fully optimized for mobile devices, providing a responsive and touch-friendly experience on phones.
@@ -33,20 +37,10 @@ When you zoom into a node on mobile:
 - **Touch-Optimized Toggles**: Hide Frontmatter, Hide Content, and Exit Zoom buttons sized for easy tapping
 
 ### Bases View
-
-#### View Selection
-- **Abbreviated Labels**: Buttons show single letters instead of full names:
-  - "Children" → "C"
-  - "Parent" → "P"
-  - "Related" → "R"
-  - "Archived Children" → "A-C"
-  - "Archived Parent" → "A-P"
-  - "Archived Related" → "A-R"
-- **Compact Size**: Buttons 50% smaller to fit 3+ per row
+- **Compact Mobile Layout**: Buttons are smaller on mobile to fit comfortably on small screens
 
 #### View Switcher
 - **Smaller Toggle**: The "Switch to Graph View" / "Switch to Bases View" button is 30% smaller
-- **Full Width**: Sidebar expands to use entire screen width
 
 ### Touch Interactions
 
