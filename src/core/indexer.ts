@@ -66,7 +66,7 @@ export class Indexer {
 
 	private buildIndexerConfig(): IndexerConfig {
 		return {
-			includeFile: this.shouldIndexFile.bind(this),
+			includeFile: (filePath: string) => this.shouldIndexFile(filePath),
 			scanConcurrency: SCAN_CONCURRENCY,
 			debounceMs: 300,
 		};
@@ -88,13 +88,10 @@ export class Indexer {
 	}
 
 	shouldIndexFile(filePath: string): boolean {
-		const { directories } = this.settings;
-
-		if (directories.includes("*")) {
+		if (this.settings.directories.includes("*")) {
 			return true;
 		}
-
-		return directories.some((dir) => {
+		return this.settings.directories.some((dir) => {
 			const normalizedDir = dir.endsWith("/") ? dir.slice(0, -1) : dir;
 			return filePath === normalizedDir || filePath.startsWith(`${normalizedDir}/`);
 		});
@@ -102,22 +99,40 @@ export class Indexer {
 
 	private handleGenericEvent(genericEvent: GenericIndexerEvent): void {
 		if (genericEvent.type === "file-deleted") {
-			const oldRelationships = this.relationshipsCache.get(genericEvent.filePath);
-			const oldFrontmatter = oldRelationships?.frontmatter;
+			// Ignore delete events that are part of renames - Obsidian handles link updates automatically
+			if (genericEvent.isRename) {
+				return;
+			}
 
-			this.relationshipsCache.delete(genericEvent.filePath);
+			const { filePath } = genericEvent;
+			const oldRelationships = this.relationshipsCache.get(filePath);
+			this.relationshipsCache.delete(filePath);
 
 			this.scanEventsSubject.next({
 				type: "file-deleted",
-				filePath: genericEvent.filePath,
+				filePath,
 				oldRelationships,
-				oldFrontmatter,
+				oldFrontmatter: oldRelationships?.frontmatter,
 			});
 			return;
 		}
 
 		if (genericEvent.type === "file-changed" && genericEvent.source) {
-			const { filePath, source, oldFrontmatter, frontmatterDiff } = genericEvent;
+			const { filePath, source, oldFrontmatter, frontmatterDiff, oldPath } = genericEvent;
+
+			// If this is a rename (oldPath is set), update cache silently without emitting an event.
+			// Obsidian handles link updates, so components just need the updated cache.
+			if (oldPath) {
+				const file = this.app.vault.getFileByPath(filePath);
+				if (file) {
+					const newRelationships = this.extractRelationships(file, source.frontmatter);
+					this.relationshipsCache.delete(oldPath);
+					this.relationshipsCache.set(filePath, newRelationships);
+				}
+				return;
+			}
+
+			// Regular file change (not a rename)
 			const file = this.app.vault.getFileByPath(filePath);
 			if (!file) return;
 

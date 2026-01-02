@@ -10,6 +10,10 @@ All notable changes to Nexus Properties will be documented here.
 
 ### Bug Fixes
 
+#### File Rename Relationship Link Updates
+
+Fixed issue where relationship links (Parent/Child/Related) were not properly updated when renaming files via the inline title editor after node creation. Obsidian's built-in link update system now correctly handles all wiki link updates during renames, ensuring bidirectional relationships remain intact.
+
 #### Root Directory Wiki Link Generation
 
 Fixed double slash issue in wiki links for files in the root directory.
