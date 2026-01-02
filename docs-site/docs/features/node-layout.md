@@ -18,6 +18,17 @@ Automatic node positioning using different algorithms based on view mode.
 
 **Best for**: Projects, org charts, taxonomies
 
+### Multi-Row Layout (Large Families)
+
+**Used in**: Hierarchical mode (optional setting)
+
+**Goal**: Make big hierarchies readable by using vertical space instead of stretching extremely wide.
+
+**What you’ll notice**:
+- **Multi-row families**: When a parent has many children, they wrap into multiple compact rows instead of one long line.
+- **Generation-aware spacing**: Each “layer” starts below the lowest row of the layer above, so deep hierarchies don’t collide.
+- **Branch-aware spacing**: Each family branch gets enough horizontal room, so different branches don’t overlap when wrapping happens.
+
 ### Constellation (Related Networks)
 
 **Used in**: Related and All Related modes
