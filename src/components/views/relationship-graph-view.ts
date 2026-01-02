@@ -170,56 +170,74 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		const settings = this.plugin.settingsStore.settings$.value;
 		const showSearchBar = settings.showSearchBar;
 		const showFilterBar = settings.showFilterBar;
+		const isMobile = window.innerWidth <= 600;
 
-		// Create search row wrapper
-		const searchRowClasses = showSearchBar ? cls("graph-search-row") : cls("graph-search-row", "hidden");
-		this.searchRowEl = this.containerEl.createEl("div", {
-			cls: searchRowClasses,
-		});
+		// Shared callbacks
+		const onFilterPresetChange = (expression: string) => {
+			this.graphFilter?.setFilterValue(expression);
+		};
 
-		// Create search component inside the row
-		this.graphSearch = new GraphSearch(
-			this.searchRowEl,
-			() => {
-				this.updateGraph();
-			},
-			showSearchBar,
-			() => {
-				// onHide callback - hide the entire search row
-				this.hideSearchRow();
+		const onSearchChange = () => {
+			this.updateGraph();
+		};
+
+		const onFilterChange = () => {
+			this.updateGraph();
+		};
+
+		// Inner function to create filter preset selector
+		const createFilterPresetSelector = (container: HTMLElement) => {
+			this.graphFilterPresetSelector = new GraphFilterPresetSelector(
+				container,
+				settings.filterPresets,
+				onFilterPresetChange,
+				showFilterBar
+			);
+		};
+
+		// Inner function to create search component
+		const createSearchComponent = (container: HTMLElement, onHide: () => void) => {
+			this.graphSearch = new GraphSearch(container, onSearchChange, showSearchBar, onHide);
+			this.graphSearch.setPersistentlyVisible(showSearchBar);
+		};
+
+		// Inner function to create filter component
+		const createFilterComponent = (container: HTMLElement, onHide: () => void) => {
+			this.graphFilter = new GraphFilter(container, onFilterChange, showFilterBar, onHide);
+			this.graphFilter.setPersistentlyVisible(showFilterBar);
+		};
+
+		if (isMobile) {
+			// Mobile: Filter preset in header, search + filter combined in one row
+			const controlsContainer = this.header?.getControlsContainer();
+			if (controlsContainer) {
+				createFilterPresetSelector(controlsContainer);
 			}
-		);
-		this.graphSearch.setPersistentlyVisible(showSearchBar);
+			// Combined search/filter row
+			const filterRowClasses =
+				showFilterBar || showSearchBar ? cls("graph-filter-row") : cls("graph-filter-row", "hidden");
+			const filterRowEl = this.containerEl.createEl("div", { cls: filterRowClasses });
 
-		// Create filter preset selector and filter (in a row)
-		const filterRowClasses = showFilterBar ? cls("graph-filter-row") : cls("graph-filter-row", "hidden");
-		const filterRowEl = this.containerEl.createEl("div", {
-			cls: filterRowClasses,
-		});
+			const searchContainer = filterRowEl.createEl("div", { cls: cls("graph-search-input-container") });
+			createSearchComponent(searchContainer, () => this.hideFilterRow());
+			createFilterComponent(filterRowEl, () => this.hideFilterRow());
 
-		this.graphFilterPresetSelector = new GraphFilterPresetSelector(
-			filterRowEl,
-			settings.filterPresets,
-			(expression: string) => {
-				this.graphFilter?.setFilterValue(expression);
-			},
-			showFilterBar // Match parent visibility
-		);
+			this.filterRowEl = filterRowEl;
+		} else {
+			// Desktop: Separate rows for search and filter
+			const searchRowClasses = showSearchBar ? cls("graph-search-row") : cls("graph-search-row", "hidden");
+			this.searchRowEl = this.containerEl.createEl("div", { cls: searchRowClasses });
+			createSearchComponent(this.searchRowEl, () => this.hideSearchRow());
 
-		this.graphFilter = new GraphFilter(
-			filterRowEl,
-			() => {
-				this.updateGraph();
-			},
-			showFilterBar, // Match parent visibility
-			() => {
-				// onHide callback - hide the entire filter row (including preset selector)
-				this.hideFilterRow();
-			}
-		);
-		this.graphFilter.setPersistentlyVisible(showFilterBar);
+			const filterRowClasses = showFilterBar ? cls("graph-filter-row") : cls("graph-filter-row", "hidden");
+			const filterRowEl = this.containerEl.createEl("div", { cls: filterRowClasses });
 
-		this.filterRowEl = filterRowEl;
+			createFilterPresetSelector(filterRowEl);
+			createFilterComponent(filterRowEl, () => this.hideFilterRow());
+
+			this.filterRowEl = filterRowEl;
+		}
+
 		this.applyPreFillFilter();
 
 		// Create a wrapper for zoom preview (sits between header and graph)
@@ -259,6 +277,10 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		// Also react to global window resizes
 		this.registerDomEvent(window, "resize", () => {
+			this.handleResize();
+		});
+
+		this.graphContainerEl.addEventListener("nexus-graph-resize", () => {
 			this.handleResize();
 		});
 
@@ -405,7 +427,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.resizeObserver.observe(this.graphContainerEl);
 	}
 
-	private handleResize(): void {
+	public handleResize(): void {
 		if (!this.cy || !this.graphContainerEl?.isConnected) return;
 
 		const skipFitOnce = this.zoomManager.shouldSuppressNextResizeFit();
@@ -713,7 +735,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	private initializeCytoscape(): void {
 		if (this.cy) return;
 
-		if (!this.graphContainerEl?.isConnected || !document.body.contains(this.graphContainerEl)) {
+		if (!this.graphContainerEl?.isConnected) {
 			return;
 		}
 
@@ -856,9 +878,6 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			},
 		});
 
-		// Add all edges to core class for layered rendering
-		this.cy.edges().addClass("core");
-
 		this.interactionHandler.setupInteractions();
 
 		const settings = this.plugin.settingsStore.settings$.value;
@@ -871,6 +890,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		if (!this.cy) return;
 
 		this.cy.add([...nodes, ...edges]);
+		this.cy.edges().addClass("core");
 
 		const settings = this.plugin.settingsStore.settings$.value;
 		const animationDuration = settings.graphAnimationDuration;

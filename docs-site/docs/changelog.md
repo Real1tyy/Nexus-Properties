@@ -6,6 +6,48 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.5.0
+
+### New Features
+
+#### Complete Mobile Optimization
+
+Nexus Properties now provides a fully optimized mobile experience with comprehensive UI improvements for phones and tablets.
+
+**Graph View Mobile Layout**:
+- **Fixed Rendering Issues**: Graph now displays properly on all mobile screen sizes without layout problems
+- **Compact Header**: Title hidden to save space, all controls condensed into a single row
+- **Shortened Labels**: Button text abbreviated ("Related", "All", "Current") to fit more controls
+- **Combined Search & Filter**: Search and filter inputs merged into one row with reduced size
+- **Hidden Zoom Indicator**: Zoom percentages removed on mobile to reduce clutter
+
+**Bases View Mobile Layout**:
+- **Abbreviated Buttons**: View buttons show single letters (C, P, R, A-C, A-P, A-R) instead of full names
+- **Compact View Switcher**: Toggle button between Graph and Bases views is 30% smaller
+- **Optimized Spacing**: Tighter padding and gaps throughout for maximum content visibility
+
+**Zoom Preview Optimizations**:
+- **Auto-Hide Header**: Search bar, filter bar, and controls automatically hide when zooming to maximize preview space
+- **Compact Frontmatter**: Properties displayed in a tighter grid showing ~4 properties per row by default
+- **Reduced Padding**: Note content uses minimal padding to show more text at once
+- **Smaller Elements**: Titles and toggles sized appropriately for mobile screens
+- **Touch-Optimized Controls**: All buttons sized for comfortable finger taps
+
+**Touch Interactions**:
+- **Long-Press Context Menu**: Hold on a node (~500ms) to open the context menu with all node actions
+- **Tap to Zoom**: Single tap still triggers zoom preview as expected
+- **Gesture Support**: Standard pinch-to-zoom and pan gestures work throughout
+
+**Configurable Settings**:
+- **Mobile Frontmatter Width**: New setting (Graph → Mobile) allows adjusting property width (50-300px) to fit your screen size and preference
+
+### Bug Fixes
+
+#### Mobile Graph Rendering
+- **Fixed Graph Not Displaying**: Resolved issue where the graph view header consumed all vertical space on mobile, preventing the graph from rendering
+
+---
+
 ## 1.4.0
 
 ### New Features

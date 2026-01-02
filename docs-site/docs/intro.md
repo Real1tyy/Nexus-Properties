@@ -50,8 +50,9 @@ Visualize your knowledge network with multiple view modes:
 - **Related** - View direct related connections
 - **All Related** - Explore entire constellations of related notes
 - **Start from Current** - Focus on specific nodes
+- **Fully Mobile Optimized** - Complete touch support with responsive layouts
 
-[Learn more about Graph Views →](features/graph-views)
+[Learn more about Graph Views →](features/graph-views) | [Mobile Support →](mobile)
 
 ### 🎨 Customizable Node Colors
 
@@ -76,6 +77,12 @@ Enter zoom mode to see detailed previews of any note directly in the graph view.
 Create parent, child, or related nodes instantly from the command palette. New nodes automatically inherit properties and establish bidirectional relationships.
 
 [Learn more about Node Creation →](features/node-creation)
+
+## Mobile Support
+
+Nexus Properties is **fully optimized for mobile devices** with touch-friendly interfaces, responsive layouts, and gesture support. The plugin has been tested on phones to ensure a smooth experience on all screen sizes.
+
+[Learn more about Mobile Support →](mobile)
 
 ## Getting Started
 

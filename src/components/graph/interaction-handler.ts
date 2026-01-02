@@ -41,6 +41,11 @@ export class GraphInteractionHandler {
 	// This allows intelligent backtracking: up then down returns to same child
 	private previousChildNodeId: string | null = null;
 
+	// Long-press detection for mobile context menu
+	private longPressTimer: number | null = null;
+	private longPressTriggered = false;
+	private longPressDelay = 500; // milliseconds
+
 	private get cy(): Core {
 		return this.config.getCy();
 	}
@@ -52,6 +57,7 @@ export class GraphInteractionHandler {
 		this.setupEdgeClickHandler();
 		this.setupNodeContextMenu();
 		this.setupEdgeContextMenu();
+		this.setupNodeLongPress();
 		this.setupDoubleClickZoom();
 		this.addSparkleAnimations();
 	}
@@ -96,6 +102,11 @@ export class GraphInteractionHandler {
 
 	private setupNodeClickHandler(): void {
 		this.cy.on("tap", "node", (evt) => {
+			if (this.longPressTriggered) {
+				this.longPressTriggered = false;
+				return;
+			}
+
 			const node = evt.target;
 			const filePath = node.id();
 			const file = this.app.vault.getAbstractFileByPath(filePath);
@@ -143,6 +154,51 @@ export class GraphInteractionHandler {
 			}
 
 			this.nodeContextMenu.show(originalEvent, filePath);
+		});
+	}
+
+	private setupNodeLongPress(): void {
+		// Start long-press timer on touch/mouse down
+		this.cy.on("tapstart", "node", (evt) => {
+			const node = evt.target;
+			const filePath = node.id();
+			const originalEvent = evt.originalEvent as MouseEvent | TouchEvent;
+
+			// Clear any existing timer
+			if (this.longPressTimer !== null) {
+				window.clearTimeout(this.longPressTimer);
+			}
+
+			this.longPressTriggered = false;
+
+			// Set timer to trigger context menu after long press delay
+			this.longPressTimer = window.setTimeout(() => {
+				this.longPressTriggered = true;
+
+				// Cancel relationship selection if long-pressing during selection
+				if (this.relationshipAdder.isSelectionActive()) {
+					this.relationshipAdder.cancel();
+				}
+
+				this.nodeContextMenu.show(originalEvent as MouseEvent, filePath);
+				this.longPressTimer = null;
+			}, this.longPressDelay);
+		});
+
+		// Cancel long-press timer if touch/mouse is released early or moved away
+		this.cy.on("tapend", "node", () => {
+			if (this.longPressTimer !== null) {
+				window.clearTimeout(this.longPressTimer);
+				this.longPressTimer = null;
+			}
+		});
+
+		// Also cancel if user starts dragging
+		this.cy.on("tapdragover", "node", () => {
+			if (this.longPressTimer !== null) {
+				window.clearTimeout(this.longPressTimer);
+				this.longPressTimer = null;
+			}
 		});
 	}
 

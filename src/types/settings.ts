@@ -76,6 +76,11 @@ export const NexusPropertiesSettingsSchema = z
 			.min(50)
 			.max(300)
 			.catch(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ZOOM_PREVIEW_FRONTMATTER_HEIGHT),
+		mobileFrontmatterPropertyWidth: z
+			.number()
+			.min(50)
+			.max(300)
+			.catch(SETTINGS_DEFAULTS.DEFAULT_MOBILE_FRONTMATTER_PROPERTY_WIDTH),
 		graphAnimationDuration: z.number().min(0).max(2000).catch(SETTINGS_DEFAULTS.DEFAULT_GRAPH_ANIMATION_DURATION),
 		allRelatedMaxDepth: z.number().int().min(1).max(20).catch(SETTINGS_DEFAULTS.DEFAULT_ALL_RELATED_MAX_DEPTH),
 		hierarchyMaxDepth: z.number().int().min(1).max(50).catch(SETTINGS_DEFAULTS.DEFAULT_HIERARCHY_MAX_DEPTH),

@@ -453,7 +453,8 @@
 .nexus-properties-graph-view-header {
 	display: flex;
 	flex-direction: row;
-	align-items: flex-start;
+	align-items: center;
+	flex-wrap: wrap;
 	gap: 1em;
 	padding: 1em;
 	border-bottom: 2px solid var(--background-modifier-border);
@@ -466,17 +467,19 @@
 	color: var(--text-normal);
 	font-size: 1.1em;
 	font-weight: 600;
-	flex: 1;
+	flex: 1 1 240px;
 	min-width: 0;
 	overflow-wrap: break-word;
 	word-wrap: break-word;
-	word-break: break-word;
+	word-break: normal;
 }
 
 .nexus-properties-graph-controls-container {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
+	flex-wrap: wrap;
+	justify-content: flex-end;
 	gap: 0.75em;
 	flex-shrink: 0;
 }
@@ -502,6 +505,360 @@
 
 .nexus-properties-graph-toggle-label:hover {
 	color: var(--text-normal);
+}
+
+/* ============================================
+   MOBILE OPTIMIZATIONS (< 600px)
+   ============================================ */
+@media (max-width: 600px) {
+	/* ===== GRAPH HEADER - COMPACT MODE ===== */
+	.nexus-properties-graph-view-header {
+		padding: 0.3em 0.5em;
+		gap: 0.3em;
+		min-height: auto;
+		flex-wrap: wrap;
+	}
+
+	/* Hide the "Relationship Graph: FileName" title text completely on mobile */
+	body .nexus-properties-graph-view-title {
+		display: none;
+	}
+
+	/* Controls container now includes filter preset - force single row */
+	.nexus-properties-graph-controls-container {
+		flex: 1 1 100%;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+		gap: 0.3em;
+		align-items: center;
+	}
+
+	/* Move filter preset selector to header row with controls */
+	.nexus-properties-graph-view-header .nexus-properties-graph-filter-preset-container {
+		order: 1;
+		flex-shrink: 0;
+	}
+
+	/* Make toggle containers much smaller and compact */
+	.nexus-properties-graph-toggle-container {
+		padding: 0.25em 0.4em;
+		font-size: 0.65em;
+		gap: 0.25em;
+		border-width: 1px;
+		min-width: 0;
+		white-space: nowrap;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	}
+
+	/* Smaller checkbox */
+	.nexus-properties-graph-toggle-checkbox {
+		width: 11px;
+		height: 11px;
+		flex-shrink: 0;
+	}
+
+	/* Shorter labels for mobile */
+	.nexus-properties-graph-toggle-label {
+		font-size: 1em; /* Relative to container's 0.65em */
+	}
+
+	/* Shorten toggle label text on mobile */
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(1)
+		.nexus-properties-graph-toggle-label::before {
+		content: "Related";
+	}
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(1)
+		.nexus-properties-graph-toggle-label {
+		font-size: 0;
+	}
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(1)
+		.nexus-properties-graph-toggle-label::before {
+		font-size: 1rem;
+	}
+
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(2)
+		.nexus-properties-graph-toggle-label::before {
+		content: "All";
+	}
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(2)
+		.nexus-properties-graph-toggle-label {
+		font-size: 0;
+	}
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(2)
+		.nexus-properties-graph-toggle-label::before {
+		font-size: 1rem;
+	}
+
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(3)
+		.nexus-properties-graph-toggle-label::before {
+		content: "Current";
+	}
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(3)
+		.nexus-properties-graph-toggle-label {
+		font-size: 0;
+	}
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(3)
+		.nexus-properties-graph-toggle-label::before {
+		font-size: 1rem;
+	}
+
+	/* ===== COMBINED SEARCH/FILTER ROW ===== */
+	/* Hide individual rows, we'll combine them */
+	.nexus-properties-graph-search-row {
+		display: none;
+	}
+
+	.nexus-properties-graph-filter-row {
+		display: flex;
+		padding: 0.3em 0.5em;
+		gap: 0.3em;
+		align-items: center;
+	}
+
+	/* Search and filter inputs share the row - 50% each */
+	.nexus-properties-graph-search-input-container,
+	.nexus-properties-graph-filter-input-container {
+		flex: 1 1 calc(50% - 0.15em);
+		min-width: 0;
+	}
+
+	/* Move search input to filter row on mobile */
+	.nexus-properties-graph-filter-row .nexus-properties-graph-search-input-container {
+		display: flex;
+	}
+
+	/* Smaller input heights on mobile */
+	.nexus-properties-graph-view-content .nexus-properties-graph-search-input,
+	.nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
+		height: 2em;
+		padding: 0.35em 0.5em;
+		font-size: 0.8em;
+		border-radius: 4px;
+		width: 100%;
+	}
+
+	/* Filter preset selector in header - smaller */
+	.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
+		height: 2em;
+		min-width: 70px;
+		padding: 0.25em 1.6em 0.25em 0.4em;
+		font-size: 0.65em;
+		border-radius: 4px;
+		border-width: 1px;
+	}
+
+	.nexus-properties-graph-filter-preset-container::after {
+		font-size: 0.55em;
+		right: 0.5em;
+	}
+
+	/* Hide filter preset from its normal location in filter row */
+	.nexus-properties-graph-filter-row .nexus-properties-graph-filter-preset-container {
+		display: none;
+	}
+
+	/* ===== HIDE ZOOM INDICATOR ON MOBILE ===== */
+	body .nexus-properties-zoom-indicator {
+		display: none;
+	}
+
+	/* ===== ZOOM MODE - HIDE EVERYTHING EXCEPT PREVIEW ===== */
+	/* When zoom preview exists, hide header/search/filter */
+	body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview)
+		.nexus-properties-graph-view-header,
+	body
+		.nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview)
+		.nexus-properties-graph-search-row,
+	body
+		.nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview)
+		.nexus-properties-graph-filter-row {
+		display: none;
+	}
+
+	/* ===== ZOOM PREVIEW - COMPACT CONTROLS ===== */
+	body .nexus-properties-graph-zoom-preview-controls {
+		padding: 0.5em 0.6em;
+		gap: 0.3em;
+		min-height: auto;
+		flex-wrap: wrap;
+	}
+
+	/* Compact zoom preview title on mobile (20% smaller) */
+	body .nexus-properties-graph-zoom-preview-title {
+		font-size: 0.72em;
+		flex: 1 1 100%;
+		margin-bottom: 0.25em;
+	}
+
+	/* Toggles container takes full width */
+	body .nexus-properties-graph-zoom-preview-toggles {
+		flex: 1 1 100%;
+		justify-content: space-between;
+		gap: 0.3em;
+	}
+
+	/* Compact toggle buttons in zoom preview */
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-container {
+		padding: 0.3em 0.4em;
+		font-size: 0.7em;
+		gap: 0.25em;
+		flex: 1; /* Equal width distribution */
+		justify-content: center;
+	}
+
+	/* Adjust checkbox size in zoom preview */
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-checkbox {
+		width: 11px;
+		height: 11px;
+	}
+
+	/* Shorter toggle labels */
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-label {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+
+	/* Reduce zoom preview heights on mobile */
+	body .nexus-properties-graph-zoom-preview {
+		max-height: min(50vh, var(--zoom-preview-max-height, 200px));
+	}
+
+	body .nexus-properties-graph-zoom-preview-frontmatter {
+		padding: 0.3em;
+		gap: 0.2em;
+		grid-template-columns: repeat(auto-fill, minmax(var(--mobile-frontmatter-property-width, 100px), 1fr));
+		font-size: 0.75em;
+		max-height: min(30vh, var(--zoom-preview-frontmatter-height, 70px));
+	}
+
+	body .nexus-properties-graph-zoom-preview-property {
+		padding: 0.25em;
+		gap: 0.15em;
+	}
+
+	body .nexus-properties-graph-zoom-preview-property-key {
+		font-size: 0.7em;
+	}
+
+	body .nexus-properties-graph-zoom-preview-property-value {
+		font-size: 0.8em;
+		gap: 0.15em;
+	}
+
+	body .nexus-properties-graph-zoom-preview-content {
+		padding: 0.3em;
+		font-size: 0.8em;
+	}
+
+	body .nexus-properties-graph-zoom-preview-content p {
+		margin: 0.3em 0;
+	}
+
+	body .nexus-properties-graph-zoom-preview-content p:first-child {
+		margin-top: 0;
+	}
+
+	body .nexus-properties-graph-zoom-preview-content p:last-child {
+		margin-bottom: 0;
+	}
+
+	/* ===== VIEW SWITCHER BUTTON - 30% SMALLER ===== */
+	body .nexus-properties-view-switcher-header {
+		padding: 0.2em;
+	}
+
+	body button.nexus-properties-view-toggle-button {
+		padding: 0.25em 0.4em;
+		min-height: 20px;
+		font-size: 0.6em;
+		border-radius: 3px;
+		border-width: 1px;
+	}
+
+	/* ===== BASES VIEW - COMPACT SELECTORS (50% SMALLER) ===== */
+	body .nexus-properties-bases-view-selector {
+		padding: 0.3em 0.4em;
+		gap: 0.25em;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: flex-start;
+	}
+
+	body .nexus-properties-bases-view-selector button {
+		padding: 0.2em 0.35em;
+		font-size: 0.6em;
+		border-radius: 3px;
+		flex: 0 0 auto;
+		min-width: 0;
+		max-width: calc(33.333% - 0.17em); /* 3 per row with gap */
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		border-width: 1px;
+	}
+
+	/* Replace button text with abbreviations on mobile */
+	body .nexus-properties-bases-view-selector button {
+		font-size: 0;
+	}
+
+	body .nexus-properties-bases-view-selector button::before {
+		font-size: 1rem;
+	}
+
+	/* Children button */
+	body .nexus-properties-bases-view-selector button:nth-child(1)::before {
+		content: "C";
+	}
+
+	/* Parent button */
+	body .nexus-properties-bases-view-selector button:nth-child(2)::before {
+		content: "P";
+	}
+
+	/* Related button */
+	body .nexus-properties-bases-view-selector button:nth-child(3)::before {
+		content: "R";
+	}
+
+	/* Archived Children button */
+	body .nexus-properties-bases-view-selector button:nth-child(4)::before {
+		content: "A-C";
+	}
+
+	/* Archived Parent button */
+	body .nexus-properties-bases-view-selector button:nth-child(5)::before {
+		content: "A-P";
+	}
+
+	/* Archived Related button */
+	body .nexus-properties-bases-view-selector button:nth-child(6)::before {
+		content: "A-R";
+	}
+
+	/* ===== FORCE FULL-WIDTH SIDEBAR ON MOBILE ===== */
+	/* Target Obsidian's sidebar when Nexus Properties view is active */
+	.workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content),
+	.workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
+		width: 100%;
+		max-width: 100%;
+		min-width: 100%;
+	}
+
+	/* Also ensure the leaf itself is full width */
+	.workspace-leaf:has(.nexus-properties-view-switcher-content) {
+		width: 100%;
+		max-width: 100%;
+	}
 }
 
 /* Search Row - contains search input (matches filter row structure) */

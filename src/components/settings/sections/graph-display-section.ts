@@ -57,6 +57,19 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 			step: 5,
 		});
 
+		new Setting(container).setName("Mobile").setHeading();
+
+		this.uiBuilder.addSlider(container, {
+			key: "mobileFrontmatterPropertyWidth",
+			name: "Mobile frontmatter property width",
+			desc: "Minimum width in pixels for frontmatter properties in zoom preview on mobile (screens < 600px). Lower values fit more properties per row.",
+			min: 50,
+			max: 300,
+			step: 5,
+		});
+
+		new Setting(container).setName("Animation").setHeading();
+
 		this.uiBuilder.addSlider(container, {
 			key: "graphAnimationDuration",
 			name: "Graph animation duration",

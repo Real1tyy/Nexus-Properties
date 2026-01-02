@@ -58,6 +58,7 @@ export class GraphZoomPreview {
 		this.previewOverlay.setCssProps({
 			"--zoom-preview-max-height": `${this.settings.graphZoomPreviewHeight}px`,
 			"--zoom-preview-frontmatter-height": `${this.settings.graphZoomPreviewFrontmatterHeight}px`,
+			"--mobile-frontmatter-property-width": `${this.settings.mobileFrontmatterPropertyWidth}px`,
 		});
 
 		// Subscribe to settings changes to update preview reactively

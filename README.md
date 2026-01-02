@@ -134,11 +134,11 @@ Once approved for the Community Plugin store, you'll be able to install Nexus Pr
 
 ## 📱 **Mobile Support**
 
-**Current Status**: Mobile support is currently limited and not fully optimized. The plugin is primarily designed for desktop use, and while it may function on mobile devices, the experience is not yet polished.
+**Nexus Properties is fully optimized for mobile devices!** The plugin has been tested on phones with comprehensive UI improvements for touch-friendly interaction.
 
-**Future Plans**: Mobile support is a priority for future development. We're committed to improving the mobile experience over time.
+**Learn More**: Check out the [Mobile Support Documentation](https://real1tyy.github.io/Nexus-Properties/mobile) for detailed information about mobile-specific features and optimizations.
 
-**Stay Updated**: Keep an eye on the [Changelog](https://real1tyy.github.io/Nexus-Properties/changelog) for mobile improvements as they're released. If you encounter specific mobile issues or have suggestions, please [open an issue](https://github.com/Real1tyy/Nexus-Properties/issues) — your feedback helps prioritize mobile enhancements.
+**Feedback Welcome**: If you encounter any mobile issues or have suggestions for improvement, please [open an issue](https://github.com/Real1tyy/Nexus-Properties/issues) on GitHub.
 
 ---
 
