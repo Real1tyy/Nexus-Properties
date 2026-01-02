@@ -532,11 +532,6 @@ export class GraphBuilder {
 		return { nodes: filteredNodes, edges: filteredEdges };
 	}
 
-	/**
-	 * Connect kept nodes that remain connected via directed paths consisting only of removed intermediate nodes.
-	 *
-	 * Example: A → B → C → D, keep {A, D}, removed {B, C} => adds A → D
-	 */
 	private findIndirectConnections(originalEdges: ElementDefinition[], keepNodeIds: Set<string>): ElementDefinition[] {
 		const outgoing = new Map<string, Set<string>>();
 		for (const edge of originalEdges) {
