@@ -902,6 +902,8 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			isFolderNote: isFolderNoteGraph,
 			renderRelated: this.renderRelated,
 			includeAllRelated: this.includeAllRelated,
+			useMultiRowLayout: settings.useMultiRowLayout,
+			maxChildrenPerRow: settings.maxChildrenPerRow,
 		});
 	}
 

@@ -16,6 +16,19 @@ Fixed race condition errors when creating nodes by adding retry mechanism to han
 
 ### New Features
 
+#### Multi-Row Layout for Large Hierarchies
+
+Transform how large hierarchies are displayed with intelligent multi-row child positioning that uses vertical space more effectively.
+
+- **Vertical Space Optimization**: Parents with many children now distribute them across multiple staggered rows instead of a single horizontal line
+- **Staggered Pattern**: Children are arranged in an alternating pattern (10-9-10-9) where odd rows are offset to fit between nodes in even rows, creating a compact domino-like layout
+- **Better Readability**: More zoom-in capability as nodes use both width and height instead of stretching horizontally
+- **Generation Tracking**: Automatically accounts for multi-row layouts when positioning grandchildren, ensuring proper spacing between generations
+- **Configurable Threshold**: Set the maximum children per row (3-30, default: 10) to control when multi-row layout activates
+- **Optional Feature**: Enable/disable in settings
+
+See [Configuration](configuration#multi-row-layout) for setup instructions.
+
 #### Bases View Archived Toggle
 
 Simplified the bases view interface with a new archived toggle checkbox.

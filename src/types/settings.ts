@@ -85,6 +85,10 @@ export const NexusPropertiesSettingsSchema = z
 		allRelatedMaxDepth: z.number().int().min(1).max(20).catch(SETTINGS_DEFAULTS.DEFAULT_ALL_RELATED_MAX_DEPTH),
 		hierarchyMaxDepth: z.number().int().min(1).max(50).catch(SETTINGS_DEFAULTS.DEFAULT_HIERARCHY_MAX_DEPTH),
 
+		// Multi-row layout settings
+		useMultiRowLayout: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_USE_MULTI_ROW_LAYOUT),
+		maxChildrenPerRow: z.number().int().min(3).max(30).catch(SETTINGS_DEFAULTS.DEFAULT_MAX_CHILDREN_PER_ROW),
+
 		// Zoom preview behavior
 		zoomHideFrontmatterByDefault: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_ZOOM_HIDE_FRONTMATTER),
 		zoomHideContentByDefault: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_ZOOM_HIDE_CONTENT),

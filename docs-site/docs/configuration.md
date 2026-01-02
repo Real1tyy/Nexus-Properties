@@ -33,6 +33,33 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 
 **Hierarchy Traversal Depth** (default: `10`, range: 1-50): Max levels in hierarchy mode
 
+## Multi-Row Layout
+
+Configure how nodes with many children are displayed in hierarchy mode.
+
+**Use Multi-Row Layout for Large Families** (default: `false`): Enable multi-row child positioning
+- Distributes children across multiple staggered rows when a parent has many children
+- Uses more vertical space and less horizontal space for better readability
+- Applies only in hierarchy mode (not constellation or related views)
+
+**Max Children Per Row** (default: `10`, range: 3-30): Maximum children in a single row
+- When exceeded, children wrap to next row in staggered pattern
+- Pattern: full row (10), offset row (9), full row (10), offset row (9)...
+- Offset rows fit between nodes in the row above, creating a domino effect
+- Only applies when multi-row layout is enabled
+
+**How it works**:
+1. Parent with 15 children and max=10:
+   - Row 1: 10 children in a line
+   - Row 2: 5 children offset between Row 1 gaps
+2. Grandchildren are positioned below the lowest row of their parent's generation
+3. Proper spacing maintained between all generations
+
+**Use cases**:
+- Organizational charts with many direct reports
+- Project hierarchies with numerous sub-tasks
+- Knowledge structures with broad categorization
+
 **Display Properties in Nodes** (default: `[]`): Comma-separated properties to show in nodes (e.g., `status, priority`)
 
 **Show Node Tooltips** (default: `true`): Display property tooltips on hover

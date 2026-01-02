@@ -97,6 +97,23 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 			step: 1,
 		});
 
+		new Setting(container).setName("Layout").setHeading();
+
+		this.uiBuilder.addToggle(container, {
+			key: "useMultiRowLayout",
+			name: "Use multi-row layout for large families",
+			desc: "When a parent has many children, distribute them across multiple staggered rows to use more vertical space. This makes large hierarchies more readable by reducing horizontal spread.",
+		});
+
+		this.uiBuilder.addSlider(container, {
+			key: "maxChildrenPerRow",
+			name: "Max children per row",
+			desc: "Maximum number of children to display in a single row before wrapping to the next row in staggered pattern (3-30). Only applies when multi-row layout is enabled.",
+			min: 3,
+			max: 30,
+			step: 1,
+		});
+
 		this.uiBuilder.addTextArray(container, {
 			key: "displayNodeProperties",
 			name: "Display properties in nodes",

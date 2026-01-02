@@ -9,6 +9,8 @@ interface LayoutConfig {
 	isFolderNote: boolean;
 	renderRelated: boolean;
 	includeAllRelated: boolean;
+	useMultiRowLayout?: boolean;
+	maxChildrenPerRow?: number;
 }
 
 interface GraphLayoutManagerConfig {
@@ -29,7 +31,8 @@ export class GraphLayoutManager {
 	}
 
 	applyLayout(nodes: ElementDefinition[], edges: ElementDefinition[], config: LayoutConfig): void {
-		const { animationDuration, isFolderNote, renderRelated, includeAllRelated } = config;
+		const { animationDuration, isFolderNote, renderRelated, includeAllRelated, useMultiRowLayout, maxChildrenPerRow } =
+			config;
 
 		// Check layout mode flags
 		const hasConstellationData = nodes.some((node) => node.data && typeof node.data.constellationIndex === "number");
@@ -44,7 +47,7 @@ export class GraphLayoutManager {
 		} else if (renderRelated) {
 			this.applyConcentricLayout(animationDuration);
 		} else {
-			this.applyDagreLayout(animationDuration);
+			this.applyDagreLayout(animationDuration, useMultiRowLayout, maxChildrenPerRow, nodes, edges);
 		}
 		this.distributeIsolatedNodes(nodes, edges, animationDuration);
 	}
@@ -307,25 +310,185 @@ export class GraphLayoutManager {
 		);
 	}
 
-	private applyDagreLayout(animationDuration: number): void {
+	private applyDagreLayout(
+		animationDuration: number,
+		useMultiRowLayout?: boolean,
+		maxChildrenPerRow?: number,
+		nodes?: ElementDefinition[],
+		edges?: ElementDefinition[]
+	): void {
+		// First apply standard dagre layout
+		const layout = this.cy.layout({
+			name: "dagre",
+			rankDir: "TB",
+			align: undefined,
+			nodeSep: 80,
+			rankSep: 120,
+			edgeSep: 50,
+			ranker: "network-simplex",
+			animate: false, // We'll handle animation separately
+			fit: false,
+			padding: 80,
+		} as any);
+
+		layout.run();
+
+		// Apply multi-row layout if enabled
+		if (useMultiRowLayout && maxChildrenPerRow && nodes && edges) {
+			this.applyMultiRowChildLayout(nodes, edges, maxChildrenPerRow);
+		}
+
+		// Now fit and animate if needed
 		this.runLayoutWithAnimationHandling(
 			() =>
 				this.cy.layout({
-					name: "dagre",
-					rankDir: "TB",
-					align: undefined,
-					nodeSep: 80,
-					rankSep: 120,
-					edgeSep: 50,
-					ranker: "network-simplex",
+					name: "preset",
+					fit: true,
+					padding: 80,
 					animate: animationDuration > 0,
 					animationDuration: animationDuration,
 					animationEasing: "ease-out-cubic",
-					fit: true,
-					padding: 80,
-				} as any),
+				}),
 			animationDuration
 		);
+	}
+
+	/**
+	 * Apply multi-row layout to children of parents with many children.
+	 * Distributes children in staggered rows (maxPerRow, maxPerRow-1, maxPerRow, maxPerRow-1...)
+	 * to use more vertical space and less horizontal space.
+	 */
+	private applyMultiRowChildLayout(
+		nodes: ElementDefinition[],
+		edges: ElementDefinition[],
+		maxChildrenPerRow: number
+	): void {
+		// Build parent-child relationships
+		const parentToChildren = new Map<string, string[]>();
+		const childToParent = new Map<string, string>();
+
+		edges.forEach((edge) => {
+			const source = edge.data?.source as string;
+			const target = edge.data?.target as string;
+
+			if (!parentToChildren.has(source)) {
+				parentToChildren.set(source, []);
+			}
+			parentToChildren.get(source)!.push(target);
+			childToParent.set(target, source);
+		});
+
+		// Group nodes by level
+		const nodesByLevel = new Map<number, ElementDefinition[]>();
+		nodes.forEach((node) => {
+			const level = (node.data?.level as number) ?? 0;
+			if (!nodesByLevel.has(level)) {
+				nodesByLevel.set(level, []);
+			}
+			nodesByLevel.get(level)!.push(node);
+		});
+
+		// Track the maximum Y position for each level (generation bounds)
+		const levelMaxY = new Map<number, number>();
+
+		// Process each level in order
+		const maxLevel = Math.max(...Array.from(nodesByLevel.keys()));
+		for (let level = 0; level <= maxLevel; level++) {
+			const nodesAtLevel = nodesByLevel.get(level) ?? [];
+
+			nodesAtLevel.forEach((node) => {
+				const nodeId = node.data?.id as string;
+				const cyNode = this.cy.getElementById(nodeId);
+				if (cyNode.length === 0) return;
+
+				const children = parentToChildren.get(nodeId) ?? [];
+				if (children.length <= maxChildrenPerRow) {
+					// No need to reposition - update level max Y
+					const pos = cyNode.position();
+					levelMaxY.set(level, Math.max(levelMaxY.get(level) ?? -Infinity, pos.y));
+					return;
+				}
+
+				// This parent has too many children - apply multi-row layout
+				const parentPos = cyNode.position();
+
+				// Calculate new positions for children
+				const childPositions = this.calculateStaggeredChildPositions(
+					children,
+					parentPos,
+					maxChildrenPerRow,
+					level,
+					levelMaxY
+				);
+
+				// Apply positions to children
+				childPositions.forEach((pos, childId) => {
+					const childNode = this.cy.getElementById(childId);
+					if (childNode.length > 0) {
+						childNode.position(pos);
+					}
+				});
+
+				// Update parent position to be at center of first row
+				levelMaxY.set(level, Math.max(levelMaxY.get(level) ?? -Infinity, parentPos.y));
+			});
+		}
+	}
+
+	/**
+	 * Calculate staggered row positions for children.
+	 * Pattern: maxPerRow in first row, maxPerRow-1 in second row (offset), maxPerRow in third row, etc.
+	 */
+	private calculateStaggeredChildPositions(
+		children: string[],
+		parentPos: { x: number; y: number },
+		maxPerRow: number,
+		parentLevel: number,
+		levelMaxY: Map<number, number>
+	): Map<string, { x: number; y: number }> {
+		const positions = new Map<string, { x: number; y: number }>();
+		const horizontalSpacing = 120; // Space between nodes in a row
+		const verticalSpacing = 150; // Space between rows
+
+		// Determine starting Y position based on previous generation's max Y
+		const parentMaxY = levelMaxY.get(parentLevel) ?? parentPos.y;
+		const startY = parentMaxY + verticalSpacing;
+
+		let childIndex = 0;
+		let rowIndex = 0;
+
+		while (childIndex < children.length) {
+			// Alternate between maxPerRow and maxPerRow-1
+			const isEvenRow = rowIndex % 2 === 0;
+			const nodesInThisRow = isEvenRow ? maxPerRow : maxPerRow - 1;
+			const actualNodesInRow = Math.min(nodesInThisRow, children.length - childIndex);
+
+			// Calculate row width and starting X
+			const rowWidth = (actualNodesInRow - 1) * horizontalSpacing;
+			const startX = parentPos.x - rowWidth / 2;
+
+			// Add offset for odd rows (staggered effect)
+			const xOffset = isEvenRow ? 0 : horizontalSpacing / 2;
+
+			// Position nodes in this row
+			for (let i = 0; i < actualNodesInRow; i++) {
+				const childId = children[childIndex];
+				const x = startX + i * horizontalSpacing + xOffset;
+				const y = startY + rowIndex * verticalSpacing;
+
+				positions.set(childId, { x, y });
+				childIndex++;
+			}
+
+			rowIndex++;
+		}
+
+		// Update generation max Y for the next level
+		const childLevel = parentLevel + 1;
+		const lastRowY = startY + (rowIndex - 1) * verticalSpacing;
+		levelMaxY.set(childLevel, Math.max(levelMaxY.get(childLevel) ?? -Infinity, lastRowY));
+
+		return positions;
 	}
 
 	private applyPresetLayout(
