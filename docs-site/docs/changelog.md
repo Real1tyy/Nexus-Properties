@@ -8,6 +8,12 @@ All notable changes to Nexus Properties will be documented here.
 
 ## 1.5.0
 
+### Bug Fixes
+
+#### Inline Title Focus for Node Creation
+
+Fixed race condition errors when creating nodes by adding retry mechanism to handle Obsidian's internal rendering conflicts.
+
 ### New Features
 
 #### Bases View Archived Toggle

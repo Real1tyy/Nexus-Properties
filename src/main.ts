@@ -251,32 +251,42 @@ export default class NexusPropertiesPlugin extends Plugin {
 	}
 
 	private async focusInlineTitle(leaf: WorkspaceLeaf, type: "parent" | "child" | "related"): Promise<void> {
-		await new Promise((resolve) => setTimeout(resolve, 30));
+		const MAX_ATTEMPTS = 10;
+		const RETRY_DELAY = 30;
 
-		const view = leaf.view;
-		if (!(view instanceof MarkdownView)) return;
+		for (let attempt = 0; attempt < MAX_ATTEMPTS; attempt++) {
+			try {
+				await new Promise((resolve) => setTimeout(resolve, RETRY_DELAY));
 
-		const inlineTitle = view.containerEl.querySelector(".inline-title") as HTMLElement;
-		if (!inlineTitle || inlineTitle.contentEditable !== "true") return;
+				const view = leaf.view;
+				if (!(view instanceof MarkdownView)) continue;
 
-		inlineTitle.focus();
+				const inlineTitle = view.containerEl.querySelector(".inline-title") as HTMLElement;
+				if (!inlineTitle || inlineTitle.contentEditable !== "true") continue;
 
-		const range = document.createRange();
-		const selection = window.getSelection();
-		if (selection) {
-			range.selectNodeContents(inlineTitle);
+				inlineTitle.focus();
 
-			// Position cursor based on node type
-			if (type === "parent") {
-				// Focus at the very start (before the dash)
-				range.collapse(true);
-			} else {
-				// Focus at the end for child and related
-				range.collapse(false);
-			}
+				const selection = window.getSelection();
+				if (!selection) continue;
 
-			selection.removeAllRanges();
-			selection.addRange(range);
+				const textNode = inlineTitle.firstChild;
+				if (!textNode || textNode.nodeType !== Node.TEXT_NODE) continue;
+
+				const range = document.createRange();
+				const textContent = textNode.textContent || "";
+
+				if (type === "parent") {
+					range.setStart(textNode, 0);
+					range.setEnd(textNode, 0);
+				} else {
+					range.setStart(textNode, textContent.length);
+					range.setEnd(textNode, textContent.length);
+				}
+
+				selection.removeAllRanges();
+				selection.addRange(range);
+				return;
+			} catch {}
 		}
 	}
 }
