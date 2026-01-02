@@ -76,6 +76,9 @@ Fixed double slash issue in wiki links for files in the root directory.
 **Before:** `[[//Parent|Parent]]`
 **After:** `[[/Parent|Parent]]`
 
+#### Mobile Graph Rendering
+- **Fixed Graph Not Displaying**: Resolved issue where the graph view header consumed all vertical space on mobile, preventing the graph from rendering
+
 #### Complete Mobile Optimization
 
 Nexus Properties now provides a fully optimized mobile experience with comprehensive UI improvements for phones.
@@ -105,11 +108,6 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 **Configurable Settings**:
 - **Mobile Frontmatter Width**: New setting (Graph → Mobile) allows adjusting property width (50-300px) to fit your screen size and preference
-
-### Bug Fixes
-
-#### Mobile Graph Rendering
-- **Fixed Graph Not Displaying**: Resolved issue where the graph view header consumed all vertical space on mobile, preventing the graph from rendering
 
 ---
 
