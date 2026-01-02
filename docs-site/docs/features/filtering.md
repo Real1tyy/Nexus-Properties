@@ -75,6 +75,36 @@ Equivalent to: `type === 'project' && status === 'active' && priority === 'high'
 - `Array.isArray(tags) && tags.includes('work')` - Work Notes
 - `status !== 'complete'` - Incomplete
 
+## Indirect Connections
+
+When filtering removes intermediate nodes, Nexus Properties can automatically maintain connections between the remaining nodes.
+
+**How it works**:
+- If you have A → B → C
+- And filtering removes B
+- The graph will show A → C
+
+**Enable/Disable**: Settings → Nexus Properties → Graph → "Maintain indirect connections when filtering"
+
+**Default**: Enabled
+
+**Benefits**:
+- **Prevents fragmentation**: Graph stays connected even when filtering removes nodes
+- **Maintains context**: See relationships between distant nodes
+- **Better readability**: Understand the full relationship structure
+
+**Example**:
+```
+Original: Person → Meeting → Project
+Filter out meetings: Person → Project (indirect connection created)
+```
+
+This feature is especially useful when:
+- Filtering by node type to hide intermediaries
+- Using search to focus on specific nodes
+- Analyzing deep relationship chains
+- Exploring connections across multiple levels
+
 ## Combining Features
 
 **Filtering + Color Rules**: Color by category, filter to focus
@@ -82,6 +112,8 @@ Equivalent to: `type === 'project' && status === 'active' && priority === 'high'
 **Filtering + View Modes**: Works in all modes
 
 **Filtering + Search**: Filter first, then search within results
+
+**Filtering + Indirect Connections**: Maintain relationship context when nodes are hidden
 
 ## Next Steps
 

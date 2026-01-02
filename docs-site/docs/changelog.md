@@ -35,6 +35,16 @@ Transform how large hierarchies are displayed with intelligent multi-row child p
 
 See [Configuration](configuration#multi-row-layout) for setup instructions.
 
+#### Maintain Indirect Connections When Filtering
+
+Added intelligent connection preservation when filtering removes intermediate nodes from the graph.
+
+- **Smart Edge Creation**: When filtering removes nodes that connect other nodes, those connections are automatically maintained
+- **Example**: If you have A → B → C and filter out B, the graph will show A → C
+- **Configurable**: Toggle "Maintain indirect connections when filtering" in Graph Display settings
+- **Default Enabled**: Feature is on by default for better graph coherence
+- **Works With**: Both search queries and filter expressions
+
 #### Bases View Archived Toggle
 
 Simplified the bases view interface with a new archived toggle checkbox.

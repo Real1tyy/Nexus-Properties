@@ -102,6 +102,7 @@ export const NexusPropertiesSettingsSchema = z
 		showFilterBar: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_FILTER_BAR),
 		showViewSwitcherHeader: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_VIEW_SWITCHER_HEADER),
 		showZoomIndicator: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_ZOOM_INDICATOR),
+		maintainIndirectConnections: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_MAINTAIN_INDIRECT_CONNECTIONS),
 
 		// Graph filtering settings
 		filterExpressions: z.array(z.string()).catch([]),

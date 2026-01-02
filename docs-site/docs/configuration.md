@@ -21,6 +21,11 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 - Shows current zoom percentage (e.g., "100%")
 - Click to type a specific zoom level
 
+**Maintain Indirect Connections When Filtering** (default: `true`): Preserve connections when intermediate nodes are filtered
+- Example: A → B → C, filter out B → shows A → C
+- Prevents graph fragmentation during filtering
+- [Learn more →](features/filtering#indirect-connections)
+
 **Graph Enlarged Width** (default: `75%`, range: 50-100%): Window width when enlarged
 
 **Zoom Preview Height** (default: `280px`, range: 120-700px): Max height for zoom preview panel

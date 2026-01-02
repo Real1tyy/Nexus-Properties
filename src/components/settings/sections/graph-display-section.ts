@@ -30,6 +30,12 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 			desc: "Display the zoom level indicator in the filter row. Shows current zoom percentage and allows typing a specific zoom level.",
 		});
 
+		this.uiBuilder.addToggle(container, {
+			key: "maintainIndirectConnections",
+			name: "Maintain indirect connections when filtering",
+			desc: "When search or filter removes intermediate nodes, still show connections between nodes that were indirectly connected through them. For example, if A → B → C and B is filtered out, still show A → C.",
+		});
+
 		this.uiBuilder.addSlider(container, {
 			key: "graphEnlargedWidthPercent",
 			name: "Graph enlarged width",

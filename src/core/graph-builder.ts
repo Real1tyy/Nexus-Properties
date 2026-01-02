@@ -54,6 +54,7 @@ export class GraphBuilder {
 	private readonly colorEvaluator: ColorEvaluator<NexusPropertiesSettings>;
 	private allRelatedMaxDepth: number;
 	private hierarchyMaxDepth: number;
+	private maintainIndirectConnections: boolean;
 
 	constructor(
 		private readonly app: App,
@@ -63,13 +64,13 @@ export class GraphBuilder {
 		this.filterEvaluator = new FilterEvaluator(settingsStore.settings$);
 		this.colorEvaluator = new ColorEvaluator(settingsStore.settings$);
 
-		// Initialize and subscribe to depth settings
-		this.allRelatedMaxDepth = settingsStore.settings$.value.allRelatedMaxDepth;
-		this.hierarchyMaxDepth = settingsStore.settings$.value.hierarchyMaxDepth;
-		settingsStore.settings$.subscribe((settings) => {
+		const applySettings = (settings: NexusPropertiesSettings) => {
 			this.allRelatedMaxDepth = settings.allRelatedMaxDepth;
 			this.hierarchyMaxDepth = settings.hierarchyMaxDepth;
-		});
+			this.maintainIndirectConnections = settings.maintainIndirectConnections;
+		};
+		applySettings(settingsStore.settings$.value);
+		settingsStore.settings$.subscribe(applySettings);
 	}
 
 	private resolveValidContexts(wikiLinks: string[], excludePaths: Set<string>, sourcePath: string): ValidFileContext[] {
@@ -519,10 +520,113 @@ export class GraphBuilder {
 
 		const keepNodeIds = new Set(filteredNodes.map((node) => node.data?.id as string));
 
-		const filteredEdges = graphData.edges.filter(
+		let filteredEdges = graphData.edges.filter(
 			(edge) => keepNodeIds.has(edge.data?.source as string) && keepNodeIds.has(edge.data?.target as string)
 		);
 
+		if (this.maintainIndirectConnections) {
+			const indirectEdges = this.findIndirectConnections(graphData.edges, keepNodeIds);
+			filteredEdges = [...filteredEdges, ...indirectEdges];
+		}
+
 		return { nodes: filteredNodes, edges: filteredEdges };
+	}
+
+	/**
+	 * Connect kept nodes that remain connected via directed paths consisting only of removed intermediate nodes.
+	 *
+	 * Example: A → B → C → D, keep {A, D}, removed {B, C} => adds A → D
+	 */
+	private findIndirectConnections(originalEdges: ElementDefinition[], keepNodeIds: Set<string>): ElementDefinition[] {
+		const outgoing = new Map<string, Set<string>>();
+		for (const edge of originalEdges) {
+			const source = edge.data?.source as string | undefined;
+			const target = edge.data?.target as string | undefined;
+			if (!source || !target) continue;
+
+			let set = outgoing.get(source);
+			if (!set) {
+				set = new Set<string>();
+				outgoing.set(source, set);
+			}
+			set.add(target);
+		}
+
+		// Nodes that appear in the graph
+		const allNodeIds = new Set<string>();
+		for (const [source, targets] of outgoing) {
+			allNodeIds.add(source);
+			for (const target of targets) {
+				allNodeIds.add(target);
+			}
+		}
+
+		const removedNodeIds = new Set<string>();
+		for (const id of allNodeIds) {
+			if (!keepNodeIds.has(id)) {
+				removedNodeIds.add(id);
+			}
+		}
+
+		const indirect = new Map<string, Set<string>>();
+
+		const addIndirect = (from: string, to: string) => {
+			if (from === to) return;
+
+			// If there is already a direct edge, skip
+			if (outgoing.get(from)?.has(to)) return;
+
+			let set = indirect.get(from);
+			if (!set) {
+				set = new Set<string>();
+				indirect.set(from, set);
+			}
+			set.add(to);
+		};
+
+		// For each kept node, BFS through removed nodes only. Emit an indirect edge when we reach another kept node.
+		for (const start of keepNodeIds) {
+			const visitedRemoved = new Set<string>();
+			const queue: string[] = [];
+
+			const first = outgoing.get(start);
+			if (!first) continue;
+
+			for (const next of first) {
+				if (keepNodeIds.has(next)) continue;
+				if (removedNodeIds.has(next) && !visitedRemoved.has(next)) {
+					visitedRemoved.add(next);
+					queue.push(next);
+				}
+			}
+
+			while (queue.length > 0) {
+				const cur = queue.shift();
+				if (!cur) break;
+
+				const neighbors = outgoing.get(cur);
+				if (!neighbors) continue;
+
+				for (const next of neighbors) {
+					if (keepNodeIds.has(next)) {
+						addIndirect(start, next);
+						continue;
+					}
+
+					if (removedNodeIds.has(next) && !visitedRemoved.has(next)) {
+						visitedRemoved.add(next);
+						queue.push(next);
+					}
+				}
+			}
+		}
+
+		const result: ElementDefinition[] = [];
+		for (const [source, targets] of indirect) {
+			for (const target of targets) {
+				result.push({ data: { source, target, indirect: true } });
+			}
+		}
+		return result;
 	}
 }
