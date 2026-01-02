@@ -31,10 +31,7 @@ export class NodeCreator {
 
 	async createRelatedNode(sourceFile: TFile, type: NodeCreationType): Promise<TFile | null> {
 		try {
-			const frontmatter = this.app.metadataCache.getFileCache(sourceFile)?.frontmatter;
-			if (!frontmatter) {
-				throw new Error(`No frontmatter found for ${sourceFile.basename}`);
-			}
+			const frontmatter = this.app.metadataCache.getFileCache(sourceFile)?.frontmatter || {};
 
 			const folder = sourceFile.parent?.path || "";
 			const filePath = this.getUniqueFilePathForType(folder, sourceFile.basename, type);
