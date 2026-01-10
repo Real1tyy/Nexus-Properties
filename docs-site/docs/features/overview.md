@@ -40,6 +40,9 @@ Real-time search by filename/path. Highlights matches, dims non-matches. Command
 ![Graph Search](/img/screenshots/graph-search.png)
 *Real-time search highlighting*
 
+### 📊 Node Statistics
+View real-time relationship counts for the active file in the view switcher header. See direct relationships (Parents, Children, Related) and recursive totals (All Parents, All Children, All Related) at a glance. Both displays are independently configurable in settings.
+
 ### ⚡ [Node Creation](node-creation)
 Create parent/child/related nodes with property inheritance and bidirectional linking.
 

@@ -38,6 +38,18 @@ export class GeneralSection implements SettingsSection {
 			desc: "Display the header with toggle button in the Nexus Properties view. Changes apply immediately.",
 		});
 
+		this.uiBuilder.addToggle(container, {
+			key: "showSimpleStatistics",
+			name: "Show simple statistics",
+			desc: "Display direct parent, children, and related counts in the view switcher header.",
+		});
+
+		this.uiBuilder.addToggle(container, {
+			key: "showRecursiveStatistics",
+			name: "Show recursive statistics",
+			desc: "Display recursive (all) parent, children, and related counts in the view switcher header.",
+		});
+
 		this.uiBuilder.addArrayManager(container, {
 			key: "directories",
 			name: "Directory scanning",

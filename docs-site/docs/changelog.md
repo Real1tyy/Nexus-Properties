@@ -6,6 +6,31 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.6.0
+
+### New Features
+
+#### Node Statistics in View Switcher Header
+
+The view switcher header now displays real-time relationship statistics for the active file, giving instant insight into node connections.
+
+- **Direct Relationships**: Shows immediate parent, children, and related counts
+- **Recursive Relationships**: Shows all (recursive) parent, children, and related counts across the entire hierarchy
+- **Configurable Display**: Two separate toggles to show/hide simple and recursive statistics independently
+
+**Example Display**:
+```
+Parents: 1          All Parents: 3
+Children: 2         All Children: 8
+Related: 3          All Related: 12
+```
+
+**Settings**:
+- `Show Simple Statistics` (default: `true`) - Display direct relationship counts
+- `Show Recursive Statistics` (default: `true`) - Display recursive relationship counts
+
+See [Configuration](configuration#view-switcher-statistics) for details.
+
 ## 1.5.0
 
 ### New Features

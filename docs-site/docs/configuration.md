@@ -11,6 +11,22 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 **Show Ribbon Icon** (default: `true`): Display graph icon in left ribbon
 - ⚠️ Restart required after changing
 
+**Show View Switcher Header** (default: `true`): Display header with toggle button in Nexus Properties view
+- Changes apply immediately
+
+### View Switcher Statistics
+
+**Show Simple Statistics** (default: `true`): Display direct parent, children, and related counts
+- Shows immediate relationships only (one level)
+- Format: `Parents: N`, `Children: N`, `Related: N`
+
+**Show Recursive Statistics** (default: `true`): Display recursive (all) parent, children, and related counts
+- Shows all relationships across entire hierarchy
+- Format: `All Parents: N`, `All Children: N`, `All Related: N`
+- Uses efficient traversal with cycle detection
+
+**Layout**: Statistics appear on the left side of the view switcher header without affecting the centered toggle button position.
+
 ## Graph Display
 
 **Show Search Bar by Default** (default: `true`): Display search bar on graph open

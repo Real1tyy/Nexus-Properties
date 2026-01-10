@@ -248,9 +248,9 @@ export class GraphBuilder {
 			const relations = this.indexer.extractRelationships(file, frontmatter);
 			const validParents = this.resolveValidContexts(relations.parent, visited, filePath);
 
-			validParents.forEach((ctx) => {
+			for (const ctx of validParents) {
 				dfsUpwards(ctx.path, currentLevel + 1);
-			});
+			}
 		};
 
 		dfsUpwards(startPath, 0);

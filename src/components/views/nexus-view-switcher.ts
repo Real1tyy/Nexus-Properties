@@ -1,8 +1,10 @@
-import { ItemView, Platform, type WorkspaceLeaf } from "obsidian";
+import { ItemView, Platform, type TFile, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
+import type { NodeStatistics } from "../../types/statistics";
 import { cls } from "../../utils/css";
+import { collectRelatedNodesRecursively } from "../../utils/hierarchy";
 import { BasesView, type BaseViewType } from "./bases-view";
 import { RelationshipGraphView } from "./relationship-graph-view";
 
@@ -17,6 +19,7 @@ export class NexusViewSwitcher extends ItemView {
 	private toggleButton: HTMLButtonElement | null = null;
 	private archivedToggleContainer: HTMLElement | null = null;
 	private archivedCheckbox: HTMLInputElement | null = null;
+	private statsContainer: HTMLElement | null = null;
 	private basesContentEl: HTMLElement | null = null;
 	private graphContainerEl: HTMLElement | null = null;
 	private isEnlarged = false;
@@ -59,6 +62,7 @@ export class NexusViewSwitcher extends ItemView {
 				if (this.currentMode === "bases" && this.basesView) {
 					await this.basesView.updateActiveFile();
 				}
+				this.updateStatistics();
 			})
 		);
 
@@ -142,6 +146,13 @@ export class NexusViewSwitcher extends ItemView {
 				cls: cls("view-switcher-header"),
 			});
 
+			// Left side: Statistics
+			this.statsContainer = headerBar.createEl("div", {
+				cls: cls("view-switcher-stats"),
+			});
+			this.updateStatistics();
+
+			// Center: Toggle button
 			this.toggleButton = headerBar.createEl("button", {
 				text: this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View",
 				cls: cls("view-toggle-button"),
@@ -151,6 +162,7 @@ export class NexusViewSwitcher extends ItemView {
 				await this.toggleView();
 			});
 
+			// Right side: Archived toggle
 			if (settings.excludeArchived) {
 				this.archivedToggleContainer = headerBar.createEl("label", {
 					cls: cls("view-switcher-archived-toggle"),
@@ -298,5 +310,90 @@ export class NexusViewSwitcher extends ItemView {
 
 		// Trigger a resize event to update any content that needs it
 		window.dispatchEvent(new Event("resize"));
+	}
+
+	public calculateNodeStatistics(file: TFile): NodeStatistics {
+		const cache = this.app.metadataCache.getFileCache(file);
+		const frontmatter = cache?.frontmatter;
+
+		if (!frontmatter) {
+			return {
+				parents: 0,
+				children: 0,
+				related: 0,
+				allParents: new Set(),
+				allChildren: new Set(),
+				allRelated: new Set(),
+			};
+		}
+
+		const relationships = this.indexer.extractRelationships(file, frontmatter);
+
+		const parents = relationships.parent.length;
+		const children = relationships.children.length;
+		const related = relationships.related.length;
+
+		const allParents = collectRelatedNodesRecursively(this.app, this.indexer, file, "parent");
+		const allChildren = collectRelatedNodesRecursively(this.app, this.indexer, file, "children");
+		const allRelated = collectRelatedNodesRecursively(this.app, this.indexer, file, "related");
+
+		return {
+			parents,
+			children,
+			related,
+			allParents,
+			allChildren,
+			allRelated,
+		};
+	}
+
+	private updateStatistics(): void {
+		if (!this.statsContainer) return;
+
+		const activeFile = this.app.workspace.getActiveFile();
+		if (!activeFile) {
+			this.statsContainer.empty();
+			return;
+		}
+
+		const settings = this.plugin.settingsStore.settings$.value;
+		const stats = this.calculateNodeStatistics(activeFile);
+		this.statsContainer.empty();
+
+		if (settings.showSimpleStatistics) {
+			const directStatsCol = this.statsContainer.createDiv({
+				cls: cls("view-switcher-stats-column"),
+			});
+			directStatsCol.createEl("div", {
+				text: `Parents: ${stats.parents}`,
+				cls: cls("view-switcher-stat-item"),
+			});
+			directStatsCol.createEl("div", {
+				text: `Children: ${stats.children}`,
+				cls: cls("view-switcher-stat-item"),
+			});
+			directStatsCol.createEl("div", {
+				text: `Related: ${stats.related}`,
+				cls: cls("view-switcher-stat-item"),
+			});
+		}
+
+		if (settings.showRecursiveStatistics) {
+			const allStatsCol = this.statsContainer.createDiv({
+				cls: cls("view-switcher-stats-column"),
+			});
+			allStatsCol.createEl("div", {
+				text: `All Parents: ${stats.allParents.size}`,
+				cls: cls("view-switcher-stat-item"),
+			});
+			allStatsCol.createEl("div", {
+				text: `All Children: ${stats.allChildren.size}`,
+				cls: cls("view-switcher-stat-item"),
+			});
+			allStatsCol.createEl("div", {
+				text: `All Related: ${stats.allRelated.size}`,
+				cls: cls("view-switcher-stat-item"),
+			});
+		}
 	}
 }
