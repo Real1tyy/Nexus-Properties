@@ -72,6 +72,13 @@ export class PropertiesSection implements SettingsSection {
 		});
 
 		this.uiBuilder.addText(container, {
+			key: "prioritizeParentProp",
+			name: "Prioritize parent property",
+			desc: "Optional property name to specify which parent should be prioritized when building hierarchy graphs. If a node has multiple parents and this property is set with a parent's name, that parent will be chosen.",
+			placeholder: "PriorityParent",
+		});
+
+		this.uiBuilder.addText(container, {
 			key: "zettelIdProp",
 			name: "Zettel ID property",
 			desc: "Property name for unique timestamp identifier assigned to new nodes",

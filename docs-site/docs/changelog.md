@@ -31,6 +31,23 @@ Related: 3          All Related: 12
 
 See [Configuration](configuration#view-switcher-statistics) for details.
 
+#### Prioritize Parent Property
+
+Control which parent is used when building hierarchy graphs for nodes with multiple parents.
+
+- **Configurable Property**: Set "Prioritize Parent Property" in settings to specify which frontmatter property controls parent selection
+- **Per-Node Control**: Each node can specify its preferred parent using this property
+- **Automatic Selection**: If the prioritized parent exists in the node's parent list, it's used; otherwise falls back to first available parent
+- **Graph-Wide Application**: Works for all nodes in the hierarchy, not just the source node
+
+**Example**:
+```yaml
+Parent: ["[[Team A]]", "[[Team B]]", "[[Team C]]"]
+PriorityParent: "[[Team B]]"  # Team B will be used in hierarchy views
+```
+
+See [Configuration](configuration#direct-relationship-properties) for setup instructions.
+
 ## 1.5.0
 
 ### New Features

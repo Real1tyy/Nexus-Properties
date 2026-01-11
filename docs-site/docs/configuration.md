@@ -184,6 +184,15 @@ Child: ["[[child-1]]", "[[child-2]]"]
 Related: ["[[note-2]]", "[[note-3]]"]
 ```
 
+**Prioritize Parent Property** (default: `""`): Optional property to specify which parent to prioritize in hierarchy graphs
+```yaml
+PriorityParent: "[[preferred-parent]]"
+```
+- When a node has multiple parents, use this property to choose which one is used in hierarchy views
+- The value should match one of the parent names from the Parent property
+- If not set or the specified parent isn't found, uses the first available parent
+- Works for all nodes in the graph, not just the current one
+
 **Auto-Link Siblings** (default: `true`): Automatically mark siblings as related
 
 ## Frontmatter Propagation
@@ -194,6 +203,7 @@ Related: ["[[note-2]]", "[[note-3]]"]
 
 **Excluded Propagated Properties** (default: `""`): Comma-separated properties to exclude (e.g., `Status, Priority`)
 - Relationship properties always excluded
+- Prioritize Parent property always excluded
 
 **Propagation Debounce Delay** (default: `1000ms`, range: 100-10000ms): Delay before propagating
 

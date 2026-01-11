@@ -7,7 +7,6 @@ import {
 	formatWikiLink,
 	getFileContext,
 	mergeFrontmatterDiffs,
-	parseExcludedProps,
 	parsePropertyLinks,
 	withFileContext,
 } from "@real1ty-obsidian-plugins/utils";
@@ -15,6 +14,7 @@ import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
+import { parseExcludedProps } from "../utils/frontmatter-utils";
 import { getChildrenRecursively } from "../utils/hierarchy";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";

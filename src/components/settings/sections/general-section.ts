@@ -166,7 +166,7 @@ export class GeneralSection implements SettingsSection {
 		this.uiBuilder.addText(container, {
 			key: "excludedPropagatedProps",
 			name: "Excluded propagation properties",
-			desc: "Comma-separated list of frontmatter property names to exclude from propagation. These properties will not be copied to child files. Relationship properties (Parent, Child, Related, _ZettelID) are always excluded automatically.",
+			desc: "Comma-separated list of frontmatter property names to exclude from propagation. These properties will not be copied to child files. Relationship properties (Parent, Child, Related, _ZettelID) and Prioritize Parent are always excluded automatically.",
 			placeholder: "status, archived, date",
 		});
 

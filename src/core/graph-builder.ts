@@ -55,6 +55,7 @@ export class GraphBuilder {
 	private allRelatedMaxDepth: number;
 	private hierarchyMaxDepth: number;
 	private maintainIndirectConnections: boolean;
+	private prioritizeParentProp: string;
 
 	constructor(
 		private readonly app: App,
@@ -68,9 +69,35 @@ export class GraphBuilder {
 			this.allRelatedMaxDepth = settings.allRelatedMaxDepth;
 			this.hierarchyMaxDepth = settings.hierarchyMaxDepth;
 			this.maintainIndirectConnections = settings.maintainIndirectConnections;
+			this.prioritizeParentProp = settings.prioritizeParentProp;
 		};
 		applySettings(settingsStore.settings$.value);
 		settingsStore.settings$.subscribe(applySettings);
+	}
+
+	/**
+	 * Get the prioritized parent for a given node, if configured and valid.
+	 * Returns the path of the prioritized parent if it exists in the node's parent list, otherwise undefined.
+	 */
+	private getPrioritizedParent(
+		frontmatter: Record<string, unknown>,
+		validParents: ValidFileContext[]
+	): string | undefined {
+		if (!this.prioritizeParentProp || !frontmatter[this.prioritizeParentProp]) {
+			return undefined;
+		}
+
+		const prioritizedParentValue = String(frontmatter[this.prioritizeParentProp]).trim();
+
+		const prioritizedPath = extractFilePath(prioritizedParentValue);
+
+		const matchingParent = validParents.find((ctx) => {
+			const parentPath = extractFilePath(ctx.wikiLink);
+
+			return parentPath === prioritizedPath || ctx.path === prioritizedPath;
+		});
+
+		return matchingParent?.path;
 	}
 
 	private resolveValidContexts(wikiLinks: string[], excludePaths: Set<string>, sourcePath: string): ValidFileContext[] {
@@ -248,6 +275,14 @@ export class GraphBuilder {
 			const relations = this.indexer.extractRelationships(file, frontmatter);
 			const validParents = this.resolveValidContexts(relations.parent, visited, filePath);
 
+			// Check if this node has a prioritized parent
+			const prioritizedParentPath = this.getPrioritizedParent(frontmatter, validParents);
+			if (prioritizedParentPath) {
+				dfsUpwards(prioritizedParentPath, currentLevel + 1);
+				return;
+			}
+
+			// Otherwise, explore all parents (first come first serve)
 			for (const ctx of validParents) {
 				dfsUpwards(ctx.path, currentLevel + 1);
 			}

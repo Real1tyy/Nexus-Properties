@@ -47,6 +47,7 @@ export const NexusPropertiesSettingsSchema = z
 		parentProp: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_PARENT_PROP),
 		childrenProp: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_CHILDREN_PROP),
 		relatedProp: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_RELATED_PROP),
+		prioritizeParentProp: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_PRIORITIZE_PARENT_PROP),
 
 		// Directories to scan - ["*"] means scan all, otherwise only scan specified directories and subdirectories
 		directories: z.array(z.string()).catch([...SETTINGS_DEFAULTS.DEFAULT_DIRECTORIES]),
