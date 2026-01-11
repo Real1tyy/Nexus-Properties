@@ -48,6 +48,14 @@ PriorityParent: "[[Team B]]"  # Team B will be used in hierarchy views
 
 See [Configuration](configuration#direct-relationship-properties) for setup instructions.
 
+#### What's New Modal
+
+Automatic changelog notifications keep you informed about new features and improvements.
+
+- **Version Updates**: Modal appears automatically when plugin updates to a new version
+- **Changelog Display**: Shows formatted changelog with all new features, improvements, and fixes
+- **Quick Links**: Direct access to full changelog, documentation, and support
+
 ## 1.5.0
 
 ### New Features

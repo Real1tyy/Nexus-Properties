@@ -1,4 +1,6 @@
+import { WhatsNewModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins/utils";
 import { Notice, Plugin, TFile } from "obsidian";
+import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
 import { NexusPropertiesSettingsTab, NodeCreationModal } from "./components";
 import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/views/nexus-view-switcher";
 import { Indexer } from "./core/indexer";
@@ -121,6 +123,8 @@ export default class NexusPropertiesPlugin extends Plugin {
 		await this.indexer.start();
 
 		this.registerView(VIEW_TYPE_NEXUS_SWITCHER, (leaf) => new NexusViewSwitcher(leaf, this.indexer, this));
+
+		await this.checkForUpdates();
 	}
 
 	async onunload() {
@@ -259,6 +263,30 @@ export default class NexusPropertiesPlugin extends Plugin {
 		} catch (error) {
 			console.error(`Error creating ${typeLabel} node:`, error);
 			new Notice(`❌ Error creating ${typeLabel} node: ${error}`);
+		}
+	}
+
+	private async checkForUpdates(): Promise<void> {
+		const currentVersion = this.manifest.version;
+		const lastSeenVersion = this.settingsStore.settings$.value.version;
+
+		if (lastSeenVersion !== currentVersion) {
+			const config: WhatsNewModalConfig = {
+				cssPrefix: "nexus",
+				pluginName: "Nexus Properties",
+				changelogContent: CHANGELOG_CONTENT,
+				links: {
+					support: "https://matejvavroproductivity.com/support/",
+					changelog: "https://real1tyy.github.io/Nexus-Properties/docs-site/changelog",
+					documentation: "https://real1tyy.github.io/Nexus-Properties/",
+				},
+			};
+
+			new WhatsNewModal(this.app, this, config, lastSeenVersion, currentVersion).open();
+			await this.settingsStore.updateSettings((settings) => ({
+				...settings,
+				version: currentVersion,
+			}));
 		}
 	}
 }

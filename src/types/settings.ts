@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { SETTINGS_DEFAULTS, SETTINGS_VERSION } from "./constants";
+import { SETTINGS_DEFAULTS } from "./constants";
 
 export type Frontmatter = Record<string, unknown>;
 
@@ -41,7 +41,7 @@ const PathIncludedPropertiesSchema = z
 
 export const NexusPropertiesSettingsSchema = z
 	.object({
-		version: z.number().int().positive().catch(SETTINGS_VERSION),
+		version: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_VERSION),
 
 		// Property names for direct relationships
 		parentProp: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_PARENT_PROP),
