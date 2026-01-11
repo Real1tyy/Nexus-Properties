@@ -59,6 +59,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	private layoutManager: GraphLayoutManager;
 	private zoomIndicator: ZoomIndicator | null = null;
 	private pendingGraphData: { nodes: ElementDefinition[]; edges: ElementDefinition[] } | null = null;
+	private onViewTypeChangeCallback: (() => void) | null = null;
 
 	constructor(
 		private readonly app: App,
@@ -156,10 +157,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			onRenderRelatedChange: (value) => {
 				this.renderRelated = value;
 				this.updateGraph();
+				this.notifyViewTypeChange();
 			},
 			onIncludeAllRelatedChange: (value) => {
 				this.includeAllRelated = value;
 				this.updateGraph();
+				this.notifyViewTypeChange();
 			},
 			onStartFromCurrentChange: (value) => {
 				this.ignoreTopmostParent = value;
@@ -1064,5 +1067,28 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.cy.resize();
 		this.cy.fit();
 		this.cy.center();
+	}
+
+	public isRelatedView(): boolean {
+		return this.renderRelated;
+	}
+
+	public isAllRelatedView(): boolean {
+		return this.includeAllRelated;
+	}
+
+	public setViewTypeChangeCallback(callback: () => void): void {
+		this.onViewTypeChangeCallback = callback;
+	}
+
+	private notifyViewTypeChange(): void {
+		if (this.onViewTypeChangeCallback) {
+			this.onViewTypeChangeCallback();
+		}
+	}
+
+	public updateGraphWithDepth(depth: number): void {
+		this.graphBuilder.setDepthOverride(depth);
+		this.updateGraph();
 	}
 }

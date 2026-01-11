@@ -10,6 +10,27 @@ All notable changes to Nexus Properties will be documented here.
 
 ### New Features
 
+#### Hierarchy Depth Slider
+
+Control how deep the graph traverses hierarchical relationships with an interactive depth slider in the graph view header.
+
+- **Dynamic Depth Control**: Adjust recursion depth from 1 to 50 levels using a slider
+- **Separate Depths**: Automatically uses appropriate depth setting based on view type:
+  - **Hierarchy views** (parent/child): Uses hierarchyMaxDepth setting
+  - **All Related views** (constellation): Uses allRelatedMaxDepth setting
+- **Temporary Adjustments**: Slider changes don't save to settings, only affect current session
+- **Live Updates**: Graph and statistics recalculate immediately as you adjust the slider
+- **Configurable**: Toggle slider visibility in settings (default: enabled)
+
+**How it works**: When viewing node E in hierarchy A → B → C → D → E with depth 3:
+- Finds an ancestor at the right level → starts at C
+- Builds down 3 levels → shows C, D, E and all descendants
+
+**Settings**:
+- `Show Depth Slider in Graph View` (default: `true`) - Display the depth slider in graph view header
+
+See [Graph Views](features/graph-views#depth-control) for usage examples.
+
 #### Node Statistics in View Switcher Header
 
 The view switcher header now displays real-time relationship statistics for the active file, giving instant insight into node connections.
@@ -17,6 +38,7 @@ The view switcher header now displays real-time relationship statistics for the 
 - **Direct Relationships**: Shows immediate parent, children, and related counts
 - **Recursive Relationships**: Shows all (recursive) parent, children, and related counts across the entire hierarchy
 - **Configurable Display**: Two separate toggles to show/hide simple and recursive statistics independently
+- **Respects Depth**: Recursive statistics use the current depth slider value when active
 
 **Example Display**:
 ```

@@ -19,6 +19,9 @@ export class NexusViewSwitcher extends ItemView {
 	private toggleButton: HTMLButtonElement | null = null;
 	private archivedToggleContainer: HTMLElement | null = null;
 	private archivedCheckbox: HTMLInputElement | null = null;
+	private depthSliderContainer: HTMLElement | null = null;
+	private depthSlider: HTMLInputElement | null = null;
+	private depthValueLabel: HTMLElement | null = null;
 	private statsContainer: HTMLElement | null = null;
 	private basesContentEl: HTMLElement | null = null;
 	private graphContainerEl: HTMLElement | null = null;
@@ -27,6 +30,7 @@ export class NexusViewSwitcher extends ItemView {
 	private settingsSubscription: Subscription | null = null;
 	private lastBasesViewType: BaseViewType = "children";
 	private showArchived = false;
+	private temporaryDepthOverride: number | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -131,6 +135,15 @@ export class NexusViewSwitcher extends ItemView {
 				this.archivedToggleContainer.style.display = "none";
 			}
 		}
+
+		if (this.depthSliderContainer) {
+			const settings = this.plugin.settingsStore.settings$.value;
+			if (this.currentMode === "graph" && settings.showDepthSlider) {
+				this.depthSliderContainer.style.display = "flex";
+			} else {
+				this.depthSliderContainer.style.display = "none";
+			}
+		}
 	}
 
 	private async renderView(): Promise<void> {
@@ -184,6 +197,36 @@ export class NexusViewSwitcher extends ItemView {
 					await this.renderViewContent();
 				});
 			}
+
+			// Right side: Depth slider (for graph mode)
+			if (settings.showDepthSlider) {
+				this.depthSliderContainer = headerBar.createEl("div", {
+					cls: cls("view-switcher-depth-slider"),
+				});
+
+				this.depthSliderContainer.createSpan({
+					text: "Depth:",
+					cls: cls("view-switcher-depth-label"),
+				});
+
+				this.depthSlider = this.depthSliderContainer.createEl("input", {
+					type: "range",
+					cls: cls("view-switcher-depth-input"),
+				});
+				this.depthSlider.min = "1";
+				this.depthSlider.max = "50";
+
+				this.depthValueLabel = this.depthSliderContainer.createSpan({
+					text: "",
+					cls: cls("view-switcher-depth-value"),
+				});
+
+				this.depthSlider.addEventListener("input", async () => {
+					await this.handleDepthChange();
+				});
+
+				this.updateDepthSlider();
+			}
 		}
 
 		this.updateArchivedToggleVisibility();
@@ -217,6 +260,10 @@ export class NexusViewSwitcher extends ItemView {
 
 			// Create and render graph view
 			this.graphView = new RelationshipGraphView(this.app, this.indexer, this.plugin, this.graphContainerEl);
+
+			this.graphView.setViewTypeChangeCallback(() => {
+				this.updateDepthSlider();
+			});
 
 			await this.graphView.render();
 		} else {
@@ -333,9 +380,17 @@ export class NexusViewSwitcher extends ItemView {
 		const children = relationships.children.length;
 		const related = relationships.related.length;
 
-		const allParents = collectRelatedNodesRecursively(this.app, this.indexer, file, "parent");
-		const allChildren = collectRelatedNodesRecursively(this.app, this.indexer, file, "children");
-		const allRelated = collectRelatedNodesRecursively(this.app, this.indexer, file, "related");
+		const currentDepth = this.getCurrentDepth();
+
+		const allParents = collectRelatedNodesRecursively(this.app, this.indexer, file, "parent", {
+			maxDepth: currentDepth,
+		});
+		const allChildren = collectRelatedNodesRecursively(this.app, this.indexer, file, "children", {
+			maxDepth: currentDepth,
+		});
+		const allRelated = collectRelatedNodesRecursively(this.app, this.indexer, file, "related", {
+			maxDepth: currentDepth,
+		});
 
 		return {
 			parents,
@@ -345,6 +400,49 @@ export class NexusViewSwitcher extends ItemView {
 			allChildren,
 			allRelated,
 		};
+	}
+
+	private getCurrentDepth(): number {
+		const settings = this.plugin.settingsStore.settings$.value;
+
+		// If there's a temporary override, use it
+		if (this.temporaryDepthOverride !== null) {
+			return this.temporaryDepthOverride;
+		}
+
+		if (this.graphView) {
+			const isRelatedView = this.graphView.isRelatedView?.() ?? false;
+			const isAllRelated = this.graphView.isAllRelatedView?.() ?? false;
+
+			if (isRelatedView && isAllRelated) {
+				return settings.allRelatedMaxDepth;
+			}
+		}
+		return settings.hierarchyMaxDepth;
+	}
+
+	private updateDepthSlider(): void {
+		if (!this.depthSlider || !this.depthValueLabel) return;
+
+		const currentDepth = this.getCurrentDepth();
+		this.depthSlider.value = currentDepth.toString();
+		this.depthValueLabel.textContent = currentDepth.toString();
+
+		// Reset temporary override when view type changes
+		this.temporaryDepthOverride = null;
+	}
+
+	private async handleDepthChange(): Promise<void> {
+		if (!this.depthSlider || !this.depthValueLabel) return;
+
+		const newDepth = Number.parseInt(this.depthSlider.value, 10);
+		this.depthValueLabel.textContent = newDepth.toString();
+		this.temporaryDepthOverride = newDepth;
+		this.updateStatistics();
+
+		if (this.graphView) {
+			this.graphView.updateGraphWithDepth(newDepth);
+		}
 	}
 
 	private updateStatistics(): void {

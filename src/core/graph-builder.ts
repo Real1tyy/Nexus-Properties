@@ -56,6 +56,7 @@ export class GraphBuilder {
 	private hierarchyMaxDepth: number;
 	private maintainIndirectConnections: boolean;
 	private prioritizeParentProp: string;
+	private depthOverride: number | null = null;
 
 	constructor(
 		private readonly app: App,
@@ -73,6 +74,18 @@ export class GraphBuilder {
 		};
 		applySettings(settingsStore.settings$.value);
 		settingsStore.settings$.subscribe(applySettings);
+	}
+
+	public setDepthOverride(depth: number | null): void {
+		this.depthOverride = depth;
+	}
+
+	private getEffectiveAllRelatedMaxDepth(): number {
+		return this.depthOverride ?? this.allRelatedMaxDepth;
+	}
+
+	private getEffectiveHierarchyMaxDepth(): number {
+		return this.depthOverride ?? this.hierarchyMaxDepth;
 	}
 
 	/**
@@ -211,7 +224,13 @@ export class GraphBuilder {
 		const edges: ElementDefinition[] = [];
 		const processedPaths = sharedProcessedPaths || new Set<string>();
 
-		const rootPath = startFromCurrent ? sourcePath : this.findTopmostParent(sourcePath);
+		const effectiveDepth = this.getEffectiveHierarchyMaxDepth();
+		const rootPath = startFromCurrent
+			? sourcePath
+			: this.depthOverride !== null
+				? this.findTopmostParent(sourcePath, effectiveDepth)
+				: this.findTopmostParent(sourcePath);
+
 		const rootNode = this.createNodeElement(rootPath, 0, allowSourceHighlight && rootPath === sourcePath);
 		nodes.push(rootNode);
 		processedPaths.add(rootPath);
@@ -227,7 +246,7 @@ export class GraphBuilder {
 			const parentDisplayName = extractDisplayName(currentPath);
 
 			// Check if we can add children (next level must be within depth limit)
-			if (currentLevel + 1 >= this.hierarchyMaxDepth) continue;
+			if (currentLevel + 1 >= effectiveDepth) continue;
 
 			const relations = this.indexer.extractRelationships(file, frontmatter);
 			const validChildren = this.resolveValidContexts(relations.children, processedPaths, currentPath);
@@ -255,13 +274,13 @@ export class GraphBuilder {
 		return { nodes, edges };
 	}
 
-	private findTopmostParent(startPath: string, maxDepth = 50): string {
+	private findTopmostParent(startPath: string, maxDepth: number = 50): string {
 		const visited = new Set<string>();
 		let topmostParent = startPath;
 		let maxLevel = 0;
 
 		const dfsUpwards = (filePath: string, currentLevel: number): void => {
-			if (currentLevel > maxDepth || visited.has(filePath)) return;
+			if (currentLevel >= maxDepth || visited.has(filePath)) return;
 			visited.add(filePath);
 
 			if (currentLevel > maxLevel) {
@@ -304,7 +323,7 @@ export class GraphBuilder {
 			const { centerPath, level } = queue.shift()!;
 
 			// Safety check to prevent infinite loops
-			if (level >= this.allRelatedMaxDepth) continue;
+			if (level >= this.getEffectiveAllRelatedMaxDepth()) continue;
 
 			const { file, frontmatter } = getFileContext(this.app, centerPath);
 			if (!file || !frontmatter) continue;

@@ -30,6 +30,29 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 
 **Include All Related**: Add related constellations to hierarchy view
 
+## Depth Control
+
+Control how deeply the graph traverses hierarchical relationships with the depth slider in the graph view header.
+
+### How It Works
+
+**Viewing Window**: The slider controls how many levels are shown in the hierarchy:
+- Depth 3 viewing node E in A → B → C → D → E:
+  - Finds an ancestor at the right level → starts at C
+  - Builds down 3 levels → shows C, D, E and all descendants
+
+**Smart Depth Selection**:
+- **Hierarchy views** (parent/child): Uses [Hierarchy Max Depth](../configuration#hierarchy-max-depth) setting
+- **All Related views** (constellation): Uses [All Related Recursion Depth](../configuration#all-related-recursion-depth) setting
+
+**Temporary Adjustments**: Slider changes don't save to settings - they only affect your current session
+
+**Live Updates**: Graph and statistics recalculate immediately as you adjust
+
+**Toggle visibility**: Enable/disable slider in Settings → User Interface → "Show depth slider in graph view"
+
+See [Configuration](../configuration#depth-settings) for default depth values.
+
 ### Related
 
 **Shows**: Source file + directly related notes (1 hop)

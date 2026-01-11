@@ -105,6 +105,7 @@ export const NexusPropertiesSettingsSchema = z
 		showSimpleStatistics: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_SIMPLE_STATISTICS),
 		showRecursiveStatistics: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_RECURSIVE_STATISTICS),
 		showZoomIndicator: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_ZOOM_INDICATOR),
+		showDepthSlider: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_DEPTH_SLIDER),
 		maintainIndirectConnections: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_MAINTAIN_INDIRECT_CONNECTIONS),
 
 		// Graph filtering settings

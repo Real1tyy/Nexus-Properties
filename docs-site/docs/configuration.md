@@ -14,6 +14,12 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 **Show View Switcher Header** (default: `true`): Display header with toggle button in Nexus Properties view
 - Changes apply immediately
 
+**Show Depth Slider in Graph View** (default: `true`): Display interactive depth slider in graph view header
+- Temporarily adjust recursion depth for statistics and hierarchy rendering
+- Slider changes don't save to settings - only affect current session
+- Controls how many levels up/down to traverse from current node
+- [Learn more →](features/graph-views#depth-control)
+
 ### View Switcher Statistics
 
 **Show Simple Statistics** (default: `true`): Display direct parent, children, and related counts
@@ -24,6 +30,7 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 - Shows all relationships across entire hierarchy
 - Format: `All Parents: N`, `All Children: N`, `All Related: N`
 - Uses efficient traversal with cycle detection
+- Respects current depth slider value when active
 
 **Layout**: Statistics appear on the left side of the view switcher header without affecting the centered toggle button position.
 
@@ -50,7 +57,19 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 
 **Graph Animation Duration** (default: `800ms`, range: 0-2000ms): Layout animation duration (0ms = instant)
 
-**All Related Recursion Depth** (default: `10`, range: 1-20): Max levels in "All Related" mode
+### Depth Settings
+
+**All Related Recursion Depth** (default: `10`, range: 1-20): Max levels in "All Related" constellation mode
+- Controls how many hops to traverse when exploring related connections
+- Used when "Include All Related" is enabled in graph view
+- Affects graph building and recursive statistics calculation
+- Can be temporarily adjusted with [depth slider](features/graph-views#depth-control)
+
+**Hierarchy Traversal Depth** (default: `10`, range: 1-50): Max levels in parent-child hierarchy mode
+- Controls how many levels up/down to traverse in hierarchy graphs
+- Creates a viewing window centered on the current file
+- Used for both upward (parents) and downward (children) traversal
+- Can be temporarily adjusted with [depth slider](features/graph-views#depth-control)
 
 **Hierarchy Traversal Depth** (default: `10`, range: 1-50): Max levels in hierarchy mode
 

@@ -1700,6 +1700,38 @@ button.nexus-properties-view-toggle-button:active {
 	user-select: none;
 }
 
+/* View Switcher Header Depth Slider */
+.nexus-properties-view-switcher-depth-slider {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	justify-self: end;
+	grid-column: 3;
+	padding: 0.4em 0.8em;
+	border-radius: 4px;
+}
+
+.nexus-properties-view-switcher-depth-label {
+	font-size: 0.9em;
+	color: var(--text-normal);
+	user-select: none;
+	white-space: nowrap;
+}
+
+.nexus-properties-view-switcher-depth-input {
+	width: 80px;
+	cursor: pointer;
+	accent-color: var(--interactive-accent);
+}
+
+.nexus-properties-view-switcher-depth-value {
+	font-size: 0.9em;
+	color: var(--text-normal);
+	font-weight: 600;
+	min-width: 1.5em;
+	text-align: center;
+}
+
 button.nexus-properties-bases-view-button {
 	flex: 1;
 	min-width: 120px;

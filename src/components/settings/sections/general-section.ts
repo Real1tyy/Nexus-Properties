@@ -50,6 +50,12 @@ export class GeneralSection implements SettingsSection {
 			desc: "Display recursive (all) parent, children, and related counts in the view switcher header.",
 		});
 
+		this.uiBuilder.addToggle(container, {
+			key: "showDepthSlider",
+			name: "Show depth slider in graph view",
+			desc: "Display a slider in the graph view header to temporarily adjust the recursion depth for statistics and hierarchy rendering. Depth controls how many levels up/down to traverse from the current node.",
+		});
+
 		this.uiBuilder.addArrayManager(container, {
 			key: "directories",
 			name: "Directory scanning",
