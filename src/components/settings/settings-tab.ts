@@ -13,7 +13,7 @@ import type { SettingsSection } from "./types";
 
 const DOCS_URL = "https://real1tyy.github.io/Nexus-Properties/";
 const CHANGELOG_URL = "https://real1tyy.github.io/Nexus-Properties/changelog";
-const SPONSOR_URL = "https://github.com/Real1tyy#-support-my-work";
+const SPONSOR_URL = "https://matejvavroproductivity.com/support/";
 const VIDEO_URL = "https://www.youtube.com/watch?v=Im0SfuBHamo";
 
 export class NexusPropertiesSettingsTab extends PluginSettingTab {

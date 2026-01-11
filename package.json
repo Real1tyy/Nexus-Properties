@@ -27,8 +27,8 @@
 		"automation"
 	],
 	"funding": {
-		"type": "github",
-		"url": "https://github.com/sponsors/Real1tyy"
+		"type": "custom",
+		"url": "https://matejvavroproductivity.com/support/"
 	},
 	"author": "Real1tyy",
 	"license": "MIT",

@@ -244,7 +244,7 @@ Filter the graph to show only nodes matching specific criteria. Use JavaScript e
 
 If you find Nexus Properties useful and want to support its ongoing development, please consider becoming a sponsor. Your contribution helps ensure continuous maintenance, bug fixes, and the introduction of new features.
 
-- [Support My Work](https://github.com/Real1tyy#-support-my-work)
+- [Support My Work](https://matejvavroproductivity.com/support/)
 
 Every contribution, no matter the size, is greatly appreciated!
 

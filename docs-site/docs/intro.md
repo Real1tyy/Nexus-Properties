@@ -98,7 +98,7 @@ Ready to start building your knowledge network?
 
 - **Issues & Bug Reports**: [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues)
 - **Feature Requests**: [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions)
-- **Sponsor Development**: [GitHub Sponsors](https://github.com/sponsors/Real1tyy)
+- **Sponsor Development**: [Support My Work](https://matejvavroproductivity.com/support/)
 
 ## Credits & Acknowledgments
 
