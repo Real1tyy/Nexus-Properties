@@ -1,6 +1,5 @@
 import type { Core } from "cytoscape";
-import type { App } from "obsidian";
-import { TFile } from "obsidian";
+import { type App, Notice, TFile } from "obsidian";
 import type { SettingsStore } from "../../core/settings-store";
 import type { GraphZoomPreview } from "./zoom-preview";
 
@@ -65,9 +64,13 @@ export class GraphZoomManager {
 		return value;
 	}
 
-	enterZoomMode(filePath: string, createPreview: (el: HTMLElement) => GraphZoomPreview): void {
+	enterZoomMode(filePath: string, createPreview: (el: HTMLElement) => GraphZoomPreview | null): void {
 		this.isZoomMode = true;
-		this.focusOnNode(filePath, createPreview);
+		const didFocus = this.focusOnNode(filePath, createPreview);
+		if (!didFocus) {
+			this.isZoomMode = false;
+			this.focusedNodeId = null;
+		}
 	}
 
 	exitZoomMode(): void {
@@ -89,11 +92,12 @@ export class GraphZoomManager {
 		});
 	}
 
-	focusOnNode(filePath: string, createPreview: (el: HTMLElement) => GraphZoomPreview): void {
-		this.focusedNodeId = filePath;
+	focusOnNode(filePath: string, createPreview: (el: HTMLElement) => GraphZoomPreview | null): boolean {
 		const file = this.app.vault.getAbstractFileByPath(filePath);
 
-		if (!(file instanceof TFile)) return;
+		if (!(file instanceof TFile)) return false;
+
+		this.focusedNodeId = filePath;
 
 		// Zoom to the focused node
 		this.cy.nodes().removeClass("focused");
@@ -116,6 +120,7 @@ export class GraphZoomManager {
 			);
 		}
 		this.showPreviewOverlay(createPreview);
+		return true;
 	}
 
 	centerOnFocusedNode(): void {
@@ -141,10 +146,17 @@ export class GraphZoomManager {
 		}
 	}
 
-	private showPreviewOverlay(createPreview: (el: HTMLElement) => GraphZoomPreview): void {
+	private showPreviewOverlay(createPreview: (el: HTMLElement) => GraphZoomPreview | null): void {
 		this.hidePreviewOverlay();
 
-		this.zoomPreview = createPreview(this.config.getPreviewWrapperEl());
+		try {
+			const preview = createPreview(this.config.getPreviewWrapperEl());
+			if (!preview) return;
+			this.zoomPreview = preview;
+		} catch (error) {
+			console.error("Failed to create zoom preview:", error);
+			new Notice("Failed to open zoom preview.");
+		}
 	}
 
 	private hidePreviewOverlay(): void {

@@ -134,7 +134,9 @@ export class PropertiesManager {
 		const fileToAddContext = getFileContext(this.app, fileToAdd);
 
 		await withFileContext(this.app, targetFilePath, async (target) => {
-			await this.app.fileManager.processFrontMatter(target.file!, (fm) => {
+			if (!target.file) return;
+
+			await this.app.fileManager.processFrontMatter(target.file, (fm) => {
 				const currentValue = fm[propertyName];
 				fm[propertyName] = addLinkToProperty(currentValue, fileToAddContext.baseName);
 			});
@@ -181,7 +183,9 @@ export class PropertiesManager {
 		const fileToRemoveContext = getFileContext(this.app, fileToRemove);
 
 		await withFileContext(this.app, targetFilePath, async (target) => {
-			await this.app.fileManager.processFrontMatter(target.file!, (fm) => {
+			if (!target.file) return;
+
+			await this.app.fileManager.processFrontMatter(target.file, (fm) => {
 				const currentValue = fm[propertyName];
 
 				if (!currentValue) {

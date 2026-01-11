@@ -78,6 +78,13 @@ Automatic changelog notifications keep you informed about new features and impro
 - **Changelog Display**: Shows formatted changelog with all new features, improvements, and fixes
 - **Quick Links**: Direct access to full changelog, documentation, and support
 
+### Bug Fixes
+
+#### Auto-linking when the target note doesn’t exist yet
+
+- **No more UI errors when selecting a suggestion**: Setting Parent/Child/Related to a note that isn’t created yet won’t throw errors or break the editor suggestions.
+- **Graceful behavior**: The plugin skips bidirectional updates for missing target notes until they exist.
+
 ## 1.5.0
 
 ### New Features

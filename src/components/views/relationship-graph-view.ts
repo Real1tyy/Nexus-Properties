@@ -1,7 +1,7 @@
 import { isFolderNote } from "@real1ty-obsidian-plugins/utils";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
-import { type App, TFile } from "obsidian";
+import { type App, Notice, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import { GraphBuilder } from "../../core/graph-builder";
 import type { Indexer } from "../../core/indexer";
@@ -960,10 +960,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.zoomManager.focusOnNode(filePath, (el) => this.createZoomPreview(el, filePath));
 	}
 
-	private createZoomPreview(el: HTMLElement, filePath: string): GraphZoomPreview {
+	private createZoomPreview(el: HTMLElement, filePath: string): GraphZoomPreview | null {
 		const file = this.app.vault.getAbstractFileByPath(filePath);
 		if (!(file instanceof TFile)) {
-			throw new Error(`File not found: ${filePath}`);
+			new Notice(`File not found: ${filePath}`);
+			return null;
 		}
 
 		return new GraphZoomPreview(el, this.app, {
