@@ -6,6 +6,49 @@ sidebar_position: 99
 
 Critical troubleshooting steps for common issues. For other questions, see [FAQ](faq) or [open an issue](https://github.com/Real1tyy/Nexus-Properties/issues).
 
+## Bases View Filter Errors
+
+**Error message:**
+```
+Failed to evaluate a filter: Type error in "contains" parameter "value". Expected String, given File.
+```
+
+**Cause:** Relationship properties (`Parent`, `Child`, `Related`) are set to empty strings (`""`) instead of proper values.
+
+**Solution:**
+
+Update the property to one of these valid formats:
+
+1. **Null/empty** (no relationships):
+   ```yaml
+   Parent: null
+   Child: null
+   Related: null
+   ```
+
+2. **Single relationship**:
+   ```yaml
+   Parent: "[[Parent Note]]"
+   ```
+
+3. **Multiple relationships** (list):
+   ```yaml
+   Child:
+     - "[[Child 1]]"
+     - "[[Child 2]]"
+   ```
+
+**Important:** Never use empty strings for relationship properties:
+```yaml
+Parent: ""    # ❌ Causes filter errors
+Child: ""     # ❌ Causes filter errors
+Related: ""   # ❌ Causes filter errors
+```
+
+**Note:** New nodes created after version 1.6.0 automatically use `null` for excluded properties.
+
+---
+
 ## Graph Not Showing Nodes
 
 **Check:**

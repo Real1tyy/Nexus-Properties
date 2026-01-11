@@ -8,6 +8,16 @@ All notable changes to Nexus Properties will be documented here.
 
 ## 1.6.0
 
+### Bug Fixes
+
+#### Bases View Filter Errors When Switching Notes
+
+- **Fixed "Type error in 'contains'" errors**: Bases view no longer throws filter errors when switching between notes with empty relationship properties
+- **Root cause**: Excluded properties were set to empty strings (`""`) instead of `null` when creating new nodes
+- **Solution**: New nodes now set excluded relationship properties to `null`, which Bases handles gracefully
+
+If you encounter this error on existing notes, see [Troubleshooting → Bases View Filter Errors](troubleshooting#bases-view-filter-errors).
+
 ### New Features
 
 #### Hierarchy Depth Slider

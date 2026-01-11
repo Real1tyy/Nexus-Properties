@@ -95,9 +95,9 @@ export class NodeCreator {
 				// Copy the property value
 				target[key] = value;
 			} else {
-				// Keep the property key but set it to undefined
-				// This preserves the property structure while clearing the value
-				target[key] = "";
+				// Set excluded properties to null to preserve structure without causing type errors
+				// Empty strings ("") cause Bases filter errors, null is handled gracefully
+				target[key] = null;
 			}
 		}
 	}
