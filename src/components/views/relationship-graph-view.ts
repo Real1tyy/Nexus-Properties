@@ -1,4 +1,4 @@
-import { isFolderNote } from "@real1ty-obsidian-plugins/utils";
+import { isFolderNote, RegisteredEventsComponent } from "@real1ty-obsidian-plugins/utils";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { type App, Notice, TFile } from "obsidian";
@@ -20,7 +20,6 @@ import { GraphSearch } from "../input-managers/graph-search";
 import { GraphLayoutManager } from "../layout/graph-layout-manager";
 import { PropertyTooltip } from "../property-tooltip";
 import { RelationshipAdder } from "../relationship-adder";
-import { RegisteredEventsComponent } from "./component";
 
 cytoscape.use(cytoscapeDagre);
 

@@ -1,10 +1,9 @@
-import { IncludedPropertiesEvaluator } from "@real1ty-obsidian-plugins/utils";
+import { IncludedPropertiesEvaluator, RegisteredEventsComponent } from "@real1ty-obsidian-plugins/utils";
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
-import { RegisteredEventsComponent } from "./component";
 
 const _VIEW_TYPE_BASES = "nexus-bases-view";
 
