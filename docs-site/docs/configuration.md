@@ -11,6 +11,11 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 **Show Ribbon Icon** (default: `true`): Display graph icon in left ribbon
 - ⚠️ Restart required after changing
 
+**View Sidebar Position** (default: `Left sidebar`): Choose which sidebar to open the Nexus Properties view in
+- Options: Left sidebar or Right sidebar
+- Your preference is saved and applied when opening the view
+- Only affects new view creation (not existing open views)
+
 **Show View Switcher Header** (default: `true`): Display header with toggle button in Nexus Properties view
 - Changes apply immediately
 

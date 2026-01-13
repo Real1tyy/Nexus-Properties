@@ -32,6 +32,16 @@ export class GeneralSection implements SettingsSection {
 			desc: "Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.",
 		});
 
+		this.uiBuilder.addDropdown(container, {
+			key: "viewLeafPosition",
+			name: "View sidebar position",
+			desc: "Choose which sidebar (left or right) to open the Nexus Properties view in.",
+			options: {
+				left: "Left sidebar",
+				right: "Right sidebar",
+			},
+		});
+
 		this.uiBuilder.addToggle(container, {
 			key: "showViewSwitcherHeader",
 			name: "Show view switcher header",

@@ -6,6 +6,19 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.7.0
+
+### New Features
+
+#### Configurable View Sidebar Position
+
+Choose which sidebar to open the Nexus Properties view in, giving you control over your workspace layout.
+
+- **Left or Right Sidebar**: Select your preferred sidebar position in settings
+- **Default**: Opens in left sidebar (preserves existing behavior)
+
+See [Configuration](configuration#user-interface) for details.
+
 ## 1.6.0
 
 ### Bug Fixes

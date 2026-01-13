@@ -152,8 +152,8 @@ export default class NexusPropertiesPlugin extends Plugin {
 			const firstLeaf = existingLeaves[0];
 			workspace.revealLeaf(firstLeaf);
 		} else {
-			// View doesn't exist, create it in the left sidebar
-			const leaf = workspace.getLeftLeaf(false);
+			const settings = this.settingsStore.currentSettings;
+			const leaf = settings.viewLeafPosition === "right" ? workspace.getRightLeaf(false) : workspace.getLeftLeaf(false);
 			if (leaf) {
 				await leaf.setViewState({ type: VIEW_TYPE_NEXUS_SWITCHER, active: true });
 				workspace.revealLeaf(leaf);

@@ -60,6 +60,7 @@ export const NexusPropertiesSettingsSchema = z
 
 		// UI settings
 		showRibbonIcon: z.boolean().catch(true),
+		viewLeafPosition: z.enum(["left", "right"]).catch(SETTINGS_DEFAULTS.DEFAULT_VIEW_LEAF_POSITION),
 
 		// Preview settings
 		hideEmptyProperties: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_HIDE_EMPTY_PROPERTIES),
