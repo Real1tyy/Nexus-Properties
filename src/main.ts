@@ -276,10 +276,11 @@ export default class NexusPropertiesPlugin extends Plugin {
 				pluginName: "Nexus Properties",
 				changelogContent: CHANGELOG_CONTENT,
 				links: {
+					github: "https://github.com/Real1tyy/Nexus-Properties",
 					support: "https://matejvavroproductivity.com/support/",
-					changelog: "https://real1tyy.github.io/Nexus-Properties/docs-site/changelog",
+					changelog: "https://real1tyy.github.io/Nexus-Properties/changelog",
 					documentation: "https://real1tyy.github.io/Nexus-Properties/",
-				},
+				} as WhatsNewModalConfig["links"] & { github: string },
 			};
 
 			new WhatsNewModal(this.app, this, config, lastSeenVersion, currentVersion).open();
