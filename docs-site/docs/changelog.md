@@ -110,6 +110,10 @@ Automatic changelog notifications keep you informed about new features and impro
 
 ## 1.5.0 - 1/2/2026
 
+### New Video
+
+- [How I Structure Complex Knowledge in Obsidian (Nexus Properties)](https://www.youtube.com/watch?v=SJIu1qB-wBU)
+
 ### New Features
 
 #### Modal-Based Node Creation
@@ -300,6 +304,10 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 ---
 
 ## 1.2.0 - 12/25/2025
+
+### New Video
+
+- [Nexus Properties — A Hierarchical Knowledge System for Obsidian](https://www.youtube.com/watch?v=Im0SfuBHamo)
 
 ### New Features
 
