@@ -6,7 +6,7 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
-## 1.7.0
+## 1.7.0 - TBD
 
 ### New Features
 
@@ -19,7 +19,7 @@ Choose which sidebar to open the Nexus Properties view in, giving you control ov
 
 See [Configuration](configuration#user-interface) for details.
 
-## 1.6.0
+## 1.6.0 - 1/11/2026
 
 ### Bug Fixes
 
@@ -108,7 +108,7 @@ Automatic changelog notifications keep you informed about new features and impro
 - **No more UI errors when selecting a suggestion**: Setting Parent/Child/Related to a note that isn’t created yet won’t throw errors or break the editor suggestions.
 - **Graceful behavior**: The plugin skips bidirectional updates for missing target notes until they exist.
 
-## 1.5.0
+## 1.5.0 - 1/2/2026
 
 ### New Features
 
@@ -213,7 +213,7 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 ---
 
-## 1.4.0
+## 1.4.0 - 12/27/2025
 
 ### New Features
 
@@ -269,7 +269,7 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 ---
 
-## 1.3.0
+## 1.3.0 - 12/26/2025
 
 ### New Features
 
@@ -289,7 +289,7 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 ---
 
-## 1.2.1
+## 1.2.1 - 12/25/2025
 
 ### Bug Fixes
 
@@ -299,7 +299,7 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 ---
 
-## 1.2.0
+## 1.2.0 - 12/25/2025
 
 ### New Features
 
@@ -313,7 +313,7 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 ---
 
-## 1.1.0
+## 1.1.0 - 12/20/2025
 
 ### New Features
 
@@ -334,7 +334,8 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 ---
 
-## 1.0.0
+## 1.0.0 - 10/25/2025
+
 - Initial release of Nexus Properties
 
 ## Contributing
