@@ -34,31 +34,31 @@
 
 ![Hierarchical View](docs-site/static/img/screenshots/hierarchical-view.png)
 
-*Parent-child tree structure with automatic hierarchical layout*
+_Parent-child tree structure with automatic hierarchical layout_
 
 ### Related View
 
 ![Related View](docs-site/static/img/screenshots/related-view.png)
 
-*Direct related connections in radial layout*
+_Direct related connections in radial layout_
 
 ### All Related View
 
 ![All Related View](docs-site/static/img/screenshots/all-related-view.png)
 
-*Entire constellation of related notes with recursive traversal*
+_Entire constellation of related notes with recursive traversal_
 
 ### Bases View
 
 ![Bases View](docs-site/static/img/screenshots/bases-view.png)
 
-*List-based view of current note's relationships*
+_List-based view of current note's relationships_
 
 ### Zoom Mode
 
 ![Zoom Mode](docs-site/static/img/screenshots/zoom-mode.png)
 
-*Click any node to preview content and frontmatter inline*
+_Click any node to preview content and frontmatter inline_
 
 Check out the [complete screenshots gallery](https://real1tyy.github.io/Nexus-Properties/screenshots) in the documentation to see all features in detail.
 
@@ -69,6 +69,7 @@ Check out the [complete screenshots gallery](https://real1tyy.github.io/Nexus-Pr
 Nexus Properties is built for **system builders** with large, long-lived vaults who want structured PKM workflows and think in hierarchies and networks.
 
 **Perfect for you if:**
+
 - You manage complex knowledge systems with hundreds or thousands of notes
 - You think in hierarchies, relationships, and networks
 - You want structured workflows with consistent metadata
@@ -76,6 +77,7 @@ Nexus Properties is built for **system builders** with large, long-lived vaults 
 - You value visual navigation of your knowledge structure
 
 **Probably not for you if:**
+
 - You prefer minimal notes with no metadata
 - You want a lightweight, simple note-taking experience
 - You don't use frontmatter or structured properties
@@ -90,6 +92,7 @@ If you're building a structured knowledge system, Nexus Properties will feel lik
 **[View Full Documentation →](https://real1tyy.github.io/Nexus-Properties/)**
 
 Quick Links:
+
 - [Installation](https://real1tyy.github.io/Nexus-Properties/installation) • [Quickstart](https://real1tyy.github.io/Nexus-Properties/quickstart) • [Configuration](https://real1tyy.github.io/Nexus-Properties/configuration)
 - [Features Overview](https://real1tyy.github.io/Nexus-Properties/features/overview) • [FAQ](https://real1tyy.github.io/Nexus-Properties/faq) • [Troubleshooting](https://real1tyy.github.io/Nexus-Properties/troubleshooting)
 

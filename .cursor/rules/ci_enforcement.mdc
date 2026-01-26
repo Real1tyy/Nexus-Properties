@@ -15,8 +15,8 @@ description: Enforce running CI checks after code changes
    ```
 
 2. **If CI fails**, fix all issues before proceeding:
-   - **Linting errors**: Fix code quality issues reported by Biome
-   - **Formatting issues**: Let Biome auto-fix formatting
+   - **Linting errors**: Fix code quality issues reported by ESLint
+   - **Formatting issues**: Let Prettier auto-fix formatting
    - **Test failures**: Ensure all tests pass
    - **Type errors**: Resolve TypeScript compilation issues
 
@@ -24,20 +24,18 @@ description: Enforce running CI checks after code changes
 
 ## Common Issues to Fix
 
-### Biome Linting Errors
-- **`useIterableCallbackReturn`**: Don't return values from `forEach()` callbacks
+### ESLint Linting Errors
+- **Unused variables**: Remove or prefix with underscore
   ```typescript
-  // ❌ DON'T: Return value from forEach
-  array.forEach(item => item.process());
+  // ❌ DON'T: Unused variable
+  const unusedVar = 42;
 
-  // ✅ DO: Use block syntax for side effects
-  array.forEach(item => {
-    item.process();
-  });
+  // ✅ DO: Remove or prefix with underscore
+  const _unusedVar = 42; // Explicitly marked as intentionally unused
   ```
 
-- **Formatting**: Let Biome auto-fix with `pnpm check:fix`
-- **Import ordering**: Biome will sort imports automatically
+- **Formatting**: Let Prettier auto-fix with `pnpm format:fix`
+- **Linting**: Let ESLint auto-fix with `pnpm lint:fix`
 
 ### Test Issues
 - Ensure all mocks are properly configured
@@ -47,7 +45,9 @@ description: Enforce running CI checks after code changes
 ## Commands Reference
 
 - `mise run ci` - Run full CI pipeline
-- `pnpm check:fix` - Run Biome checks and auto-fix
+- `pnpm check:fix` - Run Prettier and ESLint checks and auto-fix
+- `pnpm format:fix` - Run Prettier formatting auto-fix
+- `pnpm lint:fix` - Run ESLint checks and auto-fix
 - `pnpm test` - Run tests only
 - `pnpm build` - Build the project
 

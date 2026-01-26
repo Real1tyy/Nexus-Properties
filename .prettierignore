@@ -1,0 +1,13 @@
+node_modules
+dist
+main.js
+styles.css
+*.d.ts
+docs-site
+.obsidian
+build
+coverage
+.cache
+.eslintcache
+htmlcov
+pnpm-lock.yaml
