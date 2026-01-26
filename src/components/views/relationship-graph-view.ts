@@ -1,4 +1,4 @@
-import { isFolderNote, RegisteredEventsComponent } from "@real1ty-obsidian-plugins/utils";
+import { isFolderNote, RegisteredEventsComponent } from "@real1ty-obsidian-plugins";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { type App, Notice, TFile } from "obsidian";
@@ -57,7 +57,10 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	private interactionHandler: GraphInteractionHandler;
 	private layoutManager: GraphLayoutManager;
 	private zoomIndicator: ZoomIndicator | null = null;
-	private pendingGraphData: { nodes: ElementDefinition[]; edges: ElementDefinition[] } | null = null;
+	private pendingGraphData: {
+		nodes: ElementDefinition[];
+		edges: ElementDefinition[];
+	} | null = null;
 	private onViewTypeChangeCallback: (() => void) | null = null;
 
 	constructor(
@@ -218,9 +221,13 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			// Combined search/filter row
 			const filterRowClasses =
 				showFilterBar || showSearchBar ? cls("graph-filter-row") : cls("graph-filter-row", "hidden");
-			const filterRowEl = this.containerEl.createEl("div", { cls: filterRowClasses });
+			const filterRowEl = this.containerEl.createEl("div", {
+				cls: filterRowClasses,
+			});
 
-			const searchContainer = filterRowEl.createEl("div", { cls: cls("graph-search-input-container") });
+			const searchContainer = filterRowEl.createEl("div", {
+				cls: cls("graph-search-input-container"),
+			});
 			createSearchComponent(searchContainer, () => this.hideFilterRow());
 			createFilterComponent(filterRowEl, () => this.hideFilterRow());
 
@@ -228,11 +235,15 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		} else {
 			// Desktop: Separate rows for search and filter
 			const searchRowClasses = showSearchBar ? cls("graph-search-row") : cls("graph-search-row", "hidden");
-			this.searchRowEl = this.containerEl.createEl("div", { cls: searchRowClasses });
+			this.searchRowEl = this.containerEl.createEl("div", {
+				cls: searchRowClasses,
+			});
 			createSearchComponent(this.searchRowEl, () => this.hideSearchRow());
 
 			const filterRowClasses = showFilterBar ? cls("graph-filter-row") : cls("graph-filter-row", "hidden");
-			const filterRowEl = this.containerEl.createEl("div", { cls: filterRowClasses });
+			const filterRowEl = this.containerEl.createEl("div", {
+				cls: filterRowClasses,
+			});
 
 			createFilterPresetSelector(filterRowEl);
 			createFilterComponent(filterRowEl, () => this.hideFilterRow());
@@ -255,7 +266,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		// Register event listeners
 		this.registerEvent(this.app.workspace, "file-open", (file) => {
-			this.onFileOpen(file);
+			this.onFileOpen(file instanceof TFile ? file : null);
 		});
 
 		// Subscribe to indexer events for reactive updates

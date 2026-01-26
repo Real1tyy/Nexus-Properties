@@ -1,4 +1,4 @@
-import { parseValue, serializeValue } from "@real1ty-obsidian-plugins/utils";
+import { parseValue, serializeValue } from "@real1ty-obsidian-plugins";
 import { type App, Modal, type TFile } from "obsidian";
 import { cls } from "../utils/css";
 

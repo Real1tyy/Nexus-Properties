@@ -1,4 +1,4 @@
-import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
+import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
@@ -114,7 +114,9 @@ export class BasesViewSettingsSection implements SettingsSection {
 		});
 
 		const examplesContainer = description.createDiv(cls("settings-info-box"));
-		examplesContainer.createEl("strong", { text: "Example path-based inclusion rules:" });
+		examplesContainer.createEl("strong", {
+			text: "Example path-based inclusion rules:",
+		});
 		const examplesList = examplesContainer.createEl("ul");
 
 		const examples = [
@@ -131,19 +133,34 @@ export class BasesViewSettingsSection implements SettingsSection {
 		];
 
 		for (const example of examples) {
-			const listItem = examplesList.createEl("li", { cls: cls("color-example-item") });
-			listItem.createEl("code", { text: example.path, cls: cls("settings-info-box-example") });
+			const listItem = examplesList.createEl("li", {
+				cls: cls("color-example-item"),
+			});
+			listItem.createEl("code", {
+				text: example.path,
+				cls: cls("settings-info-box-example"),
+			});
 			listItem.createSpan({ text: "→", cls: cls("color-arrow") });
-			listItem.createEl("code", { text: example.properties, cls: cls("settings-info-box-example") });
-			listItem.createSpan({ text: `: ${example.description}`, cls: cls("color-example-description") });
+			listItem.createEl("code", {
+				text: example.properties,
+				cls: cls("settings-info-box-example"),
+			});
+			listItem.createSpan({
+				text: `: ${example.description}`,
+				cls: cls("color-example-description"),
+			});
 		}
 
 		const infoBox = description.createDiv(cls("settings-info-box"));
 		infoBox.createEl("strong", { text: "Column order:" });
 		const orderList = infoBox.createEl("ol");
 		orderList.createEl("li", { text: "file.name (always first)" });
-		orderList.createEl("li", { text: "Default included properties (in order specified)" });
-		orderList.createEl("li", { text: "Path-specific properties (in order specified)" });
+		orderList.createEl("li", {
+			text: "Default included properties (in order specified)",
+		});
+		orderList.createEl("li", {
+			text: "Path-specific properties (in order specified)",
+		});
 
 		const warning = description.createDiv(cls("settings-warning-box"));
 		warning.createEl("strong", { text: "⚠️ Important:" });

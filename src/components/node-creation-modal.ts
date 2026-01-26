@@ -28,7 +28,9 @@ export class NodeCreationModal extends Modal {
 			cls: "nexus-node-creation-title",
 		});
 
-		const inputContainer = contentEl.createDiv({ cls: "nexus-node-creation-input-container" });
+		const inputContainer = contentEl.createDiv({
+			cls: "nexus-node-creation-input-container",
+		});
 
 		this.inputEl = inputContainer.createEl("input", {
 			type: "text",
@@ -62,7 +64,9 @@ export class NodeCreationModal extends Modal {
 		});
 
 		// Create button container
-		const buttonContainer = contentEl.createDiv({ cls: "nexus-node-creation-buttons" });
+		const buttonContainer = contentEl.createDiv({
+			cls: "nexus-node-creation-buttons",
+		});
 
 		const createButton = buttonContainer.createEl("button", {
 			text: "Create",

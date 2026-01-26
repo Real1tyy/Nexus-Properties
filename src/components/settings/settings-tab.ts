@@ -1,4 +1,4 @@
-import { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
+import { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { type App, PluginSettingTab } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
@@ -58,10 +58,14 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			});
 		}
 
-		this.sectionContainer = containerEl.createDiv({ cls: cls("settings-section-container") });
+		this.sectionContainer = containerEl.createDiv({
+			cls: cls("settings-section-container"),
+		});
 		this.renderSelectedSection();
 
-		const footerEl = containerEl.createDiv({ cls: `setting-item ${cls("settings-footer")}` });
+		const footerEl = containerEl.createDiv({
+			cls: `setting-item ${cls("settings-footer")}`,
+		});
 		const linksContainer = footerEl.createDiv(cls("settings-footer-links"));
 
 		linksContainer.createEl("a", {

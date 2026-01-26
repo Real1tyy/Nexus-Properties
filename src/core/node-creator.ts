@@ -4,7 +4,7 @@ import {
 	generateUniqueFilePath,
 	generateZettelId,
 	normalizeProperty,
-} from "@real1ty-obsidian-plugins/utils";
+} from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
 import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";

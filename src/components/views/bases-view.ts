@@ -1,4 +1,4 @@
-import { IncludedPropertiesEvaluator, RegisteredEventsComponent } from "@real1ty-obsidian-plugins/utils";
+import { IncludedPropertiesEvaluator, RegisteredEventsComponent } from "@real1ty-obsidian-plugins";
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type NexusPropertiesPlugin from "../../main";
@@ -194,15 +194,27 @@ ${orderArray}
 		return `\n    sort:\n${sort}`;
 	}
 
-	private getViewConfig(viewType: BaseViewType): { name: string; prop: string } {
+	private getViewConfig(viewType: BaseViewType): {
+		name: string;
+		prop: string;
+	} {
 		const prefix = this.showArchived ? "Archived " : "";
 		switch (viewType) {
 			case "children":
-				return { name: `${prefix}Children`, prop: this.currentSettings.childrenProp };
+				return {
+					name: `${prefix}Children`,
+					prop: this.currentSettings.childrenProp,
+				};
 			case "parent":
-				return { name: `${prefix}Parent`, prop: this.currentSettings.parentProp };
+				return {
+					name: `${prefix}Parent`,
+					prop: this.currentSettings.parentProp,
+				};
 			case "related":
-				return { name: `${prefix}Related`, prop: this.currentSettings.relatedProp };
+				return {
+					name: `${prefix}Related`,
+					prop: this.currentSettings.relatedProp,
+				};
 		}
 	}
 

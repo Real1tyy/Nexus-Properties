@@ -7,7 +7,7 @@ import {
 	getFileContext,
 	getFolderPath,
 	isFolderNote,
-} from "@real1ty-obsidian-plugins/utils";
+} from "@real1ty-obsidian-plugins";
 import type { ElementDefinition } from "cytoscape";
 import type { App } from "obsidian";
 import type { NexusPropertiesSettings } from "../types/settings";
@@ -120,7 +120,13 @@ export class GraphBuilder {
 				const resolvedFile = this.app.metadataCache.getFirstLinkpathDest(linkPath, sourcePath);
 
 				if (!resolvedFile) {
-					return { wikiLink, file: null, frontmatter: null, path: "", pathWithExt: "" };
+					return {
+						wikiLink,
+						file: null,
+						frontmatter: null,
+						path: "",
+						pathWithExt: "",
+					};
 				}
 
 				const fileContext = getFileContext(this.app, resolvedFile.path);
@@ -206,7 +212,9 @@ export class GraphBuilder {
 
 		const relatedNodes = validContexts.map((ctx) => this.createNodeElement(ctx.pathWithExt, 1, false));
 
-		const edges = validContexts.map((ctx) => ({ data: { source: sourcePath, target: ctx.path } }));
+		const edges = validContexts.map((ctx) => ({
+			data: { source: sourcePath, target: ctx.path },
+		}));
 
 		return {
 			nodes: [sourceNode, ...relatedNodes],
@@ -260,7 +268,9 @@ export class GraphBuilder {
 				)
 			);
 
-			const childEdges = validChildren.map((ctx) => ({ data: { source: currentPath, target: ctx.path } }));
+			const childEdges = validChildren.map((ctx) => ({
+				data: { source: currentPath, target: ctx.path },
+			}));
 
 			nodes.push(...childNodes);
 			edges.push(...childEdges);
@@ -426,12 +436,23 @@ export class GraphBuilder {
 		};
 	}
 
-	private collectOrbitalMetadata(
-		constellations: ConstellationNode[]
-	): Map<string, { centerPath: string; orbitalIndex: number; orbitalCount: number; constellationLevel: number }> {
+	private collectOrbitalMetadata(constellations: ConstellationNode[]): Map<
+		string,
+		{
+			centerPath: string;
+			orbitalIndex: number;
+			orbitalCount: number;
+			constellationLevel: number;
+		}
+	> {
 		const metadata = new Map<
 			string,
-			{ centerPath: string; orbitalIndex: number; orbitalCount: number; constellationLevel: number }
+			{
+				centerPath: string;
+				orbitalIndex: number;
+				orbitalCount: number;
+				constellationLevel: number;
+			}
 		>();
 
 		constellations.forEach((constellation) => {

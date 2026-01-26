@@ -1,4 +1,4 @@
-import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
+import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 import type { SettingsSection } from "../types";

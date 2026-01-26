@@ -1,4 +1,4 @@
-import { hasLinkInProperty, removeLinkFromProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins/utils";
+import { hasLinkInProperty, removeLinkFromProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins";
 import { type App, Menu, Notice, TFile } from "obsidian";
 import type { SettingsStore } from "../../core/settings-store";
 

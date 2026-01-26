@@ -1,4 +1,4 @@
-import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins/utils";
+import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
@@ -79,12 +79,22 @@ export class RulesSection implements SettingsSection {
 		];
 
 		for (const example of examples) {
-			const listItem = examplesList.createEl("li", { cls: cls("color-example-item") });
-			listItem.createEl("code", { text: example.expression, cls: cls("settings-info-box-example") });
+			const listItem = examplesList.createEl("li", {
+				cls: cls("color-example-item"),
+			});
+			listItem.createEl("code", {
+				text: example.expression,
+				cls: cls("settings-info-box-example"),
+			});
 			listItem.createSpan({ text: "→", cls: cls("color-arrow") });
-			const colorSpan = listItem.createEl("span", { cls: cls("color-example-dot") });
+			const colorSpan = listItem.createEl("span", {
+				cls: cls("color-example-dot"),
+			});
 			colorSpan.style.setProperty("--example-color", example.color);
-			listItem.createSpan({ text: example.description, cls: cls("color-example-description") });
+			listItem.createSpan({
+				text: example.description,
+				cls: cls("color-example-description"),
+			});
 		}
 
 		const warningContainer = descriptionContainer.createDiv(cls("settings-warning-box"));
@@ -178,7 +188,9 @@ export class RulesSection implements SettingsSection {
 		});
 
 		const examplesContainer = description.createDiv(cls("settings-info-box"));
-		examplesContainer.createEl("strong", { text: "Example filter expressions:" });
+		examplesContainer.createEl("strong", {
+			text: "Example filter expressions:",
+		});
 		const examplesList = examplesContainer.createEl("ul");
 
 		const examples = [
@@ -197,10 +209,18 @@ export class RulesSection implements SettingsSection {
 		];
 
 		for (const example of examples) {
-			const listItem = examplesList.createEl("li", { cls: cls("color-example-item") });
-			listItem.createEl("code", { text: example.expression, cls: cls("settings-info-box-example") });
+			const listItem = examplesList.createEl("li", {
+				cls: cls("color-example-item"),
+			});
+			listItem.createEl("code", {
+				text: example.expression,
+				cls: cls("settings-info-box-example"),
+			});
 			listItem.createSpan({ text: "→", cls: cls("color-arrow") });
-			listItem.createSpan({ text: example.description, cls: cls("color-example-description") });
+			listItem.createSpan({
+				text: example.description,
+				cls: cls("color-example-description"),
+			});
 		}
 
 		const warningContainer = description.createDiv(cls("settings-warning-box"));

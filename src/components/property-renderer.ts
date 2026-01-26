@@ -1,4 +1,4 @@
-import { formatValue, parseWikiLinkWithDisplay } from "@real1ty-obsidian-plugins/utils";
+import { formatValue, parseWikiLinkWithDisplay } from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
 
 interface PropertyRendererOptions {
@@ -56,7 +56,10 @@ export class PropertyRenderer {
 
 			for (let i = 0; i < value.length; i++) {
 				if (i > 0) {
-					container.createEl("span", { text: ", ", cls: this.options.separatorClass });
+					container.createEl("span", {
+						text: ", ",
+						cls: this.options.separatorClass,
+					});
 				}
 				this.renderSingleValue(container, value[i]);
 			}

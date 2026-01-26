@@ -26,7 +26,9 @@ export class GraphHeader {
 		private containerEl: HTMLElement,
 		private props: GraphHeaderProps
 	) {
-		this.headerEl = this.containerEl.createEl("div", { cls: cls("graph-view-header") });
+		this.headerEl = this.containerEl.createEl("div", {
+			cls: cls("graph-view-header"),
+		});
 		this.render();
 	}
 
@@ -53,11 +55,17 @@ export class GraphHeader {
 		});
 
 		// Controls container
-		this.controlsContainer = this.headerEl.createEl("div", { cls: cls("graph-controls-container") });
+		this.controlsContainer = this.headerEl.createEl("div", {
+			cls: cls("graph-controls-container"),
+		});
 
 		// Render Related checkbox
-		this.relatedToggleContainer = this.controlsContainer.createEl("div", { cls: cls("graph-toggle-container") });
-		this.relatedCheckbox = this.relatedToggleContainer.createEl("input", { type: "checkbox" });
+		this.relatedToggleContainer = this.controlsContainer.createEl("div", {
+			cls: cls("graph-toggle-container"),
+		});
+		this.relatedCheckbox = this.relatedToggleContainer.createEl("input", {
+			type: "checkbox",
+		});
 		this.relatedCheckbox.addClass(cls("graph-toggle-checkbox"));
 		this.relatedCheckbox.checked = this.props.renderRelated;
 
@@ -76,8 +84,12 @@ export class GraphHeader {
 		this.makeContainerClickable(this.relatedToggleContainer, this.relatedCheckbox);
 
 		// Include all related checkbox
-		this.includeAllContainer = this.controlsContainer.createEl("div", { cls: cls("graph-toggle-container") });
-		this.includeAllCheckbox = this.includeAllContainer.createEl("input", { type: "checkbox" });
+		this.includeAllContainer = this.controlsContainer.createEl("div", {
+			cls: cls("graph-toggle-container"),
+		});
+		this.includeAllCheckbox = this.includeAllContainer.createEl("input", {
+			type: "checkbox",
+		});
 		this.includeAllCheckbox.addClass(cls("graph-toggle-checkbox"));
 		this.includeAllCheckbox.checked = this.props.includeAllRelated;
 
@@ -93,8 +105,12 @@ export class GraphHeader {
 		this.makeContainerClickable(this.includeAllContainer, this.includeAllCheckbox);
 
 		// Start from current file checkbox
-		this.startFromCurrentContainer = this.controlsContainer.createEl("div", { cls: cls("graph-toggle-container") });
-		this.toggleCheckbox = this.startFromCurrentContainer.createEl("input", { type: "checkbox" });
+		this.startFromCurrentContainer = this.controlsContainer.createEl("div", {
+			cls: cls("graph-toggle-container"),
+		});
+		this.toggleCheckbox = this.startFromCurrentContainer.createEl("input", {
+			type: "checkbox",
+		});
 		this.toggleCheckbox.addClass(cls("graph-toggle-checkbox"));
 		this.toggleCheckbox.checked = this.props.startFromCurrent;
 

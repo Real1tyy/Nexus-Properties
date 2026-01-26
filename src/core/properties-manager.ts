@@ -9,7 +9,7 @@ import {
 	mergeFrontmatterDiffs,
 	parsePropertyLinks,
 	withFileContext,
-} from "@real1ty-obsidian-plugins/utils";
+} from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";

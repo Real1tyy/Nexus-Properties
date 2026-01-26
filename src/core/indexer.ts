@@ -4,7 +4,7 @@ import {
 	type IndexerEvent as GenericIndexerEvent,
 	type IndexerConfig,
 	normalizeProperty,
-} from "@real1ty-obsidian-plugins/utils";
+} from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { BehaviorSubject, Subject } from "rxjs";

@@ -1,4 +1,4 @@
-import { extractFilePath, getFileContext, parsePropertyLinks } from "@real1ty-obsidian-plugins/utils";
+import { extractFilePath, getFileContext, parsePropertyLinks } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
 import type { FileRelationships, Indexer } from "../core/indexer";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";

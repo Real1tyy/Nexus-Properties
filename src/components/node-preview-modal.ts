@@ -1,4 +1,4 @@
-import { filterPropertiesForDisplay } from "@real1ty-obsidian-plugins/utils";
+import { filterPropertiesForDisplay } from "@real1ty-obsidian-plugins";
 import { type App, Modal, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { SettingsStore } from "../core/settings-store";

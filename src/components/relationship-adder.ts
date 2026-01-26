@@ -1,4 +1,4 @@
-import { addLinkToProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins/utils";
+import { addLinkToProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins";
 import { type App, Notice, TFile } from "obsidian";
 import type { SettingsStore } from "../core/settings-store";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";

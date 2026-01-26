@@ -276,7 +276,10 @@ export class GraphInteractionHandler {
 			const modelPos = evt.position;
 			if (!modelPos) return;
 
-			const viewportCenter = { x: this.cy.width() / 2, y: this.cy.height() / 2 };
+			const viewportCenter = {
+				x: this.cy.width() / 2,
+				y: this.cy.height() / 2,
+			};
 			const targetPan = {
 				x: viewportCenter.x - modelPos.x * targetZoom,
 				y: viewportCenter.y - modelPos.y * targetZoom,
@@ -288,10 +291,16 @@ export class GraphInteractionHandler {
 			// Update tracking
 			if (isZoomIn) {
 				this.lastBackgroundTapTime = now;
-				this.lastBackgroundTapRenderedPos = { x: renderedPos.x, y: renderedPos.y };
+				this.lastBackgroundTapRenderedPos = {
+					x: renderedPos.x,
+					y: renderedPos.y,
+				};
 			} else {
 				this.lastBackgroundRightClickTime = now;
-				this.lastBackgroundRightClickRenderedPos = { x: renderedPos.x, y: renderedPos.y };
+				this.lastBackgroundRightClickRenderedPos = {
+					x: renderedPos.x,
+					y: renderedPos.y,
+				};
 			}
 		}
 	}

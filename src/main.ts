@@ -1,4 +1,4 @@
-import { WhatsNewModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins/utils";
+import { WhatsNewModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins";
 import { Notice, Plugin, TFile } from "obsidian";
 import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
 import { NexusPropertiesSettingsTab, NodeCreationModal } from "./components";
@@ -155,7 +155,10 @@ export default class NexusPropertiesPlugin extends Plugin {
 			const settings = this.settingsStore.currentSettings;
 			const leaf = settings.viewLeafPosition === "right" ? workspace.getRightLeaf(false) : workspace.getLeftLeaf(false);
 			if (leaf) {
-				await leaf.setViewState({ type: VIEW_TYPE_NEXUS_SWITCHER, active: true });
+				await leaf.setViewState({
+					type: VIEW_TYPE_NEXUS_SWITCHER,
+					active: true,
+				});
 				workspace.revealLeaf(leaf);
 			}
 		}

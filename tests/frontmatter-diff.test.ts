@@ -3,7 +3,7 @@ import {
 	type FrontmatterChange,
 	formatChangeForDisplay,
 	mergeFrontmatterDiffs,
-} from "@real1ty-obsidian-plugins/utils";
+} from "@real1ty-obsidian-plugins";
 import { describe, expect, it } from "vitest";
 import type { Frontmatter } from "../src/types/settings";
 

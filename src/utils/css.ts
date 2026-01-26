@@ -1,64 +1,9 @@
-const CSS_PREFIX = "nexus-properties-";
+import { createCssUtils } from "@real1ty-obsidian-plugins";
 
 /**
- * Prefixes class names with the standard plugin prefix.
- * Handles multiple class names and automatically adds the prefix.
- *
- * @example
- * cls("calendar-view") => "nexus-properties-calendar-view"
- * cls("button", "active") => "nexus-properties-button nexus-properties-active"
- * cls("modal calendar") => "nexus-properties-modal nexus-properties-calendar"
+ * CSS utilities for Nexus-Properties plugin.
+ * Uses the shared factory with "nexus-properties-" prefix.
  */
-export function cls(...classNames: string[]): string {
-	return classNames
-		.flatMap((name) => name.split(/\s+/))
-		.filter((name) => name.length > 0)
-		.map((name) => `${CSS_PREFIX}${name}`)
-		.join(" ");
-}
+const { cls, addCls, removeCls, toggleCls, hasCls } = createCssUtils("nexus-properties-");
 
-/**
- * Adds prefixed class names to an element.
- *
- * @example
- * addCls(element, "active", "selected")
- */
-function _addCls(element: HTMLElement, ...classNames: string[]): void {
-	const classes = cls(...classNames);
-	if (classes) {
-		element.classList.add(...classes.split(/\s+/));
-	}
-}
-
-/**
- * Removes prefixed class names from an element.
- *
- * @example
- * removeCls(element, "active", "selected")
- */
-function _removeCls(element: HTMLElement, ...classNames: string[]): void {
-	const classes = cls(...classNames);
-	if (classes) {
-		element.classList.remove(...classes.split(/\s+/));
-	}
-}
-
-/**
- * Toggles prefixed class names on an element.
- *
- * @example
- * toggleCls(element, "active")
- */
-function _toggleCls(element: HTMLElement, className: string, force?: boolean): boolean {
-	return element.classList.toggle(cls(className), force);
-}
-
-/**
- * Checks if element has a prefixed class.
- *
- * @example
- * hasCls(element, "active")
- */
-function _hasCls(element: HTMLElement, className: string): boolean {
-	return element.classList.contains(cls(className));
-}
+export { cls, addCls, removeCls, toggleCls, hasCls };

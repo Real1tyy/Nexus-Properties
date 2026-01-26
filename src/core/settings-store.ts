@@ -1,4 +1,4 @@
-import { SettingsStore as GenericSettingsStore } from "@real1ty-obsidian-plugins/utils";
+import { SettingsStore as GenericSettingsStore } from "@real1ty-obsidian-plugins";
 import type { Plugin } from "obsidian";
 import { NexusPropertiesSettingsSchema } from "../types/settings";
 

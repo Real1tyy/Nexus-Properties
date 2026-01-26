@@ -197,7 +197,10 @@ export class GraphLayoutManager {
 		return treeBounds.sort((a, b) => a.maxX - a.minX - (b.maxX - b.minX));
 	}
 
-	private positionMultiNodeTrees(treeBounds: TreeBounds[]): { maxX: number; maxHeight: number } {
+	private positionMultiNodeTrees(treeBounds: TreeBounds[]): {
+		maxX: number;
+		maxHeight: number;
+	} {
 		const TREE_HORIZONTAL_SPACING = 150;
 		const VERTICAL_STAGGER = 200;
 
@@ -524,7 +527,11 @@ export class GraphLayoutManager {
 		children: string[],
 		parentCenterX: number,
 		baselineY: number,
-		options: { maxPerRow: number; horizontalSpacing: number; rowVerticalSpacing: number }
+		options: {
+			maxPerRow: number;
+			horizontalSpacing: number;
+			rowVerticalSpacing: number;
+		}
 	): Map<string, { x: number; y: number }> {
 		const positions = new Map<string, { x: number; y: number }>();
 		const { maxPerRow, horizontalSpacing, rowVerticalSpacing } = options;
