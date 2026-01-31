@@ -22,13 +22,34 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 **Layout**: Tree with parent at top, children below
 **Best for**: Projects, outlines, taxonomies
 
-**Node labels**: Automatically strips redundant parent name prefixes
-- "Health Nutrition" → "Nutrition" under "Health"
-- "Parent-Child" → "Child" under "Parent"
-
 **Start from Current**: Enable to show only subtree from current file (excludes ancestors)
 
 **Include All Related**: Add related constellations to hierarchy view
+
+## Node Labels
+
+Graph nodes display the `title` property from each file's frontmatter. This title is automatically managed by the plugin:
+
+- **With Parent**: Title = filename with parent prefix stripped (e.g., "Parent - Child" → "Child")
+- **Without Parent**: Title = file basename
+
+**Supported prefix patterns**:
+- `Parent - Child` → "Child"
+- `Parent Child` → "Child"
+- `Parent-Child` → "Child"
+
+**Benefits**:
+- Cleaner, more readable graph labels
+- Consistent display across all views
+- No redundant parent names cluttering the graph
+- Pre-computed for faster rendering
+
+The title property is updated automatically when:
+- A file is created or modified
+- Parent relationships change
+- You run "Rescan All Files" command
+
+See [Configuration](../configuration#node-creation-shortcuts) for property name settings.
 
 ## Depth Control
 

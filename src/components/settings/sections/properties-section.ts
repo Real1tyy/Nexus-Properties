@@ -2,6 +2,7 @@ import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 import type { SettingsSection } from "../types";
+import { SETTINGS_DEFAULTS } from "src/types/constants";
 
 export class PropertiesSection implements SettingsSection {
 	readonly id = "properties";
@@ -83,6 +84,13 @@ export class PropertiesSection implements SettingsSection {
 			name: "Zettel ID property",
 			desc: "Property name for unique timestamp identifier assigned to new nodes",
 			placeholder: "_ZettelID",
+		});
+
+		this.uiBuilder.addText(container, {
+			key: "titleProp",
+			name: "Title property",
+			desc: "Property name for auto-assigned title (file name with parent prefix stripped)",
+			placeholder: SETTINGS_DEFAULTS.DEFAULT_TITLE_PROP,
 		});
 	}
 }

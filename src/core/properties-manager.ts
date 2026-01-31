@@ -1,6 +1,7 @@
 import {
 	addLinkToProperty,
 	applyFrontmatterChanges,
+	extractDisplayName,
 	type FrontmatterChange,
 	type FrontmatterDiff,
 	FrontmatterPropagationModal,
@@ -16,6 +17,7 @@ import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { parseExcludedProps } from "../utils/frontmatter-utils";
 import { getChildrenRecursively } from "../utils/hierarchy";
+import { stripParentPrefix } from "../utils/string-utils";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 
@@ -34,10 +36,13 @@ export class PropertiesManager {
 		this.subscription = events$.subscribe((event) => {
 			if (event.type === "file-deleted" && event.oldRelationships) {
 				this.handleFileDeletion(event.filePath, event.oldRelationships);
-			} else if (event.type === "file-changed" && event.oldRelationships && event.newRelationships) {
-				this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
+			} else if (event.type === "file-changed" && event.newRelationships) {
+				if (event.oldRelationships) {
+					this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
+				}
 
 				if (!this.filesBeingPropagated.has(event.filePath)) {
+					void this.updateTitleProperty(event.filePath, event.newRelationships);
 					this.handleFrontmatterPropagation(event.filePath, event.newRelationships, event.frontmatterDiff);
 				}
 			}
@@ -61,19 +66,46 @@ export class PropertiesManager {
 		const allFiles = this.app.vault.getMarkdownFiles();
 		const relevantFiles = allFiles.filter((file) => indexer.shouldIndexFile(file.path));
 
-		if (this.settings.autoLinkSiblings) {
-			await Promise.all(
-				relevantFiles.map(async (file) => {
-					const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-					if (!frontmatter) {
-						return;
-					}
+		await Promise.all(
+			relevantFiles.map(async (file) => {
+				const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+				if (!frontmatter) {
+					return;
+				}
 
-					const relationships = indexer.extractRelationships(file, frontmatter);
+				const relationships = indexer.extractRelationships(file, frontmatter);
+
+				if (this.settings.autoLinkSiblings) {
 					await this.linkSiblingsIfNeeded(relationships);
-				})
-			);
+				}
+
+				await this.updateTitleProperty(file.path, relationships);
+			})
+		);
+	}
+
+	private computeTitle(baseName: string, parentWikiLinks: string[]): string {
+		if (!parentWikiLinks.length) {
+			return baseName;
 		}
+		const firstParentLink = parentWikiLinks[0];
+		const parentDisplayName = extractDisplayName(firstParentLink);
+		return stripParentPrefix(baseName, parentDisplayName);
+	}
+
+	private async updateTitleProperty(filePath: string, newRelationships: FileRelationships): Promise<void> {
+		const context = getFileContext(this.app, filePath);
+		if (!context.file) return;
+
+		const displayName = extractDisplayName(filePath);
+		const computedTitle = this.computeTitle(displayName, newRelationships.parent);
+		const currentTitle = newRelationships.frontmatter[this.settings.titleProp];
+
+		if (currentTitle === computedTitle) return;
+
+		await this.app.fileManager.processFrontMatter(context.file, (fm) => {
+			fm[this.settings.titleProp] = computedTitle;
+		});
 	}
 
 	private async linkSiblingsIfNeeded(relationships: FileRelationships): Promise<void> {

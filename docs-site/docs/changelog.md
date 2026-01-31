@@ -19,6 +19,18 @@ Choose which sidebar to open the Nexus Properties view in, giving you control ov
 
 See [Configuration](configuration#user-interface) for details.
 
+#### Automatic Title Property
+
+The plugin now automatically assigns a `Title` property to files, making graph rendering faster and more consistent.
+
+- **Auto-Computed Title**: When a file has a parent, the title is computed by stripping the parent name prefix from the filename (e.g., "Parent - Child.md" gets title "Child")
+- **No Parent Fallback**: Files without a parent get their basename as the title
+- **Graph Performance**: Graph nodes read the pre-computed title from frontmatter instead of calculating it on every render
+- **Configurable Property Name**: Change the property name in settings (default: `Title`)
+- **Automatic Updates**: Title is updated whenever parent relationships change
+
+See [Configuration](configuration#node-creation-shortcuts) for property name settings, and [Graph Views](features/graph-views#node-labels) for how titles display in graphs.
+
 ## 1.6.0 - 1/11/2026
 
 ### Bug Fixes

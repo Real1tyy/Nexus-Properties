@@ -11,7 +11,6 @@ import {
 import type { ElementDefinition } from "cytoscape";
 import type { App } from "obsidian";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { stripParentPrefix } from "../utils/string-utils";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
 
@@ -56,6 +55,7 @@ export class GraphBuilder {
 	private hierarchyMaxDepth: number;
 	private maintainIndirectConnections: boolean;
 	private prioritizeParentProp: string;
+	private titleProp: string;
 	private depthOverride: number | null = null;
 
 	constructor(
@@ -71,6 +71,7 @@ export class GraphBuilder {
 			this.hierarchyMaxDepth = settings.hierarchyMaxDepth;
 			this.maintainIndirectConnections = settings.maintainIndirectConnections;
 			this.prioritizeParentProp = settings.prioritizeParentProp;
+			this.titleProp = settings.titleProp;
 		};
 		applySettings(settingsStore.settings$.value);
 		settingsStore.settings$.subscribe(applySettings);
@@ -140,23 +141,13 @@ export class GraphBuilder {
 			});
 	}
 
-	private createNodeElement(
-		pathOrWikiLink: string,
-		level: number,
-		isSource: boolean,
-		parentDisplayName?: string
-	): ElementDefinition {
+	private createNodeElement(pathOrWikiLink: string, level: number, isSource: boolean): ElementDefinition {
 		const filePath = extractFilePath(pathOrWikiLink);
-		let displayName = extractDisplayName(pathOrWikiLink);
-
-		if (parentDisplayName) {
-			displayName = stripParentPrefix(displayName, parentDisplayName);
-		}
+		const { frontmatter } = getFileContext(this.app, filePath);
+		const displayName = String(frontmatter?.[this.titleProp] ?? extractDisplayName(pathOrWikiLink));
 
 		const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
 		const estimatedHeight = 45;
-
-		const { frontmatter } = getFileContext(this.app, filePath);
 		const nodeColor = this.colorEvaluator.evaluateColor(frontmatter ?? {});
 
 		return {
@@ -251,8 +242,6 @@ export class GraphBuilder {
 			const { file, frontmatter } = getFileContext(this.app, currentPath);
 			if (!file || !frontmatter) continue;
 
-			const parentDisplayName = extractDisplayName(currentPath);
-
 			// Check if we can add children (next level must be within depth limit)
 			if (currentLevel + 1 >= effectiveDepth) continue;
 
@@ -260,12 +249,7 @@ export class GraphBuilder {
 			const validChildren = this.resolveValidContexts(relations.children, processedPaths, currentPath);
 
 			const childNodes = validChildren.map((ctx) =>
-				this.createNodeElement(
-					ctx.pathWithExt,
-					currentLevel + 1,
-					allowSourceHighlight && ctx.path === sourcePath,
-					parentDisplayName
-				)
+				this.createNodeElement(ctx.pathWithExt, currentLevel + 1, allowSourceHighlight && ctx.path === sourcePath)
 			);
 
 			const childEdges = validChildren.map((ctx) => ({
