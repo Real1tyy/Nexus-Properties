@@ -25,11 +25,11 @@ The plugin now automatically assigns a `Title` property to files, making graph r
 
 - **Auto-Computed Title**: When a file has a parent, the title is computed by stripping the parent name prefix from the filename (e.g., "Parent - Child.md" gets title "Child")
 - **No Parent Fallback**: Files without a parent get their basename as the title
-- **Graph Performance**: Graph nodes read the pre-computed title from frontmatter instead of calculating it on every render
+- **Cleaner Display**: Both Graph views and Bases view use the title property for cleaner file names
 - **Configurable Property Name**: Change the property name in settings (default: `Title`)
 - **Automatic Updates**: Title is updated whenever parent relationships change
 
-See [Configuration](configuration#node-creation-shortcuts) for property name settings, and [Graph Views](features/graph-views#node-labels) for how titles display in graphs.
+See [Configuration](configuration#node-creation-shortcuts) for property name settings, and [Graph Views](features/graph-views#node-labels) for how titles display.
 
 ## 1.6.0 - 1/11/2026
 

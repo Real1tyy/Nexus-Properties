@@ -28,6 +28,16 @@ When the "Exclude Archived" setting is enabled in Settings → Bases View, an **
 - Select "Children" view with archived toggle ON → Shows archived children
 - Select "Parent" view with archived toggle ON → Shows archived parent (if archived)
 
+## File Names
+
+Bases view displays the `Title` property instead of `file.name` for cleaner, more readable file names.
+
+The title property is automatically computed by stripping parent name prefixes:
+- "Parent - Child" → displays as "Child"
+- "Category Item" → displays as "Item"
+
+See [Graph Views → Node Labels](graph-views#node-labels) for details on how titles work.
+
 ## Usage
 
 **Switch views**: Click "Switch to Bases View" / "Switch to Graph View" button
