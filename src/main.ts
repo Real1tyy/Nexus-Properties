@@ -32,7 +32,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.addCommand({
 			id: "toggle-view-mode",
-			name: "Toggle between Graph and Bases View",
+			name: "Toggle View Mode (Graph/Bases/MOC)",
 			callback: () => this.toggleViewMode(),
 		});
 

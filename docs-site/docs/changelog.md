@@ -36,6 +36,32 @@ Configure in **Settings → Bases → View type**.
 
 See [Configuration](configuration#bases-view) for details.
 
+#### MOC (Map of Content) View
+
+New tree-based view that renders your hierarchy as an indented outline with clickable wiki links.
+
+- **Tree Structure**: Displays the current file and all its children in a hierarchical tree format
+- **Indented Outline**: Each level is indented to show parent-child relationships clearly
+- **Clickable Links**: All items are rendered as wiki links - click to navigate directly to any file
+- **Cycle Detection**: Handles circular relationships without infinite loops
+- **Three-Way Toggle**: Switch between Graph → Bases → MOC views using the toggle button
+- **Root Mode Toggle**: Switch between "Current" (current file as root) and "Top Parent" (topmost ancestor as root)
+
+**Root Mode**:
+- **Current**: Shows hierarchy starting from the active file (default)
+- **Top Parent**: Traverses upward to find the topmost parent, then renders the full tree with the current file highlighted
+
+**Example Output** (Top Parent mode):
+```
+- [[Topmost Ancestor]]
+    - [[Intermediate Parent]]
+        - [[Current Note]] ← highlighted
+            - [[Child 1]]
+            - [[Child 2]]
+```
+
+Perfect for creating Maps of Content or viewing your knowledge hierarchy at a glance.
+
 #### Undo/Redo for Graph Operations
 
 Full undo/redo support for all graph operations, allowing you to easily revert accidental changes.

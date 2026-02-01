@@ -6,16 +6,19 @@ import type { NodeStatistics } from "../../types/statistics";
 import { cls } from "../../utils/css";
 import { collectRelatedNodesRecursively } from "../../utils/hierarchy";
 import { BasesView, type BaseViewType } from "./bases-view";
+import { MocView } from "./moc-view";
 import { RelationshipGraphView } from "./relationship-graph-view";
 
 export const VIEW_TYPE_NEXUS_SWITCHER = "nexus-view-switcher";
 
-type ViewMode = "graph" | "bases";
+type ViewMode = "graph" | "bases" | "moc";
 
 export class NexusViewSwitcher extends ItemView {
 	private currentMode: ViewMode = "graph";
 	private graphView: RelationshipGraphView | null = null;
 	private basesView: BasesView | null = null;
+	private mocView: MocView | null = null;
+	private mocContentEl: HTMLElement | null = null;
 	private toggleButton: HTMLButtonElement | null = null;
 	private archivedToggleContainer: HTMLElement | null = null;
 	private archivedCheckbox: HTMLInputElement | null = null;
@@ -49,7 +52,14 @@ export class NexusViewSwitcher extends ItemView {
 	}
 
 	getIcon(): string {
-		return this.currentMode === "graph" ? "git-fork" : "layout-grid";
+		switch (this.currentMode) {
+			case "graph":
+				return "git-fork";
+			case "bases":
+				return "layout-grid";
+			case "moc":
+				return "list-tree";
+		}
 	}
 
 	async onOpen(): Promise<void> {
@@ -65,6 +75,9 @@ export class NexusViewSwitcher extends ItemView {
 			this.app.workspace.on("active-leaf-change", async () => {
 				if (this.currentMode === "bases" && this.basesView) {
 					await this.basesView.updateActiveFile();
+				}
+				if (this.currentMode === "moc" && this.mocView) {
+					await this.mocView.updateActiveFile();
 				}
 				this.updateStatistics();
 			})
@@ -89,9 +102,19 @@ export class NexusViewSwitcher extends ItemView {
 			this.basesView = null;
 		}
 
+		if (this.mocView) {
+			this.mocView.destroy();
+			this.mocView = null;
+		}
+
 		if (this.basesContentEl) {
 			this.basesContentEl.empty();
 			this.basesContentEl = null;
+		}
+
+		if (this.mocContentEl) {
+			this.mocContentEl.empty();
+			this.mocContentEl = null;
 		}
 
 		if (this.graphContainerEl) {
@@ -112,19 +135,32 @@ export class NexusViewSwitcher extends ItemView {
 	}
 
 	/**
-	 * Toggle between graph and bases views
+	 * Toggle between graph, bases, and moc views
 	 */
 	async toggleView(): Promise<void> {
-		const newMode: ViewMode = this.currentMode === "graph" ? "bases" : "graph";
-		this.currentMode = newMode;
+		const modes: ViewMode[] = ["graph", "bases", "moc"];
+		const currentIndex = modes.indexOf(this.currentMode);
+		const nextIndex = (currentIndex + 1) % modes.length;
+		this.currentMode = modes[nextIndex];
 
 		// Update button text
 		if (this.toggleButton) {
-			this.toggleButton.textContent = this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View";
+			this.toggleButton.textContent = this.getToggleButtonText();
 		}
 
 		this.updateArchivedToggleVisibility();
 		await this.renderViewContent();
+	}
+
+	private getToggleButtonText(): string {
+		switch (this.currentMode) {
+			case "graph":
+				return "Switch to Bases";
+			case "bases":
+				return "Switch to MOC";
+			case "moc":
+				return "Switch to Graph";
+		}
 	}
 
 	private updateArchivedToggleVisibility(): void {
@@ -167,7 +203,7 @@ export class NexusViewSwitcher extends ItemView {
 
 			// Center: Toggle button
 			this.toggleButton = headerBar.createEl("button", {
-				text: this.currentMode === "graph" ? "Switch to Bases View" : "Switch to Graph View",
+				text: this.getToggleButtonText(),
 				cls: cls("view-toggle-button"),
 			});
 
@@ -247,12 +283,10 @@ export class NexusViewSwitcher extends ItemView {
 			}
 		});
 
-		if (this.currentMode === "graph") {
-			// Clean up bases view
-			if (this.basesContentEl) {
-				this.basesContentEl = null;
-			}
+		// Clean up all views first
+		this.cleanupViews();
 
+		if (this.currentMode === "graph") {
 			// Create graph container
 			this.graphContainerEl = contentEl.createEl("div", {
 				cls: cls("graph-container"),
@@ -266,16 +300,7 @@ export class NexusViewSwitcher extends ItemView {
 			});
 
 			await this.graphView.render();
-		} else {
-			// Clean up graph view
-			if (this.graphView) {
-				this.graphView.destroy();
-				this.graphView = null;
-			}
-			if (this.graphContainerEl) {
-				this.graphContainerEl = null;
-			}
-
+		} else if (this.currentMode === "bases") {
 			// Create bases container
 			this.basesContentEl = contentEl.createEl("div", {
 				cls: cls("bases-view-content"),
@@ -293,6 +318,39 @@ export class NexusViewSwitcher extends ItemView {
 			);
 
 			await this.basesView.render();
+		} else if (this.currentMode === "moc") {
+			// Create MOC container
+			this.mocContentEl = contentEl.createEl("div", {
+				cls: cls("moc-view-content"),
+			});
+
+			this.mocView = new MocView(this.app, this.mocContentEl, this.plugin, this.indexer);
+
+			await this.mocView.render();
+		}
+	}
+
+	private cleanupViews(): void {
+		if (this.graphView) {
+			this.graphView.destroy();
+			this.graphView = null;
+		}
+		if (this.graphContainerEl) {
+			this.graphContainerEl = null;
+		}
+		if (this.basesView) {
+			this.basesView.destroy();
+			this.basesView = null;
+		}
+		if (this.basesContentEl) {
+			this.basesContentEl = null;
+		}
+		if (this.mocView) {
+			this.mocView.destroy();
+			this.mocView = null;
+		}
+		if (this.mocContentEl) {
+			this.mocContentEl = null;
 		}
 	}
 

@@ -1812,6 +1812,215 @@ button.nexus-properties-view-toggle-button:active {
 	flex: 1;
 }
 
+/* MOC View Styles */
+.nexus-properties-moc-view-content {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	overflow: auto;
+	background: var(--background-primary);
+}
+
+.nexus-properties-moc-view {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	width: 100%;
+	height: 100%;
+}
+
+/* Toolbar */
+.nexus-properties-moc-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+}
+
+.nexus-properties-moc-toolbar-group {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}
+
+.nexus-properties-moc-toolbar-btn {
+	padding: 4px 12px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.nexus-properties-moc-toolbar-btn:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+
+/* Root mode toggle */
+.nexus-properties-moc-root-toggle {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 10px;
+}
+
+.nexus-properties-moc-root-toggle svg {
+	flex-shrink: 0;
+}
+
+.nexus-properties-moc-root-toggle span {
+	white-space: nowrap;
+}
+
+.nexus-properties-moc-root-toggle-active {
+	background: var(--interactive-accent);
+	border-color: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.nexus-properties-moc-root-toggle-active:hover {
+	background: var(--interactive-accent-hover);
+	border-color: var(--interactive-accent-hover);
+	color: var(--text-on-accent);
+}
+
+/* Tree container */
+.nexus-properties-moc-tree-container {
+	padding: 12px;
+	overflow-y: auto;
+	flex: 1;
+}
+
+/* Tree item */
+.nexus-properties-moc-item {
+	position: relative;
+}
+
+.nexus-properties-moc-item-header {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 4px;
+	border-radius: 6px;
+	transition: background-color 0.1s;
+}
+
+.nexus-properties-moc-item-header:hover {
+	background: var(--background-secondary);
+}
+
+/* Toggle button */
+.nexus-properties-moc-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 4px;
+	cursor: pointer;
+	color: var(--text-muted);
+	flex-shrink: 0;
+	transition: all 0.15s;
+}
+
+.nexus-properties-moc-toggle:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+
+.nexus-properties-moc-toggle svg {
+	width: 14px;
+	height: 14px;
+}
+
+/* Spacer for items without children */
+.nexus-properties-moc-toggle-spacer {
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+}
+
+/* Link styling */
+.nexus-properties-moc-link {
+	color: var(--text-normal);
+	text-decoration: none;
+	font-size: 14px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.nexus-properties-moc-link:hover {
+	color: var(--text-accent);
+	background: var(--background-modifier-hover);
+}
+
+/* Current file highlight */
+.nexus-properties-moc-link-current {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent) !important;
+	font-weight: 600 !important;
+}
+
+.nexus-properties-moc-link-current:hover {
+	background: var(--interactive-accent-hover);
+	color: var(--text-on-accent);
+}
+
+/* Children container */
+.nexus-properties-moc-children {
+	margin-left: 12px;
+	padding-left: 12px;
+	border-left: 2px solid var(--background-modifier-border);
+}
+
+/* Depth-based styling */
+.nexus-properties-moc-item[data-depth="0"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--text-normal);
+}
+
+.nexus-properties-moc-item[data-depth="1"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.nexus-properties-moc-item[data-depth="2"] > .nexus-properties-moc-item-header .nexus-properties-moc-link,
+.nexus-properties-moc-item[data-depth="3"] > .nexus-properties-moc-item-header .nexus-properties-moc-link,
+.nexus-properties-moc-item[data-depth="4"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+	font-size: 13px;
+	font-weight: 400;
+	color: var(--text-muted);
+}
+
+.nexus-properties-moc-item[data-depth="2"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover,
+.nexus-properties-moc-item[data-depth="3"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover,
+.nexus-properties-moc-item[data-depth="4"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover {
+	color: var(--text-normal);
+}
+
+/* Empty state */
+.nexus-properties-moc-empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2em;
+	font-size: 1.1em;
+	color: var(--text-muted);
+	text-align: center;
+}
+
 .nexus-properties-bases-empty-state {
 	display: flex;
 	align-items: center;
