@@ -10,6 +10,20 @@ All notable changes to Nexus Properties will be documented here.
 
 ### New Features
 
+#### Bases View Dropdown with Hotkey Navigation
+
+Redesigned the Bases view selector to use a dropdown interface with keyboard navigation support.
+
+- **Dropdown Selector**: View types (Children, Parent, Related, etc.) now appear in a compact dropdown instead of separate buttons
+- **Right-Click to Cycle**: Right-click the dropdown to quickly cycle to the next view
+- **Keyboard Navigation**: New hotkeys to navigate forward/backward through views or jump directly to a specific view
+
+**Available Hotkeys** (assign in Settings → Hotkeys):
+- `Bases: Next View` - Cycle forward through view options
+- `Bases: Previous View` - Cycle backward through view options
+
+See [Hotkeys](hotkeys#bases-view-navigation) for keyboard shortcuts.
+
 #### Undo/Redo for Graph Operations
 
 Full undo/redo support for all graph operations, allowing you to easily revert accidental changes.

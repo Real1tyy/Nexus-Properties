@@ -48,6 +48,16 @@ Zoom commands only work when graph view is open and zoom mode is active
 Node creation commands only available when viewing a file in an indexed directory
 :::
 
+### Bases View Navigation
+
+**Bases: Next View**: Cycle forward through view options (Children → Parent → Related → All Children → etc.)
+
+**Bases: Previous View**: Cycle backward through view options
+
+:::tip
+You can also right-click the view dropdown to quickly cycle to the next view without using hotkeys.
+:::
+
 ### Undo/Redo
 
 **Undo**: Undo the last graph operation (add/remove relationship, create/delete/edit node)

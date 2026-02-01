@@ -318,6 +318,27 @@ export class NexusViewSwitcher extends ItemView {
 	}
 
 	/**
+	 * Navigate bases view forward
+	 */
+	async toggleBasesViewForward(): Promise<void> {
+		await this.basesView?.toggleViewForward();
+	}
+
+	/**
+	 * Navigate bases view backward
+	 */
+	async toggleBasesViewBackward(): Promise<void> {
+		await this.basesView?.toggleViewBackward();
+	}
+
+	/**
+	 * Go to bases view by index
+	 */
+	async goToBasesViewByIndex(index: number): Promise<void> {
+		await this.basesView?.goToViewByIndex(index);
+	}
+
+	/**
 	 * Toggle enlargement of the view (expand/collapse sidebar)
 	 */
 	toggleEnlargement(): void {

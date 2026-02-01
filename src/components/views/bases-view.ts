@@ -124,11 +124,7 @@ export class BasesView extends RegisteredEventsComponent {
 		}
 	}
 
-	private createViewSelector(): void {
-		this.viewSelectorEl = this.contentEl.createDiv({
-			cls: cls("bases-view-selector"),
-		});
-
+	private getViewOptions(): { type: BaseViewType; label: string }[] {
 		const viewTypes: { type: BaseViewType; label: string }[] = [
 			{ type: "children", label: "Children" },
 			{ type: "parent", label: "Parent" },
@@ -144,27 +140,44 @@ export class BasesView extends RegisteredEventsComponent {
 			);
 		}
 
-		for (const { type, label } of viewTypes) {
-			const button = this.viewSelectorEl.createEl("button", {
+		return viewTypes;
+	}
+
+	private createViewSelector(): void {
+		this.viewSelectorEl = this.contentEl.createDiv({
+			cls: cls("bases-view-selector"),
+		});
+
+		const selectEl = this.viewSelectorEl.createEl("select", {
+			cls: cls("bases-select"),
+		});
+
+		const viewOptions = this.getViewOptions();
+
+		for (const { type, label } of viewOptions) {
+			selectEl.createEl("option", {
+				value: type,
 				text: label,
-				cls: cls("bases-view-button"),
-			});
-
-			if (type === this.selectedViewType) {
-				button.addClass("is-active");
-			}
-
-			button.addEventListener("mousedown", async (e) => {
-				e.preventDefault();
-				this.selectedViewType = type;
-				if (this.onViewTypeChange) {
-					this.onViewTypeChange(type);
-				}
-				// Force re-render by clearing last path since view changed
-				this.lastFilePath = null;
-				await this.render();
 			});
 		}
+
+		selectEl.value = this.selectedViewType;
+
+		selectEl.addEventListener("change", async () => {
+			this.selectedViewType = selectEl.value as BaseViewType;
+			if (this.onViewTypeChange) {
+				this.onViewTypeChange(this.selectedViewType);
+			}
+			// Force re-render by clearing last path since view changed
+			this.lastFilePath = null;
+			await this.render();
+		});
+
+		// Right-click to toggle forward through views
+		selectEl.addEventListener("contextmenu", async (e) => {
+			e.preventDefault();
+			await this.toggleViewForward();
+		});
 	}
 
 	private async renderSelectedView(activeFile: TFile, container: HTMLElement): Promise<void> {
@@ -320,6 +333,38 @@ ${orderArray}${
 
 	getSelectedViewType(): BaseViewType {
 		return this.selectedViewType;
+	}
+
+	async toggleViewForward(): Promise<void> {
+		await this.navigateView(1);
+	}
+
+	async toggleViewBackward(): Promise<void> {
+		await this.navigateView(-1);
+	}
+
+	async goToViewByIndex(index: number): Promise<void> {
+		const viewOptions = this.getViewOptions();
+		if (index < 0 || index >= viewOptions.length) return;
+		await this.setView(viewOptions[index].type);
+	}
+
+	private async navigateView(direction: 1 | -1): Promise<void> {
+		const viewOptions = this.getViewOptions();
+		if (viewOptions.length === 0) return;
+
+		const currentIndex = viewOptions.findIndex((opt) => opt.type === this.selectedViewType);
+		const nextIndex = (currentIndex + direction + viewOptions.length) % viewOptions.length;
+		await this.setView(viewOptions[nextIndex].type);
+	}
+
+	private async setView(viewType: BaseViewType): Promise<void> {
+		this.selectedViewType = viewType;
+		if (this.onViewTypeChange) {
+			this.onViewTypeChange(this.selectedViewType);
+		}
+		this.lastFilePath = null;
+		await this.render();
 	}
 
 	destroy(): void {

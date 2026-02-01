@@ -113,6 +113,18 @@ export default class NexusPropertiesPlugin extends Plugin {
 			callback: () => this.commandManager.redo(),
 		});
 
+		this.addCommand({
+			id: "bases-view-forward",
+			name: "Bases: Next View",
+			callback: () => this.executeViewSwitcherMethod("toggleBasesViewForward"),
+		});
+
+		this.addCommand({
+			id: "bases-view-backward",
+			name: "Bases: Previous View",
+			callback: () => this.executeViewSwitcherMethod("toggleBasesViewBackward"),
+		});
+
 		this.initializePlugin();
 	}
 
@@ -232,6 +244,46 @@ export default class NexusPropertiesPlugin extends Plugin {
 		} else {
 			new Notice("Please open the Nexus Properties view in Graph mode first");
 		}
+	}
+
+	private executeViewSwitcherMethod(methodName: string, noticeMessage?: string): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
+
+		if (existingLeaves.length > 0) {
+			const switcherView = existingLeaves[0].view;
+			if (switcherView instanceof NexusViewSwitcher) {
+				const method = switcherView[methodName as keyof NexusViewSwitcher];
+				if (typeof method === "function") {
+					(method as () => void).call(switcherView);
+				}
+				return;
+			}
+		}
+
+		if (noticeMessage) {
+			new Notice(noticeMessage);
+		} else {
+			new Notice("Please open the Nexus Properties view first");
+		}
+	}
+
+	private executeViewSwitcherMethodWithArg(methodName: string, arg: number): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
+
+		if (existingLeaves.length > 0) {
+			const switcherView = existingLeaves[0].view;
+			if (switcherView instanceof NexusViewSwitcher) {
+				const method = switcherView[methodName as keyof NexusViewSwitcher];
+				if (typeof method === "function") {
+					(method as (arg: number) => void).call(switcherView, arg);
+				}
+				return;
+			}
+		}
+
+		new Notice("Please open the Nexus Properties view first");
 	}
 
 	private handleNodeCreationCommand(checking: boolean, type: "parent" | "child" | "related"): boolean {
