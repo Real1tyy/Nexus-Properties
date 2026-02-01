@@ -4,50 +4,49 @@ import { stripParentPrefix } from "../src/utils/string-utils";
 describe("stripParentPrefix", () => {
 	describe("pattern 1: parent name + space", () => {
 		it("should strip parent name followed by space", () => {
-			expect(stripParentPrefix("Females Addictions", "Females")).toBe("Addictions");
+			expect(stripParentPrefix("Technology Programming", "Technology")).toBe("Programming");
 		});
 
 		it("should strip parent name followed by space with multiple words", () => {
-			expect(stripParentPrefix("Females Psychology How Woman Bond", "Females")).toBe("Psychology How Woman Bond");
+			expect(stripParentPrefix("Technology Web Development Best Practices", "Technology")).toBe(
+				"Web Development Best Practices"
+			);
 		});
 
 		it("should strip parent name followed by space for single word child", () => {
-			expect(stripParentPrefix("Females Sex", "Females")).toBe("Sex");
+			expect(stripParentPrefix("Technology Security", "Technology")).toBe("Security");
 		});
 	});
 
 	describe("pattern 2: parent name + ' - ' (dash with spaces)", () => {
 		it("should strip parent name followed by dash with spaces", () => {
-			expect(stripParentPrefix("Cold Approaching - Only Repels", "Cold Approaching")).toBe("Only Repels");
+			expect(stripParentPrefix("Sports - Basketball", "Sports")).toBe("Basketball");
 		});
 
 		it("should strip parent name followed by dash with spaces for long child name", () => {
-			expect(
-				stripParentPrefix(
-					"Cold Approaching - Check - Signals Signs She Wants You Not All Touches Flirtation, Polarity",
-					"Cold Approaching"
-				)
-			).toBe("Check - Signals Signs She Wants You Not All Touches Flirtation, Polarity");
+			expect(stripParentPrefix("Sports - Training - Advanced Techniques For Team Coordination", "Sports")).toBe(
+				"Training - Advanced Techniques For Team Coordination"
+			);
 		});
 
 		it("should strip parent name followed by dash with spaces for single word child", () => {
-			expect(stripParentPrefix("Cold Approaching - Teasing", "Cold Approaching")).toBe("Teasing");
+			expect(stripParentPrefix("Sports - Swimming", "Sports")).toBe("Swimming");
 		});
 	});
 
 	describe("pattern 3: parent name + '-' (dash without spaces)", () => {
 		it("should strip parent name followed by dash without spaces", () => {
-			expect(stripParentPrefix("Cold Approaching-Real1ty", "Cold Approaching")).toBe("Real1ty");
+			expect(stripParentPrefix("Sports-Soccer", "Sports")).toBe("Soccer");
 		});
 
 		it("should strip parent name followed by dash without spaces for multiple words", () => {
-			expect(stripParentPrefix("Females-Bratislava Vaping", "Females")).toBe("Bratislava Vaping");
+			expect(stripParentPrefix("Technology-Machine Learning", "Technology")).toBe("Machine Learning");
 		});
 	});
 
 	describe("pattern 4: parent name + en-dash/em-dash", () => {
 		it("should strip parent name followed by en-dash with spaces", () => {
-			expect(stripParentPrefix("Cold Approaching – Gamify Mindset", "Cold Approaching")).toBe("Gamify Mindset");
+			expect(stripParentPrefix("Science – Biology", "Science")).toBe("Biology");
 		});
 
 		it("should strip parent name followed by en-dash without spaces", () => {
@@ -63,7 +62,7 @@ describe("stripParentPrefix", () => {
 		});
 
 		it("should handle space then en-dash pattern", () => {
-			expect(stripParentPrefix("Cold Approaching – Only Repels", "Cold Approaching")).toBe("Only Repels");
+			expect(stripParentPrefix("Science – Chemistry", "Science")).toBe("Chemistry");
 		});
 	});
 
@@ -81,11 +80,11 @@ describe("stripParentPrefix", () => {
 		});
 
 		it("should return original name if display name equals parent name", () => {
-			expect(stripParentPrefix("Females", "Females")).toBe("Females");
+			expect(stripParentPrefix("Technology", "Technology")).toBe("Technology");
 		});
 
 		it("should return original name if display name only starts with parent name but no separator", () => {
-			expect(stripParentPrefix("FemalesAddictions", "Females")).toBe("FemalesAddictions");
+			expect(stripParentPrefix("TechnologyProgramming", "Technology")).toBe("TechnologyProgramming");
 		});
 
 		it("should handle parent name with special characters", () => {
@@ -93,7 +92,7 @@ describe("stripParentPrefix", () => {
 		});
 
 		it("should handle case-sensitive matching", () => {
-			expect(stripParentPrefix("females Addictions", "Females")).toBe("females Addictions");
+			expect(stripParentPrefix("technology Programming", "Technology")).toBe("technology Programming");
 		});
 
 		it("should handle multiple dashes in pattern 2", () => {
@@ -112,17 +111,17 @@ describe("stripParentPrefix", () => {
 	});
 
 	describe("real-world examples", () => {
-		it("should handle 'Females' parent with various children", () => {
-			expect(stripParentPrefix("Females Addictions", "Females")).toBe("Addictions");
-			expect(stripParentPrefix("Females Biology", "Females")).toBe("Biology");
-			expect(stripParentPrefix("Females Dates", "Females")).toBe("Dates");
-			expect(stripParentPrefix("Females Sex", "Females")).toBe("Sex");
+		it("should handle 'Technology' parent with various children", () => {
+			expect(stripParentPrefix("Technology Programming", "Technology")).toBe("Programming");
+			expect(stripParentPrefix("Technology Security", "Technology")).toBe("Security");
+			expect(stripParentPrefix("Technology Database", "Technology")).toBe("Database");
+			expect(stripParentPrefix("Technology Cloud", "Technology")).toBe("Cloud");
 		});
 
-		it("should handle 'Cold Approaching' parent with various children", () => {
-			expect(stripParentPrefix("Cold Approaching - Only Repels", "Cold Approaching")).toBe("Only Repels");
-			expect(stripParentPrefix("Cold Approaching Real1ty", "Cold Approaching")).toBe("Real1ty");
-			expect(stripParentPrefix("Cold Approaching-Real1ty", "Cold Approaching")).toBe("Real1ty");
+		it("should handle 'Sports' parent with various children", () => {
+			expect(stripParentPrefix("Sports - Basketball", "Sports")).toBe("Basketball");
+			expect(stripParentPrefix("Sports Soccer", "Sports")).toBe("Soccer");
+			expect(stripParentPrefix("Sports-Tennis", "Sports")).toBe("Tennis");
 		});
 	});
 });
