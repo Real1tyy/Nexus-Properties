@@ -176,7 +176,9 @@ export class PropertiesManager {
 
 			await this.app.fileManager.processFrontMatter(target.file, (fm) => {
 				const currentValue = fm[propertyName];
-				fm[propertyName] = addLinkToProperty(currentValue, fileToAddContext.baseName);
+				// Use full path (without extension) for consistent link formatting and duplicate detection
+				const linkPath = fileToAddContext.pathWithExt.replace(/\.md$/, "");
+				fm[propertyName] = addLinkToProperty(currentValue, linkPath);
 			});
 		});
 	}
