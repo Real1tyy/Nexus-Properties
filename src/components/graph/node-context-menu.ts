@@ -159,7 +159,7 @@ export class NodeContextMenu {
 		}
 
 		try {
-			const command = new DeleteNodeCommand(this.app, filePath);
+			const command = new DeleteNodeCommand(this.app, filePath, this.settingsStore.currentSettings);
 			await this.commandManager.executeCommand(command);
 			new Notice(`Deleted: ${file.basename}`);
 		} catch (error) {

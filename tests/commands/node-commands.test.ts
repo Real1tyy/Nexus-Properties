@@ -31,7 +31,23 @@ vi.mock("@real1ty-obsidian-plugins", () => ({
 		if (!current) return [];
 		return Array.isArray(current) ? current.slice(0, -1) : [];
 	}),
+	parsePropertyLinks: vi.fn(() => []),
+	getFileContext: vi.fn((_app, path) => ({ file: null, pathWithExt: path })),
+	removeMarkdownExtension: vi.fn((path) => path.replace(/\.md$/, "")),
+	addLinkToProperty: vi.fn((current, link) => {
+		if (!current) return [`[[${link}]]`];
+		return Array.isArray(current) ? [...current, `[[${link}]]`] : [current, `[[${link}]]`];
+	}),
+	withFileContext: vi.fn(async (_app, _path, callback) => {
+		await callback({ file: null, pathWithExt: _path });
+	}),
 }));
+
+const mockSettings: Partial<NexusPropertiesSettings> = {
+	parentProp: "Parent",
+	childrenProp: "Child",
+	relatedProp: "Related",
+};
 
 // Import after mocking
 import { CreateNodeCommand } from "../../src/core/commands/create-node-command";
@@ -194,7 +210,7 @@ describe("DeleteNodeCommand", () => {
 	});
 
 	it("should store original content and trash the file", async () => {
-		const command = new DeleteNodeCommand(mockApp, "test.md");
+		const command = new DeleteNodeCommand(mockApp, "test.md", mockSettings as NexusPropertiesSettings);
 
 		await command.execute();
 
@@ -203,7 +219,7 @@ describe("DeleteNodeCommand", () => {
 	});
 
 	it("should undo by recreating the file", async () => {
-		const command = new DeleteNodeCommand(mockApp, "test.md");
+		const command = new DeleteNodeCommand(mockApp, "test.md", mockSettings as NexusPropertiesSettings);
 
 		await command.execute();
 		await command.undo();
@@ -214,13 +230,13 @@ describe("DeleteNodeCommand", () => {
 	it("should throw error if file not found on execute", async () => {
 		fileExists = false;
 
-		const command = new DeleteNodeCommand(mockApp, "nonexistent.md");
+		const command = new DeleteNodeCommand(mockApp, "nonexistent.md", mockSettings as NexusPropertiesSettings);
 
 		await expect(command.execute()).rejects.toThrow("File not found");
 	});
 
 	it("should throw error if file already exists on undo", async () => {
-		const command = new DeleteNodeCommand(mockApp, "test.md");
+		const command = new DeleteNodeCommand(mockApp, "test.md", mockSettings as NexusPropertiesSettings);
 
 		await command.execute();
 		fileExists = true; // Simulate file being recreated externally
@@ -229,12 +245,12 @@ describe("DeleteNodeCommand", () => {
 	});
 
 	it("should return correct type", () => {
-		const command = new DeleteNodeCommand(mockApp, "test.md");
+		const command = new DeleteNodeCommand(mockApp, "test.md", mockSettings as NexusPropertiesSettings);
 		expect(command.getType()).toBe("Delete node");
 	});
 
 	it("should check canUndo correctly", async () => {
-		const command = new DeleteNodeCommand(mockApp, "test.md");
+		const command = new DeleteNodeCommand(mockApp, "test.md", mockSettings as NexusPropertiesSettings);
 
 		// Before execute, no original content
 		let canUndo = await command.canUndo();
