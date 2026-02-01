@@ -3,8 +3,8 @@ import { type App, Modal, type TFile } from "obsidian";
 import { cls } from "../utils/css";
 
 interface PropertyRow {
-	key: string;
-	value: string;
+	originalKey: string;
+	originalSerializedValue: string;
 	element: HTMLElement;
 }
 
@@ -27,6 +27,12 @@ export class NodeEditModal extends Modal {
 
 		await this.loadFrontmatter();
 		this.renderEditForm();
+
+		// Handle Enter key to submit
+		this.scope.register([], "Enter", (e) => {
+			e.preventDefault();
+			this.save();
+		});
 	}
 
 	private async loadFrontmatter(): Promise<void> {
@@ -79,7 +85,7 @@ export class NodeEditModal extends Modal {
 		this.createActionButtons(contentEl);
 	}
 
-	private addPropertyRow(key: string, value: string): void {
+	private addPropertyRow(key: string, serializedValue: string): void {
 		const row = this.propertiesContainer.createDiv(cls("node-edit-prop-row"));
 
 		row.createEl("input", {
@@ -92,7 +98,7 @@ export class NodeEditModal extends Modal {
 		row.createEl("input", {
 			type: "text",
 			placeholder: "Value",
-			value: value,
+			value: serializedValue,
 			cls: cls("node-edit-prop-value-input"),
 		});
 
@@ -109,7 +115,7 @@ export class NodeEditModal extends Modal {
 			}
 		});
 
-		this.propertyRows.push({ key, value, element: row });
+		this.propertyRows.push({ originalKey: key, originalSerializedValue: serializedValue, element: row });
 	}
 
 	private createActionButtons(contentEl: HTMLElement): void {
@@ -142,10 +148,26 @@ export class NodeEditModal extends Modal {
 			const valueInput = row.querySelector(`.${cls("node-edit-prop-value-input")}`) as HTMLInputElement;
 
 			if (keyInput?.value && valueInput?.value !== undefined) {
-				const key = keyInput.value.trim();
-				const rawValue = valueInput.value;
+				const currentKey = keyInput.value.trim();
+				const currentValue = valueInput.value;
 
-				updatedFrontmatter[key] = parseValue(rawValue);
+				// Find the corresponding property row to check if value was changed
+				const propertyRow = this.propertyRows.find((p) => p.element === row);
+
+				// Determine if this is an unchanged existing property
+				const isUnchangedExisting =
+					propertyRow &&
+					propertyRow.originalKey === currentKey &&
+					propertyRow.originalSerializedValue === currentValue &&
+					currentKey in this.originalFrontmatter;
+
+				if (isUnchangedExisting) {
+					// Use the original value to preserve type (e.g., [] stays [], not "")
+					updatedFrontmatter[currentKey] = this.originalFrontmatter[currentKey];
+				} else {
+					// Value was changed or this is a new property, parse it
+					updatedFrontmatter[currentKey] = parseValue(currentValue);
+				}
 			}
 		}
 

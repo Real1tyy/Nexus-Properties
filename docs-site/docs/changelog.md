@@ -114,6 +114,14 @@ See [Configuration](configuration#bases-view) for setup instructions.
 
 ### Bug Fixes
 
+#### Edit Modal Property Handling
+
+Fixed multiple issues with the node edit modal that caused unintended property modifications:
+
+- **Properties no longer overwritten**: Editing a single property no longer removes or overwrites unrelated properties in the file
+- **Type preservation**: Property types are now preserved when unchanged (e.g., empty arrays `[]` stay as arrays instead of being converted to empty strings `""`)
+- **Enter key support**: The edit modal can now be submitted by pressing Enter
+
 #### Console Error When Selecting Parent from Suggester
 
 Fixed an "Uncaught NotFoundError": failed to execute 'removeChild' on 'Node' that appeared in the developer console when selecting a parent note from the property suggester dropdown in Obsidian's Properties panel.

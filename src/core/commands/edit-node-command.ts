@@ -37,20 +37,26 @@ export class EditNodeCommand implements Command {
 		return file instanceof TFile;
 	}
 
-	private async applyFrontmatter(frontmatter: Frontmatter): Promise<void> {
+	private async applyFrontmatter(targetFrontmatter: Frontmatter): Promise<void> {
 		const file = this.app.vault.getAbstractFileByPath(this.filePath);
 		if (!(file instanceof TFile)) {
 			throw new Error(`File not found: ${this.filePath}`);
 		}
 
+		// Determine which properties to remove (present in source but not in target)
+		const sourceFrontmatter =
+			targetFrontmatter === this.updatedFrontmatter ? this.originalFrontmatter : this.updatedFrontmatter;
+
+		const keysToRemove = Object.keys(sourceFrontmatter).filter((key) => !(key in targetFrontmatter));
+
 		await this.app.fileManager.processFrontMatter(file, (fm: Frontmatter) => {
-			// Clear existing frontmatter
-			for (const key of Object.keys(fm)) {
+			// Only remove properties that were explicitly removed
+			for (const key of keysToRemove) {
 				delete fm[key];
 			}
 
-			// Apply new frontmatter
-			for (const [key, value] of Object.entries(frontmatter)) {
+			// Update/add properties from target frontmatter
+			for (const [key, value] of Object.entries(targetFrontmatter)) {
 				fm[key] = value;
 			}
 		});
