@@ -85,6 +85,9 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			onRenderAsRoot: (nodeId) => {
 				this.renderNodeAsRoot(nodeId);
 			},
+			onNodeDeleted: () => {
+				this.updateGraph();
+			},
 		});
 		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore, this.plugin.commandManager, () => {
 			this.updateGraph();

@@ -10,6 +10,7 @@ import { NodePreviewModal } from "../node-preview-modal";
 interface NodeContextMenuCallbacks {
 	onStartRelationship: (sourceNodePath: string, relationshipType: RelationshipType) => void;
 	onRenderAsRoot: (nodeId: string) => void;
+	onNodeDeleted: () => void;
 }
 
 export class NodeContextMenu {
@@ -162,6 +163,7 @@ export class NodeContextMenu {
 			const command = new DeleteNodeCommand(this.app, filePath, this.settingsStore.currentSettings);
 			await this.commandManager.executeCommand(command);
 			new Notice(`Deleted: ${file.basename}`);
+			this.callbacks.onNodeDeleted();
 		} catch (error) {
 			console.error("Failed to delete file:", error);
 			new Notice("Failed to delete file");
