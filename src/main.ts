@@ -131,7 +131,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		this.indexer = new Indexer(this.app, this.settingsStore.settings$);
 
-		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$.value);
+		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$);
 		this.propertiesManager.start(this.indexer.events$);
 
 		this.nodeCreator = new NodeCreator(this.app, this.settingsStore.settings$, this.commandManager);

@@ -14,6 +14,7 @@ import {
 } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
+import type { BehaviorSubject } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { parseExcludedProps } from "../utils/frontmatter-utils";
@@ -24,16 +25,25 @@ import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 
 export class PropertiesManager {
 	private subscription: Subscription | null = null;
+	private settingsSubscription: Subscription | null = null;
 	private propagationDebounceTimers: Map<string, NodeJS.Timeout> = new Map();
 	private accumulatedDiffs: Map<string, FrontmatterDiff[]> = new Map();
 	private filesBeingPropagated: Set<string> = new Set();
-	private cachedExcludedDirs: string[] | null = null;
-	private lastExcludedDirsString: string = "";
+	private cachedExcludedDirs: string[] = [];
+	private settings: NexusPropertiesSettings;
 
 	constructor(
 		private app: App,
-		private settings: NexusPropertiesSettings
-	) {}
+		settingsStore: BehaviorSubject<NexusPropertiesSettings>
+	) {
+		this.settings = settingsStore.value;
+		this.updateExcludedDirsCache();
+
+		this.settingsSubscription = settingsStore.subscribe((newSettings) => {
+			this.settings = newSettings;
+			this.updateExcludedDirsCache();
+		});
+	}
 
 	start(events$: Observable<IndexerEvent>): void {
 		this.subscription = events$.subscribe((event) => {
@@ -55,6 +65,8 @@ export class PropertiesManager {
 	stop(): void {
 		this.subscription?.unsubscribe();
 		this.subscription = null;
+		this.settingsSubscription?.unsubscribe();
+		this.settingsSubscription = null;
 
 		// Clear all debounce timers
 		for (const timer of this.propagationDebounceTimers.values()) {
@@ -69,31 +81,10 @@ export class PropertiesManager {
 		const allFiles = this.app.vault.getMarkdownFiles();
 		const relevantFiles = allFiles.filter((file) => indexer.shouldIndexFile(file.path));
 
-		// Pre-filter files that need processing to avoid unnecessary work
-		const filesToProcess = relevantFiles.filter((file) => {
-			const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-			if (!frontmatter) return false;
-
-			// Skip if title mode disabled or file is excluded
-			if (this.settings.titlePropertyMode !== "enabled") return this.settings.autoLinkSiblings;
-			if (this.isExcludedFromTitle(file.path)) return this.settings.autoLinkSiblings;
-
-			// Check if title needs updating using cheap string operations
-			const pathWithoutExt = removeMarkdownExtension(file.path);
-			const currentTitle = frontmatter[this.settings.titleProp];
-
-			// If no title or title path doesn't match, needs processing
-			if (!currentTitle || typeof currentTitle !== "string") return true;
-			if (!currentTitle.startsWith(`[[${pathWithoutExt}|`)) return true;
-
-			// Title path matches - only process if sibling linking is needed
-			return this.settings.autoLinkSiblings;
-		});
-
 		// Process in batches to avoid overwhelming the system
 		const BATCH_SIZE = 50;
-		for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
-			const batch = filesToProcess.slice(i, i + BATCH_SIZE);
+		for (let i = 0; i < relevantFiles.length; i += BATCH_SIZE) {
+			const batch = relevantFiles.slice(i, i + BATCH_SIZE);
 			await Promise.all(
 				batch.map(async (file) => {
 					const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
@@ -120,41 +111,29 @@ export class PropertiesManager {
 		return stripParentPrefix(baseName, parentDisplayName);
 	}
 
-	private getExcludedDirectories(): string[] {
-		// Cache parsed directories - only reparse if setting changed
-		if (this.cachedExcludedDirs === null || this.lastExcludedDirsString !== this.settings.excludeTitleDirectories) {
-			this.lastExcludedDirsString = this.settings.excludeTitleDirectories;
-			this.cachedExcludedDirs = this.settings.excludeTitleDirectories
-				.split(",")
-				.map((dir) => dir.trim())
-				.filter((dir) => dir.length > 0);
-		}
-		return this.cachedExcludedDirs;
+	private updateExcludedDirsCache(): void {
+		this.cachedExcludedDirs = this.settings.excludeTitleDirectories
+			.split(",")
+			.map((dir) => dir.trim())
+			.filter((dir) => dir.length > 0);
 	}
 
 	private isExcludedFromTitle(filePath: string): boolean {
-		const excludeDirectories = this.getExcludedDirectories();
-		if (excludeDirectories.length === 0) {
-			return false;
-		}
-		return excludeDirectories.some((dir) => filePath.startsWith(dir + "/") || filePath.startsWith(dir));
+		return this.cachedExcludedDirs.some((dir) => filePath.startsWith(dir + "/") || filePath.startsWith(dir));
 	}
 
 	private async updateTitleProperty(filePath: string, newRelationships: FileRelationships): Promise<void> {
 		if (this.settings.titlePropertyMode !== "enabled") return;
 		if (this.isExcludedFromTitle(filePath)) return;
 
-		// Compute expected title using only string operations (no file context needed)
 		const pathWithoutExt = removeMarkdownExtension(filePath);
 		const displayName = extractDisplayName(filePath);
 		const computedTitle = this.computeTitle(displayName, newRelationships.parent);
 		const titleLink = `[[${pathWithoutExt}|${computedTitle}]]`;
 
-		// Early exit if title already matches (avoid file operations)
 		const currentTitle = newRelationships.frontmatter[this.settings.titleProp];
 		if (currentTitle === titleLink) return;
 
-		// Only get file context when we actually need to write
 		const context = getFileContext(this.app, filePath);
 		if (!context.file) return;
 
