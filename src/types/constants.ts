@@ -64,6 +64,9 @@ export const SETTINGS_DEFAULTS = {
 	DEFAULT_SHOW_ALL_RELATIONSHIP_VIEWS: false,
 	DEFAULT_BASES_VIEW_TYPE: "cards" as "table" | "cards" | "list",
 
+	// MOC view defaults
+	DEFAULT_MOC_DISPLAY_PROPERTIES: [] as string[],
+
 	// Frontmatter propagation defaults
 	PROPAGATE_FRONTMATTER_TO_CHILDREN: false,
 	ASK_BEFORE_PROPAGATING_FRONTMATTER: false,

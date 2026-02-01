@@ -1,4 +1,4 @@
-import { RegisteredEventsComponent } from "@real1ty-obsidian-plugins";
+import { RegisteredEventsComponent, renderPropertyValue, type PropertyRendererConfig } from "@real1ty-obsidian-plugins";
 import { type App, Component, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
@@ -196,6 +196,22 @@ export class MocView extends RegisteredEventsComponent {
 			}
 		});
 
+		// Render display properties
+		const displayProps = this.currentSettings.mocDisplayProperties;
+		if (displayProps.length > 0) {
+			const file = this.app.vault.getAbstractFileByPath(node.path);
+			if (file instanceof TFile) {
+				const cache = this.app.metadataCache.getFileCache(file);
+				const frontmatter = cache?.frontmatter;
+				if (frontmatter) {
+					const propsContainer = headerEl.createDiv({
+						cls: cls("moc-properties"),
+					});
+					this.renderProperties(propsContainer, frontmatter, displayProps, file);
+				}
+			}
+		}
+
 		// Children container
 		if (node.children.length > 0) {
 			const childrenEl = itemEl.createDiv({
@@ -271,6 +287,50 @@ export class MocView extends RegisteredEventsComponent {
 			text: message,
 			cls: cls("moc-empty-state"),
 		});
+	}
+
+	private renderProperties(
+		container: HTMLElement,
+		frontmatter: Record<string, unknown>,
+		propertyNames: string[],
+		file: TFile
+	): void {
+		const config: PropertyRendererConfig = {
+			createLink: (text, path) => {
+				const link = document.createElement("a");
+				link.textContent = text;
+				link.className = cls("moc-property-link");
+				link.addEventListener("click", (e) => {
+					e.preventDefault();
+					e.stopPropagation();
+					this.app.workspace.openLinkText(path, file.path, true);
+				});
+				return link;
+			},
+			createText: (text) => {
+				const span = document.createElement("span");
+				span.textContent = text;
+				span.className = cls("moc-property-text");
+				return span;
+			},
+			createSeparator: () => {
+				const span = document.createElement("span");
+				span.textContent = ", ";
+				span.className = cls("moc-property-separator");
+				return span;
+			},
+		};
+
+		for (const propName of propertyNames) {
+			const value = frontmatter[propName];
+			if (value === undefined || value === null) continue;
+
+			const propEl = container.createDiv({
+				cls: cls("moc-property"),
+			});
+
+			renderPropertyValue(propEl, value, config);
+		}
 	}
 
 	async updateActiveFile(): Promise<void> {

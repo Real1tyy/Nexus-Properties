@@ -71,11 +71,26 @@ Open note in a new tab.
 - **Expand All**: Show all nested children
 - **Collapse All**: Hide all children
 
+## Display Properties
+
+Show frontmatter properties next to each note in the tree. Configure in **Settings → Bases → Display properties**.
+
+Enter a comma-separated list of property names (e.g., `status, priority, tags`). Properties containing wiki links are rendered as clickable links.
+
+```
+- [[Project A]]                    [Active] [High]
+    - [[Task 1]]                   [Done]
+    - [[Task 2]]                   [In Progress]
+```
+
+The properties appear to the right of each note name and scroll horizontally if they overflow.
+
 ## Visual Indicators
 
 - **Current file**: Highlighted with accent background color (in Top Parent mode)
 - **Depth styling**: Root items are larger/bolder, deeper items are smaller/muted
 - **Vertical lines**: Connect parent to children visually
+- **Property badges**: Frontmatter values shown as compact badges
 
 ## Cycle Detection
 

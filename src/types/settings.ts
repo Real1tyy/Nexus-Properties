@@ -144,6 +144,9 @@ export const NexusPropertiesSettingsSchema = z
 		// Bases view type (table, cards, list)
 		basesViewType: z.enum(["table", "cards", "list"]).catch(SETTINGS_DEFAULTS.DEFAULT_BASES_VIEW_TYPE),
 
+		// MOC view settings
+		mocDisplayProperties: z.array(z.string()).catch([...SETTINGS_DEFAULTS.DEFAULT_MOC_DISPLAY_PROPERTIES]),
+
 		// Frontmatter propagation settings
 		propagateFrontmatterToChildren: z.boolean().catch(SETTINGS_DEFAULTS.PROPAGATE_FRONTMATTER_TO_CHILDREN),
 		askBeforePropagatingFrontmatter: z.boolean().catch(SETTINGS_DEFAULTS.ASK_BEFORE_PROPAGATING_FRONTMATTER),

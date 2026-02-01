@@ -1896,7 +1896,7 @@ button.nexus-properties-view-toggle-button:active {
 /* Tree container */
 .nexus-properties-moc-tree-container {
 	padding: 12px;
-	overflow-y: auto;
+	overflow: auto;
 	flex: 1;
 }
 
@@ -1912,6 +1912,7 @@ button.nexus-properties-view-toggle-button:active {
 	padding: 6px 4px;
 	border-radius: 6px;
 	transition: background-color 0.1s;
+	white-space: nowrap;
 }
 
 .nexus-properties-moc-item-header:hover {
@@ -1975,6 +1976,47 @@ button.nexus-properties-view-toggle-button:active {
 .nexus-properties-moc-link-current:hover {
 	background: var(--interactive-accent-hover);
 	color: var(--text-on-accent);
+}
+
+/* Properties display */
+.nexus-properties-moc-properties {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-left: auto;
+	padding-left: 12px;
+	flex-shrink: 0;
+}
+
+.nexus-properties-moc-property {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	color: var(--text-muted);
+	white-space: nowrap;
+	padding: 2px 8px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	flex-shrink: 0;
+}
+
+.nexus-properties-moc-property-text {
+	color: var(--text-muted);
+}
+
+.nexus-properties-moc-property-link {
+	color: var(--text-accent);
+	text-decoration: none;
+	cursor: pointer;
+}
+
+.nexus-properties-moc-property-link:hover {
+	text-decoration: underline;
+}
+
+.nexus-properties-moc-property-separator {
+	color: var(--text-faint);
 }
 
 /* Children container */

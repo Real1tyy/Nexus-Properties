@@ -20,6 +20,19 @@ export class BasesViewSettingsSection implements SettingsSection {
 	) {}
 
 	render(container: HTMLElement): void {
+		new Setting(container).setName("MOC view configuration").setHeading();
+
+		container
+			.createDiv("setting-item-description nexus-properties-section-description")
+			.setText("Configure which frontmatter properties to display next to each item in the MOC (Map of Content) view.");
+
+		this.uiBuilder.addTextArray(container, {
+			key: "mocDisplayProperties",
+			name: "Display properties",
+			desc: "Comma-separated list of frontmatter properties to show next to each note in the MOC tree. Properties with wiki links will be rendered as clickable links.",
+			placeholder: "e.g., status, priority, tags",
+		});
+
 		new Setting(container).setName("Bases view configuration").setHeading();
 
 		container

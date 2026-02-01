@@ -44,6 +44,7 @@ New tree-based view that renders your hierarchy as an indented outline with clic
 - **Indented Outline**: Each level is indented to show parent-child relationships clearly
 - **Clickable Links**: All items are rendered as wiki links - click to navigate directly to any file
 - **Ctrl+Click**: Open notes in a new tab
+- **Display Properties**: Configure frontmatter properties to show next to each note (Settings → Bases → Display properties)
 - **Cycle Detection**: Handles circular relationships without infinite loops
 - **Three-Way Toggle**: Switch between Graph → Bases → MOC views using the toggle button
 - **Root Mode Toggle**: Switch between "Current" (current file as root) and "Top Parent" (topmost ancestor as root)
