@@ -125,6 +125,7 @@ Large constellations can be slow. Reduce max depth if needed.
 
 ## Next Steps
 
+- [MOC View](moc-view) - Collapsible tree outline view
 - [Node Layout](node-layout) - How nodes are positioned
 - [Filtering](filtering) - Focus on subsets
 - [Zoom Mode](zoom-mode) - Explore nodes in detail

@@ -15,6 +15,9 @@ Visualize relationships with **Hierarchical** (trees), **Related** (direct conne
 ### 📝 [Bases View](bases-view)
 List-based view of current note's relationships. Shows children, parent, and related notes with custom sorting.
 
+### 🗺️ [MOC View](moc-view)
+Map of Content view renders hierarchy as a collapsible tree outline. Toggle between current file or topmost parent as root.
+
 ### 🎨 [Color Rules](color-rules)
 Apply conditional colors using JavaScript expressions. First matching rule wins.
 

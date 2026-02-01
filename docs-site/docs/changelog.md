@@ -43,6 +43,7 @@ New tree-based view that renders your hierarchy as an indented outline with clic
 - **Tree Structure**: Displays the current file and all its children in a hierarchical tree format
 - **Indented Outline**: Each level is indented to show parent-child relationships clearly
 - **Clickable Links**: All items are rendered as wiki links - click to navigate directly to any file
+- **Ctrl+Click**: Open notes in a new tab
 - **Cycle Detection**: Handles circular relationships without infinite loops
 - **Three-Way Toggle**: Switch between Graph → Bases → MOC views using the toggle button
 - **Root Mode Toggle**: Switch between "Current" (current file as root) and "Top Parent" (topmost ancestor as root)
@@ -61,6 +62,8 @@ New tree-based view that renders your hierarchy as an indented outline with clic
 ```
 
 Perfect for creating Maps of Content or viewing your knowledge hierarchy at a glance.
+
+See [MOC View](features/moc-view) for details.
 
 #### Undo/Redo for Graph Operations
 

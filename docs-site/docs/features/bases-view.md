@@ -77,4 +77,5 @@ Enter only the content AFTER `formulas:` and `sort:` keywords. The plugin adds t
 ## Next Steps
 
 - [Graph Views](graph-views) - Visual network exploration
+- [MOC View](moc-view) - Collapsible tree outline view
 - [Bidirectional Sync](bidirectional-sync) - Relationship management

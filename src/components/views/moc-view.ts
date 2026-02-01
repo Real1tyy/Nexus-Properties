@@ -187,10 +187,9 @@ export class MocView extends RegisteredEventsComponent {
 			e.preventDefault();
 			const file = this.app.vault.getAbstractFileByPath(node.path);
 			if (file instanceof TFile) {
-				// Ctrl/Cmd+click: open in new pane without changing focus
+				// Ctrl/Cmd+click: open in new tab
 				if (e.ctrlKey || e.metaKey) {
-					const newLeaf = this.app.workspace.getLeaf("tab");
-					newLeaf.openFile(file, { active: false });
+					this.app.workspace.getLeaf("tab").openFile(file);
 				} else {
 					this.app.workspace.getLeaf(false).openFile(file);
 				}

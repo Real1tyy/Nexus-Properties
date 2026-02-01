@@ -54,6 +54,14 @@ Visualize your knowledge network with multiple view modes:
 
 [Learn more about Graph Views →](features/graph-views) | [Mobile Support →](mobile)
 
+### 🗺️ MOC (Map of Content) View
+
+Render your hierarchy as a collapsible tree outline with clickable wiki links:
+- **Current or Top Parent** - Start from active file or traverse to topmost ancestor
+- **Expand/Collapse** - Navigate deep hierarchies with ease
+
+[Learn more about MOC View →](features/moc-view)
+
 ### 🎨 Customizable Node Colors
 
 Apply conditional colors to nodes based on frontmatter properties. Create visual categories using JavaScript expressions to instantly identify different types of notes.

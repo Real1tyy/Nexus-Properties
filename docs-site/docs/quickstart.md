@@ -62,12 +62,13 @@ Parent: "[[Project Overview]]"
 
 ### Try Different View Modes
 
-Use the dropdown in the graph header to try different views:
+Use the toggle button to switch between views:
 
-- **Hierarchical** - Shows the parent-child tree (current view)
-- **Related** - Shows direct related connections
-- **All Related** - Shows all connected nodes in the constellation
-- **Start from Current** - Focuses on the current file instead of the root
+- **Graph View** - Interactive visualization with Hierarchical, Related, and All Related modes
+- **Bases View** - List-based view with custom sorting
+- **MOC View** - Collapsible tree outline with clickable links
+
+In MOC View, try toggling between "Current" and "Top Parent" modes to see different perspectives of your hierarchy.
 
 ## Step 4: Add Related Relationships
 
@@ -187,6 +188,7 @@ You can filter the graph to show only specific nodes:
 Now that you understand the basics, explore more advanced features:
 
 - [Learn about all Graph View modes](features/graph-views)
+- [Explore MOC View](features/moc-view) - Collapsible tree outlines
 - [Master Color Rules](features/color-rules)
 - [Understand Filtering](features/filtering)
 - [Explore Node Layouts](features/node-layout)
