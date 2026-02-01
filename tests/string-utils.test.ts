@@ -45,6 +45,28 @@ describe("stripParentPrefix", () => {
 		});
 	});
 
+	describe("pattern 4: parent name + en-dash/em-dash", () => {
+		it("should strip parent name followed by en-dash with spaces", () => {
+			expect(stripParentPrefix("Cold Approaching – Gamify Mindset", "Cold Approaching")).toBe("Gamify Mindset");
+		});
+
+		it("should strip parent name followed by en-dash without spaces", () => {
+			expect(stripParentPrefix("Parent–Child", "Parent")).toBe("Child");
+		});
+
+		it("should strip parent name followed by em-dash with spaces", () => {
+			expect(stripParentPrefix("Parent — Child", "Parent")).toBe("Child");
+		});
+
+		it("should strip parent name followed by em-dash without spaces", () => {
+			expect(stripParentPrefix("Parent—Child", "Parent")).toBe("Child");
+		});
+
+		it("should handle space then en-dash pattern", () => {
+			expect(stripParentPrefix("Cold Approaching – Only Repels", "Cold Approaching")).toBe("Only Repels");
+		});
+	});
+
 	describe("edge cases", () => {
 		it("should return original name if parent name is empty", () => {
 			expect(stripParentPrefix("Some Name", "")).toBe("Some Name");
@@ -83,8 +105,9 @@ describe("stripParentPrefix", () => {
 			expect(stripParentPrefix("Parent - Child", "Parent")).toBe("Child");
 		});
 
-		it("should handle whitespace-only child name after stripping", () => {
-			expect(stripParentPrefix("Parent   ", "Parent")).toBe("  ");
+		it("should return original if only whitespace remains after stripping", () => {
+			// When stripping leaves only whitespace, return original to avoid empty titles
+			expect(stripParentPrefix("Parent   ", "Parent")).toBe("Parent   ");
 		});
 	});
 

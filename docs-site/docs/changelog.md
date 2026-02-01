@@ -23,13 +23,20 @@ See [Configuration](configuration#user-interface) for details.
 
 The plugin now automatically assigns a `Title` property to files, making graph rendering faster and more consistent.
 
-- **Auto-Computed Title**: When a file has a parent, the title is computed by stripping the parent name prefix from the filename (e.g., "Parent - Child.md" gets title "Child")
-- **No Parent Fallback**: Files without a parent get their basename as the title
-- **Cleaner Display**: Both Graph views and Bases view use the title property for cleaner file names
+- **Auto-Computed Title**: When a file has a parent, the title is computed by stripping the parent name prefix from the filename (e.g., "Parent - Child.md" gets display name "Child")
+- **Wiki Link Format**: Title is stored as `[[path|DisplayName]]` making it clickable in Bases view
+- **No Parent Fallback**: Files without a parent get their basename as the display name
+- **Cleaner Display**: Both Graph and Bases views use the title property for cleaner file names
 - **Configurable Property Name**: Change the property name in settings (default: `Title`)
 - **Automatic Updates**: Title is updated whenever parent relationships change
 
 See [Configuration](configuration#node-creation-shortcuts) for property name settings, and [Graph Views](features/graph-views#node-labels) for how titles display.
+
+### Bug Fixes
+
+#### Console Error When Selecting Parent from Suggester
+
+Fixed an "Uncaught NotFoundError": failed to execute 'removeChild' on 'Node' that appeared in the developer console when selecting a parent note from the property suggester dropdown in Obsidian's Properties panel.
 
 ## 1.6.0 - 1/11/2026
 

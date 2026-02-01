@@ -144,7 +144,9 @@ export class GraphBuilder {
 	private createNodeElement(pathOrWikiLink: string, level: number, isSource: boolean): ElementDefinition {
 		const filePath = extractFilePath(pathOrWikiLink);
 		const { frontmatter } = getFileContext(this.app, filePath);
-		const displayName = String(frontmatter?.[this.titleProp] ?? extractDisplayName(pathOrWikiLink));
+		const titleValue = frontmatter?.[this.titleProp];
+		// Title property is a wiki link, extract display name from it
+		const displayName = titleValue ? extractDisplayName(String(titleValue)) : extractDisplayName(pathOrWikiLink);
 
 		const estimatedWidth = Math.max(80, Math.min(displayName.length * 8, 150));
 		const estimatedHeight = 45;

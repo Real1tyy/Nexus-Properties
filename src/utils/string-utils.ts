@@ -1,9 +1,15 @@
 /**
+ * Matches separator characters at the start of a string (spaces, dashes, en-dashes, em-dashes).
+ */
+const SEPARATOR_PATTERN = /^[\s\-–—]+/;
+
+/**
  * Strips the parent name prefix from a display name if it matches common patterns.
- * Handles three patterns:
- * 1. Parent name + space (e.g., "Females Addictions" → "Addictions")
- * 2. Parent name + " - " (e.g., "Cold Approaching - Only Repels" → "Only Repels")
- * 3. Parent name + "-" (e.g., "Cold Approaching-Real1ty" → "Real1ty")
+ * Handles patterns like:
+ * - "Parent - Child" → "Child"
+ * - "Parent – Child" → "Child" (en-dash)
+ * - "Parent Child" → "Child"
+ * - "Parent-Child" → "Child"
  *
  * @param displayName - The display name to strip the prefix from
  * @param parentDisplayName - The parent display name to strip
@@ -12,20 +18,22 @@
 export function stripParentPrefix(displayName: string, parentDisplayName: string): string {
 	if (!parentDisplayName) return displayName;
 
-	// Pattern 2: Parent name followed by " - " (dash with spaces) - check first to avoid matching pattern 1
-	if (displayName.startsWith(`${parentDisplayName} - `)) {
-		return displayName.slice(parentDisplayName.length + 3);
+	// Check if display name starts with parent name
+	if (!displayName.startsWith(parentDisplayName)) {
+		return displayName;
 	}
 
-	// Pattern 1: Parent name followed by space
-	if (displayName.startsWith(`${parentDisplayName} `)) {
-		return displayName.slice(parentDisplayName.length + 1);
+	// Get the remainder after the parent name
+	const remainder = displayName.slice(parentDisplayName.length);
+
+	// Must have a separator after the parent name (space, dash, en-dash, em-dash)
+	if (!SEPARATOR_PATTERN.test(remainder)) {
+		return displayName;
 	}
 
-	// Pattern 3: Parent name followed by "-" (dash without spaces)
-	if (displayName.startsWith(`${parentDisplayName}-`)) {
-		return displayName.slice(parentDisplayName.length + 1);
-	}
+	// Strip leading separators to get the actual child name
+	const stripped = remainder.replace(SEPARATOR_PATTERN, "");
 
-	return displayName;
+	// Only return stripped version if we have meaningful content left
+	return stripped || displayName;
 }

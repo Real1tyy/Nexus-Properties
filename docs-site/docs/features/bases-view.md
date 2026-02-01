@@ -32,9 +32,9 @@ When the "Exclude Archived" setting is enabled in Settings → Bases View, an **
 
 Bases view displays the `Title` property instead of `file.name` for cleaner, more readable file names.
 
-The title property is automatically computed by stripping parent name prefixes:
-- "Parent - Child" → displays as "Child"
-- "Category Item" → displays as "Item"
+The title property is stored as a wiki link (e.g., `[[path/to/file|Child]]`), making it:
+- **Clickable**: Navigate directly to the file
+- **Clean**: Parent name prefixes are stripped (e.g., "Parent - Child" → "Child")
 
 See [Graph Views → Node Labels](graph-views#node-labels) for details on how titles work.
 

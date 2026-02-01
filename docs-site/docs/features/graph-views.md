@@ -28,10 +28,11 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 
 ## Node Labels
 
-Graph nodes display the `title` property from each file's frontmatter. This title is automatically managed by the plugin:
+Graph nodes display the `Title` property from each file's frontmatter. This title is automatically managed by the plugin as a wiki link:
 
-- **With Parent**: Title = filename with parent prefix stripped (e.g., "Parent - Child" → "Child")
-- **Without Parent**: Title = file basename
+- **Format**: `[[path/to/file|DisplayName]]`
+- **With Parent**: Display name = filename with parent prefix stripped (e.g., "Parent - Child" → "Child")
+- **Without Parent**: Display name = file basename
 
 **Supported prefix patterns**:
 - `Parent - Child` → "Child"
@@ -39,9 +40,9 @@ Graph nodes display the `title` property from each file's frontmatter. This titl
 - `Parent-Child` → "Child"
 
 **Benefits**:
-- Cleaner, more readable graph labels
-- Consistent display across all views
-- No redundant parent names cluttering the graph
+- Cleaner, more readable labels in both Graph and Bases views
+- Clickable links in Bases view for easy navigation
+- No redundant parent names cluttering the display
 - Pre-computed for faster rendering
 
 The title property is updated automatically when:

@@ -99,12 +99,15 @@ export class PropertiesManager {
 
 		const displayName = extractDisplayName(filePath);
 		const computedTitle = this.computeTitle(displayName, newRelationships.parent);
-		const currentTitle = newRelationships.frontmatter[this.settings.titleProp];
 
-		if (currentTitle === computedTitle) return;
+		const pathWithoutExt = filePath.replace(/\.md$/, "");
+		const titleLink = `[[${pathWithoutExt}|${computedTitle}]]`;
+
+		const currentTitle = newRelationships.frontmatter[this.settings.titleProp];
+		if (currentTitle === titleLink) return;
 
 		await this.app.fileManager.processFrontMatter(context.file, (fm) => {
-			fm[this.settings.titleProp] = computedTitle;
+			fm[this.settings.titleProp] = titleLink;
 		});
 	}
 
@@ -145,21 +148,24 @@ export class PropertiesManager {
 	}
 
 	private getSiblings(relationships: FileRelationships): string[] {
-		const parentPaths = parsePropertyLinks(relationships.parent);
+		const parentLinks = parsePropertyLinks(relationships.parent);
 
-		const allSiblings = parentPaths
-			.map((parentPath) => getFileContext(this.app, parentPath))
-			.filter((parentContext) => parentContext.file)
-			.flatMap((parentContext) => {
-				const freshFrontmatter = this.app.metadataCache.getFileCache(parentContext.file!)?.frontmatter;
-				if (!freshFrontmatter) return [];
-
-				return parsePropertyLinks(freshFrontmatter[this.settings.childrenProp]);
-			})
-			.map((childLink) => getFileContext(this.app, childLink).pathWithExt)
-			.filter((path) => path !== relationships.filePath);
-
-		return [...new Set(allSiblings)];
+		return [
+			...new Set(
+				parentLinks
+					.map((parentLink) => getFileContext(this.app, parentLink, { sourcePath: relationships.filePath }))
+					.filter((parentContext) => parentContext.file)
+					.flatMap((parentContext) => {
+						const freshFrontmatter = this.app.metadataCache.getFileCache(parentContext.file!)?.frontmatter;
+						if (!freshFrontmatter) return [];
+						return parsePropertyLinks(freshFrontmatter[this.settings.childrenProp]);
+					})
+					.map((childLink) => getFileContext(this.app, childLink, { sourcePath: relationships.filePath }))
+					.filter((childContext) => childContext.file)
+					.map((childContext) => childContext.pathWithExt)
+					.filter((path) => path !== relationships.filePath)
+			),
+		];
 	}
 
 	private async addToProperty(targetFilePath: string, propertyName: string, fileToAdd: string): Promise<void> {
@@ -181,8 +187,14 @@ export class PropertiesManager {
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const ctx = getRelationshipContext(config, oldRelationships, this.settings);
 
-			for (const referencedFilePath of ctx.paths) {
-				await this.removeFromProperty(referencedFilePath, ctx.reversePropName, deletedContext.baseName);
+			for (const referencedLink of ctx.paths) {
+				// Use sourcePath for proper link resolution
+				const targetContext = getFileContext(this.app, referencedLink, { sourcePath: deletedFilePath });
+				if (!targetContext.file) {
+					// File doesn't exist - nothing to remove from
+					continue;
+				}
+				await this.removeFromProperty(targetContext.pathWithExt, ctx.reversePropName, deletedContext.baseName);
 			}
 		}
 	}
@@ -198,11 +210,24 @@ export class PropertiesManager {
 			const diff = getRelationshipDiff(config, oldRelationships, newRelationships, this.settings);
 
 			for (const addedLink of diff.addedLinks) {
-				await this.addToProperty(addedLink, diff.reversePropName, currentContext.baseName);
+				// Use sourcePath for proper link resolution (handles files in subfolders)
+				const targetContext = getFileContext(this.app, addedLink, { sourcePath: filePath });
+				if (!targetContext.file) {
+					// File doesn't exist yet - skip silently
+					// The relationship will be established when the file is created
+					continue;
+				}
+				await this.addToProperty(targetContext.pathWithExt, diff.reversePropName, currentContext.baseName);
 			}
 
 			for (const removedLink of diff.removedLinks) {
-				await this.removeFromProperty(removedLink, diff.reversePropName, currentContext.baseName);
+				// Use sourcePath for proper link resolution
+				const targetContext = getFileContext(this.app, removedLink, { sourcePath: filePath });
+				if (!targetContext.file) {
+					// File doesn't exist - nothing to remove from
+					continue;
+				}
+				await this.removeFromProperty(targetContext.pathWithExt, diff.reversePropName, currentContext.baseName);
 			}
 		}
 

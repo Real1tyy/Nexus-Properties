@@ -278,12 +278,13 @@ PriorityParent: "[[preferred-parent]]"
 
 **Zettel ID Property** (default: `_ZettelID`): Property for unique timestamp ID (format: `YYYYMMDDHHmmss`)
 
-**Title Property** (default: `title`): Property for auto-assigned display title
-- Automatically computed from filename with parent prefix stripped
-- Example: "Parent - Child.md" with parent "Parent" → title is "Child"
-- Files without parents get their basename as the title
+**Title Property** (default: `Title`): Property for auto-assigned display title as a wiki link
+- Format: `[[path/to/file|DisplayName]]` - clickable in Bases view
+- Display name is computed from filename with parent prefix stripped
+- Example: "Parent - Child.md" with parent "Parent" → `[[Parent - Child|Child]]`
+- Files without parents get their basename as the display name
 - Updated automatically when parent relationships change
-- Used by graph views for node labels
+- Used by Graph and Bases views for node labels
 
 **How it works**:
 1. New node in same folder as source
