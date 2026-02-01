@@ -19,11 +19,11 @@ Right-click nodes or edges for quick actions.
 
 **Render as Root**: Removes all parent nodes above the selected node, making it the new root of the hierarchy
 
-**Edit Node**: Opens frontmatter editor modal (not implemented yet)
+**Preview**: Opens read-only preview modal (alternative: [Zoom Mode](zoom-mode))
 
-**View Node Preview**: Opens read-only preview modal (alternative: [Zoom Mode](zoom-mode))
+**Edit**: Opens frontmatter editor modal for quick property editing
 
-**Copy Node Path**: Copies full file path to clipboard
+**Delete**: Moves file to trash (can be undone with undo)
 
 ## Edge Context Menu
 
@@ -48,9 +48,14 @@ Right-click nodes or edges for quick actions.
 
 **Validation**: Prevents circular relationships and duplicates
 
+:::tip Undo Support
+All destructive operations (delete node, remove relationship) can be undone. See [Hotkeys](../hotkeys#undoredo) for details.
+:::
+
 ## Next Steps
 
 - [Node Creation](node-creation) - Create new related nodes
 - [Zoom Mode](zoom-mode) - Alternative to preview
 - [Bidirectional Sync](bidirectional-sync) - Relationship management
 - [Graph Views](graph-views) - Visualize relationships
+- [Hotkeys](../hotkeys) - Keyboard shortcuts including undo/redo

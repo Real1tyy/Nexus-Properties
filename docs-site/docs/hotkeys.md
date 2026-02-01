@@ -48,8 +48,19 @@ Zoom commands only work when graph view is open and zoom mode is active
 Node creation commands only available when viewing a file in an indexed directory
 :::
 
+### Undo/Redo
+
+**Undo**: Undo the last graph operation (add/remove relationship, create/delete/edit node)
+
+**Redo**: Redo the last undone operation
+
+:::note
+Undo/redo maintains a history of up to 50 operations. Performing a new action clears the redo history.
+:::
+
 ## Next Steps
 
 - [Features Overview](features/overview) - See what each command does
 - [Graph Views](features/graph-views) - Understand graph navigation
 - [Node Creation](features/node-creation) - Learn about node creation workflow
+- [Context Menus](features/context-menus) - Quick actions via right-click

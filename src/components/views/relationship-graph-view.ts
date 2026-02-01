@@ -70,10 +70,15 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		private readonly containerEl: HTMLElement
 	) {
 		super();
-		this.relationshipAdder = new RelationshipAdder(this.app, this.plugin.settingsStore, () => {
-			this.updateGraph();
-		});
-		this.nodeContextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore, {
+		this.relationshipAdder = new RelationshipAdder(
+			this.app,
+			this.plugin.settingsStore,
+			this.plugin.commandManager,
+			() => {
+				this.updateGraph();
+			}
+		);
+		this.nodeContextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore, this.plugin.commandManager, {
 			onStartRelationship: (sourceNodePath, relationshipType) => {
 				this.relationshipAdder.startSelection(sourceNodePath, relationshipType);
 			},
@@ -81,7 +86,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				this.renderNodeAsRoot(nodeId);
 			},
 		});
-		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore, () => {
+		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore, this.plugin.commandManager, () => {
 			this.updateGraph();
 		});
 		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);

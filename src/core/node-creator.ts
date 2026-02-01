@@ -1,32 +1,18 @@
-import {
-	ExcludedPropertiesEvaluator,
-	formatWikiLink,
-	generateUniqueFilePath,
-	generateZettelId,
-	normalizeProperty,
-} from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
 import type { BehaviorSubject } from "rxjs";
-import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
-import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-import { buildFilePathForWikiLink } from "../utils/file-utils";
-
-type NodeCreationType = "parent" | "child" | "related";
+import type { NodeCreationType } from "../types/constants";
+import type { NexusPropertiesSettings } from "../types/settings";
+import { type CommandManager, CreateNodeCommand } from "./commands";
 
 export class NodeCreator {
-	private excludedPropertiesEvaluator: ExcludedPropertiesEvaluator<NexusPropertiesSettings>;
-	private settings: NexusPropertiesSettings;
+	private app: App;
+	private settingsObservable: BehaviorSubject<NexusPropertiesSettings>;
+	private commandManager: CommandManager;
 
-	constructor(
-		private app: App,
-		settingsObservable: BehaviorSubject<NexusPropertiesSettings>
-	) {
-		this.excludedPropertiesEvaluator = new ExcludedPropertiesEvaluator(settingsObservable);
-		this.settings = settingsObservable.value;
-
-		settingsObservable.subscribe((settings) => {
-			this.settings = settings;
-		});
+	constructor(app: App, settingsObservable: BehaviorSubject<NexusPropertiesSettings>, commandManager: CommandManager) {
+		this.app = app;
+		this.settingsObservable = settingsObservable;
+		this.commandManager = commandManager;
 	}
 
 	async createRelatedNode(sourceFile: TFile, type: NodeCreationType): Promise<TFile | null> {
@@ -36,14 +22,12 @@ export class NodeCreator {
 
 	async createRelatedNodeWithName(sourceFile: TFile, type: NodeCreationType, nodeName: string): Promise<TFile | null> {
 		try {
-			const frontmatter = this.app.metadataCache.getFileCache(sourceFile)?.frontmatter || {};
+			const settings = this.settingsObservable.value;
+			const command = new CreateNodeCommand(this.app, sourceFile.path, type, nodeName, settings);
+			await this.commandManager.executeCommand(command);
 
-			const folder = sourceFile.parent?.path || "";
-			const finalPath = generateUniqueFilePath(this.app, folder, nodeName);
-			const newFile = await this.app.vault.create(finalPath, "");
-			await this.setupFrontmatter(sourceFile, newFile, frontmatter, type);
-
-			return newFile;
+			const createdPath = command.getCreatedFilePath();
+			return createdPath ? (this.app.vault.getAbstractFileByPath(createdPath) as TFile | null) : null;
 		} catch (error) {
 			console.error(`Error creating ${type} node:`, error);
 			return null;
@@ -58,70 +42,6 @@ export class NodeCreator {
 				return `${sourceBasename} - `;
 			case "related":
 				return `${sourceBasename} `;
-		}
-	}
-
-	private async setupFrontmatter(
-		sourceFile: TFile,
-		newFile: TFile,
-		sourceFrontmatter: Frontmatter,
-		type: NodeCreationType
-	): Promise<void> {
-		const sourceFilePath = buildFilePathForWikiLink(sourceFile);
-		const newFilePath = buildFilePathForWikiLink(newFile);
-
-		const sourceLink = formatWikiLink(sourceFilePath);
-		const newFileLink = formatWikiLink(newFilePath);
-
-		await this.app.fileManager.processFrontMatter(newFile, (fm) => {
-			this.copyPropertiesExcludingRelationships(fm, sourceFrontmatter, sourceFile.path);
-
-			fm[this.settings.zettelIdProp] = generateZettelId();
-
-			this.setupRelationship(fm, sourceLink, type, true);
-		});
-
-		await this.app.fileManager.processFrontMatter(sourceFile, (fm) => {
-			this.setupRelationship(fm, newFileLink, type, false);
-		});
-	}
-
-	private copyPropertiesExcludingRelationships(target: Frontmatter, source: Frontmatter, sourceFilePath: string): void {
-		const excludedProperties = this.excludedPropertiesEvaluator.evaluateExcludedProperties(sourceFilePath);
-		const excludeProps = new Set(excludedProperties);
-
-		for (const [key, value] of Object.entries(source)) {
-			if (!excludeProps.has(key)) {
-				// Copy the property value
-				target[key] = value;
-			} else {
-				// Set excluded properties to null to preserve structure without causing type errors
-				// Empty strings ("") cause Bases filter errors, null is handled gracefully
-				target[key] = null;
-			}
-		}
-	}
-
-	private setupRelationship(fm: Frontmatter, link: string, type: NodeCreationType, isNewFile: boolean): void {
-		// Map NodeCreationType to RelationshipType
-		const relationshipType: RelationshipType = type === "child" ? "children" : type;
-
-		// Find the relationship config
-		const config = RELATIONSHIP_CONFIGS.find((c) => c.type === relationshipType);
-		if (!config) {
-			console.error(`No relationship config found for type: ${relationshipType}`);
-			return;
-		}
-
-		// For new file: use reverse property (e.g., parent creates child, child gets Parent prop)
-		// For source file: use forward property (e.g., parent creates child, parent gets Child prop)
-		const propName = isNewFile ? config.getReverseProp(this.settings) : config.getProp(this.settings);
-
-		const currentArray = normalizeProperty(fm[propName]);
-
-		if (!currentArray.includes(link)) {
-			currentArray.push(link);
-			fm[propName] = currentArray;
 		}
 	}
 }

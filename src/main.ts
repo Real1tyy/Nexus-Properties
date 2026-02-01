@@ -3,6 +3,7 @@ import { Notice, Plugin, TFile } from "obsidian";
 import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
 import { NexusPropertiesSettingsTab, NodeCreationModal } from "./components";
 import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/views/nexus-view-switcher";
+import { CommandManager } from "./core/commands";
 import { Indexer } from "./core/indexer";
 import { NodeCreator } from "./core/node-creator";
 import { PropertiesManager } from "./core/properties-manager";
@@ -13,10 +14,13 @@ export default class NexusPropertiesPlugin extends Plugin {
 	indexer!: Indexer;
 	propertiesManager!: PropertiesManager;
 	nodeCreator!: NodeCreator;
+	commandManager!: CommandManager;
 
 	async onload() {
 		this.settingsStore = new SettingsStore(this);
 		await this.settingsStore.loadSettings();
+
+		this.commandManager = new CommandManager();
 
 		this.addSettingTab(new NexusPropertiesSettingsTab(this.app, this));
 
@@ -97,6 +101,18 @@ export default class NexusPropertiesPlugin extends Plugin {
 			checkCallback: (checking: boolean) => this.handleNodeCreationCommand(checking, "related"),
 		});
 
+		this.addCommand({
+			id: "nexus-undo",
+			name: "Undo",
+			callback: () => this.commandManager.undo(),
+		});
+
+		this.addCommand({
+			id: "nexus-redo",
+			name: "Redo",
+			callback: () => this.commandManager.redo(),
+		});
+
 		this.initializePlugin();
 	}
 
@@ -118,7 +134,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$.value);
 		this.propertiesManager.start(this.indexer.events$);
 
-		this.nodeCreator = new NodeCreator(this.app, this.settingsStore.settings$);
+		this.nodeCreator = new NodeCreator(this.app, this.settingsStore.settings$, this.commandManager);
 
 		await this.indexer.start();
 

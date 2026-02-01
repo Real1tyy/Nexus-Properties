@@ -10,6 +10,25 @@ All notable changes to Nexus Properties will be documented here.
 
 ### New Features
 
+#### Undo/Redo for Graph Operations
+
+Full undo/redo support for all graph operations, allowing you to easily revert accidental changes.
+
+- **Supported Operations**:
+  - Adding relationships (parent, child, related)
+  - Removing relationships (edge removal)
+  - Creating nodes (parent, child, related)
+  - Deleting nodes
+  - Editing node frontmatter
+- **Configurable Hotkeys**: Assign your preferred keyboard shortcuts in Settings → Hotkeys
+- **History Management**: Maintains up to 50 operations in history
+- **Smart State Tracking**: Each command captures the necessary state to fully restore previous conditions
+- **Instant Delete**: Node deletion no longer shows a confirmation dialog since it can be easily undone
+
+**How it works**: When you perform an operation like adding a relationship or deleting a node, the plugin captures the state before and after the change. Pressing undo reverses the operation, and redo re-applies it. The undo/redo stacks work like most applications - performing a new action clears the redo history.
+
+See [Hotkeys](hotkeys#undoredo) for keyboard shortcuts.
+
 #### Configurable View Sidebar Position
 
 Choose which sidebar to open the Nexus Properties view in, giving you control over your workspace layout.

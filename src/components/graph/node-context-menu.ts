@@ -1,6 +1,9 @@
-import { type App, Menu, Modal, Notice, Setting, TFile } from "obsidian";
+import { extractUserFrontmatter } from "@real1ty-obsidian-plugins";
+import { type App, Menu, Notice, TFile } from "obsidian";
+import { type CommandManager, DeleteNodeCommand, EditNodeCommand } from "../../core/commands";
 import type { SettingsStore } from "../../core/settings-store";
 import type { RelationshipType } from "../../types/constants";
+import type { Frontmatter } from "../../types/settings";
 import { NodeEditModal } from "../node-edit-modal";
 import { NodePreviewModal } from "../node-preview-modal";
 
@@ -12,11 +15,18 @@ interface NodeContextMenuCallbacks {
 export class NodeContextMenu {
 	private app: App;
 	private settingsStore: SettingsStore;
+	private commandManager: CommandManager;
 	private callbacks: NodeContextMenuCallbacks;
 
-	constructor(app: App, settingsStore: SettingsStore, callbacks: NodeContextMenuCallbacks) {
+	constructor(
+		app: App,
+		settingsStore: SettingsStore,
+		commandManager: CommandManager,
+		callbacks: NodeContextMenuCallbacks
+	) {
 		this.app = app;
 		this.settingsStore = settingsStore;
+		this.commandManager = commandManager;
 		this.callbacks = callbacks;
 	}
 
@@ -132,8 +142,12 @@ export class NodeContextMenu {
 			return;
 		}
 
+		// Capture original frontmatter before opening the modal
+		const cache = this.app.metadataCache.getFileCache(file);
+		const originalFrontmatter = extractUserFrontmatter(cache);
+
 		new NodeEditModal(this.app, file, async (updatedFrontmatter) => {
-			await this.updateFileFrontmatter(file, updatedFrontmatter);
+			await this.updateFileFrontmatter(file, originalFrontmatter, updatedFrontmatter);
 		}).open();
 	}
 
@@ -144,12 +158,9 @@ export class NodeContextMenu {
 			return;
 		}
 
-		// Confirm deletion
-		const confirmed = await this.confirmDialog(`Delete "${file.basename}"?`, "This action cannot be undone.");
-		if (!confirmed) return;
-
 		try {
-			await this.app.vault.trash(file, true);
+			const command = new DeleteNodeCommand(this.app, filePath);
+			await this.commandManager.executeCommand(command);
 			new Notice(`Deleted: ${file.basename}`);
 		} catch (error) {
 			console.error("Failed to delete file:", error);
@@ -157,48 +168,14 @@ export class NodeContextMenu {
 		}
 	}
 
-	private confirmDialog(title: string, message: string): Promise<boolean> {
-		return new Promise((resolve) => {
-			const modal = new Modal(this.app);
-			modal.titleEl.setText(title);
-			modal.contentEl.createEl("p", { text: message });
-
-			new Setting(modal.contentEl)
-				.addButton((btn) =>
-					btn.setButtonText("Cancel").onClick(() => {
-						modal.close();
-						resolve(false);
-					})
-				)
-				.addButton((btn) =>
-					btn
-						.setButtonText("Delete")
-						.setCta()
-						.setWarning()
-						.onClick(() => {
-							modal.close();
-							resolve(true);
-						})
-				);
-
-			modal.open();
-		});
-	}
-
-	private async updateFileFrontmatter(file: TFile, updatedFrontmatter: Record<string, unknown>): Promise<void> {
+	private async updateFileFrontmatter(
+		file: TFile,
+		originalFrontmatter: Frontmatter,
+		updatedFrontmatter: Frontmatter
+	): Promise<void> {
 		try {
-			await this.app.fileManager.processFrontMatter(file, (fm) => {
-				// Clear existing frontmatter
-				for (const key of Object.keys(fm)) {
-					delete fm[key];
-				}
-
-				// Apply updated frontmatter
-				for (const [key, value] of Object.entries(updatedFrontmatter)) {
-					fm[key] = value;
-				}
-			});
-
+			const command = new EditNodeCommand(this.app, file.path, originalFrontmatter, updatedFrontmatter);
+			await this.commandManager.executeCommand(command);
 			new Notice("Frontmatter updated successfully");
 		} catch (error) {
 			console.error("Failed to update frontmatter:", error);

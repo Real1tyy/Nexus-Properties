@@ -70,6 +70,7 @@ export const SETTINGS_DEFAULTS = {
 export const SCAN_CONCURRENCY = 10;
 
 export type RelationshipType = "parent" | "children" | "related";
+export type NodeCreationType = "parent" | "child" | "related";
 
 interface RelationshipConfig {
 	type: RelationshipType;

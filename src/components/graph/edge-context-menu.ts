@@ -1,15 +1,18 @@
-import { hasLinkInProperty, removeLinkFromProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins";
+import { hasLinkInProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins";
 import { type App, Menu, Notice, TFile } from "obsidian";
+import { type CommandManager, RemoveRelationshipCommand } from "../../core/commands";
 import type { SettingsStore } from "../../core/settings-store";
 
 export class EdgeContextMenu {
 	private app: App;
 	private settingsStore: SettingsStore;
+	private commandManager: CommandManager;
 	private onEdgeRemoved: (() => void) | null = null;
 
-	constructor(app: App, settingsStore: SettingsStore, onEdgeRemoved?: () => void) {
+	constructor(app: App, settingsStore: SettingsStore, commandManager: CommandManager, onEdgeRemoved?: () => void) {
 		this.app = app;
 		this.settingsStore = settingsStore;
+		this.commandManager = commandManager;
 		this.onEdgeRemoved = onEdgeRemoved || null;
 	}
 
@@ -30,11 +33,11 @@ export class EdgeContextMenu {
 
 	private async removeEdge(sourceId: string, targetId: string, isRelatedView: boolean): Promise<void> {
 		try {
-			if (isRelatedView) {
-				await this.removeRelatedConnection(sourceId, targetId);
-			} else {
-				await this.removeHierarchicalConnection(sourceId, targetId);
-			}
+			const settings = this.settingsStore.settings$.value;
+			const relationshipType = this.determineRelationshipType(sourceId, targetId, isRelatedView);
+
+			const command = new RemoveRelationshipCommand(this.app, sourceId, targetId, relationshipType, settings);
+			await this.commandManager.executeCommand(command);
 
 			new Notice("Relationship removed successfully");
 
@@ -48,44 +51,30 @@ export class EdgeContextMenu {
 		}
 	}
 
-	private async removeRelatedConnection(sourceId: string, targetId: string): Promise<void> {
-		const settings = this.settingsStore.settings$.value;
-		const relatedProp = settings.relatedProp;
-
-		const sourceFile = this.app.vault.getAbstractFileByPath(sourceId);
-		if (!(sourceFile instanceof TFile)) {
-			throw new Error(`Source file not found: ${sourceId}`);
+	private determineRelationshipType(
+		sourceId: string,
+		targetId: string,
+		isRelatedView: boolean
+	): "parent" | "children" | "related" {
+		if (isRelatedView) {
+			return "related";
 		}
 
-		const targetPath = removeMarkdownExtension(targetId);
-
-		await this.app.fileManager.processFrontMatter(sourceFile, (fm) => {
-			const updatedRelated = removeLinkFromProperty(fm[relatedProp], targetPath);
-			fm[relatedProp] = updatedRelated;
-		});
-	}
-
-	private async removeHierarchicalConnection(sourceId: string, targetId: string): Promise<void> {
 		const settings = this.settingsStore.settings$.value;
-		const parentProp = settings.parentProp;
 		const childrenProp = settings.childrenProp;
 
 		const sourceFile = this.app.vault.getAbstractFileByPath(sourceId);
 		if (!(sourceFile instanceof TFile)) {
-			throw new Error(`Source file not found: ${sourceId}`);
+			// Default to parent if we can't determine
+			return "parent";
 		}
 
 		const targetPath = removeMarkdownExtension(targetId);
-
-		// Determine relationship direction by checking if target is in source's children
 		const sourceCache = this.app.metadataCache.getFileCache(sourceFile);
 		const sourceFm = sourceCache?.frontmatter || {};
-		const isParentChildRelationship = hasLinkInProperty(sourceFm[childrenProp], targetPath);
 
-		await this.app.fileManager.processFrontMatter(sourceFile, (fm) => {
-			const propertyToUpdate = isParentChildRelationship ? childrenProp : parentProp;
-			const updatedProperty = removeLinkFromProperty(fm[propertyToUpdate], targetPath);
-			fm[propertyToUpdate] = updatedProperty;
-		});
+		// If target is in source's children, it's a children relationship (source is parent)
+		// Otherwise, it's a parent relationship (source is child)
+		return hasLinkInProperty(sourceFm[childrenProp], targetPath) ? "children" : "parent";
 	}
 }
