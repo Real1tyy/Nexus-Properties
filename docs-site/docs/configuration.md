@@ -233,13 +233,18 @@ PriorityParent: "[[preferred-parent]]"
 
 ## Bases View
 
-**Show 'All' Relationship Views** (default: `false`): Add recursive relationship view buttons
-- When enabled, adds "All Children", "All Parents", and "All Related" buttons to the Bases view
+**Show 'All' Relationship Views** (default: `false`): Add recursive relationship view options
+- When enabled, adds "All Children", "All Parents", and "All Related" options to the Bases view dropdown
 - These views recursively traverse relationships to show all connected nodes
 - "All Children" shows all descendants (children, grandchildren, etc.)
 - "All Parents" shows all ancestors (parents, grandparents, etc.)
 - "All Related" shows all nodes connected via the related property
 - Each view displays a count of nodes found (e.g., "All Children (15)")
+
+**View Type** (default: `cards`): Choose how data is displayed in Bases views
+- **Cards**: Visual cards in a grid layout - ideal for visual browsing (recommended)
+- **Table**: Traditional table with rows and columns - best for data-heavy views
+- **List**: Simple list format - minimal and compact display
 
 **Enable Archived Filtering** (default: `false`): Split files into "Archived" and "Active" sections
 

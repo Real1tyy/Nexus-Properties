@@ -194,11 +194,12 @@ export class BasesView extends RegisteredEventsComponent {
 		const archivedFilter = this.getArchivedFilter();
 		const formulasSection = this.buildFormulasSection();
 		const sortSection = this.buildSortSection();
+		const viewType = this.currentSettings.basesViewType;
 
 		return `
 \`\`\`base
 ${formulasSection}views:
-  - type: table
+  - type: ${viewType}
     name: ${viewConfig.name}
     order:
 ${orderArray}
@@ -219,6 +220,7 @@ ${orderArray}
 		const archivedFilter = this.getArchivedFilter();
 		const formulasSection = this.buildFormulasSection();
 		const sortSection = this.buildSortSection();
+		const viewType = this.currentSettings.basesViewType;
 
 		return `
 \`\`\`base
@@ -226,7 +228,7 @@ ${formulasSection}filters:
   or:
 ${filePathFilters}
 views:
-  - type: table
+  - type: ${viewType}
     name: ${viewName}
     order:
 ${orderArray}${

@@ -24,6 +24,18 @@ Redesigned the Bases view selector to use a dropdown interface with keyboard nav
 
 See [Hotkeys](hotkeys#bases-view-navigation) for keyboard shortcuts.
 
+#### Configurable Bases View Type
+
+Choose how data is displayed in the Bases view with a new view type setting.
+
+- **Cards**: Show items as visual cards in a grid layout (default)
+- **Table**: Display data in a traditional table with rows and columns
+- **List**: Simple list format for minimal display
+
+Configure in **Settings → Bases → View type**.
+
+See [Configuration](configuration#bases-view) for details.
+
 #### Undo/Redo for Graph Operations
 
 Full undo/redo support for all graph operations, allowing you to easily revert accidental changes.

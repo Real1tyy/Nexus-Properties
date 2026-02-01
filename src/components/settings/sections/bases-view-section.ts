@@ -31,7 +31,18 @@ export class BasesViewSettingsSection implements SettingsSection {
 		this.uiBuilder.addToggle(container, {
 			key: "showAllRelationshipViews",
 			name: "Show 'All' relationship views",
-			desc: "Add 'All Children', 'All Parents', and 'All Related' buttons to Bases view. These show all nodes recursively traversed from the current file.",
+			desc: "Add 'All Children', 'All Parents', and 'All Related' options to the Bases view dropdown. These show all nodes recursively traversed from the current file.",
+		});
+
+		this.uiBuilder.addDropdown(container, {
+			key: "basesViewType",
+			name: "View type",
+			desc: "Choose the default view type for Bases views. Cards shows visual cards, Table displays data in rows and columns, and List shows a simple list.",
+			options: {
+				cards: "Cards (Recommended)",
+				table: "Table",
+				list: "List",
+			},
 		});
 
 		this.uiBuilder.addToggle(container, {

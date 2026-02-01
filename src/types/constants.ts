@@ -62,6 +62,7 @@ export const SETTINGS_DEFAULTS = {
 	DEFAULT_BASES_CUSTOM_FORMULAS: "",
 	DEFAULT_BASES_CUSTOM_SORT: "",
 	DEFAULT_SHOW_ALL_RELATIONSHIP_VIEWS: false,
+	DEFAULT_BASES_VIEW_TYPE: "cards" as "table" | "cards" | "list",
 
 	// Frontmatter propagation defaults
 	PROPAGATE_FRONTMATTER_TO_CHILDREN: false,

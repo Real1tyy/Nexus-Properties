@@ -141,6 +141,9 @@ export const NexusPropertiesSettingsSchema = z
 		// Show "All" relationship views in Bases sidebar
 		showAllRelationshipViews: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_ALL_RELATIONSHIP_VIEWS),
 
+		// Bases view type (table, cards, list)
+		basesViewType: z.enum(["table", "cards", "list"]).catch(SETTINGS_DEFAULTS.DEFAULT_BASES_VIEW_TYPE),
+
 		// Frontmatter propagation settings
 		propagateFrontmatterToChildren: z.boolean().catch(SETTINGS_DEFAULTS.PROPAGATE_FRONTMATTER_TO_CHILDREN),
 		askBeforePropagatingFrontmatter: z.boolean().catch(SETTINGS_DEFAULTS.ASK_BEFORE_PROPAGATING_FRONTMATTER),
