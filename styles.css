@@ -22,7 +22,9 @@
 	margin-bottom: 1.5em;
 }
 
-.modal-content.nexus-node-creation-modal .nexus-node-creation-input-container input.nexus-node-creation-input {
+.modal-content.nexus-node-creation-modal
+	.nexus-node-creation-input-container
+	input.nexus-node-creation-input {
 	width: 100%;
 	padding: 0.75em 1em;
 	font-size: 1.5em;
@@ -34,7 +36,9 @@
 	transition: border-color 0.2s ease;
 }
 
-.modal-content.nexus-node-creation-modal .nexus-node-creation-input-container input.nexus-node-creation-input:focus {
+.modal-content.nexus-node-creation-modal
+	.nexus-node-creation-input-container
+	input.nexus-node-creation-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
@@ -216,7 +220,9 @@
 	color: var(--text-on-accent);
 }
 
-.nexus-properties-settings-nav-button:hover:not(.nexus-properties-settings-nav-button-active) {
+.nexus-properties-settings-nav-button:hover:not(
+		.nexus-properties-settings-nav-button-active
+	) {
 	background-color: var(--background-modifier-hover);
 }
 
@@ -254,7 +260,8 @@
 	margin-bottom: 6px;
 }
 
-.nexus-properties-color-example-item .nexus-properties-settings-info-box-example {
+.nexus-properties-color-example-item
+	.nexus-properties-settings-info-box-example {
 	flex: 0 0 auto;
 }
 
@@ -477,7 +484,9 @@
 }
 
 /* Make array manager input fields wider */
-.nexus-properties-settings-array-manager-list + .setting-item .setting-item-control input[type="text"] {
+.nexus-properties-settings-array-manager-list + .setting-item
+	.setting-item-control
+	input[type="text"] {
 	min-width: 400px;
 	flex: 1;
 }
@@ -592,7 +601,8 @@
 	}
 
 	/* Move filter preset selector to header row with controls */
-	.nexus-properties-graph-view-header .nexus-properties-graph-filter-preset-container {
+	.nexus-properties-graph-view-header
+	.nexus-properties-graph-filter-preset-container {
 		order: 1;
 		flex-shrink: 0;
 	}
@@ -621,7 +631,9 @@
 	}
 
 	/* Shorten toggle label text on mobile */
-	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(1)
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(
+			1
+		)
 		.nexus-properties-graph-toggle-label::before {
 		content: "Related";
 	}
@@ -689,7 +701,8 @@
 	}
 
 	/* Move search input to filter row on mobile */
-	.nexus-properties-graph-filter-row .nexus-properties-graph-search-input-container {
+	.nexus-properties-graph-filter-row
+	.nexus-properties-graph-search-input-container {
 		display: flex;
 	}
 
@@ -704,7 +717,8 @@
 	}
 
 	/* Filter preset selector in header - smaller */
-	.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
+	.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-preset-select {
 		height: 2em;
 		min-width: 70px;
 		padding: 0.25em 1.6em 0.25em 0.4em;
@@ -719,7 +733,8 @@
 	}
 
 	/* Hide filter preset from its normal location in filter row */
-	.nexus-properties-graph-filter-row .nexus-properties-graph-filter-preset-container {
+	.nexus-properties-graph-filter-row
+	.nexus-properties-graph-filter-preset-container {
 		display: none;
 	}
 
@@ -730,13 +745,19 @@
 
 	/* ===== ZOOM MODE - HIDE EVERYTHING EXCEPT PREVIEW ===== */
 	/* When zoom preview exists, hide header/search/filter */
-	body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview)
+	body .nexus-properties-graph-view-content:has(
+			.nexus-properties-graph-zoom-preview
+		)
 		.nexus-properties-graph-view-header,
 	body
-		.nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview)
+		.nexus-properties-graph-view-content:has(
+			.nexus-properties-graph-zoom-preview
+		)
 		.nexus-properties-graph-search-row,
 	body
-		.nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview)
+		.nexus-properties-graph-view-content:has(
+			.nexus-properties-graph-zoom-preview
+		)
 		.nexus-properties-graph-filter-row {
 		display: none;
 	}
@@ -764,7 +785,8 @@
 	}
 
 	/* Compact toggle buttons in zoom preview */
-	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-container {
+	body .nexus-properties-graph-zoom-preview-toggles
+		.nexus-properties-graph-toggle-container {
 		padding: 0.3em 0.4em;
 		font-size: 0.7em;
 		gap: 0.25em;
@@ -773,13 +795,15 @@
 	}
 
 	/* Adjust checkbox size in zoom preview */
-	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-checkbox {
+	body .nexus-properties-graph-zoom-preview-toggles
+		.nexus-properties-graph-toggle-checkbox {
 		width: 11px;
 		height: 11px;
 	}
 
 	/* Shorter toggle labels */
-	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-label {
+	body .nexus-properties-graph-zoom-preview-toggles
+		.nexus-properties-graph-toggle-label {
 		overflow: hidden;
 		text-overflow: ellipsis;
 		white-space: nowrap;
@@ -793,7 +817,10 @@
 	body .nexus-properties-graph-zoom-preview-frontmatter {
 		padding: 0.3em;
 		gap: 0.2em;
-		grid-template-columns: repeat(auto-fill, minmax(var(--mobile-frontmatter-property-width, 100px), 1fr));
+		grid-template-columns: repeat(
+				auto-fill,
+				minmax(var(--mobile-frontmatter-property-width, 100px), 1fr)
+			);
 		font-size: 0.75em;
 		max-height: min(30vh, var(--zoom-preview-frontmatter-height, 70px));
 	}
@@ -920,7 +947,8 @@
 /* Shared input styling for consistency - force exact same height */
 .nexus-properties-graph-view-content .nexus-properties-graph-search-input,
 .nexus-properties-graph-view-content .nexus-properties-graph-filter-input,
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-preset-select {
 	width: 100%;
 	height: 2.8em; /* Fixed height to ensure consistency */
 	padding: 0.65em 1em;
@@ -944,14 +972,17 @@
 
 .nexus-properties-graph-view-content .nexus-properties-graph-search-input:focus,
 .nexus-properties-graph-view-content .nexus-properties-graph-filter-input:focus,
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:focus {
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-preset-select:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
 }
 
-.nexus-properties-graph-view-content .nexus-properties-graph-search-input::placeholder,
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-input::placeholder {
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-search-input::placeholder,
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-input::placeholder {
 	color: var(--text-faint);
 }
 
@@ -989,26 +1020,31 @@
 }
 
 /* Preset selector specific overrides */
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
+.nexus-properties-graph-view-content
+.nexus-properties-graph-filter-preset-select {
 	width: auto;
 	min-width: 120px;
 	padding: 0.65em 2.2em 0.65em 1em; /* Override padding for dropdown arrow space */
 	cursor: pointer;
 }
 
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:focus {
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-preset-select:focus {
 	outline: none;
 	background-color: var(--interactive-hover);
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
 }
 
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select option {
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-preset-select
+	option {
 	background-color: var(--background-primary);
 	color: var(--text-normal);
 }
 
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:hover {
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-preset-select:hover {
 	border-color: var(--interactive-accent);
 }
 
@@ -1026,7 +1062,8 @@
 	font-family: var(--font-monospace);
 }
 
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-input::placeholder {
+.nexus-properties-graph-view-content
+	.nexus-properties-graph-filter-input::placeholder {
 	font-family: var(--font-text); /* Placeholder uses regular font */
 }
 
@@ -1302,7 +1339,12 @@ input.nexus-properties-zoom-indicator-input:focus {
 	position: relative;
 	width: 100%;
 	max-height: var(--zoom-preview-max-height, 280px);
-	background: linear-gradient(to bottom, var(--background-primary) 0%, var(--background-primary) 85%, transparent 100%);
+	background: linear-gradient(
+		to bottom,
+		var(--background-primary) 0%,
+		var(--background-primary) 85%,
+		transparent 100%
+	);
 	border-bottom: 2px solid var(--background-modifier-border);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	overflow: hidden;
@@ -1467,7 +1509,9 @@ input.nexus-properties-zoom-indicator-input:focus {
 }
 
 /* When frontmatter is hidden, content should only take needed space */
-.nexus-properties-graph-zoom-preview-body:has(.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden)
+.nexus-properties-graph-zoom-preview-body:has(
+	.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden
+)
 .nexus-properties-graph-zoom-preview-content {
 	flex: 0 1 auto;
 }
@@ -2056,4 +2100,82 @@ button.nexus-properties-bases-view-button.is-active {
 .nexus-whats-new-buttons button:active {
 	transform: translateY(0);
 	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Title Property Setup Modal */
+.nexus-title-property-setup-modal {
+	display: flex;
+	flex-direction: column;
+	padding: 1.5em;
+	max-width: 550px;
+}
+
+.nexus-title-property-setup-title {
+	text-align: center;
+	margin-bottom: 1em;
+	font-size: 1.3em;
+	color: var(--text-normal);
+}
+
+.nexus-title-property-setup-description {
+	margin-bottom: 1.5em;
+}
+
+.nexus-title-property-setup-description p {
+	margin-bottom: 0.75em;
+	line-height: 1.6;
+	color: var(--text-muted);
+}
+
+.nexus-title-property-setup-warning {
+	background: var(--background-secondary);
+	padding: 0.75em 1em;
+	border-radius: 6px;
+	border-left: 3px solid var(--interactive-accent);
+}
+
+.nexus-title-property-setup-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75em;
+	margin-top: 1em;
+}
+
+.nexus-title-property-setup-button {
+	padding: 0.75em 1.5em;
+	border-radius: 6px;
+	cursor: pointer;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--interactive-normal);
+	color: var(--text-normal);
+	font-size: 1em;
+	transition: all 0.2s ease;
+}
+
+.nexus-title-property-setup-button:hover {
+	background: var(--interactive-hover);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-title-property-setup-button.mod-cta {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-title-property-setup-button.mod-cta:hover {
+	background: var(--interactive-accent-hover);
+	border-color: var(--interactive-accent-hover);
+}
+
+.nexus-title-property-setup-button-later {
+	background: transparent;
+	color: var(--text-muted);
+	border-color: transparent;
+}
+
+.nexus-title-property-setup-button-later:hover {
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	border-color: var(--background-modifier-border);
 }

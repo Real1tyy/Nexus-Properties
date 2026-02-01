@@ -58,6 +58,8 @@ export const NexusPropertiesSettingsSchema = z
 		// Node creation settings
 		zettelIdProp: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_ZETTEL_ID_PROP),
 		titleProp: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_TITLE_PROP),
+		excludeTitleDirectories: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_EXCLUDE_TITLE_DIRECTORIES),
+		titlePropertyMode: z.enum(["unknown", "enabled", "disabled"]).catch(SETTINGS_DEFAULTS.DEFAULT_TITLE_PROPERTY_MODE),
 
 		// UI settings
 		showRibbonIcon: z.boolean().catch(true),

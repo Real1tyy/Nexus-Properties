@@ -153,8 +153,8 @@ export class BasesView extends RegisteredEventsComponent {
 
 	private async renderSelectedView(activeFile: TFile, container: HTMLElement): Promise<void> {
 		const includedProperties = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
-		// Replace file.name with titleProp for cleaner display
-		if (includedProperties[0] === "file.name") {
+		// Replace file.name with titleProp for cleaner display (only when title property is enabled)
+		if (includedProperties[0] === "file.name" && this.currentSettings.titlePropertyMode === "enabled") {
 			includedProperties[0] = this.currentSettings.titleProp;
 		}
 		const orderArray = includedProperties.map((prop) => `      - ${prop}`).join("\n");

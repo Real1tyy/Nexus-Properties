@@ -278,15 +278,7 @@ PriorityParent: "[[preferred-parent]]"
 
 **Zettel ID Property** (default: `_ZettelID`): Property for unique timestamp ID (format: `YYYYMMDDHHmmss`)
 
-**Title Property** (default: `Title`): Property for auto-assigned display title as a wiki link
-- Format: `[[path/to/file|DisplayName]]` - clickable in Bases view
-- Display name is computed from filename with parent prefix stripped
-- Example: "Parent - Child.md" with parent "Parent" → `[[Parent - Child|Child]]`
-- Files without parents get their basename as the display name
-- Updated automatically when parent relationships change
-- Used by Graph and Bases views for node labels
-
-**How it works**:
+**How node creation works**:
 1. New node in same folder as source
 2. Inherits frontmatter (except excluded)
 3. New Zettel ID generated
@@ -294,6 +286,48 @@ PriorityParent: "[[preferred-parent]]"
 5. Only for files in indexed directories
 
 [Learn more →](features/node-creation)
+
+## Automatic Title Property
+
+Configure automatic title property assignment for cleaner display in Graph and Bases views.
+
+### First-Time Setup
+
+On first plugin use, a setup modal appears asking you to:
+1. **Enable**: Automatically add title properties to all indexed files
+2. **Disable**: Use raw file names instead (no title properties added)
+3. **Decide Later**: Keep the modal appearing on each startup until you decide
+
+**Recommendation**: Before enabling, configure excluded directories to skip templates, daily notes, or other directories where automatic titles aren't needed.
+
+### Settings
+
+**Title Property Mode** (default: `Not configured`): Controls automatic title property behavior
+- **Enabled**: Adds title properties to files automatically. Bases view displays these titles.
+- **Disabled**: No title properties added. Bases view uses raw file names (`file.name`).
+- **Not Configured**: Shows setup modal on startup.
+
+**Title Property Name** (default: `Title`): Property name for auto-assigned display title
+- Format: `[[path/to/file|DisplayName]]` - clickable in Bases view
+- Display name computed from filename with parent prefix stripped
+- Example: "Parent - Child.md" with parent "Parent" → `[[Parent - Child|Child]]`
+- Files without parents get their basename as the display name
+- Updated automatically when parent relationships change
+
+**Exclude Directories from Title** (default: `""`): Comma-separated directory paths to exclude
+- Files in these directories won't receive automatic title properties
+- Use for templates, daily notes, or other directories where titles aren't needed
+- Examples: `Templates`, `Daily Notes`, `Archive/Old`
+- Matches directory paths (files in subdirectories are also excluded)
+
+### Behavior Summary
+
+| Mode | Title Properties | Graph View | Bases View |
+|------|-----------------|------------|------------|
+| Enabled | Added to files | Strips prefixes | Uses Title property |
+| Disabled | Not added | Strips prefixes | Uses file.name |
+
+**Note**: Graph view always strips parent prefixes from node labels regardless of the title property mode setting.
 
 ## Excluded Properties
 

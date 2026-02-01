@@ -93,7 +93,23 @@ export class PropertiesManager {
 		return stripParentPrefix(baseName, parentDisplayName);
 	}
 
+	private isExcludedFromTitle(filePath: string): boolean {
+		const excludeDirectories = this.settings.excludeTitleDirectories
+			.split(",")
+			.map((dir) => dir.trim())
+			.filter((dir) => dir.length > 0);
+
+		if (excludeDirectories.length === 0) {
+			return false;
+		}
+
+		return excludeDirectories.some((dir) => filePath.startsWith(dir + "/") || filePath.startsWith(dir));
+	}
+
 	private async updateTitleProperty(filePath: string, newRelationships: FileRelationships): Promise<void> {
+		if (this.settings.titlePropertyMode !== "enabled") return;
+		if (this.isExcludedFromTitle(filePath)) return;
+
 		const context = getFileContext(this.app, filePath);
 		if (!context.file) return;
 

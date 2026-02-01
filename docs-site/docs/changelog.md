@@ -40,16 +40,37 @@ See [Configuration](configuration#user-interface) for details.
 
 #### Automatic Title Property
 
-The plugin now automatically assigns a `Title` property to files, making graph rendering faster and more consistent.
+The plugin can automatically assign a `Title` property to files, making graph rendering faster and more consistent.
 
+- **First-Time Setup**: On first use, a setup modal prompts you to enable or disable automatic title properties
 - **Auto-Computed Title**: When a file has a parent, the title is computed by stripping the parent name prefix from the filename (e.g., "Parent - Child.md" gets display name "Child")
 - **Wiki Link Format**: Title is stored as `[[path|DisplayName]]` making it clickable in Bases view
 - **No Parent Fallback**: Files without a parent get their basename as the display name
-- **Cleaner Display**: Both Graph and Bases views use the title property for cleaner file names
 - **Configurable Property Name**: Change the property name in settings (default: `Title`)
 - **Automatic Updates**: Title is updated whenever parent relationships change
 
-See [Configuration](configuration#node-creation-shortcuts) for property name settings, and [Graph Views](features/graph-views#node-labels) for how titles display.
+**Title Property Mode** (Settings → Properties):
+- **Enabled**: Automatically adds title properties to all indexed files. Bases view uses the title property for display.
+- **Disabled**: No title properties are added. Bases view uses raw file names (`file.name`). Graph view still strips parent prefixes for display.
+- **Not Configured**: Shows setup modal on startup to help you decide.
+
+**Important**: Graph view always strips parent prefixes from node labels regardless of this setting. The title property mode only affects:
+1. Whether title properties are written to file frontmatter
+2. Whether Bases view uses the title property or raw file names
+
+See [Configuration](configuration#automatic-title-property) for details.
+
+#### Exclude Directories from Title Assignment
+
+Control which directories are excluded from automatic title property assignment.
+
+- **Comma-Separated Paths**: Specify multiple directory paths separated by commas (e.g., `Templates, Daily Notes`)
+- **Path Matching**: Files in the specified directories (and their subdirectories) will not receive automatic title properties
+- **Use Cases**: Exclude templates, daily notes, or other directories where automatic titles are not needed
+- **Default**: Empty (all indexed directories receive title properties)
+- **Configure Before Enabling**: The setup modal recommends configuring exclusions before enabling title properties
+
+See [Configuration](configuration#automatic-title-property) for setup instructions.
 
 ### Bug Fixes
 

@@ -1,7 +1,7 @@
 import { WhatsNewModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins";
 import { Notice, Plugin, TFile } from "obsidian";
 import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
-import { NexusPropertiesSettingsTab, NodeCreationModal } from "./components";
+import { NexusPropertiesSettingsTab, NodeCreationModal, TitlePropertySetupModal } from "./components";
 import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/views/nexus-view-switcher";
 import { CommandManager } from "./core/commands";
 import { Indexer } from "./core/indexer";
@@ -141,6 +141,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.registerView(VIEW_TYPE_NEXUS_SWITCHER, (leaf) => new NexusViewSwitcher(leaf, this.indexer, this));
 
 		await this.checkForUpdates();
+		this.checkTitlePropertySetup();
 	}
 
 	async onunload() {
@@ -307,6 +308,31 @@ export default class NexusPropertiesPlugin extends Plugin {
 				...settings,
 				version: currentVersion,
 			}));
+		}
+	}
+
+	private checkTitlePropertySetup(): void {
+		const titlePropertyMode = this.settingsStore.settings$.value.titlePropertyMode;
+
+		if (titlePropertyMode === "unknown") {
+			new TitlePropertySetupModal(this.app, {
+				onEnable: async () => {
+					await this.settingsStore.updateSettings((settings) => ({
+						...settings,
+						titlePropertyMode: "enabled",
+					}));
+					new Notice("✅ Title property enabled. Running initial scan...");
+					await this.triggerFullRescan();
+					new Notice("✅ Title properties have been added to all indexed files.");
+				},
+				onDisable: async () => {
+					await this.settingsStore.updateSettings((settings) => ({
+						...settings,
+						titlePropertyMode: "disabled",
+					}));
+					new Notice("Title property disabled. File names will be used in Bases view.");
+				},
+			}).open();
 		}
 	}
 }

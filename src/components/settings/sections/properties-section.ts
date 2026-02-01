@@ -86,11 +86,37 @@ export class PropertiesSection implements SettingsSection {
 			placeholder: "_ZettelID",
 		});
 
+		new Setting(container).setName("Automatic Title Property").setHeading();
+
+		container
+			.createDiv("setting-item-description nexus-properties-section-description")
+			.setText(
+				"Configure automatic title property assignment. When enabled, the plugin adds a Title property to files with the filename stripped of its parent prefix (e.g., 'Parent - Child.md' becomes 'Child'). This title is used in Graph and Bases views for cleaner display."
+			);
+
+		this.uiBuilder.addDropdown(container, {
+			key: "titlePropertyMode",
+			name: "Title property mode",
+			desc: "Enable to automatically add title properties to files. Disable to use raw file names in Bases view. Graph view always strips prefixes regardless of this setting.",
+			options: {
+				enabled: "Enabled - Add title properties",
+				disabled: "Disabled - Use file names",
+				unknown: "Not configured",
+			},
+		});
+
 		this.uiBuilder.addText(container, {
 			key: "titleProp",
-			name: "Title property",
+			name: "Title property name",
 			desc: "Property name for auto-assigned title (file name with parent prefix stripped)",
 			placeholder: SETTINGS_DEFAULTS.DEFAULT_TITLE_PROP,
+		});
+
+		this.uiBuilder.addText(container, {
+			key: "excludeTitleDirectories",
+			name: "Exclude directories from title",
+			desc: "Comma-separated directory paths to exclude from automatic title property assignment (e.g., Templates, Daily Notes)",
+			placeholder: "Templates, Daily Notes",
 		});
 	}
 }
