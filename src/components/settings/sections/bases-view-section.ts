@@ -29,6 +29,12 @@ export class BasesViewSettingsSection implements SettingsSection {
 			);
 
 		this.uiBuilder.addToggle(container, {
+			key: "showAllRelationshipViews",
+			name: "Show 'All' relationship views",
+			desc: "Add 'All Children', 'All Parents', and 'All Related' buttons to Bases view. These show all nodes recursively traversed from the current file.",
+		});
+
+		this.uiBuilder.addToggle(container, {
 			key: "excludeArchived",
 			name: "Enable archived filtering",
 			desc: "When enabled, shows separate archived and non-archived views. When disabled, shows all items without filtering.",

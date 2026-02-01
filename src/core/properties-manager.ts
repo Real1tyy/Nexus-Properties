@@ -9,6 +9,7 @@ import {
 	getFileContext,
 	mergeFrontmatterDiffs,
 	parsePropertyLinks,
+	removeMarkdownExtension,
 	withFileContext,
 } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
@@ -26,6 +27,8 @@ export class PropertiesManager {
 	private propagationDebounceTimers: Map<string, NodeJS.Timeout> = new Map();
 	private accumulatedDiffs: Map<string, FrontmatterDiff[]> = new Map();
 	private filesBeingPropagated: Set<string> = new Set();
+	private cachedExcludedDirs: string[] | null = null;
+	private lastExcludedDirsString: string = "";
 
 	constructor(
 		private app: App,
@@ -66,22 +69,46 @@ export class PropertiesManager {
 		const allFiles = this.app.vault.getMarkdownFiles();
 		const relevantFiles = allFiles.filter((file) => indexer.shouldIndexFile(file.path));
 
-		await Promise.all(
-			relevantFiles.map(async (file) => {
-				const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
-				if (!frontmatter) {
-					return;
-				}
+		// Pre-filter files that need processing to avoid unnecessary work
+		const filesToProcess = relevantFiles.filter((file) => {
+			const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+			if (!frontmatter) return false;
 
-				const relationships = indexer.extractRelationships(file, frontmatter);
+			// Skip if title mode disabled or file is excluded
+			if (this.settings.titlePropertyMode !== "enabled") return this.settings.autoLinkSiblings;
+			if (this.isExcludedFromTitle(file.path)) return this.settings.autoLinkSiblings;
 
-				if (this.settings.autoLinkSiblings) {
-					await this.linkSiblingsIfNeeded(relationships);
-				}
+			// Check if title needs updating using cheap string operations
+			const pathWithoutExt = removeMarkdownExtension(file.path);
+			const currentTitle = frontmatter[this.settings.titleProp];
 
-				await this.updateTitleProperty(file.path, relationships);
-			})
-		);
+			// If no title or title path doesn't match, needs processing
+			if (!currentTitle || typeof currentTitle !== "string") return true;
+			if (!currentTitle.startsWith(`[[${pathWithoutExt}|`)) return true;
+
+			// Title path matches - only process if sibling linking is needed
+			return this.settings.autoLinkSiblings;
+		});
+
+		// Process in batches to avoid overwhelming the system
+		const BATCH_SIZE = 50;
+		for (let i = 0; i < filesToProcess.length; i += BATCH_SIZE) {
+			const batch = filesToProcess.slice(i, i + BATCH_SIZE);
+			await Promise.all(
+				batch.map(async (file) => {
+					const frontmatter = this.app.metadataCache.getFileCache(file)?.frontmatter;
+					if (!frontmatter) return;
+
+					const relationships = indexer.extractRelationships(file, frontmatter);
+
+					if (this.settings.autoLinkSiblings) {
+						await this.linkSiblingsIfNeeded(relationships);
+					}
+
+					await this.updateTitleProperty(file.path, relationships);
+				})
+			);
+		}
 	}
 
 	private computeTitle(baseName: string, parentWikiLinks: string[]): string {
@@ -93,16 +120,23 @@ export class PropertiesManager {
 		return stripParentPrefix(baseName, parentDisplayName);
 	}
 
-	private isExcludedFromTitle(filePath: string): boolean {
-		const excludeDirectories = this.settings.excludeTitleDirectories
-			.split(",")
-			.map((dir) => dir.trim())
-			.filter((dir) => dir.length > 0);
+	private getExcludedDirectories(): string[] {
+		// Cache parsed directories - only reparse if setting changed
+		if (this.cachedExcludedDirs === null || this.lastExcludedDirsString !== this.settings.excludeTitleDirectories) {
+			this.lastExcludedDirsString = this.settings.excludeTitleDirectories;
+			this.cachedExcludedDirs = this.settings.excludeTitleDirectories
+				.split(",")
+				.map((dir) => dir.trim())
+				.filter((dir) => dir.length > 0);
+		}
+		return this.cachedExcludedDirs;
+	}
 
+	private isExcludedFromTitle(filePath: string): boolean {
+		const excludeDirectories = this.getExcludedDirectories();
 		if (excludeDirectories.length === 0) {
 			return false;
 		}
-
 		return excludeDirectories.some((dir) => filePath.startsWith(dir + "/") || filePath.startsWith(dir));
 	}
 
@@ -110,17 +144,19 @@ export class PropertiesManager {
 		if (this.settings.titlePropertyMode !== "enabled") return;
 		if (this.isExcludedFromTitle(filePath)) return;
 
-		const context = getFileContext(this.app, filePath);
-		if (!context.file) return;
-
+		// Compute expected title using only string operations (no file context needed)
+		const pathWithoutExt = removeMarkdownExtension(filePath);
 		const displayName = extractDisplayName(filePath);
 		const computedTitle = this.computeTitle(displayName, newRelationships.parent);
-
-		const pathWithoutExt = filePath.replace(/\.md$/, "");
 		const titleLink = `[[${pathWithoutExt}|${computedTitle}]]`;
 
+		// Early exit if title already matches (avoid file operations)
 		const currentTitle = newRelationships.frontmatter[this.settings.titleProp];
 		if (currentTitle === titleLink) return;
+
+		// Only get file context when we actually need to write
+		const context = getFileContext(this.app, filePath);
+		if (!context.file) return;
 
 		await this.app.fileManager.processFrontMatter(context.file, (fm) => {
 			fm[this.settings.titleProp] = titleLink;
@@ -128,12 +164,11 @@ export class PropertiesManager {
 	}
 
 	private async linkSiblingsIfNeeded(relationships: FileRelationships): Promise<void> {
-		const currentContext = getFileContext(this.app, relationships.filePath);
 		const siblings = this.getSiblings(relationships);
 
 		for (const siblingPath of siblings) {
 			await this.addToProperty(relationships.filePath, this.settings.relatedProp, siblingPath);
-			await this.addToProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
+			await this.addToProperty(siblingPath, this.settings.relatedProp, relationships.filePath);
 		}
 	}
 
@@ -142,8 +177,6 @@ export class PropertiesManager {
 		oldRelationships: FileRelationships,
 		newRelationships: FileRelationships
 	): Promise<void> {
-		const currentContext = getFileContext(this.app, filePath);
-
 		const oldSiblings = this.getSiblings(oldRelationships);
 		const newSiblings = this.getSiblings(newRelationships);
 		const oldSet = new Set(oldSiblings);
@@ -153,12 +186,12 @@ export class PropertiesManager {
 		const addedSiblings = newSiblings.filter((s) => !oldSet.has(s));
 
 		for (const siblingPath of removedSiblings) {
-			await this.removeFromProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
+			await this.removeFromProperty(siblingPath, this.settings.relatedProp, filePath);
 			await this.removeFromProperty(filePath, this.settings.relatedProp, siblingPath);
 		}
 
 		for (const siblingPath of addedSiblings) {
-			await this.addToProperty(siblingPath, this.settings.relatedProp, currentContext.baseName);
+			await this.addToProperty(siblingPath, this.settings.relatedProp, filePath);
 			await this.addToProperty(filePath, this.settings.relatedProp, siblingPath);
 		}
 	}
@@ -193,15 +226,13 @@ export class PropertiesManager {
 			await this.app.fileManager.processFrontMatter(target.file, (fm) => {
 				const currentValue = fm[propertyName];
 				// Use full path (without extension) for consistent link formatting and duplicate detection
-				const linkPath = fileToAddContext.pathWithExt.replace(/\.md$/, "");
+				const linkPath = removeMarkdownExtension(fileToAddContext.pathWithExt);
 				fm[propertyName] = addLinkToProperty(currentValue, linkPath);
 			});
 		});
 	}
 
 	private async handleFileDeletion(deletedFilePath: string, oldRelationships: FileRelationships): Promise<void> {
-		const deletedContext = getFileContext(this.app, deletedFilePath);
-
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const ctx = getRelationshipContext(config, oldRelationships, this.settings);
 
@@ -212,7 +243,7 @@ export class PropertiesManager {
 					// File doesn't exist - nothing to remove from
 					continue;
 				}
-				await this.removeFromProperty(targetContext.pathWithExt, ctx.reversePropName, deletedContext.baseName);
+				await this.removeFromProperty(targetContext.pathWithExt, ctx.reversePropName, deletedFilePath);
 			}
 		}
 	}
@@ -222,8 +253,6 @@ export class PropertiesManager {
 		oldRelationships: FileRelationships,
 		newRelationships: FileRelationships
 	): Promise<void> {
-		const currentContext = getFileContext(this.app, filePath);
-
 		for (const config of RELATIONSHIP_CONFIGS) {
 			const diff = getRelationshipDiff(config, oldRelationships, newRelationships, this.settings);
 
@@ -235,7 +264,7 @@ export class PropertiesManager {
 					// The relationship will be established when the file is created
 					continue;
 				}
-				await this.addToProperty(targetContext.pathWithExt, diff.reversePropName, currentContext.baseName);
+				await this.addToProperty(targetContext.pathWithExt, diff.reversePropName, filePath);
 			}
 
 			for (const removedLink of diff.removedLinks) {
@@ -245,7 +274,7 @@ export class PropertiesManager {
 					// File doesn't exist - nothing to remove from
 					continue;
 				}
-				await this.removeFromProperty(targetContext.pathWithExt, diff.reversePropName, currentContext.baseName);
+				await this.removeFromProperty(targetContext.pathWithExt, diff.reversePropName, filePath);
 			}
 		}
 
@@ -256,6 +285,7 @@ export class PropertiesManager {
 
 	private async removeFromProperty(targetFilePath: string, propertyName: string, fileToRemove: string): Promise<void> {
 		const fileToRemoveContext = getFileContext(this.app, fileToRemove);
+		const fileToRemovePath = removeMarkdownExtension(fileToRemoveContext.pathWithExt);
 
 		await withFileContext(this.app, targetFilePath, async (target) => {
 			if (!target.file) return;
@@ -269,8 +299,10 @@ export class PropertiesManager {
 
 				const links = parsePropertyLinks(currentValue);
 				const filteredLinks = links.filter((link) => {
-					const linkContext = getFileContext(this.app, link);
-					return linkContext.baseName !== fileToRemoveContext.baseName;
+					// Use sourcePath for proper link resolution
+					const linkContext = getFileContext(this.app, link, { sourcePath: targetFilePath });
+					const linkPath = removeMarkdownExtension(linkContext.pathWithExt);
+					return linkPath !== fileToRemovePath;
 				});
 
 				fm[propertyName] = filteredLinks.map((path) => formatWikiLink(path));

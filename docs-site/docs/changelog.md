@@ -72,6 +72,20 @@ Control which directories are excluded from automatic title property assignment.
 
 See [Configuration](configuration#automatic-title-property) for setup instructions.
 
+#### All Relationships Views in Bases
+
+New "All" view options for Bases sidebar that recursively traverse relationships to show all connected nodes.
+
+- **All Children**: Shows all descendant nodes (children, grandchildren, etc.) by recursively traversing the children relationship
+- **All Parents**: Shows all ancestor nodes (parents, grandparents, etc.) by recursively traversing the parent relationship
+- **All Related**: Shows all related nodes by recursively traversing the related relationship
+- **Configurable**: Enable/disable via Settings → Bases → "Show 'All' relationship views"
+- **Count Display**: Each view shows the total count of nodes found (e.g., "All Children (15)")
+- **Cycle Detection**: Handles circular relationships without infinite loops
+- **Default**: Disabled (existing Children/Parent/Related views remain unchanged)
+
+See [Configuration](configuration#bases-view) for setup instructions.
+
 ### Bug Fixes
 
 #### Console Error When Selecting Parent from Suggester

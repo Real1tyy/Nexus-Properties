@@ -3,11 +3,13 @@ import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
+import { buildBasesFilePathFilters } from "../../utils/bases-utils";
 import { cls } from "../../utils/css";
+import { collectRelatedNodesRecursively } from "../../utils/hierarchy";
 
 const _VIEW_TYPE_BASES = "nexus-bases-view";
 
-export type BaseViewType = "children" | "parent" | "related";
+export type BaseViewType = "children" | "parent" | "related" | "all-children" | "all-parent" | "all-related";
 
 /**
  * Bases view component that uses Obsidian's Bases API to render
@@ -115,6 +117,11 @@ export class BasesView extends RegisteredEventsComponent {
 		if (this.showArchived && !this.currentSettings.excludeArchived) {
 			this.showArchived = false;
 		}
+
+		// Reset to "children" if an "all-*" view is selected but the setting is disabled
+		if (this.selectedViewType.startsWith("all-") && !this.currentSettings.showAllRelationshipViews) {
+			this.selectedViewType = "children";
+		}
 	}
 
 	private createViewSelector(): void {
@@ -127,6 +134,15 @@ export class BasesView extends RegisteredEventsComponent {
 			{ type: "parent", label: "Parent" },
 			{ type: "related", label: "Related" },
 		];
+
+		// Add "All" view types if enabled in settings
+		if (this.currentSettings.showAllRelationshipViews) {
+			viewTypes.push(
+				{ type: "all-children", label: "All Children" },
+				{ type: "all-parent", label: "All Parents" },
+				{ type: "all-related", label: "All Related" }
+			);
+		}
 
 		for (const { type, label } of viewTypes) {
 			const button = this.viewSelectorEl.createEl("button", {
@@ -152,20 +168,21 @@ export class BasesView extends RegisteredEventsComponent {
 	}
 
 	private async renderSelectedView(activeFile: TFile, container: HTMLElement): Promise<void> {
-		const includedProperties = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
-		// Replace file.name with titleProp for cleaner display (only when title property is enabled)
-		if (includedProperties[0] === "file.name" && this.currentSettings.titlePropertyMode === "enabled") {
-			includedProperties[0] = this.currentSettings.titleProp;
-		}
-		const orderArray = includedProperties.map((prop) => `      - ${prop}`).join("\n");
+		const basesMarkdown = this.selectedViewType.startsWith("all-")
+			? this.buildRecursiveBasesMarkdown(activeFile)
+			: this.buildNormalBasesMarkdown(activeFile);
 
+		await MarkdownRenderer.render(this.app, basesMarkdown, container, activeFile.path, this.component);
+	}
+
+	private buildNormalBasesMarkdown(activeFile: TFile): string {
+		const orderArray = this.buildOrderArray(activeFile);
 		const viewConfig = this.getViewConfig(this.selectedViewType);
 		const archivedFilter = this.getArchivedFilter();
-
 		const formulasSection = this.buildFormulasSection();
 		const sortSection = this.buildSortSection();
 
-		const basesMarkdown = `
+		return `
 \`\`\`base
 ${formulasSection}views:
   - type: table
@@ -177,7 +194,59 @@ ${orderArray}
         - this.${viewConfig.prop}.contains(file)${archivedFilter}${sortSection}
 \`\`\`
 `;
-		await MarkdownRenderer.render(this.app, basesMarkdown, container, activeFile.path, this.component);
+	}
+
+	private buildRecursiveBasesMarkdown(activeFile: TFile): string {
+		const relationshipType = this.selectedViewType.replace("all-", "") as "children" | "parent" | "related";
+		const allNodes = collectRelatedNodesRecursively(this.app, this.plugin.indexer, activeFile, relationshipType);
+
+		const orderArray = this.buildOrderArray(activeFile);
+		const viewName = this.getAllViewName(relationshipType, allNodes.size);
+		const filePathFilters = buildBasesFilePathFilters(Array.from(allNodes));
+		const archivedFilter = this.getArchivedFilter();
+		const formulasSection = this.buildFormulasSection();
+		const sortSection = this.buildSortSection();
+
+		return `
+\`\`\`base
+${formulasSection}filters:
+  or:
+${filePathFilters}
+views:
+  - type: table
+    name: ${viewName}
+    order:
+${orderArray}${
+			archivedFilter
+				? `
+    filters:
+      and:${archivedFilter}`
+				: ""
+		}${sortSection}
+\`\`\`
+`;
+	}
+
+	private buildOrderArray(activeFile: TFile): string {
+		const includedProperties = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
+		if (includedProperties[0] === "file.name" && this.currentSettings.titlePropertyMode === "enabled") {
+			includedProperties[0] = this.currentSettings.titleProp;
+		}
+		return includedProperties.map((prop) => `      - ${prop}`).join("\n");
+	}
+
+	private getAllViewName(relationshipType: "children" | "parent" | "related", count: number): string {
+		const prefix = this.showArchived ? "Archived " : "";
+		switch (relationshipType) {
+			case "children":
+				return `${prefix}All Children (${count})`;
+			case "parent":
+				return `${prefix}All Parents (${count})`;
+			case "related":
+				return `${prefix}All Related (${count})`;
+			default:
+				return `${prefix}All Nodes (${count})`;
+		}
 	}
 
 	private buildFormulasSection(): string {
@@ -218,6 +287,12 @@ ${orderArray}
 				return {
 					name: `${prefix}Related`,
 					prop: this.currentSettings.relatedProp,
+				};
+			default:
+				// For all-* types, this shouldn't be called
+				return {
+					name: `${prefix}All`,
+					prop: this.currentSettings.childrenProp,
 				};
 		}
 	}

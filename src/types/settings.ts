@@ -138,6 +138,9 @@ export const NexusPropertiesSettingsSchema = z
 		basesCustomFormulas: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_BASES_CUSTOM_FORMULAS),
 		basesCustomSort: z.string().catch(SETTINGS_DEFAULTS.DEFAULT_BASES_CUSTOM_SORT),
 
+		// Show "All" relationship views in Bases sidebar
+		showAllRelationshipViews: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_SHOW_ALL_RELATIONSHIP_VIEWS),
+
 		// Frontmatter propagation settings
 		propagateFrontmatterToChildren: z.boolean().catch(SETTINGS_DEFAULTS.PROPAGATE_FRONTMATTER_TO_CHILDREN),
 		askBeforePropagatingFrontmatter: z.boolean().catch(SETTINGS_DEFAULTS.ASK_BEFORE_PROPAGATING_FRONTMATTER),

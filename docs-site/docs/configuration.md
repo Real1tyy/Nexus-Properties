@@ -233,6 +233,14 @@ PriorityParent: "[[preferred-parent]]"
 
 ## Bases View
 
+**Show 'All' Relationship Views** (default: `false`): Add recursive relationship view buttons
+- When enabled, adds "All Children", "All Parents", and "All Related" buttons to the Bases view
+- These views recursively traverse relationships to show all connected nodes
+- "All Children" shows all descendants (children, grandchildren, etc.)
+- "All Parents" shows all ancestors (parents, grandparents, etc.)
+- "All Related" shows all nodes connected via the related property
+- Each view displays a count of nodes found (e.g., "All Children (15)")
+
 **Enable Archived Filtering** (default: `false`): Split files into "Archived" and "Active" sections
 
 **Archived Property Name** (default: `Archived`): Property marking files as archived
