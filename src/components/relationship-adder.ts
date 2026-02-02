@@ -8,25 +8,16 @@ import type { RelationshipType } from "../types/constants";
  * Manages the state of relationship creation and updates frontmatter properties.
  */
 export class RelationshipAdder {
-	private app: App;
-	private settingsStore: SettingsStore;
-	private commandManager: CommandManager;
 	private sourceNodePath: string | null = null;
 	private relationshipType: RelationshipType | null = null;
 	private isActive = false;
-	private onRelationshipAdded: (() => void) | null = null;
 
 	constructor(
-		app: App,
-		settingsStore: SettingsStore,
-		commandManager: CommandManager,
-		onRelationshipAdded?: () => void
-	) {
-		this.app = app;
-		this.settingsStore = settingsStore;
-		this.commandManager = commandManager;
-		this.onRelationshipAdded = onRelationshipAdded || null;
-	}
+		private app: App,
+		private settingsStore: SettingsStore,
+		private commandManager: CommandManager,
+		private onRelationshipAdded?: () => void
+	) {}
 
 	startSelection(sourceNodePath: string, relationshipType: RelationshipType): void {
 		this.sourceNodePath = sourceNodePath;

@@ -6,11 +6,11 @@ export interface TitlePropertySetupConfig {
 }
 
 export class TitlePropertySetupModal extends Modal {
-	private config: TitlePropertySetupConfig;
-
-	constructor(app: App, config: TitlePropertySetupConfig) {
+	constructor(
+		app: App,
+		private config: TitlePropertySetupConfig
+	) {
 		super(app);
-		this.config = config;
 	}
 
 	onOpen(): void {

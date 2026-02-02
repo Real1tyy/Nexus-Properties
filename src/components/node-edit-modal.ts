@@ -9,16 +9,16 @@ interface PropertyRow {
 }
 
 export class NodeEditModal extends Modal {
-	private file: TFile;
-	private onSave: (frontmatter: Record<string, unknown>) => void;
 	private originalFrontmatter: Record<string, unknown> = {};
 	private propertyRows: PropertyRow[] = [];
 	private propertiesContainer!: HTMLElement;
 
-	constructor(app: App, file: TFile, onSave: (frontmatter: Record<string, unknown>) => void) {
+	constructor(
+		app: App,
+		private file: TFile,
+		private onSave: (frontmatter: Record<string, unknown>) => void
+	) {
 		super(app);
-		this.file = file;
-		this.onSave = onSave;
 	}
 
 	async onOpen(): Promise<void> {

@@ -7,7 +7,6 @@ import { cls } from "../utils/css";
 import { PropertyRenderer } from "./property-renderer";
 
 export class NodePreviewModal extends Modal {
-	private file: TFile;
 	private frontmatter: Record<string, unknown> = {};
 	private settings: NexusPropertiesSettings;
 	private settingsSubscription?: Subscription;
@@ -15,11 +14,10 @@ export class NodePreviewModal extends Modal {
 
 	constructor(
 		app: App,
-		file: TFile,
+		private file: TFile,
 		private settingsStore: SettingsStore
 	) {
 		super(app);
-		this.file = file;
 		this.settings = settingsStore.currentSettings;
 		this.propertyRenderer = new PropertyRenderer(
 			this.app,

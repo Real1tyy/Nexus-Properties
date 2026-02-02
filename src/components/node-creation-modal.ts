@@ -2,20 +2,14 @@ import { type App, Modal, Notice } from "obsidian";
 
 export class NodeCreationModal extends Modal {
 	private inputEl: HTMLInputElement | null = null;
-	private onSubmit: (name: string) => void;
-	private prefillText: string;
-	private nodeType: string;
 
 	constructor(
 		app: App,
-		nodeType: "parent" | "child" | "related",
-		prefillText: string,
-		onSubmit: (name: string) => void
+		private nodeType: "parent" | "child" | "related",
+		private prefillText: string,
+		private onSubmit: (name: string) => void
 	) {
 		super(app);
-		this.nodeType = nodeType;
-		this.prefillText = prefillText;
-		this.onSubmit = onSubmit;
 	}
 
 	onOpen(): void {
