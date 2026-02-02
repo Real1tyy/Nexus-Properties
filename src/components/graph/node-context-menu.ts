@@ -14,22 +14,12 @@ interface NodeContextMenuCallbacks {
 }
 
 export class NodeContextMenu {
-	private app: App;
-	private settingsStore: SettingsStore;
-	private commandManager: CommandManager;
-	private callbacks: NodeContextMenuCallbacks;
-
 	constructor(
-		app: App,
-		settingsStore: SettingsStore,
-		commandManager: CommandManager,
-		callbacks: NodeContextMenuCallbacks
-	) {
-		this.app = app;
-		this.settingsStore = settingsStore;
-		this.commandManager = commandManager;
-		this.callbacks = callbacks;
-	}
+		private app: App,
+		private settingsStore: SettingsStore,
+		private commandManager: CommandManager,
+		private callbacks: NodeContextMenuCallbacks
+	) {}
 
 	show(e: MouseEvent, filePath: string): void {
 		const menu = new Menu();

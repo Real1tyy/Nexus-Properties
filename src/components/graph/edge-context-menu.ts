@@ -4,17 +4,12 @@ import { type CommandManager, RemoveRelationshipCommand } from "../../core/comma
 import type { SettingsStore } from "../../core/settings-store";
 
 export class EdgeContextMenu {
-	private app: App;
-	private settingsStore: SettingsStore;
-	private commandManager: CommandManager;
-	private onEdgeRemoved: (() => void) | null = null;
-
-	constructor(app: App, settingsStore: SettingsStore, commandManager: CommandManager, onEdgeRemoved?: () => void) {
-		this.app = app;
-		this.settingsStore = settingsStore;
-		this.commandManager = commandManager;
-		this.onEdgeRemoved = onEdgeRemoved || null;
-	}
+	constructor(
+		private app: App,
+		private settingsStore: SettingsStore,
+		private commandManager: CommandManager,
+		private onEdgeRemoved?: () => void
+	) {}
 
 	show(e: MouseEvent, sourceId: string, targetId: string, isRelatedView: boolean): void {
 		const menu = new Menu();

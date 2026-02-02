@@ -5,15 +5,11 @@ import type { NexusPropertiesSettings } from "../types/settings";
 import { type CommandManager, CreateNodeCommand } from "./commands";
 
 export class NodeCreator {
-	private app: App;
-	private settingsObservable: BehaviorSubject<NexusPropertiesSettings>;
-	private commandManager: CommandManager;
-
-	constructor(app: App, settingsObservable: BehaviorSubject<NexusPropertiesSettings>, commandManager: CommandManager) {
-		this.app = app;
-		this.settingsObservable = settingsObservable;
-		this.commandManager = commandManager;
-	}
+	constructor(
+		private app: App,
+		private settingsObservable: BehaviorSubject<NexusPropertiesSettings>,
+		private commandManager: CommandManager
+	) {}
 
 	async createRelatedNode(sourceFile: TFile, type: NodeCreationType): Promise<TFile | null> {
 		const autoName = this.generateAutoNodeName(sourceFile.basename, type);
