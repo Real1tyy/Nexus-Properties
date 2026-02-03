@@ -6,6 +6,7 @@ import type NexusPropertiesPlugin from "../../main";
 import type { NodeStatistics } from "../../types/statistics";
 import { cls } from "../../utils/css";
 import { collectRelatedNodesRecursively } from "../../utils/hierarchy";
+import { detectValidMocContent } from "../../utils/moc-parser";
 import { BasesView, type BaseViewType } from "./bases-view";
 import { MocView } from "./moc-view";
 import { RelationshipGraphView } from "./relationship-graph-view";
@@ -36,7 +37,9 @@ export class NexusViewSwitcher extends ItemView {
 	private showArchived = false;
 	private temporaryDepthOverride: number | null = null;
 	private currentHierarchySource: HierarchySourceType = "properties";
-	private hierarchySourceDropdown: HTMLSelectElement | null = null;
+	private hierarchySourceButton: HTMLButtonElement | null = null;
+	private hasValidMocContent = false;
+	private lastCheckedFilePath: string | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -73,7 +76,6 @@ export class NexusViewSwitcher extends ItemView {
 		this.currentHierarchySource = this.plugin.settingsStore.currentSettings.hierarchySource;
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe(async (settings) => {
-			this.currentHierarchySource = settings.hierarchySource;
 			await this.handleSettingsChange(settings.showViewSwitcherHeader);
 		});
 
@@ -85,10 +87,12 @@ export class NexusViewSwitcher extends ItemView {
 				if (this.currentMode === "moc" && this.mocView) {
 					await this.mocView.updateActiveFile();
 				}
+				await this.checkMocContent();
 				this.updateStatistics();
 			})
 		);
 
+		await this.checkMocContent();
 		await this.renderView();
 	}
 
@@ -169,6 +173,77 @@ export class NexusViewSwitcher extends ItemView {
 		}
 	}
 
+	private getHierarchySourceButtonText(): string {
+		return this.currentHierarchySource === "properties" ? "Switch to MOC" : "Switch to Properties";
+	}
+
+	private async toggleHierarchySource(): Promise<void> {
+		this.currentHierarchySource = this.currentHierarchySource === "properties" ? "moc-content" : "properties";
+
+		if (this.hierarchySourceButton) {
+			this.hierarchySourceButton.textContent = this.getHierarchySourceButtonText();
+		}
+
+		// Update statistics to reflect the new hierarchy source
+		this.updateStatistics();
+
+		await this.renderViewContent();
+	}
+
+	private updateHierarchySourceButtonVisibility(): void {
+		if (!this.hierarchySourceButton) return;
+
+		const settings = this.plugin.settingsStore.settings$.value;
+		const shouldShow = settings.enableMocContentReading && this.hasValidMocContent;
+
+		this.hierarchySourceButton.style.display = shouldShow ? "block" : "none";
+
+		// If MOC content is not available but we were in MOC mode, switch back to properties
+		if (!shouldShow && this.currentHierarchySource === "moc-content") {
+			this.currentHierarchySource = "properties";
+		}
+	}
+
+	private async checkMocContent(): Promise<void> {
+		const settings = this.plugin.settingsStore.settings$.value;
+		const activeFile = this.app.workspace.getActiveFile();
+
+		// If MOC content reading is disabled, don't check
+		if (!settings.enableMocContentReading || !activeFile) {
+			this.hasValidMocContent = false;
+			this.updateHierarchySourceButtonVisibility();
+			return;
+		}
+
+		// Skip if we already checked this file
+		if (this.lastCheckedFilePath === activeFile.path) {
+			return;
+		}
+
+		this.lastCheckedFilePath = activeFile.path;
+
+		try {
+			const content = await this.app.vault.read(activeFile);
+			this.hasValidMocContent = detectValidMocContent(content);
+		} catch {
+			this.hasValidMocContent = false;
+		}
+
+		this.updateHierarchySourceButtonVisibility();
+
+		// If we detected valid MOC content and the default is MOC, use it
+		// Otherwise, use properties
+		if (this.hasValidMocContent && settings.hierarchySource === "moc-content") {
+			this.currentHierarchySource = "moc-content";
+		} else if (!this.hasValidMocContent) {
+			this.currentHierarchySource = "properties";
+		}
+
+		if (this.hierarchySourceButton) {
+			this.hierarchySourceButton.textContent = this.getHierarchySourceButtonText();
+		}
+	}
+
 	private updateArchivedToggleVisibility(): void {
 		if (this.archivedToggleContainer) {
 			if (this.currentMode === "bases") {
@@ -207,34 +282,31 @@ export class NexusViewSwitcher extends ItemView {
 			});
 			this.updateStatistics();
 
-			// Center: Toggle button
-			this.toggleButton = headerBar.createEl("button", {
+			// Center: Buttons container (hierarchy source + view toggle)
+			const buttonsContainer = headerBar.createEl("div", {
+				cls: cls("view-switcher-buttons"),
+			});
+
+			// Hierarchy source toggle button (only shown when MOC content is detected)
+			this.hierarchySourceButton = buttonsContainer.createEl("button", {
+				text: this.getHierarchySourceButtonText(),
+				cls: cls("hierarchy-source-button"),
+			});
+
+			this.hierarchySourceButton.addEventListener("click", async () => {
+				await this.toggleHierarchySource();
+			});
+
+			this.updateHierarchySourceButtonVisibility();
+
+			// View toggle button
+			this.toggleButton = buttonsContainer.createEl("button", {
 				text: this.getToggleButtonText(),
 				cls: cls("view-toggle-button"),
 			});
 
 			this.toggleButton.addEventListener("click", async () => {
 				await this.toggleView();
-			});
-
-			this.hierarchySourceDropdown = headerBar.createEl("select", {
-				cls: cls("hierarchy-source-dropdown"),
-			});
-
-			this.hierarchySourceDropdown.createEl("option", {
-				value: "properties",
-				text: "Properties",
-			});
-			this.hierarchySourceDropdown.createEl("option", {
-				value: "moc-content",
-				text: "MOC Content",
-			});
-
-			this.hierarchySourceDropdown.value = this.currentHierarchySource;
-
-			this.hierarchySourceDropdown.addEventListener("change", async () => {
-				this.currentHierarchySource = this.hierarchySourceDropdown!.value as HierarchySourceType;
-				await this.renderViewContent();
 			});
 
 			// Right side: Archived toggle
@@ -570,40 +642,58 @@ export class NexusViewSwitcher extends ItemView {
 		const stats = this.calculateNodeStatistics(activeFile);
 		this.statsContainer.empty();
 
+		const isMocContentMode = this.currentHierarchySource === "moc-content";
+
 		if (settings.showSimpleStatistics) {
 			const directStatsCol = this.statsContainer.createDiv({
 				cls: cls("view-switcher-stats-column"),
 			});
-			directStatsCol.createEl("div", {
-				text: `Parents: ${stats.parents}`,
-				cls: cls("view-switcher-stat-item"),
-			});
+
+			// Only show Parents and Related when NOT in MOC content mode
+			if (!isMocContentMode) {
+				directStatsCol.createEl("div", {
+					text: `Parents: ${stats.parents}`,
+					cls: cls("view-switcher-stat-item"),
+				});
+			}
+
 			directStatsCol.createEl("div", {
 				text: `Children: ${stats.children}`,
 				cls: cls("view-switcher-stat-item"),
 			});
-			directStatsCol.createEl("div", {
-				text: `Related: ${stats.related}`,
-				cls: cls("view-switcher-stat-item"),
-			});
+
+			if (!isMocContentMode) {
+				directStatsCol.createEl("div", {
+					text: `Related: ${stats.related}`,
+					cls: cls("view-switcher-stat-item"),
+				});
+			}
 		}
 
 		if (settings.showRecursiveStatistics) {
 			const allStatsCol = this.statsContainer.createDiv({
 				cls: cls("view-switcher-stats-column"),
 			});
-			allStatsCol.createEl("div", {
-				text: `All Parents: ${stats.allParents.size}`,
-				cls: cls("view-switcher-stat-item"),
-			});
+
+			// Only show All Parents and All Related when NOT in MOC content mode
+			if (!isMocContentMode) {
+				allStatsCol.createEl("div", {
+					text: `All Parents: ${stats.allParents.size}`,
+					cls: cls("view-switcher-stat-item"),
+				});
+			}
+
 			allStatsCol.createEl("div", {
 				text: `All Children: ${stats.allChildren.size}`,
 				cls: cls("view-switcher-stat-item"),
 			});
-			allStatsCol.createEl("div", {
-				text: `All Related: ${stats.allRelated.size}`,
-				cls: cls("view-switcher-stat-item"),
-			});
+
+			if (!isMocContentMode) {
+				allStatsCol.createEl("div", {
+					text: `All Related: ${stats.allRelated.size}`,
+					cls: cls("view-switcher-stat-item"),
+				});
+			}
 		}
 	}
 }

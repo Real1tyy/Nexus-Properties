@@ -162,3 +162,15 @@ export function findAncestorPaths(nodes: MocNode[], targetPath: string, currentP
 	}
 	return [];
 }
+
+export function hasValidMocContent(result: MocParseResult): boolean {
+	if (result.allLinks.size < 3) {
+		return false;
+	}
+	return result.roots.some((root) => root.children.length > 0);
+}
+
+export function detectValidMocContent(content: string): boolean {
+	const result = parseMocContent(content);
+	return hasValidMocContent(result);
+}

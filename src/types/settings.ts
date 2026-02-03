@@ -144,8 +144,9 @@ export const NexusPropertiesSettingsSchema = z
 		// Bases view type (table, cards, list)
 		basesViewType: z.enum(["table", "cards", "list"]).catch(SETTINGS_DEFAULTS.DEFAULT_BASES_VIEW_TYPE),
 
-		// Hierarchy source setting
+		// Hierarchy source settings
 		hierarchySource: z.enum(["properties", "moc-content"]).catch(SETTINGS_DEFAULTS.DEFAULT_HIERARCHY_SOURCE),
+		enableMocContentReading: z.boolean().catch(SETTINGS_DEFAULTS.DEFAULT_ENABLE_MOC_CONTENT_READING),
 
 		// MOC view settings
 		mocDisplayProperties: z.array(z.string()).catch([...SETTINGS_DEFAULTS.DEFAULT_MOC_DISPLAY_PROPERTIES]),

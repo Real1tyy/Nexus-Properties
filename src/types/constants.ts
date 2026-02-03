@@ -67,6 +67,7 @@ export const SETTINGS_DEFAULTS = {
 	// MOC view defaults
 	DEFAULT_MOC_DISPLAY_PROPERTIES: [] as string[],
 	DEFAULT_HIERARCHY_SOURCE: "properties" as "properties" | "moc-content",
+	DEFAULT_ENABLE_MOC_CONTENT_READING: true,
 
 	// Frontmatter propagation defaults
 	PROPAGATE_FRONTMATTER_TO_CHILDREN: false,

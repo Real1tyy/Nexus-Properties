@@ -884,7 +884,20 @@
 		font-size: 0.56em;
 	}
 
+	body .nexus-properties-view-switcher-buttons {
+		gap: 0.25em;
+	}
+
 	body button.nexus-properties-view-toggle-button {
+		padding: 0.25em 0.4em;
+		min-height: 20px;
+		font-size: 0.6em;
+		border-radius: 3px;
+		border-width: 1px;
+		flex-shrink: 0;
+	}
+
+	body button.nexus-properties-hierarchy-source-button {
 		padding: 0.25em 0.4em;
 		min-height: 20px;
 		font-size: 0.6em;
@@ -1626,6 +1639,14 @@ input.nexus-properties-zoom-indicator-input:focus {
 	gap: 1em;
 }
 
+.nexus-properties-view-switcher-buttons {
+	display: flex;
+	gap: 0.5em;
+	align-items: center;
+	justify-self: center;
+	grid-column: 2;
+}
+
 .nexus-properties-view-switcher-stats {
 	display: flex;
 	gap: 20px;
@@ -1663,8 +1684,6 @@ button.nexus-properties-view-toggle-button {
 	transition:
 		background-color 0.2s,
 		border-color 0.2s;
-	justify-self: center;
-	grid-column: 2;
 }
 
 button.nexus-properties-view-toggle-button:hover {
@@ -1677,27 +1696,31 @@ button.nexus-properties-view-toggle-button:active {
 	color: var(--text-on-accent);
 }
 
-/* Hierarchy source dropdown in view switcher header */
-.nexus-properties-hierarchy-source-dropdown {
-	padding: 4px 8px;
-	font-size: 12px;
-	background: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	color: var(--text-muted);
-	cursor: pointer;
-	transition: all 0.15s;
-}
-
-.nexus-properties-hierarchy-source-dropdown:hover {
-	background: var(--background-modifier-hover);
+/* Hierarchy source button in view switcher header */
+button.nexus-properties-hierarchy-source-button {
+	padding: 0.65em 1em;
+	min-height: 42px;
+	background-color: var(--background-primary);
 	color: var(--text-normal);
+	border: 2px solid var(--background-modifier-border);
+	border-radius: 6px;
+	cursor: pointer;
+	font-size: 0.95em;
+	font-family: var(--font-text);
+	box-shadow: none;
+	transition:
+		background-color 0.2s,
+		border-color 0.2s;
+}
+
+button.nexus-properties-hierarchy-source-button:hover {
+	background-color: var(--interactive-hover);
 	border-color: var(--interactive-accent);
 }
 
-.nexus-properties-hierarchy-source-dropdown:focus {
-	outline: none;
-	border-color: var(--interactive-accent);
+button.nexus-properties-hierarchy-source-button:active {
+	background-color: var(--interactive-accent);
+	color: var(--text-on-accent);
 }
 
 /* Graph container when inside switcher */

@@ -66,13 +66,19 @@ export class GeneralSection implements SettingsSection {
 			desc: "Display a slider in the graph view header to temporarily adjust the recursion depth for statistics and hierarchy rendering. Depth controls how many levels up/down to traverse from the current node.",
 		});
 
+		this.uiBuilder.addToggle(container, {
+			key: "enableMocContentReading",
+			name: "Enable MOC content reading",
+			desc: "When enabled, reads note content to detect MOC (Map of Content) bullet list hierarchies. If valid MOC content is found (3+ links with nested structure), a button appears to switch between Properties and MOC modes. Disable for better performance if you don't use MOC bullet lists.",
+		});
+
 		this.uiBuilder.addDropdown(container, {
 			key: "hierarchySource",
 			name: "Default hierarchy source",
-			desc: "Choose where to read hierarchy relationships from. 'Properties' uses frontmatter (Parent/Child properties). 'MOC Content' parses bullet list hierarchies from the current note.",
+			desc: "The default mode when both Properties and MOC content are available. 'Properties' uses frontmatter relationships. 'MOC Content' uses bullet list hierarchies from note content.",
 			options: {
-				properties: "Properties (frontmatter)",
-				"moc-content": "MOC Content (bullet lists)",
+				properties: "Properties (default)",
+				"moc-content": "MOC Content",
 			},
 		});
 

@@ -1,9 +1,11 @@
 import { describe, expect, it } from "vitest";
 import {
+	detectValidMocContent,
 	extractWikiLinksFromLine,
 	findAncestorPaths,
 	findMocNode,
 	getSubtree,
+	hasValidMocContent,
 	parseMocContent,
 } from "../src/utils/moc-parser";
 
@@ -501,5 +503,97 @@ describe("findAncestorPaths", () => {
 		const { roots } = parseMocContent(content);
 		const ancestors = findAncestorPaths(roots, "E");
 		expect(ancestors).toEqual([]);
+	});
+});
+
+describe("hasValidMocContent", () => {
+	it("returns true for content with 3+ links and nested structure", () => {
+		const content = `- [[A]]
+  - [[B]]
+  - [[C]]`;
+		const result = parseMocContent(content);
+		expect(hasValidMocContent(result)).toBe(true);
+	});
+
+	it("returns true for deeply nested content with 3+ links", () => {
+		const content = `- [[A]]
+  - [[B]]
+    - [[C]]`;
+		const result = parseMocContent(content);
+		expect(hasValidMocContent(result)).toBe(true);
+	});
+
+	it("returns false for content with only 2 links", () => {
+		const content = `- [[A]]
+  - [[B]]`;
+		const result = parseMocContent(content);
+		expect(hasValidMocContent(result)).toBe(false);
+	});
+
+	it("returns false for flat structure without nesting", () => {
+		const content = `- [[A]]
+- [[B]]
+- [[C]]`;
+		const result = parseMocContent(content);
+		expect(hasValidMocContent(result)).toBe(false);
+	});
+
+	it("returns false for empty content", () => {
+		const result = parseMocContent("");
+		expect(hasValidMocContent(result)).toBe(false);
+	});
+
+	it("returns true for complex real-world MOC", () => {
+		const content = `- [[Parent]]
+  - [[Child 1]]
+    - [[Grandchild]]
+  - [[Child 2]]`;
+		const result = parseMocContent(content);
+		expect(hasValidMocContent(result)).toBe(true);
+	});
+});
+
+describe("detectValidMocContent", () => {
+	it("detects valid MOC content with hierarchy", () => {
+		const content = `- [[Note 1]]
+  - [[Note 2]]
+  - [[Note 3]]`;
+		expect(detectValidMocContent(content)).toBe(true);
+	});
+
+	it("rejects content without sufficient links", () => {
+		const content = `- [[Note 1]]
+  - [[Note 2]]`;
+		expect(detectValidMocContent(content)).toBe(false);
+	});
+
+	it("rejects flat list without hierarchy", () => {
+		const content = `- [[Note 1]]
+- [[Note 2]]
+- [[Note 3]]
+- [[Note 4]]`;
+		expect(detectValidMocContent(content)).toBe(false);
+	});
+
+	it("ignores frontmatter wiki links", () => {
+		const content = `---
+Parent: "[[Parent Note]]"
+Child: "[[Child Note]]"
+Related: "[[Related Note]]"
+---
+- [[Body Link 1]]
+  - [[Body Link 2]]`;
+		// Should be false because body only has 2 links
+		expect(detectValidMocContent(content)).toBe(false);
+	});
+
+	it("detects valid MOC after frontmatter", () => {
+		const content = `---
+Title: Test
+---
+- [[A]]
+  - [[B]]
+  - [[C]]`;
+		expect(detectValidMocContent(content)).toBe(true);
 	});
 });
