@@ -6,6 +6,12 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.7.1 - 3.2.2026
+
+### Fixed
+
+- **Title property race condition**: Fixed race condition where title property was not assigned immediately when creating nodes via commands (Create Parent, Create Child, Create Related). Causing problems with the title being overriden with incorrect values.
+
 ## 1.7.0 - 3.2.2026
 
 ### New Features

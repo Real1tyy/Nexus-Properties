@@ -1,3 +1,5 @@
+import { extractDisplayName, removeMarkdownExtension } from "@real1ty-obsidian-plugins";
+
 /**
  * Matches separator characters at the start of a string (spaces, dashes, en-dashes, em-dashes).
  */
@@ -36,4 +38,41 @@ export function stripParentPrefix(displayName: string, parentDisplayName: string
 
 	// Only return stripped version if we have meaningful content left
 	return stripped || displayName;
+}
+
+/**
+ * Computes the display title for a file based on its basename and parent links.
+ * If the file has parents, strips the first parent's name from the basename.
+ *
+ * @param baseName - The file's base name (display name)
+ * @param parentWikiLinks - Array of parent wiki links
+ * @returns Computed title with parent prefix stripped if applicable
+ */
+export function computeTitle(baseName: string, parentWikiLinks: string[]): string {
+	if (!parentWikiLinks.length) {
+		return baseName;
+	}
+	const firstParentLink = parentWikiLinks[0];
+	const parentDisplayName = extractDisplayName(firstParentLink);
+	return stripParentPrefix(baseName, parentDisplayName);
+}
+
+/**
+ * Builds a complete title property wiki link for a file based on its path and parent relationships.
+ * Encapsulates the logic for removing markdown extension, extracting display name, computing title,
+ * and formatting the wiki link.
+ *
+ * @param filePath - The full file path (with or without extension)
+ * @param parentWikiLinks - Array of parent wiki links
+ * @returns Formatted wiki link in the format `[[path|title]]`
+ *
+ * @example
+ * buildTitleLink("folder/Parent - Child.md", ["[[folder/Parent]]"])
+ * // Returns: "[[folder/Parent - Child|Child]]"
+ */
+export function buildTitleLink(filePath: string, parentWikiLinks: string[]): string {
+	const pathWithoutExt = removeMarkdownExtension(filePath);
+	const displayName = extractDisplayName(filePath);
+	const title = computeTitle(displayName, parentWikiLinks);
+	return `[[${pathWithoutExt}|${title}]]`;
 }

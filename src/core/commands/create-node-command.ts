@@ -9,6 +9,7 @@ import { type App, TFile } from "obsidian";
 import { RELATIONSHIP_CONFIGS, type NodeCreationType, type RelationshipType } from "../../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../../types/settings";
 import { buildFilePathForWikiLink } from "../../utils/file-utils";
+import { buildTitleLink } from "../../utils/string-utils";
 import type { Command } from "./command";
 
 /**
@@ -100,6 +101,7 @@ export class CreateNodeCommand implements Command {
 			this.copyPropertiesExcludingRelationships(fm, sourceFrontmatter, sourceFile.path);
 			fm[this.settings.zettelIdProp] = generateZettelId();
 			this.setupRelationship(fm, sourceLink, this.nodeType, true);
+			this.setCorrectTitle(fm, newFile, sourceLink);
 		});
 	}
 
@@ -139,6 +141,14 @@ export class CreateNodeCommand implements Command {
 		}
 
 		return excludedProperties;
+	}
+
+	private setCorrectTitle(fm: Frontmatter, newFile: TFile, parentLink: string): void {
+		if (this.settings.titlePropertyMode !== "enabled") {
+			return;
+		}
+		const titleLink = buildTitleLink(newFile.path, [parentLink]);
+		fm[this.settings.titleProp] = titleLink;
 	}
 
 	private setupRelationship(fm: Frontmatter, link: string, type: NodeCreationType, isNewFile: boolean): void {

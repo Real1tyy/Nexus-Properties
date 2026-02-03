@@ -1,7 +1,6 @@
 import {
 	addLinkToProperty,
 	applyFrontmatterChanges,
-	extractDisplayName,
 	type FrontmatterChange,
 	type FrontmatterDiff,
 	FrontmatterPropagationModal,
@@ -19,7 +18,7 @@ import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { parseExcludedProps } from "../utils/frontmatter-utils";
 import { getChildrenRecursively } from "../utils/hierarchy";
-import { stripParentPrefix } from "../utils/string-utils";
+import { buildTitleLink } from "../utils/string-utils";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 
@@ -102,15 +101,6 @@ export class PropertiesManager {
 		}
 	}
 
-	private computeTitle(baseName: string, parentWikiLinks: string[]): string {
-		if (!parentWikiLinks.length) {
-			return baseName;
-		}
-		const firstParentLink = parentWikiLinks[0];
-		const parentDisplayName = extractDisplayName(firstParentLink);
-		return stripParentPrefix(baseName, parentDisplayName);
-	}
-
 	private updateExcludedDirsCache(): void {
 		this.cachedExcludedDirs = this.settings.excludeTitleDirectories
 			.split(",")
@@ -126,10 +116,7 @@ export class PropertiesManager {
 		if (this.settings.titlePropertyMode !== "enabled") return;
 		if (this.isExcludedFromTitle(filePath)) return;
 
-		const pathWithoutExt = removeMarkdownExtension(filePath);
-		const displayName = extractDisplayName(filePath);
-		const computedTitle = this.computeTitle(displayName, newRelationships.parent);
-		const titleLink = `[[${pathWithoutExt}|${computedTitle}]]`;
+		const titleLink = buildTitleLink(filePath, newRelationships.parent);
 
 		const currentTitle = newRelationships.frontmatter[this.settings.titleProp];
 		if (currentTitle === titleLink) return;
