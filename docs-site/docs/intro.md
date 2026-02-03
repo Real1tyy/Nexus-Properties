@@ -59,6 +59,7 @@ Visualize your knowledge network with multiple view modes:
 Render your hierarchy as a collapsible tree outline with clickable wiki links:
 - **Current or Top Parent** - Start from active file or traverse to topmost ancestor
 - **Expand/Collapse** - Navigate deep hierarchies with ease
+- **MOC Content Hierarchy** - Use bullet lists with wiki links as a hierarchy source instead of frontmatter properties
 
 [Learn more about MOC View →](features/moc-view)
 

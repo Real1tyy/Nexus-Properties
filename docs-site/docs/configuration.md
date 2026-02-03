@@ -39,6 +39,42 @@ Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 
 **Layout**: Statistics appear on the left side of the view switcher header without affecting the centered toggle button position.
 
+## General
+
+### Hierarchy Source
+
+**Hierarchy Source** (default: `Properties`): Choose where to read relationship hierarchy from
+
+- **Properties**: Read from frontmatter properties (Parent, Children, Related) - traditional behavior
+- **MOC Content**: Read from bullet lists with wiki links in the note body - for Map of Content files
+
+When set to "MOC Content", the plugin parses nested bullet lists to determine parent-child relationships:
+
+```markdown
+- [[Parent Topic]]
+    - [[Child 1]]
+    - [[Child 2]]
+```
+
+[Learn more →](features/moc-view#moc-content-hierarchy)
+
+### MOC Content Reading
+
+**Enable MOC Content Reading** (default: `true`): Allow the plugin to detect and parse MOC content
+
+When enabled:
+- Files with valid MOC content (3+ links, 2+ levels) show a hierarchy source toggle button
+- The button appears next to the view toggle for quick switching between "Properties" and "MOC Content" modes
+
+When disabled:
+- No MOC content detection occurs
+- The hierarchy source toggle button is hidden
+- Only frontmatter properties are used for relationships
+
+**What is "valid MOC content"?**
+- At least 3 wiki links in bullet list format
+- At least one bullet has nested children (2+ levels of indentation)
+
 ## Graph Display
 
 **Show Search Bar by Default** (default: `true`): Display search bar on graph open

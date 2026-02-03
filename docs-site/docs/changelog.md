@@ -10,6 +10,52 @@ All notable changes to Nexus Properties will be documented here.
 
 ### New Features
 
+#### MOC Content Hierarchy Source
+
+A new hierarchy source that reads relationships from bullet lists in markdown files instead of frontmatter properties. Perfect for users who structure knowledge using Map of Content (MOC) files with nested wiki links.
+
+- **Dual Hierarchy Sources**: Choose between "Properties" (frontmatter-based, default) or "MOC Content" (bullet list-based) in General settings
+- **Automatic Detection**: When "Enable MOC content reading" is on, the plugin automatically detects valid MOC files (3+ links with 2+ levels of nesting)
+- **Quick Toggle**: A button appears next to the view toggle when valid MOC content is detected, allowing quick switching between hierarchy sources
+- **Frontmatter-Safe Parsing**: MOC parser skips frontmatter section, only reading hierarchy from the markdown body
+
+**How MOC Content Works**:
+
+Instead of reading relationships from frontmatter properties like `Parent` and `Children`, MOC content mode parses bullet list structures:
+
+```markdown
+# My MOC File
+
+- [[Parent Topic]]
+    - [[Child Topic 1]]
+        - [[Grandchild 1]]
+        - [[Grandchild 2]]
+    - [[Child Topic 2]]
+```
+
+In this example:
+- `Parent Topic` has children `Child Topic 1` and `Child Topic 2`
+- `Child Topic 1` has children `Grandchild 1` and `Grandchild 2`
+
+**Supported Bullet Format**:
+- Dash bullets: `- [[Note]]`
+- Mixed indentation (tabs or spaces)
+
+**Bases View in MOC Mode**:
+- **Children**: Shows direct children (level 0 descendants only)
+- **All Children**: Shows all descendants recursively
+- Parent and Related views are hidden (not applicable for MOC hierarchies)
+
+**Graph View in MOC Mode**:
+- Related view and "Start from Current File" options are hidden
+- Only hierarchical views (Children/Parents) are available
+
+**Settings**:
+- **Hierarchy Source** (Settings → General): Choose "Properties" or "MOC Content"
+- **Enable MOC Content Reading** (Settings → General): Enable/disable MOC content detection (default: enabled)
+
+See [MOC Content Hierarchy](features/moc-view#moc-content-hierarchy) for detailed documentation and examples.
+
 #### Bases View Dropdown with Hotkey Navigation
 
 Redesigned the Bases view selector to use a dropdown interface with keyboard navigation support.

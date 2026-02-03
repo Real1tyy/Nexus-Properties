@@ -182,9 +182,24 @@ export class BasesView extends RegisteredEventsComponent {
 	}
 
 	private async renderSelectedView(activeFile: TFile, container: HTMLElement): Promise<void> {
-		const basesMarkdown = this.selectedViewType.startsWith("all-")
-			? await this.buildRecursiveBasesMarkdownAsync(activeFile)
-			: this.buildNormalBasesMarkdown(activeFile);
+		let basesMarkdown: string;
+
+		// MOC content mode: Children view shows only direct descendants
+		if (this.selectedViewType === "children" && this.hierarchySource === "moc-content") {
+			basesMarkdown = await this.buildMocDirectChildrenMarkdownAsync(activeFile);
+		}
+		// All-* views use recursive collection (works for both properties and MOC modes)
+		else if (
+			this.selectedViewType === "all-children" ||
+			this.selectedViewType === "all-parent" ||
+			this.selectedViewType === "all-related"
+		) {
+			basesMarkdown = await this.buildAllViewMarkdownAsync(activeFile);
+		}
+		// Normal properties-based views (children, parent, related)
+		else {
+			basesMarkdown = this.buildNormalBasesMarkdown(activeFile);
+		}
 
 		await MarkdownRenderer.render(this.app, basesMarkdown, container, activeFile.path, this.component);
 	}
@@ -211,7 +226,8 @@ ${orderArray}
 `;
 	}
 
-	private async buildRecursiveBasesMarkdownAsync(activeFile: TFile): Promise<string> {
+	private async buildAllViewMarkdownAsync(activeFile: TFile): Promise<string> {
+		// Extract relationship type from "all-children" / "all-parent" / "all-related"
 		const relationshipType = this.selectedViewType.replace("all-", "") as "children" | "parent" | "related";
 
 		const provider = HierarchyProvider.getInstance(this.app, this.plugin.indexer, this.plugin.settingsStore);
@@ -227,6 +243,55 @@ ${orderArray}
 		const formulasSection = this.buildFormulasSection();
 		const sortSection = this.buildSortSection();
 		const viewType = this.currentSettings.basesViewType;
+
+		return `
+\`\`\`base
+${formulasSection}filters:
+  or:
+${filePathFilters}
+views:
+  - type: ${viewType}
+    name: ${viewName}
+    order:
+${orderArray}${
+			archivedFilter
+				? `
+    filters:
+      and:${archivedFilter}`
+				: ""
+		}${sortSection}
+\`\`\`
+`;
+	}
+
+	private async buildMocDirectChildrenMarkdownAsync(activeFile: TFile): Promise<string> {
+		const provider = HierarchyProvider.getInstance(this.app, this.plugin.indexer, this.plugin.settingsStore);
+
+		// Get only direct children (level 0 descendants from MOC file)
+		const directChildren = await provider.findChildren(activeFile.path, "moc-content", activeFile.path);
+
+		const orderArray = this.buildOrderArray(activeFile);
+		const prefix = this.showArchived ? "Archived " : "";
+		const viewName = `${prefix}Children (${directChildren.length})`;
+		const filePathFilters = buildBasesFilePathFilters(directChildren);
+		const archivedFilter = this.getArchivedFilter();
+		const formulasSection = this.buildFormulasSection();
+		const sortSection = this.buildSortSection();
+		const viewType = this.currentSettings.basesViewType;
+
+		if (directChildren.length === 0) {
+			return `
+\`\`\`base
+${formulasSection}filters:
+  - file.path = "___no_match___"
+views:
+  - type: ${viewType}
+    name: ${viewName}
+    order:
+${orderArray}${sortSection}
+\`\`\`
+`;
+		}
 
 		return `
 \`\`\`base

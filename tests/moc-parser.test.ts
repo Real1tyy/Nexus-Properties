@@ -85,26 +85,6 @@ describe("parseMocContent", () => {
 			expect(result.roots[0].notePath).toBe("Note One");
 			expect(result.roots[1].notePath).toBe("Note Two");
 		});
-
-		it("parses dot bullet items", () => {
-			const content = `. [[Note One]]
-. [[Note Two]]`;
-			const result = parseMocContent(content);
-			expect(result.roots).toHaveLength(2);
-			expect(result.roots[0].notePath).toBe("Note One");
-			expect(result.roots[1].notePath).toBe("Note Two");
-		});
-
-		it("parses mixed dash and dot bullets", () => {
-			const content = `- [[Dash Note]]
-. [[Dot Note]]
-- [[Another Dash]]`;
-			const result = parseMocContent(content);
-			expect(result.roots).toHaveLength(3);
-			expect(result.roots[0].notePath).toBe("Dash Note");
-			expect(result.roots[1].notePath).toBe("Dot Note");
-			expect(result.roots[2].notePath).toBe("Another Dash");
-		});
 	});
 
 	describe("nested hierarchy", () => {

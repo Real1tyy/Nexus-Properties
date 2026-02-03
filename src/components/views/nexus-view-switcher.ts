@@ -88,7 +88,7 @@ export class NexusViewSwitcher extends ItemView {
 					await this.mocView.updateActiveFile();
 				}
 				await this.checkMocContent();
-				this.updateStatistics();
+				await this.updateStatistics();
 			})
 		);
 
@@ -185,7 +185,7 @@ export class NexusViewSwitcher extends ItemView {
 		}
 
 		// Update statistics to reflect the new hierarchy source
-		this.updateStatistics();
+		await this.updateStatistics();
 
 		await this.renderViewContent();
 	}
@@ -280,7 +280,7 @@ export class NexusViewSwitcher extends ItemView {
 			this.statsContainer = headerBar.createEl("div", {
 				cls: cls("view-switcher-stats"),
 			});
-			this.updateStatistics();
+			await this.updateStatistics();
 
 			// Center: Buttons container (hierarchy source + view toggle)
 			const buttonsContainer = headerBar.createEl("div", {
@@ -543,54 +543,7 @@ export class NexusViewSwitcher extends ItemView {
 		window.dispatchEvent(new Event("resize"));
 	}
 
-	public calculateNodeStatistics(file: TFile): NodeStatistics {
-		const cache = this.app.metadataCache.getFileCache(file);
-		const frontmatter = cache?.frontmatter;
-
-		if (!frontmatter && this.currentHierarchySource !== "moc-content") {
-			return {
-				parents: 0,
-				children: 0,
-				related: 0,
-				allParents: new Set(),
-				allChildren: new Set(),
-				allRelated: new Set(),
-			};
-		}
-
-		const currentDepth = this.getCurrentDepth();
-
-		// Use properties-based statistics when in properties mode
-		if (this.currentHierarchySource === "properties") {
-			const relationships = frontmatter
-				? this.indexer.extractRelationships(file, frontmatter)
-				: { parent: [], children: [], related: [] };
-
-			const parents = relationships.parent.length;
-			const children = relationships.children.length;
-			const related = relationships.related.length;
-
-			const allParents = collectRelatedNodesRecursively(this.app, this.indexer, file, "parent", {
-				maxDepth: currentDepth,
-			});
-			const allChildren = collectRelatedNodesRecursively(this.app, this.indexer, file, "children", {
-				maxDepth: currentDepth,
-			});
-			const allRelated = collectRelatedNodesRecursively(this.app, this.indexer, file, "related", {
-				maxDepth: currentDepth,
-			});
-
-			return {
-				parents,
-				children,
-				related,
-				allParents,
-				allChildren,
-				allRelated,
-			};
-		}
-
-		// MOC content mode - return empty stats, will be populated async
+	private createEmptyStatistics(): NodeStatistics {
 		return {
 			parents: 0,
 			children: 0,
@@ -601,13 +554,46 @@ export class NexusViewSwitcher extends ItemView {
 		};
 	}
 
-	public async calculateNodeStatisticsAsync(file: TFile): Promise<NodeStatistics> {
-		// For properties mode, use sync method
-		if (this.currentHierarchySource === "properties") {
-			return this.calculateNodeStatistics(file);
+	public calculatePropertiesNodeStatistics(file: TFile): NodeStatistics {
+		const cache = this.app.metadataCache.getFileCache(file);
+		const frontmatter = cache?.frontmatter;
+
+		if (!frontmatter) {
+			return this.createEmptyStatistics();
 		}
 
-		// MOC content mode - use HierarchyProvider
+		const currentDepth = this.getCurrentDepth();
+		const relationships = this.indexer.extractRelationships(file, frontmatter);
+
+		const parents = relationships.parent.length;
+		const children = relationships.children.length;
+		const related = relationships.related.length;
+
+		const allParents = collectRelatedNodesRecursively(this.app, this.indexer, file, "parent", {
+			maxDepth: currentDepth,
+		});
+		const allChildren = collectRelatedNodesRecursively(this.app, this.indexer, file, "children", {
+			maxDepth: currentDepth,
+		});
+		const allRelated = collectRelatedNodesRecursively(this.app, this.indexer, file, "related", {
+			maxDepth: currentDepth,
+		});
+
+		return {
+			parents,
+			children,
+			related,
+			allParents,
+			allChildren,
+			allRelated,
+		};
+	}
+
+	public async calculateMocNodeStatistics(file: TFile): Promise<NodeStatistics> {
+		if (this.currentHierarchySource === "properties") {
+			return this.calculatePropertiesNodeStatistics(file);
+		}
+
 		const provider = HierarchyProvider.getInstance(this.app, this.indexer, this.plugin.settingsStore);
 		const currentDepth = this.getCurrentDepth();
 		const mocFilePath = file.path;
@@ -617,17 +603,11 @@ export class NexusViewSwitcher extends ItemView {
 			mocFilePath,
 		});
 
-		// For direct children count, use depth 1
 		const directChildren = await provider.findChildren(file.path, "moc-content", mocFilePath);
-
-		return {
-			parents: 0,
-			children: directChildren.length,
-			related: 0,
-			allParents: new Set(),
-			allChildren,
-			allRelated: new Set(),
-		};
+		const stats = this.createEmptyStatistics();
+		stats.children = directChildren.length;
+		stats.allChildren = allChildren;
+		return stats;
 	}
 
 	private getCurrentDepth(): number {
@@ -666,14 +646,14 @@ export class NexusViewSwitcher extends ItemView {
 		const newDepth = Number.parseInt(this.depthSlider.value, 10);
 		this.depthValueLabel.textContent = newDepth.toString();
 		this.temporaryDepthOverride = newDepth;
-		this.updateStatistics();
+		await this.updateStatistics();
 
 		if (this.graphView) {
 			this.graphView.updateGraphWithDepth(newDepth);
 		}
 	}
 
-	private updateStatistics(): void {
+	private async updateStatistics(): Promise<void> {
 		if (!this.statsContainer) return;
 
 		const activeFile = this.app.workspace.getActiveFile();
@@ -682,22 +662,13 @@ export class NexusViewSwitcher extends ItemView {
 			return;
 		}
 
-		// For MOC content mode, use async method
 		if (this.currentHierarchySource === "moc-content") {
-			this.updateStatisticsAsync(activeFile);
-			return;
+			const stats = await this.calculateMocNodeStatistics(activeFile);
+			this.renderStatistics(stats, true);
+		} else {
+			const stats = this.calculatePropertiesNodeStatistics(activeFile);
+			this.renderStatistics(stats, false);
 		}
-
-		const settings = this.plugin.settingsStore.settings$.value;
-		const stats = this.calculateNodeStatistics(activeFile);
-		this.renderStatistics(stats, false);
-	}
-
-	private async updateStatisticsAsync(activeFile: TFile): Promise<void> {
-		if (!this.statsContainer) return;
-
-		const stats = await this.calculateNodeStatisticsAsync(activeFile);
-		this.renderStatistics(stats, true);
 	}
 
 	private renderStatistics(stats: NodeStatistics, isMocContentMode: boolean): void {

@@ -6,6 +6,133 @@ sidebar_position: 5
 
 Map of Content (MOC) view renders your hierarchy as an interactive collapsible tree with clickable wiki links. Perfect for exploring your knowledge structure at a glance.
 
+## MOC Content Hierarchy
+
+Use bullet list structures in your notes as a hierarchy source instead of frontmatter properties.
+
+### What is MOC Content Hierarchy?
+
+Traditionally, Nexus Properties reads relationships from frontmatter properties (`Parent`, `Children`, `Related`). MOC Content mode provides an alternative: **parse bullet lists with wiki links** directly from your note's markdown body.
+
+This is ideal for:
+- **Existing MOC files**: Notes that already organize knowledge via nested bullet lists
+- **Quick hierarchy authoring**: Build hierarchies visually in markdown without editing frontmatter
+- **Top-down organization**: Start with a high-level overview file and nest topics underneath
+
+### Example MOC File
+
+```markdown
+# My Hobbies
+
+- [[Reading]]
+    - [[Fiction]]
+        - [[Mystery Novels]]
+        - [[Science Fiction]]
+    - [[Non-Fiction]]
+        - [[History Books]]
+- [[Sports]]
+    - [[Running]]
+    - [[Swimming]]
+```
+
+When viewing this file with MOC Content mode enabled:
+- **Children view** shows: `Reading`, `Sports`
+- **All Children view** shows all 7 descendant notes recursively
+
+### Enabling MOC Content Mode
+
+**Step 1: Enable MOC Content Reading**
+
+Settings → General → **Enable MOC content reading** (default: enabled)
+
+This allows the plugin to detect and parse MOC structures in your notes.
+
+**Step 2: Switch Hierarchy Source**
+
+Two ways to switch:
+
+1. **Quick Toggle Button**: When viewing a file with valid MOC content (3+ links, 2+ levels), a button appears next to the view toggle. Click to switch between "Properties" and "MOC Content".
+
+2. **Settings**: Settings → General → **Hierarchy Source** → Choose "MOC Content"
+
+### Valid MOC Detection
+
+The plugin automatically detects valid MOC content when:
+- The file contains **3 or more wiki links** in bullet lists
+- At least one bullet has **nested children** (2+ levels of indentation)
+
+Files that don't meet these criteria won't show the hierarchy source toggle button.
+
+### Supported Bullet Format
+
+```markdown
+- [[Note 1]]
+    - [[Child 1]]
+- [[Note 2]]
+	- [[Child with tab indent]]
+    - [[Child with space indent]]
+```
+
+The parser handles both tabs and spaces for indentation. Each bullet line must contain at least one wiki link; the first link becomes the node identity.
+
+### Frontmatter Safety
+
+The MOC parser **skips frontmatter entirely**. Wiki links in your YAML properties are not parsed as hierarchy:
+
+```markdown
+---
+parent: "[[Some Parent]]"  # NOT parsed as MOC hierarchy
+related: ["[[Related 1]]", "[[Related 2]]"]  # NOT parsed
+---
+
+# My Note
+
+- [[Actual Child 1]]  # Parsed as MOC hierarchy
+- [[Actual Child 2]]  # Parsed as MOC hierarchy
+```
+
+### Bases View Behavior
+
+When MOC Content mode is active:
+
+| View | Behavior |
+|------|----------|
+| **Children** | Direct children only (level 0 descendants from bullet list) |
+| **All Children** | All descendants recursively |
+| Parent | *Hidden* (not applicable) |
+| Related | *Hidden* (not applicable) |
+| All Parents | *Hidden* (not applicable) |
+| All Related | *Hidden* (not applicable) |
+
+### Graph View Behavior
+
+When MOC Content mode is active:
+- **Related view**: Hidden
+- **Start from Current File**: Hidden
+- Only hierarchical views (showing parent-child relationships) are available
+
+### Statistics Display
+
+The header statistics adapt to MOC Content mode:
+- Only **Children** and **All Children** counts are shown
+- Parent and Related statistics are hidden
+
+### Switching Between Modes
+
+You can freely switch between "Properties" and "MOC Content" modes:
+- The plugin remembers your preference per session
+- Each mode shows the same file's hierarchy differently
+- No data is modified when switching—it's purely a display mode
+
+### Limitations
+
+- **Read-only**: MOC Content mode only reads hierarchies; creating nodes still uses frontmatter properties
+- **Single file scope**: The hierarchy is parsed from the current file only
+- **First link wins**: If a bullet has multiple wiki links, only the first is used as the node identity
+- **No bidirectional sync**: Unlike frontmatter properties, MOC content doesn't trigger bidirectional updates
+
+---
+
 ## Opening MOC View
 
 The view switcher cycles through three modes: **Graph → Bases → MOC**

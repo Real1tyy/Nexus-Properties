@@ -239,6 +239,27 @@ tags:
 ---
 ```
 
+### MOC (Map of Content) Files
+
+Instead of using frontmatter properties, you can build hierarchies directly in markdown using bullet lists:
+
+```markdown
+# My Hobbies
+
+- [[Reading]]
+    - [[Fiction]]
+    - [[Non-Fiction]]
+- [[Sports]]
+    - [[Running]]
+    - [[Swimming]]
+```
+
+To use this workflow:
+1. Enable MOC content mode in Settings → General → Hierarchy Source → MOC Content
+2. Or click the hierarchy source toggle button when viewing a file with valid MOC structure
+
+[Learn more about MOC Content Hierarchy →](features/moc-view#moc-content-hierarchy)
+
 ## Tips for Success
 
 1. **Use consistent property names** - Stick with the default `Parent`, `Child`, `Related` or customize them in settings

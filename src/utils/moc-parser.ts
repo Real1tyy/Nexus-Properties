@@ -1,5 +1,5 @@
 // MOC (Map of Content) Parser
-// Parses markdown bullet lists (using - or .) into a hierarchy tree
+// Parses markdown bullet lists into a hierarchy tree
 
 import { parseFileContent } from "@real1ty-obsidian-plugins";
 
@@ -30,8 +30,8 @@ interface ParsedLine {
 
 const WIKILINK_REGEX = /\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g;
 
-// Matches bullet items starting with - or . (after optional whitespace)
-const BULLET_REGEX = /^(\s*)[-.]\s+(.*)$/;
+// Matches bullet items starting with - (after optional whitespace)
+const BULLET_REGEX = /^(\s*)-\s+(.*)$/;
 
 export function extractWikiLinksFromLine(line: string): WikiLinkInfo[] {
 	WIKILINK_REGEX.lastIndex = 0;
