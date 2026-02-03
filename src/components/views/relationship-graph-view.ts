@@ -166,6 +166,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			includeAllRelated: this.includeAllRelated,
 			startFromCurrent: this.ignoreTopmostParent,
 			isFolderNote: false,
+			hierarchySource: this.hierarchySource,
 			onRenderRelatedChange: (value) => {
 				this.renderRelated = value;
 				this.updateGraph();
@@ -701,6 +702,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.header.update({
 				currentFileName: this.currentFile.basename,
 				isFolderNote: isFolder,
+				hierarchySource: this.hierarchySource,
 			});
 		}
 

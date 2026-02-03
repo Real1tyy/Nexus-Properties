@@ -1,3 +1,4 @@
+import type { HierarchySourceType } from "../../core/hierarchy";
 import { cls } from "../../utils/css";
 
 interface GraphHeaderProps {
@@ -6,6 +7,7 @@ interface GraphHeaderProps {
 	includeAllRelated: boolean;
 	startFromCurrent: boolean;
 	isFolderNote?: boolean;
+	hierarchySource?: HierarchySourceType;
 	onRenderRelatedChange: (value: boolean) => void;
 	onIncludeAllRelatedChange: (value: boolean) => void;
 	onStartFromCurrentChange: (value: boolean) => void;
@@ -135,6 +137,20 @@ export class GraphHeader {
 	}
 
 	private updateVisibility(): void {
+		// When hierarchy source is MOC content, hide all related-based options
+		if (this.props.hierarchySource === "moc-content") {
+			if (this.relatedToggleContainer) {
+				this.relatedToggleContainer.toggleClass(cls("hidden"), true);
+			}
+			if (this.startFromCurrentContainer) {
+				this.startFromCurrentContainer.toggleClass(cls("hidden"), true);
+			}
+			if (this.includeAllContainer) {
+				this.includeAllContainer.toggleClass(cls("hidden"), true);
+			}
+			return;
+		}
+
 		if (this.props.isFolderNote) {
 			if (this.relatedToggleContainer) {
 				this.relatedToggleContainer.toggleClass(cls("hidden"), false);

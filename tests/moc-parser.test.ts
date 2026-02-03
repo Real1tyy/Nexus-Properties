@@ -219,6 +219,95 @@ describe("parseMocContent", () => {
 		});
 	});
 
+	describe("frontmatter handling", () => {
+		it("ignores wiki links in frontmatter", () => {
+			const content = `---
+Author:
+  - "[[Authors/Alex Becker|Alex Becker]]"
+Related: []
+Title: "[[Books/Some Book|Some Book]]"
+---
+## Summary:
+
+## Related Books:
+- [[Books/Rich dad, poor dad|Rich Dad, Poor Dad]]
+    - [[Books/Cashflow Quadrant|Cashflow Quadrant]]`;
+			const result = parseMocContent(content);
+
+			// Should only parse the bullet list items, not frontmatter
+			expect(result.roots).toHaveLength(1);
+			expect(result.roots[0].notePath).toBe("Books/Rich dad, poor dad");
+			expect(result.roots[0].children).toHaveLength(1);
+			expect(result.roots[0].children[0].notePath).toBe("Books/Cashflow Quadrant");
+
+			// allLinks should only contain links from bullet items
+			expect(result.allLinks.size).toBe(2);
+			expect(result.allLinks.has("Books/Rich dad, poor dad")).toBe(true);
+			expect(result.allLinks.has("Books/Cashflow Quadrant")).toBe(true);
+			expect(result.allLinks.has("Authors/Alex Becker")).toBe(false);
+			expect(result.allLinks.has("Books/Some Book")).toBe(false);
+		});
+
+		it("ignores complex frontmatter with nested wiki links", () => {
+			const content = `---
+Parent:
+  - "[[Parent Note]]"
+Child:
+  - "[[Child Note 1]]"
+  - "[[Child Note 2]]"
+Related:
+  - "[[Related 1]]"
+  - "[[Related 2]]"
+---
+- [[Actual Content]]
+  - [[Actual Child]]`;
+			const result = parseMocContent(content);
+
+			expect(result.roots).toHaveLength(1);
+			expect(result.roots[0].notePath).toBe("Actual Content");
+			expect(result.roots[0].children).toHaveLength(1);
+			expect(result.roots[0].children[0].notePath).toBe("Actual Child");
+			expect(result.allLinks.size).toBe(2);
+		});
+
+		it("handles content without frontmatter", () => {
+			const content = `- [[Note One]]
+- [[Note Two]]`;
+			const result = parseMocContent(content);
+
+			expect(result.roots).toHaveLength(2);
+			expect(result.roots[0].notePath).toBe("Note One");
+			expect(result.roots[1].notePath).toBe("Note Two");
+		});
+
+		it("handles frontmatter-only content", () => {
+			const content = `---
+Author: "[[Some Author]]"
+Title: "[[Some Title]]"
+---`;
+			const result = parseMocContent(content);
+
+			expect(result.roots).toHaveLength(0);
+			expect(result.allLinks.size).toBe(0);
+		});
+
+		it("handles frontmatter with bullet-like lines inside", () => {
+			const content = `---
+Notes:
+  - "[[Frontmatter Link 1]]"
+  - "[[Frontmatter Link 2]]"
+---
+## Content
+- [[Body Link]]`;
+			const result = parseMocContent(content);
+
+			expect(result.roots).toHaveLength(1);
+			expect(result.roots[0].notePath).toBe("Body Link");
+			expect(result.allLinks.has("Frontmatter Link 1")).toBe(false);
+			expect(result.allLinks.has("Frontmatter Link 2")).toBe(false);
+		});
+	});
+
 	describe("edge cases", () => {
 		it("handles empty content", () => {
 			const result = parseMocContent("");

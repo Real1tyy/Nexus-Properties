@@ -1,6 +1,8 @@
 // MOC (Map of Content) Parser
 // Parses markdown bullet lists (using - or .) into a hierarchy tree
 
+import { parseFileContent } from "@real1ty-obsidian-plugins";
+
 export interface MocNode {
 	wikiLink: string;
 	displayText: string;
@@ -111,7 +113,9 @@ function collectAllLinks(nodes: MocNode[], links: Set<string>): void {
 }
 
 export function parseMocContent(content: string): MocParseResult {
-	const lines = content.split("\n");
+	// Strip frontmatter to avoid parsing wiki links from YAML properties
+	const { body } = parseFileContent(content);
+	const lines = body.split("\n");
 	const parsedLines: ParsedLine[] = [];
 
 	for (const line of lines) {

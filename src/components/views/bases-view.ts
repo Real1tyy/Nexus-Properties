@@ -110,9 +110,24 @@ export class BasesView extends RegisteredEventsComponent {
 		if (this.selectedViewType.startsWith("all-") && !this.currentSettings.showAllRelationshipViews) {
 			this.selectedViewType = "children";
 		}
+
+		// When hierarchy source is MOC content, only children views are valid
+		if (this.hierarchySource === "moc-content") {
+			if (this.selectedViewType !== "children" && this.selectedViewType !== "all-children") {
+				this.selectedViewType = "children";
+			}
+		}
 	}
 
 	private getViewOptions(): { type: BaseViewType; label: string }[] {
+		// When hierarchy source is MOC content, only show children views
+		if (this.hierarchySource === "moc-content") {
+			return [
+				{ type: "children", label: "Children" },
+				{ type: "all-children", label: "All Children" },
+			];
+		}
+
 		const viewTypes: { type: BaseViewType; label: string }[] = [
 			{ type: "children", label: "Children" },
 			{ type: "parent", label: "Parent" },
