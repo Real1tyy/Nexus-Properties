@@ -1,6 +1,6 @@
 import { ItemView, Platform, type TFile, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
-import type { HierarchySourceType } from "../../core/hierarchy";
+import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NodeStatistics } from "../../types/statistics";
@@ -547,7 +547,7 @@ export class NexusViewSwitcher extends ItemView {
 		const cache = this.app.metadataCache.getFileCache(file);
 		const frontmatter = cache?.frontmatter;
 
-		if (!frontmatter) {
+		if (!frontmatter && this.currentHierarchySource !== "moc-content") {
 			return {
 				parents: 0,
 				children: 0,
@@ -558,31 +558,75 @@ export class NexusViewSwitcher extends ItemView {
 			};
 		}
 
-		const relationships = this.indexer.extractRelationships(file, frontmatter);
-
-		const parents = relationships.parent.length;
-		const children = relationships.children.length;
-		const related = relationships.related.length;
-
 		const currentDepth = this.getCurrentDepth();
 
-		const allParents = collectRelatedNodesRecursively(this.app, this.indexer, file, "parent", {
+		// Use properties-based statistics when in properties mode
+		if (this.currentHierarchySource === "properties") {
+			const relationships = frontmatter
+				? this.indexer.extractRelationships(file, frontmatter)
+				: { parent: [], children: [], related: [] };
+
+			const parents = relationships.parent.length;
+			const children = relationships.children.length;
+			const related = relationships.related.length;
+
+			const allParents = collectRelatedNodesRecursively(this.app, this.indexer, file, "parent", {
+				maxDepth: currentDepth,
+			});
+			const allChildren = collectRelatedNodesRecursively(this.app, this.indexer, file, "children", {
+				maxDepth: currentDepth,
+			});
+			const allRelated = collectRelatedNodesRecursively(this.app, this.indexer, file, "related", {
+				maxDepth: currentDepth,
+			});
+
+			return {
+				parents,
+				children,
+				related,
+				allParents,
+				allChildren,
+				allRelated,
+			};
+		}
+
+		// MOC content mode - return empty stats, will be populated async
+		return {
+			parents: 0,
+			children: 0,
+			related: 0,
+			allParents: new Set(),
+			allChildren: new Set(),
+			allRelated: new Set(),
+		};
+	}
+
+	public async calculateNodeStatisticsAsync(file: TFile): Promise<NodeStatistics> {
+		// For properties mode, use sync method
+		if (this.currentHierarchySource === "properties") {
+			return this.calculateNodeStatistics(file);
+		}
+
+		// MOC content mode - use HierarchyProvider
+		const provider = HierarchyProvider.getInstance(this.app, this.indexer, this.plugin.settingsStore);
+		const currentDepth = this.getCurrentDepth();
+		const mocFilePath = file.path;
+
+		const allChildren = await provider.collectRelatedNodesRecursively(file, "children", "moc-content", {
 			maxDepth: currentDepth,
-		});
-		const allChildren = collectRelatedNodesRecursively(this.app, this.indexer, file, "children", {
-			maxDepth: currentDepth,
-		});
-		const allRelated = collectRelatedNodesRecursively(this.app, this.indexer, file, "related", {
-			maxDepth: currentDepth,
+			mocFilePath,
 		});
 
+		// For direct children count, use depth 1
+		const directChildren = await provider.findChildren(file.path, "moc-content", mocFilePath);
+
 		return {
-			parents,
-			children,
-			related,
-			allParents,
+			parents: 0,
+			children: directChildren.length,
+			related: 0,
+			allParents: new Set(),
 			allChildren,
-			allRelated,
+			allRelated: new Set(),
 		};
 	}
 
@@ -638,11 +682,29 @@ export class NexusViewSwitcher extends ItemView {
 			return;
 		}
 
+		// For MOC content mode, use async method
+		if (this.currentHierarchySource === "moc-content") {
+			this.updateStatisticsAsync(activeFile);
+			return;
+		}
+
 		const settings = this.plugin.settingsStore.settings$.value;
 		const stats = this.calculateNodeStatistics(activeFile);
-		this.statsContainer.empty();
+		this.renderStatistics(stats, false);
+	}
 
-		const isMocContentMode = this.currentHierarchySource === "moc-content";
+	private async updateStatisticsAsync(activeFile: TFile): Promise<void> {
+		if (!this.statsContainer) return;
+
+		const stats = await this.calculateNodeStatisticsAsync(activeFile);
+		this.renderStatistics(stats, true);
+	}
+
+	private renderStatistics(stats: NodeStatistics, isMocContentMode: boolean): void {
+		if (!this.statsContainer) return;
+
+		const settings = this.plugin.settingsStore.settings$.value;
+		this.statsContainer.empty();
 
 		if (settings.showSimpleStatistics) {
 			const directStatsCol = this.statsContainer.createDiv({
