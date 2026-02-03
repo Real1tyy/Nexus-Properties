@@ -4,8 +4,8 @@ import type { SettingsStore } from "../../core/settings-store";
 import type { GraphZoomPreview } from "./zoom-preview";
 
 interface ZoomConfig {
-	getCy: () => Core;
-	getPreviewWrapperEl: () => HTMLElement;
+	getCy: () => Core | null;
+	getPreviewWrapperEl: () => HTMLElement | null;
 	settingsStore: SettingsStore;
 	onToggleStatesChange: (hideFrontmatter: boolean, hideContent: boolean) => void;
 }
@@ -28,7 +28,7 @@ export class GraphZoomManager {
 		this.previewHideContent = current.zoomHideContentByDefault;
 	}
 
-	private get cy(): Core {
+	private get cy(): Core | null {
 		return this.config.getCy();
 	}
 
@@ -78,17 +78,17 @@ export class GraphZoomManager {
 		this.focusedNodeId = null;
 
 		// Stop animations and remove focused class
-		this.cy.stop();
-		this.cy.nodes().removeClass("focused");
+		this.cy?.stop();
+		this.cy?.nodes().removeClass("focused");
 
 		this.hidePreviewOverlay();
 
 		// Reset zoom to show full graph
 		this.suppressNextResizeFit = true;
 		requestAnimationFrame(() => {
-			this.cy.resize();
-			this.cy.fit();
-			this.cy.center();
+			this.cy?.resize();
+			this.cy?.fit();
+			this.cy?.center();
 		});
 	}
 
@@ -96,6 +96,7 @@ export class GraphZoomManager {
 		const file = this.app.vault.getAbstractFileByPath(filePath);
 
 		if (!(file instanceof TFile)) return false;
+		if (!this.cy) return false;
 
 		this.focusedNodeId = filePath;
 
@@ -124,7 +125,7 @@ export class GraphZoomManager {
 	}
 
 	centerOnFocusedNode(): void {
-		if (!this.isZoomMode || !this.focusedNodeId) return;
+		if (!this.isZoomMode || !this.focusedNodeId || !this.cy) return;
 
 		const node = this.cy.nodes().filter((n) => n.id() === this.focusedNodeId);
 		if (node.length > 0) {
@@ -149,8 +150,11 @@ export class GraphZoomManager {
 	private showPreviewOverlay(createPreview: (el: HTMLElement) => GraphZoomPreview | null): void {
 		this.hidePreviewOverlay();
 
+		const previewWrapperEl = this.config.getPreviewWrapperEl();
+		if (!previewWrapperEl) return;
+
 		try {
-			const preview = createPreview(this.config.getPreviewWrapperEl());
+			const preview = createPreview(previewWrapperEl);
 			if (!preview) return;
 			this.zoomPreview = preview;
 		} catch (error) {

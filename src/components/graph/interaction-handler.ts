@@ -7,7 +7,7 @@ import type { EdgeContextMenu } from "./edge-context-menu";
 import type { NodeContextMenu } from "./node-context-menu";
 
 interface GraphInteractionConfig {
-	getCy: () => Core;
+	getCy: () => Core | null;
 	viewType: string;
 	getCurrentFile: () => TFile | null;
 	getGraphContainerEl: () => HTMLElement | null;
@@ -46,11 +46,12 @@ export class GraphInteractionHandler {
 	private longPressTriggered = false;
 	private longPressDelay = 500; // milliseconds
 
-	private get cy(): Core {
+	private get cy(): Core | null {
 		return this.config.getCy();
 	}
 
 	setupInteractions(): void {
+		if (!this.cy) return;
 		this.setupHoverEffects();
 		this.setupNodeHoverPreview();
 		this.setupNodeClickHandler();
@@ -63,20 +64,21 @@ export class GraphInteractionHandler {
 	}
 
 	private setupHoverEffects(): void {
-		this.cy.on("mouseover", "node", (evt) => {
+		this.cy?.on("mouseover", "node", (evt) => {
+			if (!this.cy) return;
 			const node = evt.target;
 			this.cy.elements().removeClass("dim");
 			this.cy.elements().not(node.closedNeighborhood()).addClass("dim");
 			node.closedNeighborhood("edge").addClass("highlighted");
 		});
 
-		this.cy.on("mouseout", "node", () => {
-			this.cy.elements().removeClass("dim highlighted");
+		this.cy?.on("mouseout", "node", () => {
+			this.cy?.elements().removeClass("dim highlighted");
 		});
 	}
 
 	private setupNodeHoverPreview(): void {
-		this.cy.on("mouseover", "node", (evt) => {
+		this.cy?.on("mouseover", "node", (evt) => {
 			const node = evt.target;
 			const filePath = node.id();
 			const file = this.app.vault.getAbstractFileByPath(filePath);
@@ -95,13 +97,13 @@ export class GraphInteractionHandler {
 			}
 		});
 
-		this.cy.on("mouseout", "node", () => {
+		this.cy?.on("mouseout", "node", () => {
 			this.propertyTooltip.scheduleHide(300);
 		});
 	}
 
 	private setupNodeClickHandler(): void {
-		this.cy.on("tap", "node", (evt) => {
+		this.cy?.on("tap", "node", (evt) => {
 			if (this.longPressTriggered) {
 				this.longPressTriggered = false;
 				return;
@@ -130,7 +132,7 @@ export class GraphInteractionHandler {
 	}
 
 	private setupEdgeClickHandler(): void {
-		this.cy.on("tap", "edge", (evt) => {
+		this.cy?.on("tap", "edge", (evt) => {
 			if (!this.config.isZoomMode()) return;
 
 			const edge = evt.target;
@@ -143,7 +145,7 @@ export class GraphInteractionHandler {
 	}
 
 	private setupNodeContextMenu(): void {
-		this.cy.on("cxttap", "node", (evt) => {
+		this.cy?.on("cxttap", "node", (evt) => {
 			const node = evt.target;
 			const filePath = node.id();
 			const originalEvent = evt.originalEvent as MouseEvent;
@@ -159,7 +161,7 @@ export class GraphInteractionHandler {
 
 	private setupNodeLongPress(): void {
 		// Start long-press timer on touch/mouse down
-		this.cy.on("tapstart", "node", (evt) => {
+		this.cy?.on("tapstart", "node", (evt) => {
 			const node = evt.target;
 			const filePath = node.id();
 			const originalEvent = evt.originalEvent as MouseEvent | TouchEvent;
@@ -186,7 +188,7 @@ export class GraphInteractionHandler {
 		});
 
 		// Cancel long-press timer if touch/mouse is released early or moved away
-		this.cy.on("tapend", "node", () => {
+		this.cy?.on("tapend", "node", () => {
 			if (this.longPressTimer !== null) {
 				window.clearTimeout(this.longPressTimer);
 				this.longPressTimer = null;
@@ -194,7 +196,7 @@ export class GraphInteractionHandler {
 		});
 
 		// Also cancel if user starts dragging
-		this.cy.on("tapdragover", "node", () => {
+		this.cy?.on("tapdragover", "node", () => {
 			if (this.longPressTimer !== null) {
 				window.clearTimeout(this.longPressTimer);
 				this.longPressTimer = null;
@@ -203,7 +205,7 @@ export class GraphInteractionHandler {
 	}
 
 	private setupEdgeContextMenu(): void {
-		this.cy.on("cxttap", "edge", (evt) => {
+		this.cy?.on("cxttap", "edge", (evt) => {
 			const edge = evt.target;
 			const sourceId = edge.data("source");
 			const targetId = edge.data("target");
@@ -220,8 +222,8 @@ export class GraphInteractionHandler {
 		const ZOOM_FACTOR = 1.6;
 
 		// Double left-click (double tap) on background zooms in toward clicked position
-		this.cy.on("tap", (evt) => {
-			if (evt.target !== this.cy) return;
+		this.cy?.on("tap", (evt) => {
+			if (!this.cy || evt.target !== this.cy) return;
 
 			const originalEvent = evt.originalEvent as MouseEvent | undefined;
 			if (originalEvent && typeof originalEvent.button === "number" && originalEvent.button !== 0) return;
@@ -230,8 +232,8 @@ export class GraphInteractionHandler {
 		});
 
 		// Double right-click (double cxttap) on background zooms out from clicked position
-		this.cy.on("cxttap", (evt) => {
-			if (evt.target !== this.cy) return;
+		this.cy?.on("cxttap", (evt) => {
+			if (!this.cy || evt.target !== this.cy) return;
 
 			this.handleDoubleClick(evt, "out", DOUBLE_TAP_MS, MAX_DISTANCE_PX, ZOOM_FACTOR);
 		});
@@ -257,7 +259,7 @@ export class GraphInteractionHandler {
 			? Math.hypot(lastPos.x - renderedPos.x, lastPos.y - renderedPos.y) <= maxDistancePx
 			: false;
 
-		if (withinTime && withinDistance) {
+		if (withinTime && withinDistance && this.cy) {
 			// Reset tracking
 			if (isZoomIn) {
 				this.lastBackgroundTapTime = 0;
@@ -306,7 +308,7 @@ export class GraphInteractionHandler {
 	}
 
 	private addSparkleAnimations(): void {
-		this.cy.nodes().forEach((node) => {
+		this.cy?.nodes().forEach((node) => {
 			if (Math.random() < 0.4) {
 				node.addClass("glow");
 				const pulse = (): void => {
@@ -349,6 +351,7 @@ export class GraphInteractionHandler {
 	}
 
 	private navigateAlongEdge(currentNodeId: string, direction: "incoming" | "outgoing"): string | null {
+		if (!this.cy) return null;
 		const node = this.cy.getElementById(currentNodeId);
 		if (!node.length) return null;
 
@@ -377,6 +380,7 @@ export class GraphInteractionHandler {
 	}
 
 	private navigateInDirection(currentNodeId: string, direction: "left" | "right"): string | null {
+		if (!this.cy) return null;
 		const currentNode = this.cy.getElementById(currentNodeId);
 		if (!currentNode.length) return null;
 
@@ -430,6 +434,7 @@ export class GraphInteractionHandler {
 	}
 
 	private navigateToTreeRoot(currentNodeId: string, direction: "next" | "previous"): string | null {
+		if (!this.cy) return null;
 		const currentNode = this.cy.getElementById(currentNodeId);
 		if (!currentNode.length) return null;
 
@@ -476,6 +481,7 @@ export class GraphInteractionHandler {
 	}
 
 	private findTreeRoot(nodeId: string): string | null {
+		if (!this.cy) return null;
 		const node = this.cy.getElementById(nodeId);
 		if (!node.length) return null;
 
@@ -508,6 +514,6 @@ export class GraphInteractionHandler {
 	}
 
 	cleanup(): void {
-		this.cy.removeAllListeners();
+		this.cy?.removeAllListeners();
 	}
 }

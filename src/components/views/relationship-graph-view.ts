@@ -44,7 +44,10 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	private relationshipAdder: RelationshipAdder;
 	private resizeObserver: ResizeObserver | null = null;
 	private resizeDebounceTimer: number | null = null;
+	private updateDebounceTimer: number | null = null;
 	private isUpdating = false;
+	private currentNodeIds: Set<string> = new Set();
+	private currentEdgeIds: Set<string> = new Set();
 	private graphBuilder: GraphBuilder;
 	private settingsSubscription: Subscription | null = null;
 	private indexerSubscription: Subscription | null = null;
@@ -97,14 +100,8 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
 
 		this.zoomManager = new GraphZoomManager(this.app, {
-			getCy: () => {
-				if (!this.cy) throw new Error("Cytoscape not yet initialized");
-				return this.cy;
-			},
-			getPreviewWrapperEl: () => {
-				if (!this.previewWrapperEl) throw new Error("Preview wrapper not yet initialized");
-				return this.previewWrapperEl;
-			},
+			getCy: () => this.cy,
+			getPreviewWrapperEl: () => this.previewWrapperEl,
 			settingsStore: this.plugin.settingsStore,
 			onToggleStatesChange: () => {
 				// States are tracked by zoomManager
@@ -124,10 +121,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.edgeContextMenu,
 			this.relationshipAdder,
 			{
-				getCy: () => {
-					if (!this.cy) throw new Error("Cytoscape not yet initialized");
-					return this.cy;
-				},
+				getCy: () => this.cy,
 				viewType: VIEW_TYPE_RELATIONSHIP_GRAPH,
 				getCurrentFile: () => this.currentFile,
 				getGraphContainerEl: () => this.graphContainerEl,
@@ -149,10 +143,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		);
 
 		this.layoutManager = new GraphLayoutManager({
-			getCy: () => {
-				if (!this.cy) throw new Error("Cytoscape not yet initialized");
-				return this.cy;
-			},
+			getCy: () => this.cy,
 		});
 	}
 
@@ -194,11 +185,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		};
 
 		const onSearchChange = () => {
-			this.updateGraph();
+			this.scheduleGraphUpdate();
 		};
 
 		const onFilterChange = () => {
-			this.updateGraph();
+			this.scheduleGraphUpdate();
 		};
 
 		// Inner function to create filter preset selector
@@ -282,10 +273,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		// Subscribe to indexer events for reactive updates
 		// This handles file changes, renames, and deletions after indexer has processed them
+		// Use debounced update to prevent rapid consecutive rebuilds
 		this.indexerSubscription = this.indexer.events$.subscribe((event) => {
 			if (!this.currentFile) return;
 			if (event.filePath === this.currentFile.path) {
-				this.updateGraph();
+				this.scheduleGraphUpdate();
 			}
 		});
 
@@ -416,8 +408,9 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				this.zoomIndicator = null;
 			}
 
+			// Use debounced update for settings changes to prevent cascading rebuilds
 			if (this.currentFile && !this.isUpdating) {
-				this.updateGraph();
+				this.scheduleGraphUpdate();
 			}
 		});
 	}
@@ -479,6 +472,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		if (this.resizeDebounceTimer !== null) {
 			window.clearTimeout(this.resizeDebounceTimer);
 			this.resizeDebounceTimer = null;
+		}
+
+		if (this.updateDebounceTimer !== null) {
+			window.clearTimeout(this.updateDebounceTimer);
+			this.updateDebounceTimer = null;
 		}
 
 		if (this.settingsSubscription) {
@@ -692,6 +690,21 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		}
 	}
 
+	/**
+	 * Schedules a debounced graph update.
+	 * Multiple calls within the debounce window are merged into a single update.
+	 */
+	private scheduleGraphUpdate(): void {
+		if (this.updateDebounceTimer !== null) {
+			window.clearTimeout(this.updateDebounceTimer);
+		}
+
+		this.updateDebounceTimer = window.setTimeout(() => {
+			this.updateDebounceTimer = null;
+			this.updateGraph();
+		}, 150);
+	}
+
 	private async updateGraph(): Promise<void> {
 		if (!this.currentFile || this.isUpdating) return;
 
@@ -722,25 +735,105 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			mocFilePath: this.currentFile.path,
 		});
 
-		this.destroyGraph();
-
-		if (this.graphContainerEl) {
-			this.graphContainerEl.empty();
-		}
-
-		this.initializeCytoscape();
-
-		// If initialization failed, store the graph data and wait for container to become visible
-		// The ResizeObserver will automatically render it when the view gets dimensions
+		// If Cytoscape doesn't exist yet, do full initialization
 		if (!this.cy) {
-			this.pendingGraphData = { nodes, edges };
+			this.initializeCytoscape();
+
+			// If initialization failed, store the graph data and wait for container to become visible
+			if (!this.cy) {
+				this.pendingGraphData = { nodes, edges };
+				this.isUpdating = false;
+				return;
+			}
+
+			this.renderAndFitGraph(nodes, edges);
+			this.updateTrackedElements(nodes, edges);
+			this.pendingGraphData = null;
 			this.isUpdating = false;
 			return;
 		}
 
-		this.renderAndFitGraph(nodes, edges);
+		const structureChanged = this.applyIncrementalUpdate(nodes, edges);
+
+		if (structureChanged) {
+			this.applyLayoutToGraph(nodes, edges);
+		}
+
 		this.pendingGraphData = null;
 		this.isUpdating = false;
+	}
+
+	/**
+	 * Applies incremental updates to the graph instead of destroying and recreating.
+	 * Returns true if the graph structure changed (nodes/edges added or removed).
+	 */
+	private applyIncrementalUpdate(newNodes: ElementDefinition[], newEdges: ElementDefinition[]): boolean {
+		if (!this.cy) return false;
+
+		const newNodeIds = new Set(newNodes.map((n) => n.data.id as string));
+		const newEdgeIds = new Set(newEdges.map((e) => e.data.id as string));
+
+		const nodesToRemove = Array.from(this.currentNodeIds).filter((id) => !newNodeIds.has(id));
+		const edgesToRemove = Array.from(this.currentEdgeIds).filter((id) => !newEdgeIds.has(id));
+
+		if (nodesToRemove.length > 0 || edgesToRemove.length > 0) {
+			const idsToRemove = [...nodesToRemove, ...edgesToRemove];
+			const removeCollection = this.cy.collection();
+			for (const id of idsToRemove) {
+				const el = this.cy.getElementById(id);
+				if (el.length > 0) {
+					removeCollection.merge(el);
+				}
+			}
+			removeCollection.remove();
+		}
+
+		const nodesToAdd: ElementDefinition[] = [];
+		for (const node of newNodes) {
+			const nodeId = node.data.id as string;
+			if (!this.currentNodeIds.has(nodeId)) {
+				nodesToAdd.push(node);
+			} else {
+				const existingNode = this.cy.getElementById(nodeId);
+				if (existingNode.length > 0) {
+					existingNode.data(node.data);
+				}
+			}
+		}
+
+		const edgesToAdd = newEdges.filter((edge) => {
+			const edgeId = edge.data.id as string;
+			return !this.currentEdgeIds.has(edgeId);
+		});
+
+		if (nodesToAdd.length > 0 || edgesToAdd.length > 0) {
+			this.cy.add([...nodesToAdd, ...edgesToAdd]);
+			// Apply core class to new edges
+			for (const edge of edgesToAdd) {
+				const edgeEl = this.cy.getElementById(edge.data.id as string);
+				if (edgeEl.length > 0) {
+					edgeEl.addClass("core");
+				}
+			}
+		}
+
+		this.updateTrackedElements(newNodes, newEdges);
+		return nodesToRemove.length > 0 || edgesToRemove.length > 0 || nodesToAdd.length > 0 || edgesToAdd.length > 0;
+	}
+
+	/**
+	 * Updates the tracked node and edge IDs after a graph update.
+	 */
+	private updateTrackedElements(nodes: ElementDefinition[], edges: ElementDefinition[]): void {
+		this.currentNodeIds.clear();
+		this.currentEdgeIds.clear();
+
+		for (const node of nodes) {
+			this.currentNodeIds.add(node.data.id as string);
+		}
+		for (const edge of edges) {
+			this.currentEdgeIds.add(edge.data.id as string);
+		}
 	}
 
 	private destroyGraph(): void {
@@ -757,6 +850,10 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.cy.destroy();
 			this.cy = null;
 		}
+
+		// Clear tracked elements
+		this.currentNodeIds.clear();
+		this.currentEdgeIds.clear();
 	}
 
 	private initializeCytoscape(): void {
@@ -919,9 +1016,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.cy.add([...nodes, ...edges]);
 		this.cy.edges().addClass("core");
 
+		this.applyLayoutToGraph(nodes, edges);
+	}
+
+	private applyLayoutToGraph(nodes: ElementDefinition[], edges: ElementDefinition[]): void {
 		const settings = this.plugin.settingsStore.settings$.value;
 		const animationDuration = settings.graphAnimationDuration;
-
 		const isFolderNoteGraph = Boolean(this.currentFile && isFolderNote(this.currentFile.path));
 
 		this.layoutManager.applyLayout(nodes, edges, {

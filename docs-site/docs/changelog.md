@@ -188,7 +188,34 @@ New "All" view options for Bases sidebar that recursively traverse relationships
 
 See [Configuration](configuration#bases-view) for setup instructions.
 
+### Performance Improvements
+
+#### Graph Update Debouncing
+
+Implemented debouncing for graph updates to prevent excessive re-renders during rapid file changes.
+
+- **150ms Debounce Window**: Multiple rapid changes are batched together into a single graph update
+- **Smoother Experience**: Eliminates flickering and lag when making quick edits to notes
+- **Reduced CPU Usage**: Prevents unnecessary graph destruction and recreation cycles
+
+#### Incremental Graph Updates
+
+Graph changes now apply incrementally when possible instead of destroying and recreating the entire graph.
+
+- **Smart Diffing**: Compares current graph state with new data to identify changes
+- **Surgical Updates**: Only adds new nodes/edges and removes deleted ones
+- **Preserved State**: Maintains zoom level and pan position during incremental updates
+- **Faster Updates**: Significant performance improvement for large graphs with minor changes
+
 ### Bug Fixes
+
+#### Cytoscape Initialization Errors
+
+Fixed "Uncaught Error: Cytoscape not yet initialized" console errors that occurred frequently during graph operations.
+
+- **Graceful Null Handling**: Graph components now handle uninitialized Cytoscape instances gracefully
+- **No More Console Spam**: Eliminated repeated error messages when switching views or during rapid updates
+- **Safer Async Operations**: Properly checks graph availability in async callbacks and animation handlers
 
 #### Edit Modal Property Handling
 

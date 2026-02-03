@@ -14,7 +14,7 @@ interface LayoutConfig {
 }
 
 interface GraphLayoutManagerConfig {
-	getCy: () => Core;
+	getCy: () => Core | null;
 }
 
 export class GraphLayoutManager {
@@ -26,11 +26,12 @@ export class GraphLayoutManager {
 		this.collisionDetector = new CollisionDetector(60);
 	}
 
-	private get cy(): Core {
+	private get cy(): Core | null {
 		return this.config.getCy();
 	}
 
 	applyLayout(nodes: ElementDefinition[], edges: ElementDefinition[], config: LayoutConfig): void {
+		if (!this.cy) return;
 		const { animationDuration, isFolderNote, renderRelated, includeAllRelated, useMultiRowLayout, maxChildrenPerRow } =
 			config;
 
@@ -62,6 +63,7 @@ export class GraphLayoutManager {
 		edges: ElementDefinition[],
 		animationDuration: number
 	): void {
+		if (!this.cy) return;
 		const trees = this.nodeOrganizer.identifyConnectedComponents(nodes, edges);
 		const { singleNodeTrees } = this.nodeOrganizer.separateTreesBySize(trees);
 
@@ -87,9 +89,10 @@ export class GraphLayoutManager {
 		animationDuration: number,
 		padding: number
 	): void {
+		if (!this.cy) return;
 		positions.forEach((pos, nodeId) => {
-			const cyNode = this.cy.getElementById(nodeId);
-			if (cyNode.length > 0) {
+			const cyNode = this.cy?.getElementById(nodeId);
+			if (cyNode && cyNode.length > 0) {
 				if (animationDuration > 0) {
 					cyNode.animate({
 						position: pos,
@@ -105,14 +108,15 @@ export class GraphLayoutManager {
 		// After positioning, refit the viewport to show everything
 		if (animationDuration > 0) {
 			setTimeout(() => {
-				this.cy.fit(undefined, padding);
+				this.cy?.fit(undefined, padding);
 			}, animationDuration);
 		} else {
-			this.cy.fit(undefined, padding);
+			this.cy?.fit(undefined, padding);
 		}
 	}
 
 	private applyRecursiveConstellationLayout(nodes: ElementDefinition[], animationDuration: number): void {
+		if (!this.cy) return;
 		const positioner = new ConstellationPositioner(this.cy, {
 			baseOrbitalRadius: 150,
 			minNodeDistance: 60,
@@ -126,6 +130,7 @@ export class GraphLayoutManager {
 	}
 
 	private applyFolderConstellationLayout(nodes: ElementDefinition[], animationDuration: number): void {
+		if (!this.cy) return;
 		const positioner = new ConstellationPositioner(this.cy, {
 			baseOrbitalRadius: 180,
 			minNodeDistance: 90,
@@ -143,6 +148,7 @@ export class GraphLayoutManager {
 		edges: ElementDefinition[],
 		animationDuration: number
 	): void {
+		if (!this.cy) return;
 		// First, apply dagre to get hierarchical structure
 		const layout = this.cy.layout({
 			name: "dagre",
@@ -172,7 +178,7 @@ export class GraphLayoutManager {
 		// Apply final layout
 		this.runLayoutWithAnimationHandling(
 			() =>
-				this.cy.layout({
+				this.cy?.layout({
 					name: "preset",
 					fit: true,
 					padding: 100,
@@ -185,10 +191,11 @@ export class GraphLayoutManager {
 	}
 
 	private calculateTreeBounds(trees: string[][]): TreeBounds[] {
+		if (!this.cy) return [];
 		const treeBounds: TreeBounds[] = [];
 
 		trees.forEach((tree) => {
-			const bounds = this.nodeOrganizer.calculateBounds(this.cy, tree);
+			const bounds = this.nodeOrganizer.calculateBounds(this.cy!, tree);
 			if (bounds) {
 				treeBounds.push({ tree, ...bounds });
 			}
@@ -201,6 +208,7 @@ export class GraphLayoutManager {
 		maxX: number;
 		maxHeight: number;
 	} {
+		if (!this.cy) return { maxX: 0, maxHeight: 0 };
 		const TREE_HORIZONTAL_SPACING = 150;
 		const VERTICAL_STAGGER = 200;
 
@@ -216,8 +224,8 @@ export class GraphLayoutManager {
 			const translateY = verticalOffset - minY;
 
 			tree.forEach((nodeId) => {
-				const cyNode = this.cy.getElementById(nodeId);
-				if (cyNode.length > 0) {
+				const cyNode = this.cy?.getElementById(nodeId);
+				if (cyNode && cyNode.length > 0) {
 					const pos = cyNode.position();
 					cyNode.position({
 						x: pos.x + translateX,
@@ -239,6 +247,7 @@ export class GraphLayoutManager {
 		multiTreeEndX: number,
 		maxMultiTreeHeight: number
 	): void {
+		if (!this.cy) return;
 		const MIN_NODE_SPACING = 80;
 		const PADDING = 50;
 
@@ -284,17 +293,18 @@ export class GraphLayoutManager {
 				}
 			}
 
-			const cyNode = this.cy.getElementById(tree[0]);
-			if (cyNode.length > 0) {
+			const cyNode = this.cy?.getElementById(tree[0]);
+			if (cyNode && cyNode.length > 0) {
 				cyNode.position({ x, y });
 			}
 		});
 	}
 
 	private applyConcentricLayout(animationDuration: number): void {
+		if (!this.cy) return;
 		this.runLayoutWithAnimationHandling(
 			() =>
-				this.cy.layout({
+				this.cy?.layout({
 					name: "concentric",
 					fit: true,
 					padding: 120,
@@ -320,6 +330,7 @@ export class GraphLayoutManager {
 		nodes?: ElementDefinition[],
 		edges?: ElementDefinition[]
 	): void {
+		if (!this.cy) return;
 		// First apply standard dagre layout
 		const layout = this.cy.layout({
 			name: "dagre",
@@ -342,7 +353,7 @@ export class GraphLayoutManager {
 
 		this.runLayoutWithAnimationHandling(
 			() =>
-				this.cy.layout({
+				this.cy?.layout({
 					name: "preset",
 					fit: true,
 					padding: 80,
@@ -364,6 +375,7 @@ export class GraphLayoutManager {
 		edges: ElementDefinition[],
 		maxChildrenPerRow: number
 	): void {
+		if (!this.cy) return;
 		const HORIZONTAL_SPACING = 120;
 		const ROW_VERTICAL_SPACING = 140;
 		const GENERATION_GAP = 160;
@@ -403,8 +415,8 @@ export class GraphLayoutManager {
 		const getMaxYForIds = (ids: string[]): number => {
 			let maxY = -Infinity;
 			for (const id of ids) {
-				const cyNode = this.cy.getElementById(id);
-				if (cyNode.length === 0) continue;
+				const cyNode = this.cy?.getElementById(id);
+				if (!cyNode || cyNode.length === 0) continue;
 				maxY = Math.max(maxY, cyNode.position().y);
 			}
 			return maxY;
@@ -440,8 +452,8 @@ export class GraphLayoutManager {
 			// - Place children for each parent around the group's final center X using the domino layout.
 			const groups = parentIds
 				.map((parentId) => {
-					const parentCy = this.cy.getElementById(parentId);
-					if (parentCy.length === 0) return null;
+					const parentCy = this.cy?.getElementById(parentId);
+					if (!parentCy || parentCy.length === 0) return null;
 
 					const children = parentToChildren.get(parentId) ?? [];
 					if (children.length === 0) return null;
@@ -488,8 +500,8 @@ export class GraphLayoutManager {
 				});
 
 				childPositions.forEach((pos, childId) => {
-					const childCy = this.cy.getElementById(childId);
-					if (childCy.length > 0) {
+					const childCy = this.cy?.getElementById(childId);
+					if (childCy && childCy.length > 0) {
 						childCy.position(pos);
 					}
 				});
@@ -505,8 +517,8 @@ export class GraphLayoutManager {
 				const startY = generationStartY.get(childLevel);
 				if (startY !== undefined) {
 					for (const nodeId of childIds) {
-						const cyNode = this.cy.getElementById(nodeId);
-						if (cyNode.length === 0) continue;
+						const cyNode = this.cy?.getElementById(nodeId);
+						if (!cyNode || cyNode.length === 0) continue;
 						const pos = cyNode.position();
 						if (pos.y < startY) {
 							cyNode.position({ x: pos.x, y: startY });
@@ -574,21 +586,22 @@ export class GraphLayoutManager {
 		animationDuration: number,
 		padding: number
 	): void {
+		if (!this.cy) return;
 		nodes.forEach((node) => {
 			if (!node.data?.id) return;
 
 			const pos = nodePositions.get(node.data.id);
 			if (!pos) return;
 
-			const cyNode = this.cy.getElementById(node.data.id);
-			if (cyNode.length > 0) {
+			const cyNode = this.cy?.getElementById(node.data.id);
+			if (cyNode && cyNode.length > 0) {
 				cyNode.position(pos);
 			}
 		});
 
 		this.runLayoutWithAnimationHandling(
 			() =>
-				this.cy.layout({
+				this.cy?.layout({
 					name: "preset",
 					fit: true,
 					padding: padding,
@@ -604,12 +617,16 @@ export class GraphLayoutManager {
 	 * Accepts layout factory function to avoid duplication of animation setup logic.
 	 * Centers graph after animation completes or immediately if no animation.
 	 */
-	private runLayoutWithAnimationHandling(layoutFactory: () => cytoscape.Layouts, animationDuration: number): void {
+	private runLayoutWithAnimationHandling(
+		layoutFactory: () => cytoscape.Layouts | undefined,
+		animationDuration: number
+	): void {
 		const layout = layoutFactory();
+		if (!layout) return;
 
 		// For animated layouts, center after animation completes
 		if (animationDuration > 0) {
-			this.cy.one("layoutstop", () => this.ensureCentered());
+			this.cy?.one("layoutstop", () => this.ensureCentered());
 		}
 
 		layout.run();
@@ -617,23 +634,23 @@ export class GraphLayoutManager {
 		// For instant layouts, center immediately
 		if (animationDuration === 0) {
 			setTimeout(() => {
-				this.cy.resize();
-				this.cy.fit();
-				this.cy.center();
+				this.cy?.resize();
+				this.cy?.fit();
+				this.cy?.center();
 			}, 0);
 		}
 	}
 
 	private ensureCentered(): void {
 		try {
-			this.cy.resize();
+			this.cy?.resize();
 		} catch {
 			// ignore
 		}
 
 		requestAnimationFrame(() => {
-			this.cy.fit();
-			this.cy.center();
+			this.cy?.fit();
+			this.cy?.center();
 		});
 	}
 }
