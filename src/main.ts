@@ -104,13 +104,23 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.addCommand({
 			id: "nexus-undo",
 			name: "Undo",
-			callback: () => this.commandManager.undo(),
+			callback: async () => {
+				const success = await this.commandManager.undo();
+				if (success) {
+					this.triggerGraphUpdate();
+				}
+			},
 		});
 
 		this.addCommand({
 			id: "nexus-redo",
 			name: "Redo",
-			callback: () => this.commandManager.redo(),
+			callback: async () => {
+				const success = await this.commandManager.redo();
+				if (success) {
+					this.triggerGraphUpdate();
+				}
+			},
 		});
 
 		this.addCommand({
@@ -360,6 +370,18 @@ export default class NexusPropertiesPlugin extends Plugin {
 				...settings,
 				version: currentVersion,
 			}));
+		}
+	}
+
+	private triggerGraphUpdate(): void {
+		const { workspace } = this.app;
+		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
+
+		if (existingLeaves.length > 0) {
+			const switcherView = existingLeaves[0].view;
+			if (switcherView instanceof NexusViewSwitcher) {
+				switcherView.triggerUpdate();
+			}
 		}
 	}
 

@@ -481,6 +481,24 @@ export class NexusViewSwitcher extends ItemView {
 	}
 
 	/**
+	 * Trigger an update of the current view (used after undo/redo)
+	 */
+	async triggerUpdate(): Promise<void> {
+		// Small delay to allow file system operations to complete
+		await new Promise((resolve) => setTimeout(resolve, 100));
+
+		if (this.currentMode === "graph" && this.graphView) {
+			this.graphView.triggerUpdate();
+		} else if (this.currentMode === "bases" && this.basesView) {
+			await this.basesView.updateActiveFile();
+		} else if (this.currentMode === "moc" && this.mocView) {
+			await this.mocView.updateActiveFile();
+		}
+
+		await this.updateStatistics();
+	}
+
+	/**
 	 * Navigate bases view forward
 	 */
 	async toggleBasesViewForward(): Promise<void> {

@@ -217,6 +217,20 @@ Fixed "Uncaught Error: Cytoscape not yet initialized" console errors that occurr
 - **No More Console Spam**: Eliminated repeated error messages when switching views or during rapid updates
 - **Safer Async Operations**: Properly checks graph availability in async callbacks and animation handlers
 
+#### Graph Not Updating After Undo/Redo
+
+Fixed issue where the graph view would not update after undoing or redoing operations like node deletion.
+
+- **Automatic Refresh**: Graph, Bases, and MOC views now automatically refresh after undo/redo operations
+- **Statistics Update**: View statistics are also recalculated after undo/redo
+
+#### Edge Creation Errors During Incremental Updates
+
+Fixed "Can not create edge with no source/target" errors that could occur during graph updates.
+
+- **Endpoint Validation**: Edges are now validated to ensure both source and target nodes exist before adding
+- **Ordered Addition**: Nodes are added before edges to ensure endpoints exist
+
 #### Edit Modal Property Handling
 
 Fixed multiple issues with the node edit modal that caused unintended property modifications:

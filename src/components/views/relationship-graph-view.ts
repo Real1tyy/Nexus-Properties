@@ -803,11 +803,24 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		const edgesToAdd = newEdges.filter((edge) => {
 			const edgeId = edge.data.id as string;
-			return !this.currentEdgeIds.has(edgeId);
+			if (this.currentEdgeIds.has(edgeId)) return false;
+
+			// Validate that both source and target nodes exist or will exist
+			const sourceId = edge.data.source as string;
+			const targetId = edge.data.target as string;
+			const sourceExists = newNodeIds.has(sourceId);
+			const targetExists = newNodeIds.has(targetId);
+
+			return sourceExists && targetExists;
 		});
 
 		if (nodesToAdd.length > 0 || edgesToAdd.length > 0) {
-			this.cy.add([...nodesToAdd, ...edgesToAdd]);
+			if (nodesToAdd.length > 0) {
+				this.cy.add(nodesToAdd);
+			}
+			if (edgesToAdd.length > 0) {
+				this.cy.add(edgesToAdd);
+			}
 			// Apply core class to new edges
 			for (const edge of edgesToAdd) {
 				const edgeEl = this.cy.getElementById(edge.data.id as string);
@@ -1215,5 +1228,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 	public updateGraphWithDepth(depth: number): void {
 		this.graphBuilder.setDepthOverride(depth);
 		this.updateGraph();
+	}
+
+	/**
+	 * Public method to trigger a graph update (used after undo/redo)
+	 */
+	public triggerUpdate(): void {
+		this.scheduleGraphUpdate();
 	}
 }
