@@ -66,6 +66,16 @@ export class GeneralSection implements SettingsSection {
 			desc: "Display a slider in the graph view header to temporarily adjust the recursion depth for statistics and hierarchy rendering. Depth controls how many levels up/down to traverse from the current node.",
 		});
 
+		this.uiBuilder.addDropdown(container, {
+			key: "hierarchySource",
+			name: "Default hierarchy source",
+			desc: "Choose where to read hierarchy relationships from. 'Properties' uses frontmatter (Parent/Child properties). 'MOC Content' parses bullet list hierarchies from the current note.",
+			options: {
+				properties: "Properties (frontmatter)",
+				"moc-content": "MOC Content (bullet lists)",
+			},
+		});
+
 		this.uiBuilder.addArrayManager(container, {
 			key: "directories",
 			name: "Directory scanning",

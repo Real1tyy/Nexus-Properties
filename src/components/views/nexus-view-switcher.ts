@@ -1,5 +1,6 @@
 import { ItemView, Platform, type TFile, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
+import type { HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NodeStatistics } from "../../types/statistics";
@@ -34,6 +35,8 @@ export class NexusViewSwitcher extends ItemView {
 	private lastBasesViewType: BaseViewType = "children";
 	private showArchived = false;
 	private temporaryDepthOverride: number | null = null;
+	private currentHierarchySource: HierarchySourceType = "properties";
+	private hierarchySourceDropdown: HTMLSelectElement | null = null;
 
 	constructor(
 		leaf: WorkspaceLeaf,
@@ -67,7 +70,10 @@ export class NexusViewSwitcher extends ItemView {
 		contentEl.empty();
 		contentEl.addClass(cls("view-switcher-content"));
 
+		this.currentHierarchySource = this.plugin.settingsStore.currentSettings.hierarchySource;
+
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe(async (settings) => {
+			this.currentHierarchySource = settings.hierarchySource;
 			await this.handleSettingsChange(settings.showViewSwitcherHeader);
 		});
 
@@ -211,6 +217,26 @@ export class NexusViewSwitcher extends ItemView {
 				await this.toggleView();
 			});
 
+			this.hierarchySourceDropdown = headerBar.createEl("select", {
+				cls: cls("hierarchy-source-dropdown"),
+			});
+
+			this.hierarchySourceDropdown.createEl("option", {
+				value: "properties",
+				text: "Properties",
+			});
+			this.hierarchySourceDropdown.createEl("option", {
+				value: "moc-content",
+				text: "MOC Content",
+			});
+
+			this.hierarchySourceDropdown.value = this.currentHierarchySource;
+
+			this.hierarchySourceDropdown.addEventListener("change", async () => {
+				this.currentHierarchySource = this.hierarchySourceDropdown!.value as HierarchySourceType;
+				await this.renderViewContent();
+			});
+
 			// Right side: Archived toggle
 			if (settings.excludeArchived) {
 				this.archivedToggleContainer = headerBar.createEl("label", {
@@ -293,7 +319,13 @@ export class NexusViewSwitcher extends ItemView {
 			});
 
 			// Create and render graph view
-			this.graphView = new RelationshipGraphView(this.app, this.indexer, this.plugin, this.graphContainerEl);
+			this.graphView = new RelationshipGraphView(
+				this.app,
+				this.indexer,
+				this.plugin,
+				this.graphContainerEl,
+				this.currentHierarchySource
+			);
 
 			this.graphView.setViewTypeChangeCallback(() => {
 				this.updateDepthSlider();
@@ -312,6 +344,7 @@ export class NexusViewSwitcher extends ItemView {
 				this.plugin,
 				this.lastBasesViewType,
 				this.showArchived,
+				this.currentHierarchySource,
 				(viewType) => {
 					this.lastBasesViewType = viewType;
 				}
@@ -324,7 +357,7 @@ export class NexusViewSwitcher extends ItemView {
 				cls: cls("moc-view-content"),
 			});
 
-			this.mocView = new MocView(this.app, this.mocContentEl, this.plugin, this.indexer);
+			this.mocView = new MocView(this.app, this.mocContentEl, this.plugin, this.indexer, this.currentHierarchySource);
 
 			await this.mocView.render();
 		}

@@ -4,6 +4,7 @@ import cytoscapeDagre from "cytoscape-dagre";
 import { type App, Notice, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import { GraphBuilder } from "../../core/graph-builder";
+import type { HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import { cls } from "../../utils/css";
@@ -67,7 +68,8 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		private readonly app: App,
 		private readonly indexer: Indexer,
 		private readonly plugin: NexusPropertiesPlugin,
-		private readonly containerEl: HTMLElement
+		private readonly containerEl: HTMLElement,
+		private hierarchySource: HierarchySourceType = "properties"
 	) {
 		super();
 		this.relationshipAdder = new RelationshipAdder(
@@ -689,7 +691,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		}
 	}
 
-	private updateGraph(): void {
+	private async updateGraph(): Promise<void> {
 		if (!this.currentFile || this.isUpdating) return;
 
 		this.isUpdating = true;
@@ -707,13 +709,15 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			? (frontmatter: Record<string, any>) => this.graphFilter!.shouldInclude(frontmatter)
 			: undefined;
 
-		const { nodes, edges } = this.graphBuilder.buildGraph({
+		const { nodes, edges } = await this.graphBuilder.buildGraph({
 			sourcePath: this.currentFile.path,
 			renderRelated: this.renderRelated,
 			includeAllRelated: this.includeAllRelated,
 			startFromCurrent: this.ignoreTopmostParent,
 			searchQuery: searchQuery,
 			filterEvaluator: filterEvaluator,
+			hierarchySource: this.hierarchySource,
+			mocFilePath: this.currentFile.path,
 		});
 
 		this.destroyGraph();

@@ -1,52 +1,41 @@
 import { IncludedPropertiesEvaluator, RegisteredEventsComponent } from "@real1ty-obsidian-plugins";
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
+import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { buildBasesFilePathFilters } from "../../utils/bases-utils";
 import { cls } from "../../utils/css";
-import { collectRelatedNodesRecursively } from "../../utils/hierarchy";
-
-const _VIEW_TYPE_BASES = "nexus-bases-view";
 
 export type BaseViewType = "children" | "parent" | "related" | "all-children" | "all-parent" | "all-related";
 
-/**
- * Bases view component that uses Obsidian's Bases API to render
- * Children, Parent, and Related files using native base code blocks
- */
 export class BasesView extends RegisteredEventsComponent {
-	private app: App;
-	private contentEl: HTMLElement;
 	private component: Component;
-	private plugin: NexusPropertiesPlugin;
 	private includedPropertiesEvaluator: IncludedPropertiesEvaluator<NexusPropertiesSettings>;
 	private settingsSubscription: Subscription | null = null;
 	private currentSettings: NexusPropertiesSettings;
 	private selectedViewType: BaseViewType = "children";
 	private showArchived = false;
 	private viewSelectorEl: HTMLElement | null = null;
-	private onViewTypeChange?: (viewType: BaseViewType) => void;
 	private lastFilePath: string | null = null;
 	private isUpdating = false;
+	private hierarchySource: HierarchySourceType;
 
 	constructor(
-		app: App,
-		containerEl: HTMLElement,
-		plugin: NexusPropertiesPlugin,
+		private app: App,
+		private contentEl: HTMLElement,
+		private plugin: NexusPropertiesPlugin,
 		initialViewType?: BaseViewType,
 		initialShowArchived?: boolean,
-		onViewTypeChange?: (viewType: BaseViewType) => void
+		hierarchySource?: HierarchySourceType,
+		private onViewTypeChange?: (viewType: BaseViewType) => void
 	) {
 		super();
-		this.app = app;
-		this.contentEl = containerEl;
-		this.plugin = plugin;
+		this.hierarchySource = hierarchySource ?? "properties";
 		this.component = new Component();
 		this.component.load();
 		this.currentSettings = plugin.settingsStore.currentSettings;
 		this.includedPropertiesEvaluator = new IncludedPropertiesEvaluator(plugin.settingsStore.settings$);
-		this.onViewTypeChange = onViewTypeChange;
 
 		if (initialViewType) {
 			this.selectedViewType = initialViewType;
@@ -58,7 +47,6 @@ export class BasesView extends RegisteredEventsComponent {
 
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
 			this.currentSettings = settings;
-			// Force re-render when settings change
 			this.lastFilePath = null;
 			this.render();
 		});
@@ -168,12 +156,10 @@ export class BasesView extends RegisteredEventsComponent {
 			if (this.onViewTypeChange) {
 				this.onViewTypeChange(this.selectedViewType);
 			}
-			// Force re-render by clearing last path since view changed
 			this.lastFilePath = null;
 			await this.render();
 		});
 
-		// Right-click to toggle forward through views
 		selectEl.addEventListener("contextmenu", async (e) => {
 			e.preventDefault();
 			await this.toggleViewForward();
@@ -182,7 +168,7 @@ export class BasesView extends RegisteredEventsComponent {
 
 	private async renderSelectedView(activeFile: TFile, container: HTMLElement): Promise<void> {
 		const basesMarkdown = this.selectedViewType.startsWith("all-")
-			? this.buildRecursiveBasesMarkdown(activeFile)
+			? await this.buildRecursiveBasesMarkdownAsync(activeFile)
 			: this.buildNormalBasesMarkdown(activeFile);
 
 		await MarkdownRenderer.render(this.app, basesMarkdown, container, activeFile.path, this.component);
@@ -210,9 +196,14 @@ ${orderArray}
 `;
 	}
 
-	private buildRecursiveBasesMarkdown(activeFile: TFile): string {
+	private async buildRecursiveBasesMarkdownAsync(activeFile: TFile): Promise<string> {
 		const relationshipType = this.selectedViewType.replace("all-", "") as "children" | "parent" | "related";
-		const allNodes = collectRelatedNodesRecursively(this.app, this.plugin.indexer, activeFile, relationshipType);
+
+		const provider = HierarchyProvider.getInstance(this.app, this.plugin.indexer, this.plugin.settingsStore);
+
+		const allNodes = await provider.collectRelatedNodesRecursively(activeFile, relationshipType, this.hierarchySource, {
+			mocFilePath: activeFile.path,
+		});
 
 		const orderArray = this.buildOrderArray(activeFile);
 		const viewName = this.getAllViewName(relationshipType, allNodes.size);

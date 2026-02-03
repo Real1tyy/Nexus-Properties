@@ -78,7 +78,7 @@ describe("Folder Notes Graph Building", () => {
 	};
 
 	describe("Single Tree (frontmatter-based)", () => {
-		it("should build tree from frontmatter Parent/Child relationships", () => {
+		it("should build tree from frontmatter Parent/Child relationships", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} }, // Folder note (excluded)
 				{ path: "tasks/task1.md", frontmatter: {} }, // Root (no Parent)
@@ -106,7 +106,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -130,7 +130,7 @@ describe("Folder Notes Graph Building", () => {
 			});
 		});
 
-		it("should handle deep hierarchy from frontmatter", () => {
+		it("should handle deep hierarchy from frontmatter", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} }, // Folder note
 				{ path: "tasks/task1.md", frontmatter: {} }, // Root
@@ -158,7 +158,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -174,7 +174,7 @@ describe("Folder Notes Graph Building", () => {
 	});
 
 	describe("Forest (multiple trees from frontmatter)", () => {
-		it("should build forest with multiple independent trees", () => {
+		it("should build forest with multiple independent trees", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} }, // Folder note
 				// Tree 1
@@ -205,7 +205,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -227,7 +227,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(2);
 		});
 
-		it("should handle forest with different tree depths", () => {
+		it("should handle forest with different tree depths", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} },
 				// Tree 1: Single node
@@ -262,7 +262,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -275,7 +275,7 @@ describe("Folder Notes Graph Building", () => {
 	});
 
 	describe("Edge Cases", () => {
-		it("should handle empty folder (only folder note)", () => {
+		it("should handle empty folder (only folder note)", async () => {
 			const files = [{ path: "tasks/tasks.md", frontmatter: {} }];
 
 			const mockApp = createMockApp(files);
@@ -283,7 +283,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -294,7 +294,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(0);
 		});
 
-		it("should skip files without frontmatter", () => {
+		it("should skip files without frontmatter", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} }, // Folder note
 				{ path: "tasks/task1.md", frontmatter: {} }, // Has frontmatter
@@ -313,7 +313,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -325,7 +325,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(nodeIds).not.toContain("tasks/task2.md"); // No frontmatter
 		});
 
-		it("should respect hierarchy max depth", () => {
+		it("should respect hierarchy max depth", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} },
 				{ path: "tasks/task1.md", frontmatter: {} },
@@ -356,7 +356,7 @@ describe("Folder Notes Graph Building", () => {
 			mockSettingsStore.settings$.value.hierarchyMaxDepth = 2;
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -372,7 +372,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(nodeIds).not.toContain("tasks/task4.md"); // Level 3+
 		});
 
-		it("should avoid duplicate nodes when processing multiple files", () => {
+		it("should avoid duplicate nodes when processing multiple files", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} },
 				{ path: "tasks/task1.md", frontmatter: {} }, // Root
@@ -401,7 +401,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -422,7 +422,7 @@ describe("Folder Notes Graph Building", () => {
 	});
 
 	describe("Level Assignment", () => {
-		it("should assign correct levels based on frontmatter hierarchy", () => {
+		it("should assign correct levels based on frontmatter hierarchy", async () => {
 			const files = [
 				{ path: "tasks/tasks.md", frontmatter: {} },
 				{ path: "tasks/task1.md", frontmatter: {} }, // Root (level 0)
@@ -450,7 +450,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "tasks/tasks.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -468,7 +468,7 @@ describe("Folder Notes Graph Building", () => {
 	});
 
 	describe("Wiki Link Resolution with Folders (Bug Fix)", () => {
-		it("should resolve short wiki links [[Child]] when files are in same folder", () => {
+		it("should resolve short wiki links [[Child]] when files are in same folder", async () => {
 			const files = [
 				{ path: "Test/Parent.md", frontmatter: { Child: ["[[Child]]"] } },
 				{ path: "Test/Child.md", frontmatter: { Parent: ["[[Parent]]"] } },
@@ -491,7 +491,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Test/Parent.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -512,7 +512,7 @@ describe("Folder Notes Graph Building", () => {
 			});
 		});
 
-		it("should resolve short wiki links when files are in different folders", () => {
+		it("should resolve short wiki links when files are in different folders", async () => {
 			const files = [
 				{ path: "Folder1/Parent.md", frontmatter: { Child: ["[[Child]]"] } },
 				{ path: "Folder2/Child.md", frontmatter: { Parent: ["[[Parent]]"] } },
@@ -535,7 +535,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Folder1/Parent.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -556,7 +556,7 @@ describe("Folder Notes Graph Building", () => {
 			});
 		});
 
-		it("should handle related view with short wiki links in folders", () => {
+		it("should handle related view with short wiki links in folders", async () => {
 			const files = [
 				{ path: "Test/Parent.md", frontmatter: { Related: ["[[Child]]"] } },
 				{ path: "Test/Child.md", frontmatter: { Related: ["[[Parent]]"] } },
@@ -578,7 +578,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Test/Parent.md",
 				renderRelated: true,
 				includeAllRelated: false,
@@ -601,7 +601,7 @@ describe("Folder Notes Graph Building", () => {
 	});
 
 	describe("Cross-Folder Hierarchies", () => {
-		it("should build hierarchy with parent and child in completely different folders", () => {
+		it("should build hierarchy with parent and child in completely different folders", async () => {
 			const files = [
 				{ path: "Projects/ProjectA.md", frontmatter: { Child: ["[[Task1]]"] } },
 				{ path: "Tasks/Task1.md", frontmatter: { Parent: ["[[ProjectA]]"] } },
@@ -625,7 +625,7 @@ describe("Folder Notes Graph Building", () => {
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
 			// Start from parent to build hierarchy downward (simulates opening parent file)
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Projects/ProjectA.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -643,7 +643,7 @@ describe("Folder Notes Graph Building", () => {
 			});
 		});
 
-		it("should build deep hierarchy spanning multiple folders starting from root", () => {
+		it("should build deep hierarchy spanning multiple folders starting from root", async () => {
 			// Grandparent in root, Parent in Projects, Child in Tasks, Grandchild in Archive
 			const files = [
 				{ path: "Company.md", frontmatter: { Child: ["[[Department]]"] } },
@@ -670,7 +670,7 @@ describe("Folder Notes Graph Building", () => {
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
 			// Start from root to build hierarchy downward
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Company.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -689,7 +689,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(3);
 		});
 
-		it("should handle absolute path wiki links across folders", () => {
+		it("should handle absolute path wiki links across folders", async () => {
 			const files = [
 				{ path: "Folder1/Parent.md", frontmatter: { Child: ["[[Folder2/Subfolder/Child]]"] } },
 				{ path: "Folder2/Subfolder/Child.md", frontmatter: { Parent: ["[[Folder1/Parent]]"] } },
@@ -712,7 +712,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Folder1/Parent.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -726,7 +726,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(1);
 		});
 
-		it("should handle multiple children in different folders", () => {
+		it("should handle multiple children in different folders", async () => {
 			const files = [
 				{ path: "Parent.md", frontmatter: { Child: ["[[Child1]]", "[[Child2]]", "[[Child3]]"] } },
 				{ path: "Folder1/Child1.md", frontmatter: { Parent: ["[[Parent]]"] } },
@@ -751,7 +751,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Parent.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -769,7 +769,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(3);
 		});
 
-		it("should handle multiple parents in different folders", () => {
+		it("should handle multiple parents in different folders", async () => {
 			const files = [
 				{ path: "Categories/CategoryA.md", frontmatter: { Child: ["[[SharedItem]]"] } },
 				{ path: "Tags/TagB.md", frontmatter: { Child: ["[[SharedItem]]"] } },
@@ -794,7 +794,7 @@ describe("Folder Notes Graph Building", () => {
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
 			// Start from first parent to build hierarchy downward
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Categories/CategoryA.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -809,7 +809,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(1);
 		});
 
-		it("should handle related nodes across different folders", () => {
+		it("should handle related nodes across different folders", async () => {
 			const files = [
 				{ path: "Notes/NoteA.md", frontmatter: { Related: ["[[NoteB]]", "[[NoteC]]"] } },
 				{ path: "Archive/NoteB.md", frontmatter: { Related: ["[[NoteA]]"] } },
@@ -832,7 +832,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Notes/NoteA.md",
 				renderRelated: true,
 				includeAllRelated: false,
@@ -848,7 +848,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(2);
 		});
 
-		it("should handle mixed hierarchy and related across folders", () => {
+		it("should handle mixed hierarchy and related across folders", async () => {
 			const files = [
 				{ path: "Projects/Project.md", frontmatter: { Child: ["[[Task]]"], Related: ["[[Reference]]"] } },
 				{ path: "Tasks/Task.md", frontmatter: { Parent: ["[[Project]]"] } },
@@ -875,7 +875,7 @@ describe("Folder Notes Graph Building", () => {
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
 
 			// Test hierarchy view (should show parent-child)
-			const hierarchyResult = graphBuilder.buildGraph({
+			const hierarchyResult = await graphBuilder.buildGraph({
 				sourcePath: "Projects/Project.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -887,7 +887,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(hierarchyNodeIds).toContain("Tasks/Task.md");
 
 			// Test related view (should show related)
-			const relatedResult = graphBuilder.buildGraph({
+			const relatedResult = await graphBuilder.buildGraph({
 				sourcePath: "Projects/Project.md",
 				renderRelated: true,
 				includeAllRelated: false,
@@ -899,7 +899,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(relatedNodeIds).toContain("References/Reference.md");
 		});
 
-		it("should handle wiki links with aliases across folders", () => {
+		it("should handle wiki links with aliases across folders", async () => {
 			const files = [
 				{ path: "Work/Project.md", frontmatter: { Child: ["[[Personal/Task|My Task]]"] } },
 				{ path: "Personal/Task.md", frontmatter: { Parent: ["[[Work/Project|Work Project]]"] } },
@@ -922,7 +922,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Work/Project.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -936,7 +936,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(1);
 		});
 
-		it("should handle files with same name in different folders", () => {
+		it("should handle files with same name in different folders", async () => {
 			const files = [
 				{ path: "Folder1/Note.md", frontmatter: { Child: ["[[Folder2/Note]]"] } },
 				{ path: "Folder2/Note.md", frontmatter: { Parent: ["[[Folder1/Note]]"] } },
@@ -959,7 +959,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Folder1/Note.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -974,7 +974,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(1);
 		});
 
-		it("should handle deeply nested folder structures", () => {
+		it("should handle deeply nested folder structures", async () => {
 			const files = [
 				{ path: "A/B/C/D/Parent.md", frontmatter: { Child: ["[[Child]]"] } },
 				{ path: "X/Y/Z/Child.md", frontmatter: { Parent: ["[[Parent]]"] } },
@@ -997,7 +997,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "A/B/C/D/Parent.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -1011,7 +1011,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(1);
 		});
 
-		it("should handle root-level file linked to nested file", () => {
+		it("should handle root-level file linked to nested file", async () => {
 			const files = [
 				{ path: "RootNote.md", frontmatter: { Child: ["[[NestedChild]]"] } },
 				{ path: "Deep/Nested/Folder/NestedChild.md", frontmatter: { Parent: ["[[RootNote]]"] } },
@@ -1034,7 +1034,7 @@ describe("Folder Notes Graph Building", () => {
 			const mockSettingsStore = createMockSettingsStore();
 
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "RootNote.md",
 				renderRelated: false,
 				includeAllRelated: false,
@@ -1048,7 +1048,7 @@ describe("Folder Notes Graph Building", () => {
 			expect(result.edges).toHaveLength(1);
 		});
 
-		it("should handle circular references across folders without infinite loops", () => {
+		it("should handle circular references across folders without infinite loops", async () => {
 			const files = [
 				{ path: "Folder1/A.md", frontmatter: { Child: ["[[B]]"] } },
 				{ path: "Folder2/B.md", frontmatter: { Parent: ["[[A]]"], Child: ["[[C]]"] } },
@@ -1083,7 +1083,7 @@ describe("Folder Notes Graph Building", () => {
 				});
 			}).not.toThrow();
 
-			const result = graphBuilder.buildGraph({
+			const result = await graphBuilder.buildGraph({
 				sourcePath: "Folder1/A.md",
 				renderRelated: false,
 				includeAllRelated: false,

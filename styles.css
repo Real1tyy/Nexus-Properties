@@ -1677,6 +1677,29 @@ button.nexus-properties-view-toggle-button:active {
 	color: var(--text-on-accent);
 }
 
+/* Hierarchy source dropdown in view switcher header */
+.nexus-properties-hierarchy-source-dropdown {
+	padding: 4px 8px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.nexus-properties-hierarchy-source-dropdown:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-properties-hierarchy-source-dropdown:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+}
+
 /* Graph container when inside switcher */
 .nexus-properties-graph-container {
 	display: flex;
@@ -1750,6 +1773,40 @@ button.nexus-properties-view-toggle-button:active {
 	background: var(--background-primary);
 	color: var(--text-normal);
 	padding: 4px 8px;
+}
+
+/* Bases Hierarchy Source Select */
+.nexus-properties-bases-hierarchy-source-select {
+	width: auto;
+	min-width: 100px;
+	padding: 6px 8px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	font-size: 12px;
+	cursor: pointer;
+	transition:
+		background 0.15s,
+		border-color 0.15s;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 6px center;
+	padding-right: 24px;
+}
+
+.nexus-properties-bases-hierarchy-source-select:hover {
+	background: var(--background-primary-alt);
+	border-color: var(--interactive-accent);
+	color: var(--text-normal);
+}
+
+.nexus-properties-bases-hierarchy-source-select:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
 }
 
 /* View Switcher Header Archived Toggle */
@@ -1878,6 +1935,29 @@ button.nexus-properties-view-toggle-button:active {
 .nexus-properties-moc-toolbar-btn:hover {
 	background: var(--background-modifier-hover);
 	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+
+/* Hierarchy source dropdown */
+.nexus-properties-moc-source-dropdown {
+	padding: 4px 8px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: all 0.15s;
+}
+
+.nexus-properties-moc-source-dropdown:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-properties-moc-source-dropdown:focus {
+	outline: none;
 	border-color: var(--interactive-accent);
 }
 

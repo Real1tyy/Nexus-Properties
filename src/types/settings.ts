@@ -144,9 +144,11 @@ export const NexusPropertiesSettingsSchema = z
 		// Bases view type (table, cards, list)
 		basesViewType: z.enum(["table", "cards", "list"]).catch(SETTINGS_DEFAULTS.DEFAULT_BASES_VIEW_TYPE),
 
+		// Hierarchy source setting
+		hierarchySource: z.enum(["properties", "moc-content"]).catch(SETTINGS_DEFAULTS.DEFAULT_HIERARCHY_SOURCE),
+
 		// MOC view settings
 		mocDisplayProperties: z.array(z.string()).catch([...SETTINGS_DEFAULTS.DEFAULT_MOC_DISPLAY_PROPERTIES]),
-		hierarchySource: z.enum(["properties", "moc-content"]).catch(SETTINGS_DEFAULTS.DEFAULT_HIERARCHY_SOURCE),
 
 		// Frontmatter propagation settings
 		propagateFrontmatterToChildren: z.boolean().catch(SETTINGS_DEFAULTS.PROPAGATE_FRONTMATTER_TO_CHILDREN),

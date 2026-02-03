@@ -9,10 +9,12 @@ import {
 	isFolderNote,
 } from "@real1ty-obsidian-plugins";
 import type { ElementDefinition } from "cytoscape";
-import type { App } from "obsidian";
+import { type App, TFile } from "obsidian";
 import type { NexusPropertiesSettings } from "../types/settings";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
+import { HierarchyProvider, type HierarchySourceType } from "./hierarchy";
+import type { TreeNode } from "../utils/hierarchy";
 
 interface GraphData {
 	nodes: ElementDefinition[];
@@ -38,6 +40,8 @@ interface GraphBuilderOptions {
 	startFromCurrent: boolean;
 	searchQuery?: string;
 	filterEvaluator?: (frontmatter: Record<string, any>) => boolean;
+	hierarchySource?: HierarchySourceType;
+	mocFilePath?: string;
 }
 
 interface ValidFileContext extends FileContext {
@@ -57,11 +61,12 @@ export class GraphBuilder {
 	private prioritizeParentProp: string;
 	private titleProp: string;
 	private depthOverride: number | null = null;
+	private hierarchySource: HierarchySourceType = "properties";
 
 	constructor(
 		private readonly app: App,
 		private readonly indexer: Indexer,
-		settingsStore: SettingsStore
+		private readonly settingsStore: SettingsStore
 	) {
 		this.filterEvaluator = new FilterEvaluator(settingsStore.settings$);
 		this.colorEvaluator = new ColorEvaluator(settingsStore.settings$);
@@ -72,9 +77,14 @@ export class GraphBuilder {
 			this.maintainIndirectConnections = settings.maintainIndirectConnections;
 			this.prioritizeParentProp = settings.prioritizeParentProp;
 			this.titleProp = settings.titleProp;
+			this.hierarchySource = settings.hierarchySource;
 		};
 		applySettings(settingsStore.settings$.value);
 		settingsStore.settings$.subscribe(applySettings);
+	}
+
+	public setHierarchySource(source: HierarchySourceType): void {
+		this.hierarchySource = source;
 	}
 
 	public setDepthOverride(depth: number | null): void {
@@ -165,10 +175,11 @@ export class GraphBuilder {
 		};
 	}
 
-	buildGraph(options: GraphBuilderOptions): GraphData {
+	async buildGraph(options: GraphBuilderOptions): Promise<GraphData> {
 		let graphData: GraphData;
 
 		const isFolder = isFolderNote(options.sourcePath);
+		const effectiveHierarchySource = options.hierarchySource ?? this.hierarchySource;
 
 		if (isFolder) {
 			if (options.renderRelated) {
@@ -183,6 +194,12 @@ export class GraphBuilder {
 			} else {
 				graphData = this.buildRelatedGraphData(options.sourcePath);
 			}
+		} else if (effectiveHierarchySource === "moc-content") {
+			graphData = await this.buildMocBasedHierarchyGraph(
+				options.sourcePath,
+				options.startFromCurrent,
+				options.mocFilePath
+			);
 		} else {
 			graphData = this.buildHierarchyGraphData(options.sourcePath, options.startFromCurrent);
 		}
@@ -305,6 +322,70 @@ export class GraphBuilder {
 
 		dfsUpwards(startPath, 0);
 		return topmostParent;
+	}
+
+	/**
+	 * Build graph data from MOC content (bullet list hierarchy).
+	 */
+	private async buildMocBasedHierarchyGraph(
+		sourcePath: string,
+		startFromCurrent: boolean,
+		mocFilePath?: string
+	): Promise<GraphData> {
+		const nodes: ElementDefinition[] = [];
+		const edges: ElementDefinition[] = [];
+		const processedPaths = new Set<string>();
+
+		const provider = HierarchyProvider.getInstance(this.app, this.indexer, this.settingsStore);
+
+		const file = this.app.vault.getAbstractFileByPath(sourcePath);
+		if (!(file instanceof TFile)) {
+			return { nodes, edges };
+		}
+
+		const options = {
+			highlightPath: sourcePath,
+			mocFilePath: mocFilePath || sourcePath,
+		};
+
+		const tree = startFromCurrent
+			? await provider.buildTree(file, "moc-content", options)
+			: await provider.buildTreeFromTopParent(file, "moc-content", options);
+
+		this.convertTreeToGraphData(tree, nodes, edges, processedPaths, sourcePath);
+		return { nodes, edges };
+	}
+
+	/**
+	 * Recursively convert a TreeNode to graph nodes and edges.
+	 */
+	private convertTreeToGraphData(
+		treeNode: TreeNode,
+		nodes: ElementDefinition[],
+		edges: ElementDefinition[],
+		processedPaths: Set<string>,
+		sourcePath: string,
+		parentPath?: string,
+		level = 0
+	): void {
+		const effectiveDepth = this.getEffectiveHierarchyMaxDepth();
+		if (level >= effectiveDepth) return;
+		if (processedPaths.has(treeNode.path)) return;
+
+		processedPaths.add(treeNode.path);
+
+		const node = this.createNodeElement(treeNode.path, level, treeNode.path === sourcePath);
+		nodes.push(node);
+
+		if (parentPath) {
+			edges.push({
+				data: { source: parentPath, target: treeNode.path },
+			});
+		}
+
+		for (const child of treeNode.children) {
+			this.convertTreeToGraphData(child, nodes, edges, processedPaths, sourcePath, treeNode.path, level + 1);
+		}
 	}
 
 	private buildRecursiveConstellations(sourcePath: string): ConstellationGraphData {

@@ -26,16 +26,6 @@ export class BasesViewSettingsSection implements SettingsSection {
 			.createDiv("setting-item-description nexus-properties-section-description")
 			.setText("Configure which frontmatter properties to display next to each item in the MOC (Map of Content) view.");
 
-		this.uiBuilder.addDropdown(container, {
-			key: "hierarchySource",
-			name: "Default hierarchy source",
-			desc: "Choose where to read hierarchy relationships from. 'Properties' uses frontmatter (Parent/Child properties). 'MOC Content' parses bullet list hierarchies from the current note.",
-			options: {
-				properties: "Properties (frontmatter)",
-				"moc-content": "MOC Content (bullet lists)",
-			},
-		});
-
 		this.uiBuilder.addTextArray(container, {
 			key: "mocDisplayProperties",
 			name: "Display properties",

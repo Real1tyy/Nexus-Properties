@@ -2,21 +2,13 @@ import { RegisteredEventsComponent, renderPropertyValue, type PropertyRendererCo
 import { type App, Component, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 import type { Indexer } from "../../core/indexer";
+import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
-import { buildHierarchyTree, buildHierarchyTreeFromTopParent, type TreeNode } from "../../utils/hierarchy";
+import { type TreeNode } from "../../utils/hierarchy";
 
-/**
- * MOC (Map of Content) view component that renders the hierarchy
- * as an interactive collapsible tree
- */
 export class MocView extends RegisteredEventsComponent {
-	private app: App;
-	private contentEl: HTMLElement;
-	private component: Component;
-	private plugin: NexusPropertiesPlugin;
-	private indexer: Indexer;
 	private settingsSubscription: Subscription | null = null;
 	private currentSettings: NexusPropertiesSettings;
 	private lastFilePath: string | null = null;
@@ -25,13 +17,16 @@ export class MocView extends RegisteredEventsComponent {
 	private treeContainer: HTMLElement | null = null;
 	private useTopParentAsRoot = false;
 	private rootModeBtn: HTMLButtonElement | null = null;
+	private component: Component;
 
-	constructor(app: App, containerEl: HTMLElement, plugin: NexusPropertiesPlugin, indexer: Indexer) {
+	constructor(
+		private app: App,
+		private contentEl: HTMLElement,
+		private plugin: NexusPropertiesPlugin,
+		private indexer: Indexer,
+		private hierarchySource: HierarchySourceType
+	) {
 		super();
-		this.app = app;
-		this.contentEl = containerEl;
-		this.plugin = plugin;
-		this.indexer = indexer;
 		this.component = new Component();
 		this.component.load();
 		this.currentSettings = plugin.settingsStore.currentSettings;
@@ -73,11 +68,16 @@ export class MocView extends RegisteredEventsComponent {
 				cls: cls("moc-tree-container"),
 			});
 
+			const provider = HierarchyProvider.getInstance(this.app, this.indexer, this.plugin.settingsStore);
+
+			const options = {
+				prioritizeParentProp: this.currentSettings.prioritizeParentProp,
+				mocFilePath: activeFile.path,
+			};
+
 			const tree = this.useTopParentAsRoot
-				? buildHierarchyTreeFromTopParent(this.app, this.indexer, activeFile, {
-						prioritizeParentProp: this.currentSettings.prioritizeParentProp,
-					})
-				: buildHierarchyTree(this.app, this.indexer, activeFile);
+				? await provider.buildTreeFromTopParent(activeFile, this.hierarchySource, options)
+				: await provider.buildTree(activeFile, this.hierarchySource, options);
 			this.renderTree(tree, this.treeContainer, 0);
 		} finally {
 			this.isUpdating = false;
