@@ -463,9 +463,9 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 #### Automatic Node Label Prefix Stripping
 - **Cleaner Graph Labels**: Child node labels automatically strip redundant parent name prefixes in hierarchical views, making the graph cleaner and easier to read.
 - **Smart Pattern Matching**: Handles three common naming patterns:
-  - Parent name + space (e.g., "Females Addictions" → "Addictions")
-  - Parent name + " - " (e.g., "Cold Approaching - Only Repels" → "Only Repels")
-  - Parent name + "-" (e.g., "Cold Approaching-Real1ty" → "Real1ty")
+  - Parent name + space (e.g., "Italian Cuisine Pasta" → "Pasta")
+  - Parent name + " - " (e.g., "Work Project - Design Phase" → "Design Phase")
+  - Parent name + "-" (e.g., "Mathematics-Algebra" → "Algebra")
 - **Automatic Application**: Works automatically in hierarchical graph views - no configuration needed.
 - **Reduced Visual Clutter**: Eliminates repetitive parent names in child node labels, making relationships clearer at a glance.
 
