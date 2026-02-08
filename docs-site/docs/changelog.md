@@ -14,6 +14,10 @@ All notable changes to Nexus Properties will be documented here.
 
 ## 1.7.0 - 3.2.2026
 
+### New Video
+
+- [Nexus Properties — Graph, Bases & MOCs Feature Improvements](https://www.youtube.com/watch?v=JLvChLFp-do)
+
 ### New Features
 
 #### MOC Content Hierarchy Source

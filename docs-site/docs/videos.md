@@ -7,6 +7,23 @@ description: Complete video guide collection for Nexus Properties
 
 ---
 
+## v1.7.0 Release — Graph, Bases & MOCs Feature Improvements
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <iframe
+    style={{"width":"100%", "aspectRatio": "16/9"}}
+    src="https://www.youtube.com/embed/JLvChLFp-do"
+    title="Nexus Properties — Graph, Bases & MOCs Feature Improvements"
+    frameBorder="0"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+    allowFullScreen>
+  </iframe>
+</div>
+
+**Major v1.7.0 Update**: Every new feature in one video — frontmatter propagation, graph view upgrades, Maps of Content, Bases filtering & view options, mobile experience, title property support, undo/redo, depth control, and more. Major improvements across visuals, navigation, and overall structure since v1.2.
+
+---
+
 ## Full Tutorial — Zero to Mastery
 
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
