@@ -259,13 +259,3 @@ To use this workflow:
 2. Or click the hierarchy source toggle button when viewing a file with valid MOC structure
 
 [Learn more about MOC Content Hierarchy →](features/moc-view#moc-content-hierarchy)
-
-## Tips for Success
-
-1. **Use consistent property names** - Stick with the default `Parent`, `Child`, `Related` or customize them in settings
-2. **Let the plugin do the work** - Only set relationships in one direction, the plugin handles the rest
-3. **Use wiki links** - Always use `[[note name]]` format for relationships
-4. **Enable auto-link siblings** - Makes sense for most hierarchies
-5. **Configure directory scanning** - Focus on specific folders if you have a large vault
-
-Happy networking! 🚀
