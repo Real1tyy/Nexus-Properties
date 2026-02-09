@@ -57,3 +57,13 @@ description: Complete video guide collection for Nexus Properties
 **Practical System Building**: See how I use Nexus Properties to break down goals and projects into structured hierarchies, combining parent-child relationships with tagging systems. I also discuss when this approach is worth adopting and when it might be overkill for your workflow.
 
 ---
+
+## Complete Video Playlist
+
+For the full collection of Nexus Properties tutorials and updates, check out the complete playlist on YouTube:
+
+**[📺 Watch the Complete Nexus Properties Playlist](https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be)**
+
+The playlist includes all tutorials, feature updates, and walkthroughs in one convenient location.
+
+---
