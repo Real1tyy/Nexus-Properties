@@ -1,8 +1,8 @@
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
 ---
 sidebar_position: 3
 ---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Graph Views
 

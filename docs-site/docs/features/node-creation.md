@@ -1,8 +1,8 @@
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
 ---
 sidebar_position: 11
 ---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Node Creation
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>

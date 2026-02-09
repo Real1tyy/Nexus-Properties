@@ -1,8 +1,8 @@
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
 ---
 sidebar_position: 6
 ---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Filtering
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>

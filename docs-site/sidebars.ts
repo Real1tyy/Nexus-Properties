@@ -11,7 +11,7 @@ const sidebars: SidebarsConfig = {
 		"quickstart",
 		"mobile",
 		"videos",
-		"screenshots",
+		"gallery",
 		{
 			type: "category",
 			label: "Features",

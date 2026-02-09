@@ -1,8 +1,8 @@
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
 ---
 sidebar_position: 10
 ---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Context Menus
 

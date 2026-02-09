@@ -1,8 +1,8 @@
-import useBaseUrl from "@docusaurus/useBaseUrl";
-
 ---
 sidebar_position: 5
 ---
+
+import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Color Rules
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
