@@ -1,3 +1,5 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 8
 ---
@@ -7,6 +9,7 @@ sidebar_position: 8
 Hover over nodes to see frontmatter properties instantly.
 
 ![Node Tooltips](/img/screenshots/tooltips.png)
+
 *Hover tooltip showing configured properties*
 
 ## Usage

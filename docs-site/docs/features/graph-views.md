@@ -1,3 +1,5 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 3
 ---
@@ -53,6 +55,19 @@ The title property is updated automatically when:
 See [Configuration](../configuration#node-creation-shortcuts) for property name settings.
 
 ## Depth Control
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Depth.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 Control how deeply the graph traverses hierarchical relationships with the depth slider in the graph view header.
 
@@ -87,6 +102,20 @@ See [Configuration](../configuration#depth-settings) for default depth values.
 *Related view with radial layout*
 
 ### All Related
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/RenderRelated.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 **Shows**: Entire constellation recursively up to [max depth](../configuration#all-related-recursion-depth)
 

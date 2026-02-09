@@ -1,12 +1,26 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 6
 ---
 
 # Filtering
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Filters.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 Filter nodes using JavaScript expressions. Only nodes where ALL expressions return `true` are shown.
 
-![Graph Filtering](/img/screenshots/filtering.png)
 *Active filtering with JavaScript expressions*
 
 ## Using Filters

@@ -1,8 +1,23 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 5
 ---
 
 # Color Rules
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Color.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 Apply conditional colors to nodes based on frontmatter properties using JavaScript expressions.
 
@@ -19,6 +34,7 @@ Apply conditional colors to nodes based on frontmatter properties using JavaScri
 **Access**: Settings → Nexus Properties → Node colors → Add Rule
 
 ![Color Rules Settings](/img/screenshots/color-rules-settings.png)
+
 *Color rule configuration interface*
 
 **Components**:

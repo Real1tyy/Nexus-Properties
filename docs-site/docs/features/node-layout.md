@@ -1,3 +1,5 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 4
 ---
@@ -19,6 +21,20 @@ Automatic node positioning using different algorithms based on view mode.
 **Best for**: Projects, org charts, taxonomies
 
 ### Multi-Row Layout (Large Families)
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/MultiRow.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 **Used in**: Hierarchical mode (optional setting)
 

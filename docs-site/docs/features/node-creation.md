@@ -1,8 +1,23 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 11
 ---
 
 # Node Creation
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Childnodes.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 Create parent, child, or related nodes instantly from commands using a clean modal interface. New nodes inherit properties, establish bidirectional relationships, and open for editing.
 

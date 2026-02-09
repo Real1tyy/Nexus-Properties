@@ -1,3 +1,5 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 7
 ---
@@ -6,7 +8,20 @@ sidebar_position: 7
 
 Preview notes inline by clicking any node in the graph. View frontmatter and content without leaving the visualization.
 
-![Zoom Mode](/img/screenshots/zoom-mode.png)
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Hide.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 *Zoom preview showing frontmatter and content*
 
 ## Entering & Exiting

@@ -1,8 +1,24 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 2
 ---
 
 # Bidirectional Sync
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/AddRelationship.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 Automatically manages bidirectional relationships. Set a relationship in one direction, the reverse is created automatically.
 

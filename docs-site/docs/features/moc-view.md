@@ -1,8 +1,24 @@
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 ---
 sidebar_position: 5
 ---
 
 # MOC View
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Bases.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 Map of Content (MOC) view renders your hierarchy as an interactive collapsible tree with clickable wiki links. Perfect for exploring your knowledge structure at a glance.
 
