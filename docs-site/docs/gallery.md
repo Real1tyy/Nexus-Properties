@@ -52,7 +52,7 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/Zoom.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/ZoomMode.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -67,7 +67,7 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/Hide.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/ZoomConfigurations.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
