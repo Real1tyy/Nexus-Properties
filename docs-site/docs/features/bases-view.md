@@ -19,9 +19,6 @@ List-based view of the current note's relationships. Shows children, parent, and
   </video>
 </div>
 
-![Bases View](/img/screenshots/bases-view.png)
-*List-based view of relationships*
-
 ## View Types
 
 Bases view offers three relationship perspectives:

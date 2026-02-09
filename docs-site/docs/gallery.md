@@ -27,7 +27,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Graph Views — All Related
+### Graph Views — Related View
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -57,7 +57,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Zoom Mode — Hide Sections
+### Zoom Mode
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
