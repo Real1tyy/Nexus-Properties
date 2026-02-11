@@ -3,9 +3,31 @@ sidebar_position: 1
 slug: /
 ---
 
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 # Nexus Properties
 
 **Nexus Properties** is a powerful Obsidian plugin that automatically manages bidirectional property relationships and provides an interactive relationship graph visualization. It helps you build and navigate complex knowledge networks by maintaining consistent parent-child and related relationships across your vault.
+
+## Preview
+
+<div style={{"display": "flex", "flexWrap": "wrap", "gap": "1em", "justifyContent": "center", "marginBottom": "1em"}}>
+  <video controls autoPlay loop muted playsInline style={{"flex": "1 1 45%", "minWidth": "300px", "maxWidth": "50%", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/BasesNEW.webm")} type="video/webm" />
+  </video>
+  <video controls autoPlay loop muted playsInline style={{"flex": "1 1 45%", "minWidth": "300px", "maxWidth": "50%", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/MultiRow.webm")} type="video/webm" />
+  </video>
+</div>
+
+<div style={{"display": "flex", "flexWrap": "wrap", "gap": "1em", "justifyContent": "center", "marginBottom": "2em"}}>
+  <video controls autoPlay loop muted playsInline style={{"flex": "1 1 45%", "minWidth": "300px", "maxWidth": "50%", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/Depth.webm")} type="video/webm" />
+  </video>
+  <video controls autoPlay loop muted playsInline style={{"flex": "1 1 45%", "minWidth": "300px", "maxWidth": "50%", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/AllRelatedNEW.webm")} type="video/webm" />
+  </video>
+</div>
 
 ## What is Nexus Properties?
 

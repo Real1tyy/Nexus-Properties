@@ -24,6 +24,18 @@
 
 **Complete Workflow Guide**: In this full tutorial, I walk you through exactly how to use Nexus Properties in practice — from installation and creating your first relationships, to bidirectional sync, graph views, color rules, filtering, and more.
 
+### Feature Previews
+
+<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:1em;">
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/BasesNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/MultiRow.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+</div>
+
+<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:2em;">
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/Depth.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/AllRelatedNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+</div>
+
 </div>
 
 ---

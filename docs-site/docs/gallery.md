@@ -27,7 +27,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Graph Views — Related View
+### Graph Views — All Related
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -37,7 +37,7 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/RenderRelated.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/AllRelatedNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -52,22 +52,7 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/ZoomMode.webm")} type="video/webm" />
-    Your browser does not support the video tag.
-  </video>
-</div>
-
-### Zoom Mode
-<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
-  <video
-    controls
-    autoPlay
-    loop
-    muted
-    playsInline
-    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
-  >
-    <source src={useBaseUrl("/video/ZoomConfigurations.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/ZoomNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -97,7 +82,22 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/Filters.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/FiltersNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### Search
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Search.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -127,7 +127,7 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/TableView.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/BasesNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -147,6 +147,21 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
+### MOC View — MOC Content Mode
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/MOCNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 ### Node Layout — Multi-Row
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
@@ -162,7 +177,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Node Creation — Child Nodes
+### Node Creation — Create Child
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -172,7 +187,22 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/Childnodes.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/CreateChildNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### Node Creation — Create Related
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/CreateRelatedNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -247,7 +277,22 @@ Visual guide to all Nexus Properties features.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/UndoRedo.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/UndoRedoNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### Frontmatter Propagation
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/FrontMatterNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
