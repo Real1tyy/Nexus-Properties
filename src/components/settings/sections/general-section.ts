@@ -159,41 +159,22 @@ export class GeneralSection implements SettingsSection {
 		// Frontmatter Propagation Section
 		new Setting(container).setName("Frontmatter propagation").setHeading();
 
-		new Setting(container)
-			.setName("Propagate frontmatter to children")
-			.setDesc(
-				"Automatically propagate frontmatter changes from parent files to all child files recursively. When you update custom properties (like status, priority, tags) in a parent file, all descendants are updated immediately."
-			)
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settingsStore.currentSettings.propagateFrontmatterToChildren)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							propagateFrontmatterToChildren: value,
-							askBeforePropagatingFrontmatter: value ? false : s.askBeforePropagatingFrontmatter,
-						}));
-						this.rerender();
-					});
-			});
-
-		new Setting(container)
-			.setName("Ask before propagating")
-			.setDesc(
-				"Show a confirmation modal before propagating frontmatter changes to children. Allows you to review changes before applying them to all descendant files."
-			)
-			.addToggle((toggle) => {
-				toggle
-					.setValue(this.plugin.settingsStore.currentSettings.askBeforePropagatingFrontmatter)
-					.onChange(async (value) => {
-						await this.plugin.settingsStore.updateSettings((s) => ({
-							...s,
-							askBeforePropagatingFrontmatter: value,
-							propagateFrontmatterToChildren: value ? false : s.propagateFrontmatterToChildren,
-						}));
-						this.rerender();
-					});
-			});
+		this.uiBuilder.addMutuallyExclusiveToggles(
+			container,
+			{
+				toggleA: {
+					key: "propagateFrontmatterToChildren",
+					name: "Propagate frontmatter to children",
+					desc: "Automatically propagate frontmatter changes from parent files to all child files recursively. When you update custom properties (like status, priority, tags) in a parent file, all descendants are updated immediately.",
+				},
+				toggleB: {
+					key: "askBeforePropagatingFrontmatter",
+					name: "Ask before propagating",
+					desc: "Show a confirmation modal before propagating frontmatter changes to children. Allows you to review changes before applying them to all descendant files.",
+				},
+			},
+			() => this.rerender()
+		);
 
 		this.uiBuilder.addText(container, {
 			key: "excludedPropagatedProps",
