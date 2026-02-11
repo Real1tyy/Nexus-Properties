@@ -28,33 +28,16 @@
 
 <table>
 <tr>
-<td width="50%"><video src="docs-site/static/video/BasesNEW.webm" controls muted loop width="100%"></video></td>
-<td width="50%"><video src="docs-site/static/video/MultiRow.webm" controls muted loop width="100%"></video></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/bases-view"><img src="docs-site/static/img/screenshots/bases-cards-view.png" alt="Bases View" /></a></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/node-layout"><img src="docs-site/static/img/screenshots/MultiRow.png" alt="Multi-Row Layout" /></a></td>
 </tr>
 <tr>
-<td width="50%"><video src="docs-site/static/video/Depth.webm" controls muted loop width="100%"></video></td>
-<td width="50%"><video src="docs-site/static/video/AllRelatedNEW.webm" controls muted loop width="100%"></video></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/graph-views"><img src="docs-site/static/img/screenshots/all-related-view.png" alt="All Related View" /></a></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/moc-view"><img src="docs-site/static/img/screenshots/bases-moc-view.png" alt="MOC View" /></a></td>
 </tr>
 </table>
 
-</div>
-
----
-
-## More Features
-
-<table>
-<tr>
-<td width="50%"><video src="docs-site/static/video/ZoomNEW.webm" controls muted loop width="100%"></video></td>
-<td width="50%"><video src="docs-site/static/video/MOCNEW.webm" controls muted loop width="100%"></video></td>
-</tr>
-<tr>
-<td width="50%"><video src="docs-site/static/video/Color.webm" controls muted loop width="100%"></video></td>
-<td width="50%"><video src="docs-site/static/video/CreateChildNEW.webm" controls muted loop width="100%"></video></td>
-</tr>
-</table>
-
-See the [complete gallery](https://real1tyy.github.io/Nexus-Properties/gallery) for all features.
+See the [full documentation](https://real1tyy.github.io/Nexus-Properties/) for all features and video demos.
 
 ---
 
