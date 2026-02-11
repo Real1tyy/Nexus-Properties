@@ -10,6 +10,8 @@
 
 **Automated property management and interactive relationship visualization for Obsidian — bidirectional sync, graph views, and intelligent property inheritance for power users who want structured knowledge networks.**
 
+</div>
+
 ---
 
 ## Video Tutorials
