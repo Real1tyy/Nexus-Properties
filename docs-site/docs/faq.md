@@ -4,24 +4,18 @@ sidebar_position: 98
 
 # Frequently Asked Questions
 
-Core questions about Nexus Properties functionality.
-
 ## General
-
-### What is Nexus Properties?
-
-Nexus Properties is an Obsidian plugin that automatically manages bidirectional relationships (parent-child, related) and provides an interactive relationship graph to visualize and navigate your knowledge network.
 
 ### What's the difference between this and Obsidian's built-in graph?
 
-Obsidian's graph shows backlinks. Nexus Properties shows **frontmatter-based relationships** with automatic bidirectional sync, multiple view modes, color rules, filtering, and zoom previews.
+Obsidian's graph shows backlinks between notes. Nexus Properties shows **frontmatter-based relationships** with automatic [bidirectional sync](features/bidirectional-sync), multiple [view modes](features/graph-views), [color rules](features/color-rules), [filtering](features/filtering), and [zoom previews](features/zoom-mode).
 
 ### Why use frontmatter relationships instead of backlinks?
 
-- **Explicit structure**: Define clear parent-child hierarchies
-- **Bidirectional sync**: Set once, updates both sides automatically
-- **Typed relationships**: Distinguish between parent, child, and related
-- **Queryable**: Filter and search based on relationship properties
+- **Explicit structure** — Define clear parent-child hierarchies, not just loose links
+- **Bidirectional sync** — Set once, both sides update automatically
+- **Typed relationships** — Distinguish between parent, child, and related
+- **Queryable** — Filter and search based on relationship properties
 
 ---
 
@@ -29,14 +23,14 @@ Obsidian's graph shows backlinks. Nexus Properties shows **frontmatter-based rel
 
 ### How do I break a relationship?
 
-Delete the relationship from one file's frontmatter - the plugin automatically removes it from the other file. Or use context menu: Right-click edge → "Remove Relationship"
+Delete the relationship from one file's frontmatter — the reverse is removed automatically. Or right-click an edge in the graph → "Remove Relationship". See [Context Menus](features/context-menus#edge-context-menu).
 
-### My relationships aren't syncing. What's wrong?
+### My relationships aren't syncing
 
 1. Check [directory scanning](configuration#directory-scanning) includes both files
-2. Verify [property names](configuration#direct-relationship-properties) are correct
-3. Use wiki link format: `[[note name]]`
-4. Run [full rescan](configuration#indexing) to rebuild relationships
+2. Verify [property names](configuration#direct-relationship-properties) match your frontmatter
+3. Use wiki link format: `"[[note name]]"`
+4. Run a [full rescan](configuration#indexing) to rebuild relationships
 
 ---
 
@@ -44,20 +38,17 @@ Delete the relationship from one file's frontmatter - the plugin automatically r
 
 ### Why isn't my file showing in the graph?
 
-Check:
-1. File is in an [indexed directory](configuration#directory-scanning)
-2. File has relationships (`Parent`, `Child`, or `Related`)
-3. Filters aren't hiding it
-4. View mode is appropriate (Hierarchical vs Related)
+1. File must be in an [indexed directory](configuration#directory-scanning)
+2. File needs at least one relationship (`Parent`, `Child`, or `Related`)
+3. Check that [filters](features/filtering) aren't hiding it
+4. Ensure the [view mode](features/graph-views#view-modes) matches your relationship type
 
-### My color rule isn't working. Why?
+### My color rule isn't working
 
-Check:
-1. [Expression syntax](features/color-rules#expression-syntax) is valid JavaScript
-2. Property names match exactly (case-sensitive)
-3. Rule is [enabled](features/color-rules#enablingdisabling-rules)
-4. Rule [order](features/color-rules#rule-order--priority) (first match wins)
-5. Property exists in frontmatter (use [tooltips](features/tooltips) to verify)
+1. Check [expression syntax](features/color-rules#example-rules) — must be valid JavaScript
+2. Property names are case-sensitive
+3. Verify the rule is enabled and check [rule order](features/color-rules#rule-order) (first match wins)
+4. Confirm the property exists in frontmatter (use [tooltips](features/tooltips) to verify)
 
 ---
 
@@ -65,16 +56,16 @@ Check:
 
 ### Where are new nodes created?
 
-New nodes are created in the **same folder** as the source file.
+In the **same folder** as the source file. See [Node Creation](features/node-creation) for details.
 
 ### What is a Zettel ID?
 
-A unique timestamp-based identifier (`YYYYMMDDHHmmss`) assigned to each new node. Useful for Zettelkasten workflows and ensuring unique node IDs.
+A unique timestamp identifier (`YYYYMMDDHHmmss`) assigned to each new node. Configured in [Settings](configuration#node-creation-shortcuts).
 
 ---
 
 ## Get Help
 
-- [Troubleshooting Guide](troubleshooting)
-- [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions)
-- [Report Bug](https://github.com/Real1tyy/Nexus-Properties/issues)
+- [Troubleshooting Guide](troubleshooting) — Common issues and solutions
+- [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions) — Community Q&A
+- [Report a Bug](https://github.com/Real1tyy/Nexus-Properties/issues) — File an issue

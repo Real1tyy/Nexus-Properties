@@ -114,14 +114,16 @@ Create parent, child, or related nodes instantly from commands using a clean mod
 
 ## Configuration
 
-**Zettel ID property**: [Settings](../configuration#zettel-id-property) (default: `_ZettelID`, set empty to disable)
+**Zettel ID property**: [Settings](../configuration#node-creation-shortcuts) (default: `_ZettelID`, set empty to disable)
 
-**Excluded properties**: [Settings](../configuration#default-excluded-properties) (default: `Parent, Child, Related, _ZettelID`)
+**Excluded properties**: [Settings](../configuration#excluded-properties) (default: `Parent, Child, Related, _ZettelID`)
 
 **Path-based exclusion**: [Learn more](excluded-properties)
 
 ## Next Steps
 
-- [Excluded Properties](excluded-properties) - Control inheritance
-- [Bidirectional Sync](bidirectional-sync) - Relationship management
-- [Context Menus](context-menus) - Add relationships visually
+- [Excluded Properties](excluded-properties) — Control which properties are inherited
+- [Bidirectional Sync](bidirectional-sync) — How relationships are managed
+- [Context Menus](context-menus) — Add relationships visually via right-click
+- [Configuration](../configuration#node-creation-shortcuts) — Zettel ID and exclusion settings
+- [Hotkeys](../hotkeys#node-creation) — Keyboard shortcuts for creation commands

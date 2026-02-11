@@ -45,11 +45,7 @@ Hover over nodes to see frontmatter properties instantly.
 
 ## Configuration
 
-**Tooltip width**: [Settings](../configuration#tooltip-width) (150-500px, default 255px)
-
-**Property display**: [Settings](../configuration#property-display)
-- Hide empty properties
-- Hide underscore properties
+Tooltip width and property display settings are configured in [Settings](../configuration#property-display).
 
 ## Positioning
 
@@ -60,6 +56,7 @@ Auto-positions to stay visible:
 
 ## Next Steps
 
-- [Zoom Mode](zoom-mode) - Detailed previews
-- [Context Menus](context-menus) - Quick actions
-- [Color Rules](color-rules) - Visual categories
+- [Zoom Mode](zoom-mode) — Full inline preview (alternative to tooltips)
+- [Context Menus](context-menus) — Right-click actions
+- [Color Rules](color-rules) — Visual categories
+- [Configuration](../configuration#property-display) — Tooltip width and property visibility

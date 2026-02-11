@@ -1,3 +1,7 @@
+---
+sidebar_position: 9
+---
+
 import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Bases View
@@ -19,15 +23,23 @@ List-based view of the current note's relationships. Shows children, parent, and
   </video>
 </div>
 
-## View Types
+## Relationship Views
 
 Bases view offers three relationship perspectives:
 
-**Children**: Notes with current note as parent
+- **Children** — Notes with current note as parent
+- **Parent** — Notes with current note as child
+- **Related** — Notes with mutual related connections
 
-**Parent**: Notes with current note as child
+Enable **Show 'All' Relationship Views** in [Settings](../configuration#bases-view) to add recursive views: All Children, All Parents, and All Related. Each displays a count of nodes found.
 
-**Related**: Notes with mutual related connections
+## Display Modes
+
+Choose how data is presented in [Settings](../configuration#bases-view):
+
+- **Cards** — Visual grid layout (recommended)
+- **Table** — Traditional rows and columns
+- **List** — Minimal compact display
 
 ## Archived Toggle
 
@@ -90,6 +102,7 @@ Enter only the content AFTER `formulas:` and `sort:` keywords. The plugin adds t
 
 ## Next Steps
 
-- [Graph Views](graph-views) - Visual network exploration
-- [MOC View](moc-view) - Collapsible tree outline view
-- [Bidirectional Sync](bidirectional-sync) - Relationship management
+- [Graph Views](graph-views) — Visual network exploration
+- [MOC View](moc-view) — Collapsible tree outline view
+- [Configuration](../configuration#bases-view) — Sorting, formulas, archived filtering, path-based rules
+- [Hotkeys](../hotkeys#bases-view-navigation) — View cycling shortcuts

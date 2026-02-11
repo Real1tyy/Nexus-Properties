@@ -58,11 +58,11 @@ Related: ["[[note-1]]"]
 
 **All Related (Constellations)**: Shows all notes connected through `Related` recursively
 
-**Recursion depth**: Controlled by [All Related Max Depth](../configuration#all-related-recursion-depth)
+**Recursion depth**: Controlled by [All Related Max Depth](../configuration#depth-settings)
 
 ## Auto-Link Siblings
 
-**Setting**: [autoLinkSiblings](../configuration#auto-link-siblings) (default: `true`)
+**Setting**: [autoLinkSiblings](../configuration#direct-relationship-properties) (default: `true`)
 
 When enabled, notes sharing the same parent are automatically marked as related to each other.
 
@@ -90,39 +90,9 @@ Related: ["[[Task 1]]"]
 
 **Relationship removal**: Reverse relationship removed automatically
 
-## Common Patterns
-
-**Project management**:
-```yaml
-# Project.md
-Child: ["[[Sprint 1]]", "[[Sprint 2]]"]
-
-# Sprint 1.md
-Parent: "[[Project]]"
-Child: ["[[Task 1]]", "[[Task 2]]"]
-```
-
-**Knowledge hierarchy**:
-```yaml
-# Mathematics.md
-Child: ["[[Algebra]]", "[[Geometry]]"]
-
-# Algebra.md
-Parent: "[[Mathematics]]"
-Child: ["[[Linear Algebra]]", "[[Abstract Algebra]]"]
-```
-
-**Cross-referenced network**:
-```yaml
-# Concept A.md
-Related: ["[[Concept B]]", "[[Concept C]]"]
-
-# Concept B.md
-Related: ["[[Concept A]]", "[[Concept D]]"]
-```
-
 ## Next Steps
 
-- [Graph Views](graph-views) - Visualize relationships
-- [Node Creation](node-creation) - Build hierarchies quickly
-- [Configuration](../configuration#direct-relationship-properties) - Property names
+- [Graph Views](graph-views) — Visualize relationships
+- [Node Creation](node-creation) — Build hierarchies quickly
+- [Configuration](../configuration#direct-relationship-properties) — Customize property names
+- [Troubleshooting](../troubleshooting) — Sync issues

@@ -79,24 +79,20 @@ type === 'project' || type === 'task'  → #3b82f6 (blue)
 
 ## Rule Order
 
-**First match wins**. Place specific rules above general rules.
+**First match wins.** Place specific rules above general rules.
 
-**Example**:
-1. `status === 'urgent'` → Red (specific)
-2. `status !== ''` → Blue (general)
-
-Result: Urgent notes are red, all other notes with status are blue.
+Example: If rule 1 is `status === 'urgent'` → Red, and rule 2 is `status !== ''` → Blue, then urgent notes are red while all other notes with a status are blue.
 
 ## Managing Rules
 
-**Enable/Disable**: Toggle checkbox (useful for testing)
-
-**Reorder**: Use ↑/↓ buttons
-
-**Delete**: Click × button (permanent, no undo)
+- **Enable/Disable** — Toggle checkbox (useful for testing)
+- **Reorder** — Use ↑/↓ buttons to change priority
+- **Delete** — Click × button (permanent, no undo)
 
 ## Next Steps
 
-- [Filtering](filtering) - Combine colors with filtering
-- [Tooltips](tooltips) - Verify property values
-- [Graph Views](graph-views) - See colored nodes in action
+- [Filtering](filtering) — Combine colors with filtering
+- [Tooltips](tooltips) — Verify property values on hover
+- [Graph Views](graph-views) — See colored nodes in context
+- [Configuration](../configuration#node-colors) — Default color and settings
+- [Troubleshooting](../troubleshooting#expression-rules-not-working) — Expression debugging

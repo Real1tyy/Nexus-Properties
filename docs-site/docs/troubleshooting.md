@@ -4,86 +4,69 @@ sidebar_position: 99
 
 # Troubleshooting
 
-Critical troubleshooting steps for common issues. For other questions, see [FAQ](faq) or [open an issue](https://github.com/Real1tyy/Nexus-Properties/issues).
+Common issues and solutions. For general questions, see [FAQ](faq).
 
 ## Bases View Filter Errors
 
-**Error message:**
+**Error:**
 ```
 Failed to evaluate a filter: Type error in "contains" parameter "value". Expected String, given File.
 ```
 
-**Cause:** Relationship properties (`Parent`, `Child`, `Related`) are set to empty strings (`""`) instead of proper values.
+**Cause:** Relationship properties are set to empty strings (`""`) instead of valid values.
 
-**Solution:**
+**Fix:** Use `null` for empty relationships, not empty strings:
 
-Update the property to one of these valid formats:
-
-1. **Null/empty** (no relationships):
-   ```yaml
-   Parent: null
-   Child: null
-   Related: null
-   ```
-
-2. **Single relationship**:
-   ```yaml
-   Parent: "[[Parent Note]]"
-   ```
-
-3. **Multiple relationships** (list):
-   ```yaml
-   Child:
-     - "[[Child 1]]"
-     - "[[Child 2]]"
-   ```
-
-**Important:** Never use empty strings for relationship properties:
 ```yaml
-Parent: ""    # ❌ Causes filter errors
-Child: ""     # ❌ Causes filter errors
-Related: ""   # ❌ Causes filter errors
+# Correct
+Parent: null
+Child: null
+
+# Incorrect — causes filter errors
+Parent: ""
+Child: ""
 ```
 
-**Note:** New nodes created after version 1.6.0 automatically use `null` for excluded properties.
+Valid formats are `null` (no relationship), a single wiki link (`"[[Note]]"`), or a list of wiki links. See [Bidirectional Sync](features/bidirectional-sync#relationship-types) for property formats.
+
+:::note
+Nodes created after v1.6.0 use `null` for excluded properties automatically.
+:::
 
 ---
 
 ## Graph Not Showing Nodes
 
-**Check:**
-1. File is in an [indexed directory](configuration#directory-scanning) (or use `["*"]` to scan all)
-2. File has `Parent`, `Child`, or `Related` properties in frontmatter
-3. No active filters hiding nodes (clear to test)
-4. View mode matches relationship type (Hierarchical for parent-child, Related for related)
+1. File must be in an [indexed directory](configuration#directory-scanning) (default: `["*"]` scans all)
+2. File needs `Parent`, `Child`, or `Related` properties in frontmatter
+3. Clear any active [filters](features/filtering) to test
+4. Match [view mode](features/graph-views#view-modes) to relationship type (Hierarchical for parent-child, Related for related)
 
 ---
 
 ## Expression Rules Not Working
 
-**Check:**
-1. Expression syntax is valid JavaScript
-2. Property names match exactly (case-sensitive)
-3. Strings use quotes: `status === 'active'` (not `status === active`)
-4. Rule is enabled (checkbox checked)
-5. Rule order matters - first match wins (use ↑/↓ to reorder)
-6. Property exists in frontmatter (use tooltips to verify)
-7. Console for errors: `Ctrl/Cmd+Shift+I`
+Applies to both [color rules](features/color-rules) and [filter expressions](features/filtering):
+
+1. Expression must be valid JavaScript
+2. Property names are **case-sensitive** — `status` is not `Status`
+3. Strings need quotes: `status === 'active'` (not `status === active`)
+4. Rule must be enabled (checkbox checked)
+5. For color rules: order matters — [first match wins](features/color-rules#rule-order)
+6. Verify the property exists using [tooltips](features/tooltips)
+7. Check console for errors: `Ctrl/Cmd+Shift+I`
 
 ---
 
 ## Console Errors
 
-Open developer console to check for errors:
-- Press `Ctrl/Cmd+Shift+I` → Console tab
-- Look for red error messages
-- Copy errors for bug reports
+Open the developer console (`Ctrl/Cmd+Shift+I` → Console tab) to check for errors.
 
 **Common errors:**
-- **"File not found"** - Orphaned relationship, run full rescan
-- **"Invalid expression"** - Fix JavaScript syntax in color rules/filters
-- **"Circular relationship"** - System prevented circular link (working as intended)
-- **"Property not found"** - Property doesn't exist in frontmatter
+- **"File not found"** — Orphaned relationship; run a [full rescan](configuration#indexing)
+- **"Invalid expression"** — Fix JavaScript syntax in [color rules](features/color-rules) or [filters](features/filtering)
+- **"Circular relationship"** — System prevented a circular link (working as intended)
+- **"Property not found"** — Property doesn't exist in the file's frontmatter
 
 ---
 
@@ -97,6 +80,6 @@ Open developer console to check for errors:
 - Expected vs actual behavior
 
 **Where to get help:**
-- [FAQ](faq)
-- [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues)
-- [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions)
+- [FAQ](faq) — Common questions
+- [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues) — Bug reports
+- [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions) — Community Q&A

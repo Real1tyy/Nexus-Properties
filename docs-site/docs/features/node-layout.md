@@ -62,7 +62,7 @@ Automatic node positioning using different algorithms based on view mode.
 **Building**:
 1. Start with source node
 2. Find direct related notes
-3. Recursively traverse up to [max depth](../configuration#all-related-recursion-depth)
+3. Recursively traverse up to [max depth](../configuration#depth-settings)
 4. Group visually as constellation
 
 **Depth examples**:
@@ -84,7 +84,7 @@ Higher depths show more connections but impact performance. Start with 5-10.
 
 ## Animation
 
-**Duration**: [Configurable](../configuration#graph-animation-duration) (0ms = instant, 800ms = default)
+**Duration**: [Configurable](../configuration#graph-display) (0ms = instant, 800ms = default)
 
 **Triggers**: View mode changes, add/remove nodes, filters, zoom mode, file changes
 
@@ -100,6 +100,7 @@ Higher depths show more connections but impact performance. Start with 5-10.
 
 ## Next Steps
 
-- [Graph Views](graph-views) - When each layout is used
-- [Filtering](filtering) - Focus on subsets
-- [Color Rules](color-rules) - Visual organization
+- [Graph Views](graph-views) — When each layout is used
+- [Configuration](../configuration#multi-row-layout) — Multi-row layout settings
+- [Filtering](filtering) — Focus on subsets
+- [Color Rules](color-rules) — Visual organization

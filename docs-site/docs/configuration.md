@@ -114,8 +114,6 @@ When disabled:
 - Used for both upward (parents) and downward (children) traversal
 - Can be temporarily adjusted with [depth slider](features/graph-views#depth-control)
 
-**Hierarchy Traversal Depth** (default: `10`, range: 1-50): Max levels in hierarchy mode
-
 ## Multi-Row Layout
 
 Configure how nodes with many children are displayed in hierarchy mode.
@@ -138,10 +136,7 @@ Configure how nodes with many children are displayed in hierarchy mode.
 2. Grandchildren are positioned below the lowest row of their parent's generation
 3. Proper spacing maintained between all generations
 
-**Use cases**:
-- Organizational charts with many direct reports
-- Project hierarchies with numerous sub-tasks
-- Knowledge structures with broad categorization
+[Learn more about multi-row layout →](features/node-layout#multi-row-layout-large-families)
 
 **Display Properties in Nodes** (default: `[]`): Comma-separated properties to show in nodes (e.g., `status, priority`)
 
@@ -255,7 +250,7 @@ PriorityParent: "[[preferred-parent]]"
 - If not set or the specified parent isn't found, uses the first available parent
 - Works for all nodes in the graph, not just the current one
 
-**Auto-Link Siblings** (default: `true`): Automatically mark siblings as related
+**Auto-Link Siblings** (default: `true`): Automatically mark siblings as related. See [Bidirectional Sync](features/bidirectional-sync#auto-link-siblings) for details.
 
 ## Frontmatter Propagation
 
@@ -436,7 +431,7 @@ For large vaults:
 
 ## Next Steps
 
-- [Features Overview](features/overview)
-- [Graph Views](features/graph-views)
-- [Color Rules](features/color-rules)
-- [Filtering](features/filtering)
+- [Features Overview](features/overview) — Summary of all features
+- [Hotkeys](hotkeys) — Keyboard shortcuts for all commands
+- [Quick Start Guide](quickstart) — Hands-on tutorial
+- [Mobile Support](mobile) — Mobile-specific settings and behavior

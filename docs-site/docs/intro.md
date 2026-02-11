@@ -33,29 +33,23 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 Nexus Properties transforms your Obsidian vault into an interconnected knowledge graph by:
 
-- **Automatically syncing bidirectional relationships** - When you set a child, the parent is automatically updated
-- **Computing recursive relationships** - Visualize entire hierarchies and related constellations
-- **Providing an interactive graph view** - Navigate your knowledge network visually
-- **Maintaining consistency** - Automatic cleanup when files are deleted or relationships change
+- **Syncing bidirectional relationships** — Set a child, the parent updates automatically
+- **Computing recursive relationships** — Visualize entire hierarchies and related constellations
+- **Providing interactive views** — Graph, Bases, and MOC views for navigating your network
+- **Maintaining consistency** — Automatic cleanup on file deletion, rename, or relationship change
 
 ## Who is this for?
 
-Nexus Properties is built for **system builders** with large, long-lived vaults who want structured PKM workflows and think in hierarchies and networks.
+Built for **system builders** with large, long-lived vaults who think in hierarchies and networks.
 
-**Perfect for you if:**
-- You manage complex knowledge systems with hundreds or thousands of notes
-- You think in hierarchies, relationships, and networks
-- You want structured workflows with consistent metadata
-- You need automatic synchronization to maintain consistency
-- You value visual navigation of your knowledge structure
+**Good fit if you:**
+- Manage complex knowledge systems with hundreds or thousands of notes
+- Want structured workflows with consistent, auto-synced metadata
+- Value visual navigation of your knowledge structure
 
-**Probably not for you if:**
-- You prefer minimal notes with no metadata
-- You want a lightweight, simple note-taking experience
-- You don't use frontmatter or structured properties
-- You prefer manual relationship management
-
-If you're building a structured knowledge system, Nexus Properties will feel like a natural extension of your workflow. If you prefer minimal, unstructured notes, this will likely feel like overkill — and that's intentional.
+**Not ideal if you:**
+- Prefer minimal notes without frontmatter
+- Don't need structured parent-child or related relationships
 
 ## Key Features
 
@@ -109,21 +103,13 @@ Create parent, child, or related nodes instantly from the command palette. New n
 
 [Learn more about Node Creation →](features/node-creation)
 
-## Mobile Support
-
-Nexus Properties is **fully optimized for mobile devices** with touch-friendly interfaces, responsive layouts, and gesture support. The plugin has been tested on phones to ensure a smooth experience on all screen sizes.
-
-[Learn more about Mobile Support →](mobile)
-
 ## Getting Started
 
-Ready to start building your knowledge network?
-
 1. [Install the plugin](installation)
-2. [Watch the full video tutorial](videos) 🎬
-3. [Set up hotkeys](hotkeys) for quick access
-4. [Configure your settings](configuration)
-5. [Follow the quickstart guide](quickstart)
+2. [Follow the quickstart guide](quickstart)
+3. [Configure your settings](configuration)
+4. [Set up hotkeys](hotkeys) for quick access
+5. [Watch video tutorials](videos) for a visual walkthrough
 
 ## Support & Community
 
@@ -131,9 +117,9 @@ Ready to start building your knowledge network?
 - **Feature Requests**: [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions)
 - **Sponsor Development**: [Support My Work](https://matejvavroproductivity.com/support/)
 
-## Credits & Acknowledgments
+## Credits
 
-Nexus Properties is built using [Cytoscape.js](https://js.cytoscape.org/), a powerful and flexible graph visualization library. Cytoscape.js provides the robust graph rendering engine that powers Nexus Properties' interactive visualizations, including the hierarchical layouts (via the Dagre extension) and constellation-based network views.
+Built with [Cytoscape.js](https://js.cytoscape.org/) for graph rendering, including hierarchical layouts (via Dagre) and constellation network views.
 
 ## License
 

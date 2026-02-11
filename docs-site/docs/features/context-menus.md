@@ -123,8 +123,8 @@ All destructive operations (delete node, remove relationship) can be undone. See
 
 ## Next Steps
 
-- [Node Creation](node-creation) - Create new related nodes
-- [Zoom Mode](zoom-mode) - Alternative to preview
-- [Bidirectional Sync](bidirectional-sync) - Relationship management
-- [Graph Views](graph-views) - Visualize relationships
-- [Hotkeys](../hotkeys) - Keyboard shortcuts including undo/redo
+- [Node Creation](node-creation) — Create nodes via commands
+- [Zoom Mode](zoom-mode) — Inline preview (alternative to Preview action)
+- [Bidirectional Sync](bidirectional-sync) — How relationships are managed
+- [Hotkeys](../hotkeys#undoredo) — Undo/redo keyboard shortcuts
+- [Mobile Support](../mobile#touch-interactions) — Long-press for context menus on mobile

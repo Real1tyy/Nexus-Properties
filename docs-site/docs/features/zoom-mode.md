@@ -44,14 +44,14 @@ The preview panel appears at the bottom with two sections:
 - Clickable wiki links
 - Arrays as bulleted lists
 - Respects [property display settings](../configuration#property-display)
-- Height: [Zoom Preview Frontmatter Height](../configuration#zoom-preview-frontmatter-height) (50-300px, default 90px)
+- Height: [Zoom Preview Frontmatter Height](../configuration#graph-display) (50-300px, default 90px)
 
 ### Content Section
 
 - Rendered markdown
 - Clickable links
 - Scrollable
-- Height: [Zoom Preview Height](../configuration#zoom-preview-height) (120-700px, default 280px)
+- Height: [Zoom Preview Height](../configuration#graph-display) (120-700px, default 280px)
 
 ## Toggling Sections
 
@@ -63,7 +63,7 @@ The preview panel appears at the bottom with two sections:
 - "Toggle Focus Content (Zoom Preview)"
 - "Toggle Focus Frontmatter (Zoom Preview)"
 
-**Default visibility**: [Configure in settings](../configuration#zoom-hide-frontmatter-by-default)
+**Default visibility**: [Configure in settings](../configuration#property-display)
 
 **Tip**: [Assign hotkeys](../hotkeys) for quick toggling
 
@@ -97,6 +97,9 @@ The preview panel appears at the bottom with two sections:
 
 ## Next Steps
 
-- [Tooltips](tooltips) - Hover-based previews
-- [Context Menus](context-menus) - Quick actions
-- [Graph Views](graph-views) - View modes
+- [Tooltips](tooltips) — Quick hover-based previews (alternative to zoom)
+- [Context Menus](context-menus) — Right-click actions
+- [Graph Views](graph-views) — View modes and navigation
+- [Configuration](../configuration#property-display) — Zoom height, default visibility settings
+- [Mobile Support](../mobile#zoom-preview) — Touch-optimized zoom behavior
+- [Hotkeys](../hotkeys#zoom-mode) — Keyboard shortcuts for zoom commands

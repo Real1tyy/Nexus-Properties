@@ -30,29 +30,14 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 
 ## Node Labels
 
-Graph nodes display the `Title` property from each file's frontmatter. This title is automatically managed by the plugin as a wiki link:
+Graph nodes display a cleaned-up title derived from the `Title` property. Parent prefixes are automatically stripped for readability:
 
-- **Format**: `[[path/to/file|DisplayName]]`
-- **With Parent**: Display name = filename with parent prefix stripped (e.g., "Parent - Child" → "Child")
-- **Without Parent**: Display name = file basename
-
-**Supported prefix patterns**:
 - `Parent - Child` → "Child"
 - `Parent Child` → "Child"
 - `Parent-Child` → "Child"
+- Files without parents show the basename
 
-**Benefits**:
-- Cleaner, more readable labels in both Graph and Bases views
-- Clickable links in Bases view for easy navigation
-- No redundant parent names cluttering the display
-- Pre-computed for faster rendering
-
-The title property is updated automatically when:
-- A file is created or modified
-- Parent relationships change
-- You run "Rescan All Files" command
-
-See [Configuration](../configuration#node-creation-shortcuts) for property name settings.
+Titles update automatically when files change or parent relationships are modified. The same titles are used in [Bases View](bases-view#file-names) as clickable links. See [Automatic Title Property](../configuration#automatic-title-property) for configuration.
 
 ## Depth Control
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
@@ -79,8 +64,8 @@ Control how deeply the graph traverses hierarchical relationships with the depth
   - Builds down 3 levels → shows C, D, E and all descendants
 
 **Smart Depth Selection**:
-- **Hierarchy views** (parent/child): Uses [Hierarchy Max Depth](../configuration#hierarchy-max-depth) setting
-- **All Related views** (constellation): Uses [All Related Recursion Depth](../configuration#all-related-recursion-depth) setting
+- **Hierarchy views** (parent/child): Uses [Hierarchy Max Depth](../configuration#depth-settings) setting
+- **All Related views** (constellation): Uses [All Related Recursion Depth](../configuration#depth-settings) setting
 
 **Temporary Adjustments**: Slider changes don't save to settings - they only affect your current session
 
@@ -117,7 +102,7 @@ See [Configuration](../configuration#depth-settings) for default depth values.
   </video>
 </div>
 
-**Shows**: Entire constellation recursively up to [max depth](../configuration#all-related-recursion-depth)
+**Shows**: Entire constellation recursively up to [max depth](../configuration#depth-settings)
 
 **Layout**: Constellation clusters
 
@@ -154,8 +139,10 @@ Large constellations can be slow. Reduce max depth if needed.
 
 ## Next Steps
 
-- [MOC View](moc-view) - Collapsible tree outline view
-- [Node Layout](node-layout) - How nodes are positioned
-- [Filtering](filtering) - Focus on subsets
-- [Zoom Mode](zoom-mode) - Explore nodes in detail
-- [Color Rules](color-rules) - Visual categories
+- [MOC View](moc-view) — Collapsible tree outline view
+- [Node Layout](node-layout) — How nodes are positioned
+- [Filtering](filtering) — Focus on subsets
+- [Zoom Mode](zoom-mode) — Explore nodes in detail
+- [Color Rules](color-rules) — Visual categories
+- [Mobile Support](../mobile) — Touch interactions and gestures
+- [Hotkeys](../hotkeys) — Keyboard shortcuts for graph commands

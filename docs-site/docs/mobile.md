@@ -10,7 +10,7 @@ Nexus Properties is fully optimized for mobile devices, providing a responsive a
 
 ## Overview
 
-The mobile experience has been carefully designed to maximize screen space while maintaining full functionality. On screens smaller than 600px width, the plugin automatically switches to a mobile-optimized layout.
+On screens smaller than 600px width, the plugin automatically switches to a mobile-optimized layout that maximizes screen space while maintaining full functionality.
 
 ## What's Different on Mobile?
 
@@ -31,7 +31,7 @@ The mobile experience has been carefully designed to maximize screen space while
 - **No Zoom Indicator**: Zoom percentage hidden to reduce visual clutter
 
 #### Zoom Preview
-When you zoom into a node on mobile:
+When you [zoom into a node](features/zoom-mode) on mobile:
 - **Auto-Hide Controls**: Header, search bar, and filter bar automatically hide to maximize preview space
 - **Compact Layout**: Everything is sized smaller to show more content
 - **Frontmatter Grid**: Properties displayed in a tight grid (configurable width, default shows ~4 per row)
@@ -48,9 +48,8 @@ When you zoom into a node on mobile:
 
 #### Node Interactions
 - **Single Tap**: Opens zoom preview (same as desktop click)
-- **Long Press**: Opens context menu (same as desktop right-click)
+- **Long Press**: Opens [context menu](features/context-menus) (same as desktop right-click)
   - Hold for ~500ms to trigger
-  - Shows all node actions: Open, Create Child, Add Relationship, etc.
 
 #### Gesture Support
 - **Pan**: Drag with one finger to move the graph
@@ -72,10 +71,11 @@ Lower values show more properties at once but may truncate long property names. 
 
 ## Feedback
 
-Mobile support is fully tested and ready for production use. If you encounter any issues or have suggestions for improvement:
+If you encounter issues on mobile, [open an issue](https://github.com/Real1tyy/Nexus-Properties/issues) and include your device, screen size, Obsidian version, and mobile OS.
 
-1. **Check GitHub Issues**: See if your issue is already reported
-2. **Create New Issue**: Report bugs or request features at [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues)
-3. **Include Details**: Mention your device, screen size, Obsidian version, and mobile OS
+## Next Steps
 
-Your feedback helps make the mobile experience even better!
+- [Graph Views](features/graph-views) — Desktop graph interaction reference
+- [Zoom Mode](features/zoom-mode) — Zoom preview details
+- [Context Menus](features/context-menus) — All available context menu actions
+- [Configuration](configuration) — Settings reference

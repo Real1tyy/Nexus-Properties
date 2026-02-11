@@ -57,6 +57,6 @@ Exclude additional properties for files in specific directories.
 
 ## Next Steps
 
-- [Node Creation](node-creation) - See exclusions in action
-- [Bidirectional Sync](bidirectional-sync) - Relationship management
-- [Configuration](../configuration#excluded-properties) - Settings reference
+- [Node Creation](node-creation) — See exclusions in action
+- [Bidirectional Sync](bidirectional-sync) — Relationship management
+- [Configuration](../configuration#excluded-properties) — Full settings reference

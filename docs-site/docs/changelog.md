@@ -466,7 +466,7 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 - **Context-Aware Behavior**:
   - **Not in zoom mode**: Re-centers and fits the entire graph, highlighting the source node.
   - **In zoom mode**: Switches zoom focus to the source node while staying in zoom mode.
-- **Smooth Animation**: Uses your configured [Graph Animation Duration](configuration#graph-animation-duration) for consistent transitions.
+- **Smooth Animation**: Uses your configured [Graph Animation Duration](configuration#graph-display) for consistent transitions.
 
 #### Double-Click Zoom Controls
 - **Double Left-Click**: Zoom in toward the clicked position on the graph background.

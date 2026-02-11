@@ -8,11 +8,11 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Gallery
 
-Visual guide to all Nexus Properties features.
+Visual guide to Nexus Properties features. For detailed documentation on each feature, see [Features Overview](features/overview).
 
 ## Videos
 
-### Graph Views — Depth Control
+### [Graph Views](features/graph-views) — Depth Control
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -27,7 +27,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Graph Views — All Related
+### [Graph Views](features/graph-views#all-related) — All Related
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -42,7 +42,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Zoom Mode
+### [Zoom Mode](features/zoom-mode)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -57,7 +57,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Bidirectional Sync — Adding Relationships
+### [Bidirectional Sync](features/bidirectional-sync) — Adding Relationships
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -72,7 +72,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Filtering
+### [Filtering](features/filtering)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -102,7 +102,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Color Rules
+### [Color Rules](features/color-rules)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -117,7 +117,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Bases View
+### [Bases View](features/bases-view)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -132,7 +132,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### MOC View
+### [MOC View](features/moc-view)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -147,7 +147,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### MOC View — MOC Content Mode
+### [MOC View](features/moc-view#moc-content-hierarchy) — MOC Content Mode
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -162,7 +162,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Node Layout — Multi-Row
+### [Node Layout](features/node-layout#multi-row-layout-large-families) — Multi-Row
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -177,7 +177,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Node Creation — Create Child
+### [Node Creation](features/node-creation) — Create Child
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -192,7 +192,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Node Creation — Create Related
+### [Node Creation](features/node-creation) — Create Related
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -207,7 +207,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Context Menus — Add Relationship
+### [Context Menus](features/context-menus) — Add Relationship
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -222,7 +222,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Context Menus — Render as Root
+### [Context Menus](features/context-menus) — Render as Root
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -237,7 +237,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Context Menus — Preview Node
+### [Context Menus](features/context-menus) — Preview Node
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -252,7 +252,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Context Menus — Edit Node
+### [Context Menus](features/context-menus) — Edit Node
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -267,7 +267,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Undo / Redo
+### [Undo / Redo](hotkeys#undoredo)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -282,7 +282,7 @@ Visual guide to all Nexus Properties features.
   </video>
 </div>
 
-### Frontmatter Propagation
+### [Frontmatter Propagation](configuration#frontmatter-propagation)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -299,71 +299,49 @@ Visual guide to all Nexus Properties features.
 
 ## Screenshots
 
-### Hierarchical View
+### [Hierarchical View](features/graph-views)
 
 ![Hierarchical View](/img/screenshots/hierarchical-view.png)
 
-*Parent-child tree structure with automatic layout*
-
-### Related View
+### [Related View](features/graph-views#related)
 
 ![Related View](/img/screenshots/related-view.png)
 
-*Direct related connections in radial layout*
-
-### All Related View
+### [All Related View](features/graph-views#all-related)
 
 ![All Related View](/img/screenshots/all-related-view.png)
 
-*Entire constellation of related notes*
-
-### Color Rules
+### [Color Rules](features/color-rules)
 
 ![Color Rules Settings](/img/screenshots/color-rules-settings.png)
 
-*JavaScript expression-based color rule configuration*
-
-### Filtering
+### [Filtering](features/filtering)
 
 ![Graph Filtering](/img/screenshots/filtering.png)
 
-*JavaScript expression filtering with real-time updates*
-
-### Zoom Mode
+### [Zoom Mode](features/zoom-mode)
 
 ![Zoom Mode](/img/screenshots/zoom-mode.png)
 
-*Inline preview of frontmatter and content*
-
-### Tooltips
+### [Tooltips](features/tooltips)
 
 ![Node Tooltips](/img/screenshots/tooltips.png)
 
-*Hover over nodes to see properties instantly*
-
-### Node Context Menu
+### [Node Context Menu](features/context-menus)
 
 ![Node Context Menu](/img/screenshots/node-context-menu.png)
 
-*Right-click nodes for quick actions*
-
-### Edge Context Menu
+### [Edge Context Menu](features/context-menus#edge-context-menu)
 
 ![Edge Context Menu](/img/screenshots/edge-context-menu.png)
 
-*Right-click edges to manage relationships*
-
-### Bases View
+### [Bases View](features/bases-view)
 
 ![Bases View](/img/screenshots/bases-view.png)
-
-*List-based view of current note's relationships*
 
 ### Search
 
 ![Graph Search](/img/screenshots/graph-search.png)
-
-*Real-time search by filename and path*
 
 ## Next Steps
 

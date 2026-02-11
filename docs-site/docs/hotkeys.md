@@ -8,69 +8,72 @@ All Nexus Properties commands support custom hotkey assignment. Assign hotkeys i
 
 ## Available Commands
 
-### Graph View
+### View Management
 
-**Show Relationship Graph**: Open/toggle the relationship graph view
-
-**Toggle between Graph and Bases View**: Switch between graph and list-based views
-
-**Enlarge Graph**: Toggle enlarged graph view (uses configured width percentage)
+| Command | Description |
+|---------|-------------|
+| **Show Relationship Graph** | Open/toggle the relationship graph view |
+| **Toggle View Mode** | Cycle between Graph, [Bases](features/bases-view), and [MOC](features/moc-view) views |
+| **Enlarge Graph** | Toggle enlarged graph view (uses [configured width](configuration#graph-display)) |
 
 ### Graph Navigation
 
-**Toggle Graph Search**: Show/hide search bar for finding nodes by name/path
-
-**Toggle Graph Filter (Expression Input)**: Show/hide filter input for JavaScript expressions
-
-**Toggle Graph Filter (Preset Selector)**: Show/hide preset dropdown for saved filters
-
-**Center on Source Node**: Re-center the graph on the source node (or switch zoom focus to source if in zoom mode)
+| Command | Description |
+|---------|-------------|
+| **Toggle Graph Search** | Show/hide search bar for finding nodes by name/path |
+| **Toggle Graph Filter (Expression Input)** | Show/hide [filter input](features/filtering) for JavaScript expressions |
+| **Toggle Graph Filter (Preset Selector)** | Show/hide [preset dropdown](features/filtering#filter-presets) for saved filters |
+| **Center on Source Node** | Re-center graph on source node (or switch zoom focus to source if in [zoom mode](features/zoom-mode)) |
 
 ### Zoom Mode
 
-**Toggle Focus Content (Zoom Preview)**: Show/hide content section in zoom preview
-
-**Toggle Focus Frontmatter (Zoom Preview)**: Show/hide frontmatter section in zoom preview
+| Command | Description |
+|---------|-------------|
+| **Toggle Focus Content (Zoom Preview)** | Show/hide content section in [zoom preview](features/zoom-mode) |
+| **Toggle Focus Frontmatter (Zoom Preview)** | Show/hide frontmatter section in zoom preview |
 
 :::note
-Zoom commands only work when graph view is open and zoom mode is active
+Zoom commands only work when graph view is open and zoom mode is active.
 :::
 
 ### Node Creation
 
-**Create Parent Node**: Create new parent with bidirectional relationship
-
-**Create Child Node**: Create new child with bidirectional relationship
-
-**Create Related Node**: Create new related node with bidirectional relationship
+| Command | Description |
+|---------|-------------|
+| **Create Parent Node** | Create new parent with [bidirectional relationship](features/bidirectional-sync) |
+| **Create Child Node** | Create new child with bidirectional relationship |
+| **Create Related Node** | Create new related node with bidirectional relationship |
 
 :::note
-Node creation commands only available when viewing a file in an indexed directory
+Node creation commands are only available when viewing a file in an [indexed directory](configuration#directory-scanning).
 :::
 
 ### Bases View Navigation
 
-**Bases: Next View**: Cycle forward through view options (Children → Parent → Related → All Children → etc.)
-
-**Bases: Previous View**: Cycle backward through view options
+| Command | Description |
+|---------|-------------|
+| **Bases: Next View** | Cycle forward through view options (Children → Parent → Related → All Children → etc.) |
+| **Bases: Previous View** | Cycle backward through view options |
 
 :::tip
-You can also right-click the view dropdown to quickly cycle to the next view without using hotkeys.
+Right-click the view dropdown to quickly cycle to the next view without hotkeys.
 :::
 
 ### Undo/Redo
 
-**Undo**: Undo the last graph operation (add/remove relationship, create/delete/edit node)
-
-**Redo**: Redo the last undone operation
+| Command | Description |
+|---------|-------------|
+| **Undo** | Undo the last graph operation (add/remove relationship, create/delete/edit node) |
+| **Redo** | Redo the last undone operation |
 
 :::note
-Undo/redo maintains a history of up to 50 operations. Performing a new action clears the redo history.
+History stores up to 50 operations. Performing a new action clears the redo stack.
 :::
 
 ## Next Steps
 
-- [Features Overview](features/overview) - See what each command does
-- [Graph Views](features/graph-views) - Understand graph navigation
-- [Node Creation](features/node-creation) - Learn about node creation workflow
-- [Context Menus](features/context-menus) - Quick actions via right-click
+- [Features Overview](features/overview) — What each command does in detail
+- [Graph Views](features/graph-views) — Graph navigation and interaction
+- [Node Creation](features/node-creation) — Node creation workflow
+- [Context Menus](features/context-menus) — Quick actions via right-click
+- [Configuration](configuration) — All settings reference

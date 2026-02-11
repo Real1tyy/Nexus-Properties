@@ -255,14 +255,9 @@ The properties appear to the right of each note name and scroll horizontally if 
 
 The view handles circular relationships gracefully. If a note appears in its own ancestry chain, it won't cause infinite loops.
 
-## Use Cases
-
-- **Map of Content**: Create visual outlines of topic hierarchies
-- **Project Overview**: See all tasks/subtasks in a project
-- **Knowledge Exploration**: Navigate through related concepts
-
 ## Next Steps
 
-- [Graph Views](graph-views) - Visual network exploration
-- [Bases View](bases-view) - List-based relationship view
-- [Bidirectional Sync](bidirectional-sync) - Relationship management
+- [Graph Views](graph-views) — Visual network exploration
+- [Bases View](bases-view) — List-based relationship view
+- [Configuration](../configuration#hierarchy-source) — Hierarchy source and MOC content settings
+- [Hotkeys](../hotkeys#view-management) — Toggle View Mode command
