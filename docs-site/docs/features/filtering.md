@@ -14,7 +14,7 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/Filters.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/FiltersNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
@@ -126,6 +126,20 @@ This feature is especially useful when:
 **Filtering + View Modes**: Works in all modes
 
 **Filtering + Search**: Filter first, then search within results
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/Search.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 **Filtering + Indirect Connections**: Maintain relationship context when nodes are hidden
 

@@ -112,7 +112,7 @@ See [Configuration](../configuration#depth-settings) for default depth values.
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/RenderRelated.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/AllRelatedNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>

@@ -80,6 +80,19 @@ Right-click nodes or edges for quick actions.
 </div>
 
 **Delete**: Moves file to trash (can be undone with undo)
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/UndoRedoNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 ## Edge Context Menu
 

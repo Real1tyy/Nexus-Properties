@@ -2,6 +2,8 @@
 sidebar_position: 4
 ---
 
+import useBaseUrl from "@docusaurus/useBaseUrl";
+
 # Configuration
 
 Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
@@ -256,6 +258,20 @@ PriorityParent: "[[preferred-parent]]"
 **Auto-Link Siblings** (default: `true`): Automatically mark siblings as related
 
 ## Frontmatter Propagation
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/FrontMatterNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 **Propagate Frontmatter to Children** (default: `false`): Auto-propagate changes to children recursively
 

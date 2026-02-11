@@ -59,6 +59,22 @@ When viewing this file with MOC Content mode enabled:
 
 **Step 1: Enable MOC Content Reading**
 
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/MOCNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+
+
 Settings → General → **Enable MOC content reading** (default: enabled)
 
 This allows the plugin to detect and parse MOC structures in your notes.

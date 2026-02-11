@@ -14,12 +14,26 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
     playsInline
     style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
   >
-    <source src={useBaseUrl("/video/Childnodes.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/CreateChildNEW.webm")} type="video/webm" />
     Your browser does not support the video tag.
   </video>
 </div>
 
 Create parent, child, or related nodes instantly from commands using a clean modal interface. New nodes inherit properties, establish bidirectional relationships, and open for editing.
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/CreateRelatedNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 ## Commands
 

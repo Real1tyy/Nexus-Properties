@@ -18,6 +18,22 @@ List-based view of the current note's relationships. Shows children, parent, and
     Your browser does not support the video tag.
   </video>
 </div>
+Card View Showcase
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/BasesNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+Table & List View Showcase
 
 ## View Types
 
