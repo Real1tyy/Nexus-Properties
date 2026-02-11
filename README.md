@@ -12,7 +12,7 @@
 
 ---
 
-## 🎬 Video Tutorials
+## Video Tutorials
 
 **[View All Video Tutorials →](https://real1tyy.github.io/Nexus-Properties/videos)**
 
@@ -22,7 +22,7 @@
   <img src="https://img.youtube.com/vi/Im0SfuBHamo/maxresdefault.jpg" alt="Nexus Properties - Full Tutorial" style="width:100%;">
 </a>
 
-**Complete Workflow Guide**: In this full tutorial, I walk you through exactly how to use Nexus Properties in practice — from installation and creating your first relationships, to bidirectional sync, graph views, color rules, filtering, and more.
+**Complete Workflow Guide**: From installation and creating your first relationships, to bidirectional sync, graph views, color rules, filtering, and more.
 
 ### Feature Previews
 
@@ -40,81 +40,55 @@
 
 ---
 
-## 📸 Screenshots
+## More Features
 
-### Hierarchical View
+<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:1em;">
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/ZoomNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/MOCNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+</div>
 
-![Hierarchical View](docs-site/static/img/screenshots/hierarchical-view.png)
+<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:2em;">
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/Color.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+  <video src="https://real1tyy.github.io/Nexus-Properties/video/CreateChildNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
+</div>
 
-_Parent-child tree structure with automatic hierarchical layout_
-
-### Related View
-
-![Related View](docs-site/static/img/screenshots/related-view.png)
-
-_Direct related connections in radial layout_
-
-### All Related View
-
-![All Related View](docs-site/static/img/screenshots/all-related-view.png)
-
-_Entire constellation of related notes with recursive traversal_
-
-### Bases View
-
-![Bases View](docs-site/static/img/screenshots/bases-view.png)
-
-_List-based view of current note's relationships_
-
-### Zoom Mode
-
-![Zoom Mode](docs-site/static/img/screenshots/zoom-mode.png)
-
-_Click any node to preview content and frontmatter inline_
-
-Check out the [complete screenshots gallery](https://real1tyy.github.io/Nexus-Properties/screenshots) in the documentation to see all features in detail.
+See the [complete gallery](https://real1tyy.github.io/Nexus-Properties/gallery) for all features.
 
 ---
 
-## 👥 Who is this for?
+## Who is this for?
 
-Nexus Properties is built for **system builders** with large, long-lived vaults who want structured PKM workflows and think in hierarchies and networks.
+Built for **system builders** with large, long-lived vaults who think in hierarchies and networks.
 
-**Perfect for you if:**
+**Good fit if you:**
 
-- You manage complex knowledge systems with hundreds or thousands of notes
-- You think in hierarchies, relationships, and networks
-- You want structured workflows with consistent metadata
-- You need automatic synchronization to maintain consistency
-- You value visual navigation of your knowledge structure
+- Manage complex knowledge systems with hundreds or thousands of notes
+- Want structured workflows with consistent, auto-synced metadata
+- Value visual navigation of your knowledge structure
 
-**Probably not for you if:**
+**Not ideal if you:**
 
-- You prefer minimal notes with no metadata
-- You want a lightweight, simple note-taking experience
-- You don't use frontmatter or structured properties
-- You prefer manual relationship management
-
-If you're building a structured knowledge system, Nexus Properties will feel like a natural extension of your workflow. If you prefer minimal, unstructured notes, this will likely feel like overkill — and that's intentional.
+- Prefer minimal notes without frontmatter
+- Don't need structured parent-child or related relationships
 
 ---
 
-## 📚 Documentation
+## Documentation
 
 **[View Full Documentation →](https://real1tyy.github.io/Nexus-Properties/)**
 
 Quick Links:
 
-- [Installation](https://real1tyy.github.io/Nexus-Properties/installation) • [Quickstart](https://real1tyy.github.io/Nexus-Properties/quickstart) • [Configuration](https://real1tyy.github.io/Nexus-Properties/configuration)
-- [Features Overview](https://real1tyy.github.io/Nexus-Properties/features/overview) • [FAQ](https://real1tyy.github.io/Nexus-Properties/faq) • [Troubleshooting](https://real1tyy.github.io/Nexus-Properties/troubleshooting)
+- [Installation](https://real1tyy.github.io/Nexus-Properties/installation) · [Quick Start](https://real1tyy.github.io/Nexus-Properties/quickstart) · [Configuration](https://real1tyy.github.io/Nexus-Properties/configuration)
+- [Features Overview](https://real1tyy.github.io/Nexus-Properties/features/overview) · [FAQ](https://real1tyy.github.io/Nexus-Properties/faq) · [Troubleshooting](https://real1tyy.github.io/Nexus-Properties/troubleshooting)
 
 ---
 
-## 📦 Installation
+## Installation
 
 Nexus Properties is currently **awaiting approval** for the Obsidian Community Plugin store. In the meantime, you can install it using one of these methods:
 
-### 🎯 Recommended: BRAT (Beta Reviewers Auto-update Tool)
+### Recommended: BRAT (Beta Reviewers Auto-update Tool)
 
 The easiest way to install and keep Nexus Properties up to date:
 
@@ -125,133 +99,60 @@ The easiest way to install and keep Nexus Properties up to date:
 5. Click **Add Plugin**
 6. Enable Nexus Properties in Settings → Community Plugins
 
-**Benefits**: Automatic updates, smooth experience, one-click installation
+BRAT handles updates automatically, so you always have the latest version.
 
-### 📥 Manual Installation from GitHub Releases
+### Manual Installation
 
 1. Go to [Releases](https://github.com/Real1tyy/Nexus-Properties/releases)
-2. Download the latest release assets:
-   - `main.js`
-   - `manifest.json`
-   - `styles.css`
+2. Download `main.js`, `manifest.json`, and `styles.css`
 3. Create folder: `{VaultFolder}/.obsidian/plugins/nexus-properties/`
 4. Move downloaded files into the folder
-5. Reload Obsidian (Ctrl/Cmd + R)
+5. Reload Obsidian (`Ctrl/Cmd + R`)
 6. Enable Nexus Properties in Settings → Community Plugins
 
-**Note**: All releases are versioned and tagged for easy reference.
+---
 
-### ✨ Coming Soon
+## Mobile Support
 
-Once approved for the Community Plugin store, you'll be able to install Nexus Properties directly from Settings → Community Plugins → Browse.
+Nexus Properties is **fully optimized for mobile devices** with touch-friendly interfaces, responsive layouts, and gesture support.
+
+See the [Mobile Support Documentation](https://real1tyy.github.io/Nexus-Properties/mobile) for details.
 
 ---
 
-## 📱 **Mobile Support**
+## Key Features
 
-**Nexus Properties is fully optimized for mobile devices!** The plugin has been tested on phones with comprehensive UI improvements for touch-friendly interaction.
+### Bidirectional Sync
 
-**Learn More**: Check out the [Mobile Support Documentation](https://real1tyy.github.io/Nexus-Properties/mobile) for detailed information about mobile-specific features and optimizations.
+Set relationships in one direction, the reverse syncs automatically. Supports parent-child hierarchies and related connections. Automatic cleanup on file deletion, rename, or relationship removal.
 
-**Feedback Welcome**: If you encounter any mobile issues or have suggestions for improvement, please [open an issue](https://github.com/Real1tyy/Nexus-Properties/issues) on GitHub.
+### Interactive Graph Views
 
----
+Visualize relationships with Hierarchical (trees), Related (direct connections), and All Related (constellations) modes. Includes depth control, zoom preview, tooltips, search, and context menus.
 
-## **Top 5 Killer Features**
+### Smart Node Creation
 
-### **1️⃣ Bidirectional Sync — Set Once, Updates Everywhere**
+Create child, parent, or related nodes with a single command. New nodes inherit frontmatter, get unique Zettel IDs, and establish bidirectional relationships automatically.
 
-When you define a relationship in one file, Nexus Properties automatically updates the other file. No manual work, no inconsistencies — just pure automation.
+### Color Rules
 
-- **Automatic reciprocal updates** - Add a child, parent is auto-updated
-- **Related relationship sync** - Mark files as related, both sides update
-- **Deletion cleanup** - Remove relationships, both files stay consistent
-- **Real-time sync** - Changes propagate immediately on file save
-- **Zero maintenance** - Never manually maintain both sides of a relationship
+JavaScript expression-based color rules for visual categorization. First match wins, with enable/disable toggles and priority ordering.
 
-### **2️⃣ Interactive Graph Visualization — See Your Knowledge Network**
+### Filtering
 
-Visualize your entire knowledge structure in an interactive graph with multiple view modes, drag-and-drop navigation, and intelligent layouts.
+JavaScript expression filtering with named presets, multi-expression AND logic, and indirect connection preservation. Search by filename/path with real-time highlighting.
 
-- **Multiple view modes** - Hierarchical, Related, All Related, Start from Current
-- **Drag-and-drop** - Rearrange nodes for better visualization
-- **Zoom mode** - Click nodes for full content preview
-- **Tooltips** - Hover for quick property inspection
-- **Context menus** - Right-click for quick actions
-- **Search** - Find and highlight nodes instantly
+### Bases View
 
-### **3️⃣ Smart Node Creation — Inherit Everything**
+List-based relationship view with Cards, Table, and List display modes. Custom sorting with YAML formulas, archived filtering, and path-based inclusion rules.
 
-Create child, parent, or related nodes with a single command. New nodes automatically inherit all properties from the source, maintaining consistency across your network.
+### MOC View
 
-- **Property inheritance** - All frontmatter copied to new nodes
-- **Automatic relationships** - Bidirectional links created instantly
-- **Zettel ID generation** - Unique timestamp-based identifiers
-- **Same-folder creation** - New nodes created alongside source
-- **Template support** - Inherit templates and Templater properties
-- **Context menu creation** - Right-click any node to create related nodes
+Collapsible tree outline with clickable wiki links. Toggle between current file or topmost parent as root. Supports bullet-list hierarchies as an alternative to frontmatter properties.
 
-### **4️⃣ JavaScript-Powered Color Rules — Intelligent Visualization**
+### Frontmatter Propagation
 
-Define color rules using JavaScript expressions to visually categorize your notes. First match wins, giving you complete control over node appearance.
-
-- **Expression-based** - `status === 'complete'` → Green
-- **Property access** - Reference any frontmatter property
-- **Rule priority** - First matching rule applies
-- **Enable/disable** - Toggle rules on/off without deletion
-- **Visual feedback** - Instantly see which nodes match which rules
-- **Complex logic** - Use AND, OR, comparisons, and more
-
-### **5️⃣ Advanced Filtering — Focus on What Matters**
-
-Filter the graph to show only nodes matching specific criteria. Use JavaScript expressions to create powerful filters and save them as presets for quick access.
-
-- **Expression-based filtering** - `priority === 'high' && status !== 'done'`
-- **Filter presets** - Save and name commonly-used filters
-- **Real-time updates** - Graph updates as you type
-- **Works with all views** - Filter any view mode
-- **Property-based** - Filter on any frontmatter property
-- **Complex expressions** - Combine multiple conditions
-
----
-
-## ✨ **Additional Powerful Features**
-
-### 🔗 **Relationship Management**
-
-- **Three relationship types** - Parent, Child, Related
-- **Configurable property names** - Use your own property names
-- **Wiki link format** - Standard Obsidian `[[note]]` syntax
-- **Array support** - Multiple children, multiple related notes
-- **Circular detection** - Prevents infinite loops
-- **Orphan detection** - Find notes without relationships
-
-### 🎨 **Graph Customization**
-
-- **Node layouts** - Hierarchical tree, force-directed, radial
-- **Animation controls** - Configurable animation duration (0-2000ms)
-- **View modes** - Hierarchical, Related, All Related, Start from Current
-- **Recursion depth** - Control how deep "All Related" traverses
-- **Auto-link siblings** - Automatically connect sibling nodes
-- **Edge styling** - Visual distinction between relationship types
-
-### 🔍 **Navigation & Discovery**
-
-- **Search** - Find nodes by name with instant highlighting
-- **Tooltips** - Hover for quick property preview (configurable delay)
-- **Zoom mode** - Click for full content and frontmatter preview
-- **Context menus** - Right-click for quick actions and navigation
-- **Double-click open** - Open files directly from graph
-- **Breadcrumb navigation** - Track your position in hierarchies
-
-### ⚙️ **Configuration & Performance**
-
-- **Directory scanning** - Focus on specific folders for better performance
-- **Excluded properties** - Hide properties from tooltips and previews
-- **Path-based exclusions** - Different exclusions for different folders
-- **Indexing controls** - Manual and automatic index rebuilding
-- **Performance tuning** - Adjust recursion depth and animation for large vaults
-- **Ribbon icon toggle** - Show/hide sidebar icon
+Auto-propagate frontmatter changes to children recursively, with optional confirmation and configurable exclusions.
 
 ---
 
@@ -271,8 +172,6 @@ MIT-licensed. PRs welcome! See [Contributing Guide](https://real1tyy.github.io/N
 
 ---
 
-## Credits & Acknowledgments
+## Credits
 
-Nexus Properties is built using [Cytoscape.js](https://js.cytoscape.org/), a powerful and flexible graph visualization library. Cytoscape.js provides the robust graph rendering engine that powers Nexus Properties' interactive visualizations, including the hierarchical layouts (via the Dagre extension) and constellation-based network views.
-
----
+Built with [Cytoscape.js](https://js.cytoscape.org/) for graph rendering, including hierarchical layouts (via Dagre) and constellation network views.

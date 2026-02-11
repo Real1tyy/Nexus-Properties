@@ -21,11 +21,9 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 Filter nodes using JavaScript expressions. Only nodes where ALL expressions return `true` are shown.
 
-*Active filtering with JavaScript expressions*
-
 ## Using Filters
 
-**Show filter bar**: Command "Toggle Graph Filter (Expression Input)" or [enable by default](../configuration#show-filter-bar-by-default)
+**Show filter bar**: Command "Toggle Graph Filter (Expression Input)" or [enable by default](../configuration#graph-display)
 
 **Apply**: Blur input or press `Ctrl/Cmd+Enter`
 
@@ -119,13 +117,7 @@ This feature is especially useful when:
 - Analyzing deep relationship chains
 - Exploring connections across multiple levels
 
-## Combining Features
-
-**Filtering + Color Rules**: Color by category, filter to focus
-
-**Filtering + View Modes**: Works in all modes
-
-**Filtering + Search**: Filter first, then search within results
+## Search
 
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
@@ -141,9 +133,26 @@ This feature is especially useful when:
   </video>
 </div>
 
-**Filtering + Indirect Connections**: Maintain relationship context when nodes are hidden
+Find nodes by filename or path with real-time highlighting. Non-matching nodes are dimmed, making it easy to locate specific notes in large graphs.
+
+**Toggle**: Command "Toggle Graph Search" or [show by default](../configuration#graph-display)
+
+**Searches**: File names and paths (case-insensitive, partial matching)
+
+**Does not search**: Frontmatter properties (use filters above), note content, or tags
+
+Search works alongside filters — filter first to narrow the graph, then search within visible results.
+
+## Combining Features
+
+- **[Color Rules](color-rules)** — Color by category, filter to focus on subsets
+- **[View Modes](graph-views)** — Filters apply across all graph modes
+- **Search + Filters** — Filter first, then search within visible results
+- **Indirect Connections** — Maintain relationship context when intermediate nodes are hidden
 
 ## Next Steps
 
-- [Color Rules](color-rules) - Combine with filtering
-- [Graph Views](graph-views) - Apply filters in different modes
+- [Color Rules](color-rules) — Visual categories for nodes
+- [Graph Views](graph-views) — View modes and interaction
+- [Configuration](../configuration#graph-filtering) — Filter presets and defaults
+- [Troubleshooting](../troubleshooting#expression-rules-not-working) — Expression debugging

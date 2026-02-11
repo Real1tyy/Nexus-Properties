@@ -8,60 +8,50 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 ## Core Features
 
-### 🔗 [Bidirectional Sync](bidirectional-sync)
-Set relationships in one direction, plugin syncs the reverse automatically. Optional sibling auto-linking.
+### [Bidirectional Sync](bidirectional-sync)
+Set relationships in one direction, the reverse syncs automatically. Optional [sibling auto-linking](bidirectional-sync#auto-link-siblings).
 
-### 📊 [Graph Views](graph-views)
-Visualize relationships with **Hierarchical** (trees), **Related** (direct connections), and **All Related** (constellations) modes.
+### [Graph Views](graph-views)
+Visualize relationships with **Hierarchical** (trees), **Related** (direct connections), and **All Related** (constellations) modes. Includes [depth control](graph-views#depth-control) and interactive [zoom](zoom-mode).
 
-### 📝 [Bases View](bases-view)
-List-based view of current note's relationships. Shows children, parent, and related notes with custom sorting.
+### [Bases View](bases-view)
+List-based view of the current note's relationships with custom sorting, [view types](../configuration#bases-view) (cards, table, list), and [archived filtering](bases-view#archived-toggle).
 
-### 🗺️ [MOC View](moc-view)
-Map of Content view renders hierarchy as a collapsible tree outline. Toggle between current file or topmost parent as root. Use bullet lists with wiki links as a hierarchy source instead of frontmatter properties.
+### [MOC View](moc-view)
+Collapsible tree outline with clickable wiki links. Toggle between current file or topmost parent as root. Supports [bullet-list hierarchies](moc-view#moc-content-hierarchy) as an alternative to frontmatter properties.
 
-### 🎨 [Color Rules](color-rules)
-Apply conditional colors using JavaScript expressions. First matching rule wins.
+### [Color Rules](color-rules)
+Apply conditional node colors using JavaScript expressions. First matching rule wins.
 
-### 🔍 [Filtering](filtering)
-JavaScript expression-based filtering with named presets. Multi-expression AND logic.
+### [Filtering & Search](filtering)
+JavaScript expression-based filtering with named [presets](filtering#filter-presets) and multi-expression AND logic. Real-time [search](filtering#search) by filename/path. [Indirect connections](filtering#indirect-connections) maintain context when nodes are hidden.
 
-### 🔬 [Zoom Mode](zoom-mode)
-Click nodes to preview frontmatter and content inline. Navigate with arrow keys or by clicking links.
+### [Zoom Mode](zoom-mode)
+Click nodes to preview frontmatter and content inline. Navigate with [arrow keys](zoom-mode#keyboard) or by clicking links.
 
-### 🎯 [Context Menus](context-menus)
-Right-click nodes/edges for quick actions: open, add relationships, edit, preview, copy path.
+### [Context Menus](context-menus)
+Right-click nodes/edges for quick actions: open, add relationships, edit, preview, delete, copy path.
 
-### 💬 [Tooltips](tooltips)
-Hover nodes to see properties. Clickable wiki links, configurable width.
+### [Tooltips](tooltips)
+Hover nodes to see properties. Clickable wiki links, [configurable width](../configuration#multi-row-layout).
 
-### 🔎 Search
-Real-time search by filename/path. Highlights matches, dims non-matches. Command: "Toggle Graph Search"
+### Node Statistics
+Real-time relationship counts in the view switcher header. Shows direct counts (Parents, Children, Related) and recursive totals (All Parents, All Children, All Related). Both displays are [independently configurable](../configuration#view-switcher-statistics).
 
-**Searches**: File names and paths (case-insensitive, partial matching)
+### [Node Creation](node-creation)
+Create parent/child/related nodes with [property inheritance](node-creation#property-inheritance) and bidirectional linking via a modal interface.
 
-**Does NOT search**: Frontmatter properties (use [Filtering](filtering)), note content, or tags
+### [Node Layout](node-layout)
+Automatic positioning: Dagre for hierarchies, constellation for networks. Optional [multi-row layout](node-layout#multi-row-layout-large-families) for large families. Collision detection included.
 
-![Graph Search](/img/screenshots/graph-search.png)
-*Real-time search highlighting*
-
-### 📊 Node Statistics
-View real-time relationship counts for the active file in the view switcher header. See direct relationships (Parents, Children, Related) and recursive totals (All Parents, All Children, All Related) at a glance. Both displays are independently configurable in settings.
-
-### ⚡ [Node Creation](node-creation)
-Create parent/child/related nodes with property inheritance and bidirectional linking.
-
-### 🗂️ [Node Layout](node-layout)
-Automatic positioning: Dagre for hierarchies, constellation for networks. Collision detection included.
-
-### ⚙️ [Property Exclusion](excluded-properties)
-Control which properties copy to new nodes. Default and path-based rules.
+### [Property Exclusion](excluded-properties)
+Control which properties copy to new nodes. Default and [path-based rules](excluded-properties#path-based-rules).
 
 ## Quick Start
 
-1. [Bidirectional Sync](bidirectional-sync) - Understand relationship management
-2. [Graph Views](graph-views) - Explore visualization modes
-3. [Hotkeys](../hotkeys) - Set up keyboard shortcuts
-4. [Color Rules](color-rules) - Add visual categories
-5. [Filtering](filtering) - Focus on subsets
-6. [Configuration](../configuration) - Customize settings
+1. [Bidirectional Sync](bidirectional-sync) — Understand relationship management
+2. [Graph Views](graph-views) — Explore visualization modes
+3. [Hotkeys](../hotkeys) — Set up keyboard shortcuts
+4. [Color Rules](color-rules) — Add visual categories
+5. [Filtering](filtering) — Focus on subsets
+6. [Configuration](../configuration) — Customize all settings
