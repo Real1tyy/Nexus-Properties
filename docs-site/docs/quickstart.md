@@ -4,244 +4,90 @@ sidebar_position: 3
 
 # Quick Start Guide
 
-Get up and running with Nexus Properties in 5 minutes! This guide will walk you through creating your first relationship network.
+Get up and running with Nexus Properties in 5 minutes.
 
 ## Step 1: Open the Relationship Graph
 
-There are three ways to open the Relationship Graph view:
+- **Ribbon icon**: Click the fork icon in the left sidebar (enable in Settings → Nexus Properties → Show Ribbon Icon)
+- **Command palette**: `Ctrl/Cmd+P` → "Show Relationship Graph"
 
-1. **Ribbon Icon**: Click the fork icon in the left sidebar (if enabled in settings)
-2. **Command Palette**: Press `Ctrl/Cmd+P` and search for "Show Relationship Graph"
-3. **Command**: Use the command "Nexus Properties: Show Relationship Graph"
+The graph view opens in the sidebar. For full details on graph interaction, see [Graph Views](features/graph-views).
 
-The graph view will open in the left sidebar by default.
+## Step 2: Review Default Settings
 
-## Step 2: Create Your First Parent-Child Relationship
+Open **Settings → Nexus Properties** and check:
 
-Let's create a simple hierarchy to understand how Nexus Properties works.
+- **Property names** — Defaults are `Parent`, `Child`, `Related`. Change if your vault already uses different keys.
+- **Directory scanning** — Defaults to `["*"]` (entire vault). Restrict to specific folders if needed.
 
-### Create a Parent Note
+See [Configuration](configuration) for all settings.
 
-1. Create a new note called `Project Overview.md`
-2. Add frontmatter at the top of the file:
+## Step 3: Create Your First Hierarchy
 
-```yaml
----
-Child:
-  - "[[Task 1]]"
-  - "[[Task 2]]"
----
-```
-
-### Create Child Notes
-
-Create two new notes: `Task 1.md` and `Task 2.md`.
-
-**You don't need to add anything to these notes!** Nexus Properties will automatically update them.
-
-### See the Magic ✨
-
-Open `Task 1.md` or `Task 2.md` and check their frontmatter. You'll see that Nexus Properties automatically added:
-
-```yaml
----
-Parent: "[[Project Overview]]"
----
-```
-
-**That's bidirectional sync in action!** When you set a child relationship in one file, the parent relationship is automatically created in the other file.
-
-## Step 3: View Your Hierarchy in the Graph
+Create a note called `Project Overview.md` (it can be empty). Then use the **Create Child** command to build your hierarchy:
 
 1. Open `Project Overview.md`
-2. Look at the Relationship Graph view
-3. You should see three nodes:
-   - Project Overview (the root)
-   - Task 1 (connected as a child)
-   - Task 2 (connected as a child)
+2. `Ctrl/Cmd+P` → **"Create Child Node"**
+3. A modal appears with the name pre-filled as `Project Overview - `
+4. Type `Task 1` and press **Enter**
 
-### Try Different View Modes
+The new `Project Overview - Task 1.md` file is created with:
+- `Parent: "[[Project Overview]]"` set automatically
+- All frontmatter properties inherited from the parent
+- A bidirectional relationship — `Project Overview.md` now has `Child: ["[[Project Overview - Task 1]]"]`
+
+Repeat to create `Task 2`. You now have a parent with two children, all linked automatically.
+
+See [Node Creation](features/node-creation) for all creation commands and naming patterns.
+
+## Step 4: See Bidirectional Sync
+
+Open any child note and check its frontmatter — `Parent` was set automatically. Open the parent and `Child` was updated too.
+
+This works for all relationship types. Try adding a `Related` property manually:
+
+```yaml
+---
+Related:
+  - "[[Project Overview - Task 2]]"
+---
+```
+
+Check `Task 2` — it now has `Related: ["[[Project Overview - Task 1]]"]` automatically. See [Bidirectional Sync](features/bidirectional-sync) for details.
+
+## Step 5: Explore the Views
 
 Use the toggle button to switch between views:
 
-- **Graph View** - Interactive visualization with Hierarchical, Related, and All Related modes
-- **Bases View** - List-based view with custom sorting
-- **MOC View** - Collapsible tree outline with clickable links
+- **Graph View** — Interactive visualization with [Hierarchical, Related, and All Related modes](features/graph-views)
+- **Bases View** — [List-based view](features/bases-view) with custom sorting
+- **MOC View** — [Collapsible tree outline](features/moc-view) with clickable links
 
-In MOC View, try toggling between "Current" and "Top Parent" modes to see different perspectives of your hierarchy.
+## Step 6: Interact with the Graph
 
-## Step 4: Add Related Relationships
+- **Click a node** → Enter [Zoom Mode](features/zoom-mode) to preview content inline
+- **Right-click a node** → Open the [Context Menu](features/context-menus) for quick actions (add relationships, edit, preview, delete)
+- **Hover a node** → See [Tooltips](features/tooltips) with frontmatter properties
 
-Let's connect Task 1 and Task 2 as related items.
+## Step 7: Add Color Rules
 
-1. Open `Task 1.md`
-2. Add to the frontmatter:
+1. Settings → Nexus Properties → Node Colors → **Add Rule**
+2. Expression: `status === 'complete'` → Color: green
+3. Add `status: complete` to a note's frontmatter — the node changes color
 
-```yaml
----
-Parent: "[[Project Overview]]"
-Related:
-  - "[[Task 2]]"
----
-```
-
-3. Open `Task 2.md` and check its frontmatter:
-
-```yaml
----
-Parent: "[[Project Overview]]"
-Related:
-  - "[[Task 1]]"
----
-```
-
-**Both tasks are now marked as related to each other!** This is another example of bidirectional sync.
-
-## Step 5: Explore the Graph
-
-Now that you have a basic network, let's explore the graph features:
-
-### Zoom Mode
-
-1. Click any node in the graph
-2. A preview panel appears at the bottom showing the file's content
-3. Click the node again to exit zoom mode
-4. Use the eye icons to toggle frontmatter and content visibility
-
-### Context Menu
-
-1. Right-click any node in the graph
-2. You'll see options to:
-   - Open the file
-   - Open in new tab
-   - Add Parent/Child/Related relationships
-   - Edit the node's frontmatter
-   - View node preview
-   - Copy node path
-
-### Tooltips
-
-1. Hover over any node for 1 second
-2. A tooltip appears showing the node's frontmatter properties
-3. You can click links inside the tooltip to navigate
-
-## Step 6: Create Nodes Quickly
-
-Nexus Properties provides commands to quickly create related nodes with a clean modal interface:
-
-1. Open `Project Overview.md`
-2. Open command palette (`Ctrl/Cmd+P`)
-3. Search for "Create Child Node"
-4. A modal dialog appears with the name pre-filled as `Project Overview - `
-5. **Type the child name** (cursor is positioned at the end, ready to type)
-6. Press **Enter** to create or **Escape** to cancel
-7. The new child note will be created with:
-   - The exact name you entered
-   - All properties inherited from the parent
-   - Automatic bidirectional relationship
-   - A unique Zettel ID
-
-### Smart Naming by Node Type
-
-The modal pre-fills the name based on the node type:
-
-- **Create Child Node**: `ParentName - ` (cursor at end - type the child name)
-- **Create Parent Node**: ` - ChildName` (cursor at beginning - type the parent name)
-- **Create Related Node**: `NoteName ` (cursor at end - type the related name)
-
-This approach ensures stable, reliable node creation without any timing issues!
-
-## Step 7: Add Visual Categories with Color Rules
-
-Let's make the graph more visual by adding color rules:
-
-1. Open Settings → Nexus Properties → Node colors
-2. Click "Add Rule"
-3. Add an expression like: `status === 'complete'`
-4. Choose a green color
-5. Click "Add Rule" again
-6. Add: `status === 'pending'`
-7. Choose a yellow color
-
-Now add a `status` property to your notes:
-
-```yaml
----
-Parent: "[[Project Overview]]"
-status: complete
----
-```
-
-The nodes will change color based on their status!
+See [Color Rules](features/color-rules) for expression syntax and examples.
 
 ## Step 8: Filter the Graph
 
-You can filter the graph to show only specific nodes:
+1. `Ctrl/Cmd+P` → "Toggle Graph Filter"
+2. Enter: `status === 'pending'`
+3. Only matching nodes are shown (source node always visible)
 
-1. Open command palette (`Ctrl/Cmd+P`)
-2. Search for "Toggle Graph Filter"
-3. Enter a filter expression: `status === 'pending'`
-4. Only nodes with `status: pending` will be shown
+See [Filtering](features/filtering) for multi-expression filters, presets, and search.
 
-## Next Steps
+## Step 9: MOC Content Mode
 
-Now that you understand the basics, explore more advanced features:
-
-- [Learn about all Graph View modes](features/graph-views)
-- [Explore MOC View](features/moc-view) - Collapsible tree outlines
-- [Master Color Rules](features/color-rules)
-- [Understand Filtering](features/filtering)
-- [Explore Node Layouts](features/node-layout)
-- [Configure all Settings](configuration)
-
-## Common Workflows
-
-### Project Management
-
-```yaml
----
-# Project.md
-Child:
-  - "[[Task 1]]"
-  - "[[Task 2]]"
-  - "[[Task 3]]"
-status: active
-priority: high
----
-```
-
-### Knowledge Hierarchy
-
-```yaml
----
-# Concept.md
-Child:
-  - "[[Sub-concept A]]"
-  - "[[Sub-concept B]]"
-Related:
-  - "[[Related Concept]]"
-type: concept
----
-```
-
-### Research Papers
-
-```yaml
----
-# Main Paper.md
-Related:
-  - "[[Supporting Study 1]]"
-  - "[[Supporting Study 2]]"
-  - "[[Contradicting Study]]"
-tags:
-  - research
-  - published
----
-```
-
-### MOC (Map of Content) Files
-
-Instead of using frontmatter properties, you can build hierarchies directly in markdown using bullet lists:
+If you have notes with bullet-list hierarchies (Map of Content files), switch to MOC Content mode:
 
 ```markdown
 # My Hobbies
@@ -254,8 +100,12 @@ Instead of using frontmatter properties, you can build hierarchies directly in m
     - [[Swimming]]
 ```
 
-To use this workflow:
-1. Enable MOC content mode in Settings → General → Hierarchy Source → MOC Content
-2. Or click the hierarchy source toggle button when viewing a file with valid MOC structure
+Enable in Settings → General → Hierarchy Source → **MOC Content**, or use the toggle button that appears when viewing a valid MOC file. See [MOC View](features/moc-view#moc-content-hierarchy) for details.
 
-[Learn more about MOC Content Hierarchy →](features/moc-view#moc-content-hierarchy)
+## Next Steps
+
+- [Features Overview](features/overview) — Summary of all features
+- [Configuration](configuration) — All settings reference
+- [Hotkeys](hotkeys) — Keyboard shortcuts
+- [Video Tutorials](videos) — Visual walkthroughs
+- [Mobile Support](mobile) — Touch-optimized experience

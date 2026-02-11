@@ -87,7 +87,7 @@ Visual guide to Nexus Properties features. For detailed documentation on each fe
   </video>
 </div>
 
-### Search
+### [Search](features/filtering#search)
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
