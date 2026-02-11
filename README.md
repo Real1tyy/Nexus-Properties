@@ -26,15 +26,16 @@
 
 ### Feature Previews
 
-<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:1em;">
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/BasesNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/MultiRow.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-</div>
-
-<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:2em;">
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/Depth.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/AllRelatedNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-</div>
+<table>
+<tr>
+<td width="50%"><video src="docs-site/static/video/BasesNEW.webm" controls muted loop width="100%"></video></td>
+<td width="50%"><video src="docs-site/static/video/MultiRow.webm" controls muted loop width="100%"></video></td>
+</tr>
+<tr>
+<td width="50%"><video src="docs-site/static/video/Depth.webm" controls muted loop width="100%"></video></td>
+<td width="50%"><video src="docs-site/static/video/AllRelatedNEW.webm" controls muted loop width="100%"></video></td>
+</tr>
+</table>
 
 </div>
 
@@ -42,15 +43,16 @@
 
 ## More Features
 
-<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:1em;">
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/ZoomNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/MOCNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-</div>
-
-<div style="display:flex; flex-wrap:wrap; gap:1em; justify-content:center; margin-bottom:2em;">
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/Color.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-  <video src="https://real1tyy.github.io/Nexus-Properties/video/CreateChildNEW.webm" controls autoplay loop muted style="flex:1 1 45%; min-width:300px; max-width:50%; border-radius:8px;"></video>
-</div>
+<table>
+<tr>
+<td width="50%"><video src="docs-site/static/video/ZoomNEW.webm" controls muted loop width="100%"></video></td>
+<td width="50%"><video src="docs-site/static/video/MOCNEW.webm" controls muted loop width="100%"></video></td>
+</tr>
+<tr>
+<td width="50%"><video src="docs-site/static/video/Color.webm" controls muted loop width="100%"></video></td>
+<td width="50%"><video src="docs-site/static/video/CreateChildNEW.webm" controls muted loop width="100%"></video></td>
+</tr>
+</table>
 
 See the [complete gallery](https://real1tyy.github.io/Nexus-Properties/gallery) for all features.
 
