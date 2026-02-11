@@ -6,10 +6,21 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 # Graph Views
 
-Visualize relationships with multiple viewing modes. Each mode reveals different aspects of your knowledge network.
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/RelationshipDiagram.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
-![Hierarchical View](/img/screenshots/hierarchical-view.png)
-*Hierarchical view with parent-child tree structure*
+Visualize relationships with multiple viewing modes. Each mode reveals different aspects of your knowledge network.
 
 ## Opening the Graph
 
@@ -28,18 +39,56 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 
 **Include All Related**: Add related constellations to hierarchy view
 
-## Node Labels
+### Related
 
-Graph nodes display a cleaned-up title derived from the `Title` property. Parent prefixes are automatically stripped for readability:
+**Shows**: Source file + directly related notes (1 hop)
 
-- `Parent - Child` → "Child"
-- `Parent Child` → "Child"
-- `Parent-Child` → "Child"
-- Files without parents show the basename
+**Layout**: Radial with source in center
 
-Titles update automatically when files change or parent relationships are modified. The same titles are used in [Bases View](bases-view#file-names) as clickable links. See [Automatic Title Property](../configuration#automatic-title-property) for configuration.
+**Best for**: Exploring immediate connections
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/RenderRelated.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### All Related
+
+**Shows**: Entire constellation recursively up to [max depth](../configuration#depth-settings)
+
+**Layout**: Constellation clusters
+
+**Best for**: Discovering indirect connections, full networks
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/AllRelatedNEW.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+:::warning Performance
+Large constellations can be slow. Reduce max depth if needed.
+:::
 
 ## Depth Control
+
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
   <video
     controls
@@ -75,45 +124,16 @@ Control how deeply the graph traverses hierarchical relationships with the depth
 
 See [Configuration](../configuration#depth-settings) for default depth values.
 
-### Related
+## Node Labels
 
-**Shows**: Source file + directly related notes (1 hop)
+Graph nodes display a cleaned-up title derived from the `Title` property. Parent prefixes are automatically stripped for readability:
 
-**Layout**: Radial with source in center
+- `Parent - Child` → "Child"
+- `Parent Child` → "Child"
+- `Parent-Child` → "Child"
+- Files without parents show the basename
 
-**Best for**: Exploring immediate connections
-
-![Related View](/img/screenshots/related-view.png)
-*Related view with radial layout*
-
-### All Related
-
-<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
-  <video
-    controls
-    autoPlay
-    loop
-    muted
-    playsInline
-    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
-  >
-    <source src={useBaseUrl("/video/AllRelatedNEW.webm")} type="video/webm" />
-    Your browser does not support the video tag.
-  </video>
-</div>
-
-**Shows**: Entire constellation recursively up to [max depth](../configuration#depth-settings)
-
-**Layout**: Constellation clusters
-
-**Best for**: Discovering indirect connections, full networks
-
-![All Related View](/img/screenshots/all-related-view.png)
-*All Related view showing entire constellation*
-
-:::warning Performance
-Large constellations can be slow. Reduce max depth if needed.
-:::
+Titles update automatically when files change or parent relationships are modified. The same titles are used in [Bases View](bases-view#file-names) as clickable links. See [Automatic Title Property](../configuration#automatic-title-property) for configuration.
 
 ## Interaction
 
