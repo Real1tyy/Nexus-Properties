@@ -6,6 +6,12 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 1.7.2 - 14.2.2026
+
+### Fixed
+
+- **Graph view "no frontmatter" false positive**: Fixed race condition where switching notes would show "This file has no frontmatter properties" even though the file has properties. The graph view now uses `active-leaf-change` instead of `file-open` to ensure the metadata cache is ready before reading frontmatter.
+
 ## 1.7.1 - 3.2.2026
 
 ### Fixed

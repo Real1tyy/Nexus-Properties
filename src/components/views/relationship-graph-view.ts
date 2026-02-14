@@ -267,8 +267,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		});
 
 		// Register event listeners
-		this.registerEvent(this.app.workspace, "file-open", (file) => {
-			this.onFileOpen(file instanceof TFile ? file : null);
+		// Use active-leaf-change instead of file-open to avoid race condition where
+		// file-open fires before metadata cache has processed the new file's frontmatter.
+		// We fetch the active file at call time when the cache is ready.
+		this.registerEvent(this.app.workspace, "active-leaf-change", () => {
+			const activeFile = this.app.workspace.getActiveFile();
+			this.onFileOpen(activeFile);
 		});
 
 		// Subscribe to indexer events for reactive updates
