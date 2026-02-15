@@ -153,9 +153,13 @@ Every contribution, no matter the size, is greatly appreciated!
 
 ---
 
+## License
+
+[AGPL-3.0](./LICENSE). Versions before v2.0.0 were MIT.
+
 ## Contributing
 
-MIT-licensed. PRs welcome! See [Contributing Guide](https://real1tyy.github.io/Nexus-Properties/contributing) for details.
+PRs welcome! Contributions are licensed under AGPL-3.0. See [Contributing Guide](https://real1tyy.github.io/Nexus-Properties/contributing) for details.
 
 ---
 

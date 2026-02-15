@@ -6,6 +6,18 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 2.0.0 - 15.2.2026
+
+### Changed
+
+- **License changed from MIT to AGPL-3.0**: Starting with v2.0.0, Nexus Properties is licensed under the [GNU Affero General Public License v3.0](https://www.gnu.org/licenses/agpl-3.0.html). Nexus Properties remains fully open source. The AGPL-3.0 ensures all derivative works also remain open source, preventing closed-source commercial forks. Versions prior to v2.0.0 remain available under the MIT License.
+
+### Added
+
+- **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery) page to see the plugin in action.
+
+---
+
 ## 1.7.2 - 14.2.2026
 
 ### Fixed
