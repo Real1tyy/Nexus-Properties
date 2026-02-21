@@ -7,7 +7,7 @@ import {
 import { type App, TFile } from "obsidian";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../../types/settings";
-import type { Command } from "./command";
+import type { Command } from "@real1ty-obsidian-plugins";
 
 /**
  * Command to remove a relationship between two nodes.

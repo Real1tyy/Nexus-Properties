@@ -1,10 +1,14 @@
 import { describe, expect, it, vi, beforeEach } from "vitest";
-import { CommandManager } from "../../src/core/commands/command-manager";
-import { MacroCommand, type Command } from "../../src/core/commands/command";
+import { type Command, MacroCommand, CommandManager } from "@real1ty-obsidian-plugins";
 
-// Mock Notice from obsidian
+// Mock obsidian module used by shared library and CommandManager
 vi.mock("obsidian", () => ({
 	Notice: vi.fn(),
+	Modal: class {
+		constructor() {}
+		open() {}
+		close() {}
+	},
 }));
 
 // Helper to create a mock command
@@ -262,7 +266,7 @@ describe("MacroCommand", () => {
 		};
 		const command3 = createMockCommand("Command3");
 
-		const macro = new MacroCommand([command1, command2, command3]);
+		const macro = new MacroCommand([command1, command2, command3], { rollbackOnError: true });
 
 		await expect(macro.execute()).rejects.toThrow("Execute failed");
 		expect(command1.undo).toHaveBeenCalledOnce();

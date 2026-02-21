@@ -1,6 +1,6 @@
 import { type App, TFile } from "obsidian";
 import type { Frontmatter } from "../../types/settings";
-import type { Command } from "./command";
+import type { Command } from "@real1ty-obsidian-plugins";
 
 /**
  * Command to edit a node's frontmatter.

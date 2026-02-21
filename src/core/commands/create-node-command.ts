@@ -10,7 +10,7 @@ import { RELATIONSHIP_CONFIGS, type NodeCreationType, type RelationshipType } fr
 import type { Frontmatter, NexusPropertiesSettings } from "../../types/settings";
 import { buildFilePathForWikiLink } from "../../utils/file-utils";
 import { buildTitleLink } from "../../utils/string-utils";
-import type { Command } from "./command";
+import type { Command } from "@real1ty-obsidian-plugins";
 
 /**
  * Command to create a new node with a relationship to an existing node.

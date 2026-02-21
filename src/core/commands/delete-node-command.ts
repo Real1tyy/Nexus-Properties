@@ -2,7 +2,7 @@ import { addLinkToProperty, removeMarkdownExtension, withFileContext } from "@re
 import { type App, TFile } from "obsidian";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { captureInverseRelationships, type InverseRelationship } from "../../utils/relationship-context";
-import type { Command } from "./command";
+import type { Command } from "@real1ty-obsidian-plugins";
 
 /**
  * Command to delete a node.

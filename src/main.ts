@@ -20,7 +20,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.settingsStore = new SettingsStore(this);
 		await this.settingsStore.loadSettings();
 
-		this.commandManager = new CommandManager();
+		this.commandManager = new CommandManager({ showNotices: true });
 
 		this.addSettingTab(new NexusPropertiesSettingsTab(this.app, this));
 
