@@ -6,7 +6,7 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
-## 2.0.0 - 15.2.2026
+## 2.0.0 - 24.2.2026
 
 ### Changed
 
@@ -15,6 +15,10 @@ All notable changes to Nexus Properties will be documented here.
 ### Added
 
 - **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery) page to see the plugin in action.
+
+### Fixed
+
+- **MOC view title property support**: MOC view now uses the [title property](features/moc-view#tree-structure) to display note names, matching the behavior of Graph and Bases views. Previously, MOC view always showed raw filenames.
 
 ---
 

@@ -1,4 +1,5 @@
-import type { App, TFile } from "obsidian";
+import { extractDisplayName } from "@real1ty-obsidian-plugins";
+import { type App, TFile } from "obsidian";
 
 /**
  * Builds a proper file path for wiki links, handling root directory correctly.
@@ -72,4 +73,27 @@ export function getUniqueParentFilePath(app: App, folder: string, sourceBasename
 	} while (app.vault.getAbstractFileByPath(candidatePath));
 
 	return candidatePath;
+}
+
+/**
+ * Resolves the display name for a file, preferring the title property if available.
+ * Falls back to extracting the display name from the path or wiki link.
+ *
+ * This mirrors the pattern used in the graph view for consistent naming across views.
+ *
+ * @param app - Obsidian App instance
+ * @param pathOrWikiLink - File path or wiki link to resolve
+ * @param titleProp - The frontmatter property name used for titles (e.g., "title")
+ * @returns The resolved display name
+ */
+export function resolveDisplayName(app: App, pathOrWikiLink: string, titleProp: string): string {
+	const file = app.vault.getAbstractFileByPath(pathOrWikiLink);
+	if (file instanceof TFile) {
+		const cache = app.metadataCache.getFileCache(file);
+		const titleValue = cache?.frontmatter?.[titleProp];
+		if (titleValue) {
+			return extractDisplayName(String(titleValue));
+		}
+	}
+	return extractDisplayName(pathOrWikiLink);
 }

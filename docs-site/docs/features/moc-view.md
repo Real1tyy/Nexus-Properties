@@ -174,7 +174,7 @@ The view switcher cycles through three modes: **Graph → Bases → MOC**
 
 ## Tree Structure
 
-MOC displays notes in a hierarchical outline format:
+MOC displays notes in a hierarchical outline format. Note names respect the **title property** — if a note has a title property set (e.g., `title: "[[path|Display Name]]"`), MOC view shows the display name instead of the raw filename, consistent with Graph and Bases views.
 
 ```
 - [[Current Note]]

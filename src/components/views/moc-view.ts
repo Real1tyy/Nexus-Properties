@@ -5,6 +5,7 @@ import type { Indexer } from "../../core/indexer";
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
+import { resolveDisplayName } from "../../utils/file-utils";
 import { cls } from "../../utils/css";
 import { type TreeNode } from "../../utils/hierarchy";
 
@@ -174,14 +175,14 @@ export class MocView extends RegisteredEventsComponent {
 			});
 		}
 
-		// Link
+		const displayName = resolveDisplayName(this.app, node.path, this.currentSettings.titleProp);
 		const linkClasses = [cls("moc-link")];
 		if (node.isCurrentFile) {
 			linkClasses.push(cls("moc-link-current"));
 		}
 		const linkEl = headerEl.createEl("a", {
 			cls: linkClasses.join(" "),
-			text: node.name,
+			text: displayName,
 		});
 		linkEl.addEventListener("click", (e) => {
 			e.preventDefault();
