@@ -11,6 +11,8 @@ export interface HierarchyTraversalOptions {
 	prioritizeParentProp?: string;
 	/** MOC file path - required when using moc-content source */
 	mocFilePath?: string;
+	/** Start upward traversal from this parent path instead of the current file */
+	parentOverridePath?: string;
 }
 
 /**

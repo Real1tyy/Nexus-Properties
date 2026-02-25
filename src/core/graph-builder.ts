@@ -42,6 +42,7 @@ interface GraphBuilderOptions {
 	filterEvaluator?: (frontmatter: Record<string, any>) => boolean;
 	hierarchySource?: HierarchySourceType;
 	mocFilePath?: string;
+	parentOverridePath?: string;
 }
 
 interface ValidFileContext extends FileContext {
@@ -198,10 +199,17 @@ export class GraphBuilder {
 			graphData = await this.buildMocBasedHierarchyGraph(
 				options.sourcePath,
 				options.startFromCurrent,
-				options.mocFilePath
+				options.mocFilePath,
+				options.parentOverridePath
 			);
 		} else {
-			graphData = this.buildHierarchyGraphData(options.sourcePath, options.startFromCurrent);
+			graphData = this.buildHierarchyGraphData(
+				options.sourcePath,
+				options.startFromCurrent,
+				undefined,
+				true,
+				options.parentOverridePath
+			);
 		}
 
 		return this.applyGraphFilters(graphData, options.searchQuery, options.filterEvaluator);
@@ -236,18 +244,22 @@ export class GraphBuilder {
 		sourcePath: string,
 		startFromCurrent: boolean,
 		sharedProcessedPaths?: Set<string>,
-		allowSourceHighlight = true
+		allowSourceHighlight = true,
+		parentOverridePath?: string
 	): GraphData {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
 		const processedPaths = sharedProcessedPaths || new Set<string>();
 
 		const effectiveDepth = this.getEffectiveHierarchyMaxDepth();
-		const rootPath = startFromCurrent
-			? sourcePath
-			: this.depthOverride !== null
-				? this.findTopmostParent(sourcePath, effectiveDepth)
-				: this.findTopmostParent(sourcePath);
+		// When a parent override is set, use it directly as the root
+		const rootPath = parentOverridePath
+			? parentOverridePath
+			: startFromCurrent
+				? sourcePath
+				: this.depthOverride !== null
+					? this.findTopmostParent(sourcePath, effectiveDepth)
+					: this.findTopmostParent(sourcePath, 50);
 
 		const rootNode = this.createNodeElement(rootPath, 0, allowSourceHighlight && rootPath === sourcePath);
 		nodes.push(rootNode);
@@ -330,7 +342,8 @@ export class GraphBuilder {
 	private async buildMocBasedHierarchyGraph(
 		sourcePath: string,
 		startFromCurrent: boolean,
-		mocFilePath?: string
+		mocFilePath?: string,
+		parentOverridePath?: string
 	): Promise<GraphData> {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
@@ -346,6 +359,7 @@ export class GraphBuilder {
 		const options = {
 			highlightPath: sourcePath,
 			mocFilePath: mocFilePath || sourcePath,
+			parentOverridePath,
 		};
 
 		const tree = startFromCurrent

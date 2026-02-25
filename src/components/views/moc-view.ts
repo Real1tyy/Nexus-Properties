@@ -12,7 +12,7 @@ import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
-import { resolveDisplayName } from "../../utils/file-utils";
+import { resolveDisplayName, resolveParentSelection, type ParentOption } from "../../utils/file-utils";
 import { buildRelatedTree, type TreeNode } from "../../utils/hierarchy";
 
 export class MocView extends RegisteredEventsComponent {
@@ -25,6 +25,9 @@ export class MocView extends RegisteredEventsComponent {
 	private useTopParentAsRoot = false;
 	private showRelated = false;
 	private rootModeBtn: HTMLButtonElement | null = null;
+	private parentOverridePath: string | undefined;
+	private parentDropdown: HTMLSelectElement | null = null;
+	private parentSelectorContainer: HTMLElement | null = null;
 	private component: Component;
 
 	constructor(
@@ -61,6 +64,11 @@ export class MocView extends RegisteredEventsComponent {
 				return;
 			}
 
+			// Reset parent override only on actual file switch (not forced re-renders)
+			if (this.lastFilePath !== null && this.lastFilePath !== currentFilePath) {
+				this.parentOverridePath = undefined;
+			}
+
 			this.lastFilePath = currentFilePath;
 
 			this.contentEl.empty();
@@ -73,6 +81,24 @@ export class MocView extends RegisteredEventsComponent {
 
 			const isFolder = isFolderNote(activeFile.path);
 			this.createToolbar(isFolder);
+
+			// Compute parents and populate dropdown
+			const { parents, selectedPath } = resolveParentSelection({
+				app: this.app,
+				indexer: this.indexer,
+				file: activeFile,
+				prioritizeParentProp: this.currentSettings.prioritizeParentProp,
+				overridePath: this.parentOverridePath,
+			});
+			this.populateParentDropdown(parents, selectedPath);
+
+			// Hide dropdown when: showRelated, folder note, moc-content mode, or fewer than 2 parents
+			const shouldHideParent =
+				this.showRelated || isFolder || this.hierarchySource === "moc-content" || parents.length < 2;
+			if (this.parentSelectorContainer) {
+				this.parentSelectorContainer.toggleClass(cls("hidden"), shouldHideParent);
+			}
+
 			this.treeContainer = this.contentEl.createDiv({
 				cls: cls("moc-tree-container"),
 			});
@@ -99,6 +125,7 @@ export class MocView extends RegisteredEventsComponent {
 			const options = {
 				prioritizeParentProp: this.currentSettings.prioritizeParentProp,
 				mocFilePath: activeFile.path,
+				parentOverridePath: this.parentOverridePath,
 			};
 
 			tree = this.useTopParentAsRoot
@@ -205,6 +232,19 @@ export class MocView extends RegisteredEventsComponent {
 			relatedCheckbox.click();
 		});
 
+		// Parent override dropdown
+		this.parentSelectorContainer = rightGroup.createDiv({
+			cls: cls("moc-toggle-container"),
+		});
+		this.parentDropdown = this.parentSelectorContainer.createEl("select", {
+			cls: cls("moc-parent-dropdown"),
+		});
+		this.parentDropdown.addEventListener("change", () => {
+			this.parentOverridePath = this.parentDropdown?.value;
+			this.lastFilePath = null;
+			this.render();
+		});
+
 		// Root mode toggle is not applicable for folder notes (forest always uses top parent)
 		if (!isFolder) {
 			this.rootModeBtn = rightGroup.createEl("button", {
@@ -212,6 +252,21 @@ export class MocView extends RegisteredEventsComponent {
 			});
 			this.updateRootModeButton();
 			this.rootModeBtn.addEventListener("click", () => this.toggleRootMode());
+		}
+	}
+
+	private populateParentDropdown(parents: ParentOption[], selectedPath: string | undefined): void {
+		if (!this.parentDropdown) return;
+		this.parentDropdown.empty();
+
+		for (const parent of parents) {
+			const option = this.parentDropdown.createEl("option", {
+				text: parent.displayName,
+				value: parent.path,
+			});
+			if (parent.path === selectedPath) {
+				option.selected = true;
+			}
 		}
 	}
 
@@ -450,6 +505,9 @@ export class MocView extends RegisteredEventsComponent {
 		this.collapsedNodes.clear();
 		this.treeContainer = null;
 		this.rootModeBtn = null;
+		this.parentDropdown = null;
+		this.parentSelectorContainer = null;
+		this.parentOverridePath = undefined;
 		this.contentEl.empty();
 		this.cleanupEvents();
 	}

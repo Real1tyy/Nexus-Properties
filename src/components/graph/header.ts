@@ -8,9 +8,12 @@ interface GraphHeaderProps {
 	startFromCurrent: boolean;
 	isFolderNote?: boolean;
 	hierarchySource?: HierarchySourceType;
+	parents?: Array<{ path: string; displayName: string }>;
+	selectedParentPath?: string;
 	onRenderRelatedChange: (value: boolean) => void;
 	onIncludeAllRelatedChange: (value: boolean) => void;
 	onStartFromCurrentChange: (value: boolean) => void;
+	onParentOverrideChange?: (parentPath: string) => void;
 }
 
 export class GraphHeader {
@@ -23,6 +26,8 @@ export class GraphHeader {
 	private relatedToggleContainer: HTMLElement | null = null;
 	private startFromCurrentContainer: HTMLElement | null = null;
 	private includeAllContainer: HTMLElement | null = null;
+	private parentDropdown: HTMLSelectElement | null = null;
+	private parentDropdownContainer: HTMLElement | null = null;
 
 	constructor(
 		private containerEl: HTMLElement,
@@ -127,7 +132,36 @@ export class GraphHeader {
 
 		this.makeContainerClickable(this.startFromCurrentContainer, this.toggleCheckbox);
 
+		// Parent override dropdown
+		this.parentDropdownContainer = this.controlsContainer.createEl("div", {
+			cls: cls("graph-toggle-container"),
+		});
+		this.parentDropdown = this.parentDropdownContainer.createEl("select", {
+			cls: cls("graph-parent-dropdown"),
+		});
+		this.parentDropdown.addEventListener("change", () => {
+			const selectedPath = this.parentDropdown?.value ?? "";
+			this.props.onParentOverrideChange?.(selectedPath);
+		});
+		this.populateParentDropdown();
+
 		this.updateVisibility();
+	}
+
+	private populateParentDropdown(): void {
+		if (!this.parentDropdown) return;
+		this.parentDropdown.empty();
+
+		const parents = this.props.parents ?? [];
+		for (const parent of parents) {
+			const option = this.parentDropdown.createEl("option", {
+				text: parent.displayName,
+				value: parent.path,
+			});
+			if (parent.path === this.props.selectedParentPath) {
+				option.selected = true;
+			}
+		}
 	}
 
 	updateTitle(fileName: string): void {
@@ -137,6 +171,12 @@ export class GraphHeader {
 	}
 
 	private updateVisibility(): void {
+		const hideParentDropdown = () => {
+			if (this.parentDropdownContainer) {
+				this.parentDropdownContainer.toggleClass(cls("hidden"), true);
+			}
+		};
+
 		// When hierarchy source is MOC content, hide all related-based options
 		if (this.props.hierarchySource === "moc-content") {
 			if (this.relatedToggleContainer) {
@@ -148,6 +188,7 @@ export class GraphHeader {
 			if (this.includeAllContainer) {
 				this.includeAllContainer.toggleClass(cls("hidden"), true);
 			}
+			hideParentDropdown();
 			return;
 		}
 
@@ -161,6 +202,7 @@ export class GraphHeader {
 			if (this.includeAllContainer) {
 				this.includeAllContainer.toggleClass(cls("hidden"), true);
 			}
+			hideParentDropdown();
 			return;
 		}
 
@@ -173,6 +215,13 @@ export class GraphHeader {
 		}
 		if (this.includeAllContainer) {
 			this.includeAllContainer.toggleClass(cls("hidden"), !this.props.renderRelated);
+		}
+
+		// Parent dropdown: hide when related mode, startFromCurrent, or fewer than 2 parents
+		const parentCount = this.props.parents?.length ?? 0;
+		const shouldHideParent = this.props.renderRelated || this.props.startFromCurrent || parentCount < 2;
+		if (this.parentDropdownContainer) {
+			this.parentDropdownContainer.toggleClass(cls("hidden"), shouldHideParent);
 		}
 	}
 
@@ -190,6 +239,9 @@ export class GraphHeader {
 		if (this.toggleCheckbox && props.startFromCurrent !== undefined) {
 			this.toggleCheckbox.checked = props.startFromCurrent;
 		}
+		if (props.parents !== undefined || props.selectedParentPath !== undefined) {
+			this.populateParentDropdown();
+		}
 		this.updateVisibility();
 	}
 
@@ -202,5 +254,7 @@ export class GraphHeader {
 		this.relatedToggleContainer = null;
 		this.startFromCurrentContainer = null;
 		this.includeAllContainer = null;
+		this.parentDropdown = null;
+		this.parentDropdownContainer = null;
 	}
 }

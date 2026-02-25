@@ -87,6 +87,21 @@ Visualize relationships with multiple viewing modes. Each mode reveals different
 Large constellations can be slow. Reduce max depth if needed.
 :::
 
+## Parent Selection
+
+When a note has **multiple parents**, a dropdown appears in the graph header. It lets you choose which parent the upward traversal should follow to find the root of the tree.
+
+- **Default**: The parent specified by the [Prioritize Parent](../configuration#hierarchy) setting, or the first parent if none is configured.
+- **Override**: Select a different parent from the dropdown. The graph rebuilds immediately with the new root.
+- **Ephemeral**: The override resets whenever you switch to a different file.
+
+The dropdown is hidden when:
+- The current file has fewer than 2 parents
+- **Render Related** is enabled
+- **Current file only** is enabled
+- The hierarchy source is MOC Content
+- Viewing a folder note
+
 ## Depth Control
 
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>

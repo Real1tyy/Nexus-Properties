@@ -8,6 +8,7 @@ import type { HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import { cls } from "../../utils/css";
+import { resolveParentSelection } from "../../utils/file-utils";
 import { EdgeContextMenu } from "../graph/edge-context-menu";
 import { GraphFilterPresetSelector } from "../graph/filter-preset-selector";
 import { GraphHeader } from "../graph/header";
@@ -66,6 +67,8 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		edges: ElementDefinition[];
 	} | null = null;
 	private onViewTypeChangeCallback: (() => void) | null = null;
+	private parentOverridePath: string | undefined;
+	private forceFullRebuild = false;
 
 	constructor(
 		private readonly app: App,
@@ -170,6 +173,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			},
 			onStartFromCurrentChange: (value) => {
 				this.ignoreTopmostParent = value;
+				this.updateGraph();
+			},
+			onParentOverrideChange: (parentPath) => {
+				this.parentOverridePath = parentPath;
+				this.forceFullRebuild = true;
 				this.updateGraph();
 			},
 		});
@@ -656,9 +664,10 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.exitZoomMode();
 		}
 
-		// Re-apply pre-fill filter when switching to a different file
+		// Re-apply pre-fill filter and reset parent override when switching to a different file
 		if (this.currentFile && file.path !== this.currentFile.path) {
 			this.applyPreFillFilter();
+			this.parentOverridePath = undefined;
 		}
 
 		this.currentFile = file;
@@ -715,11 +724,22 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		this.isUpdating = true;
 
 		const isFolder = isFolderNote(this.currentFile.path);
+
+		// Compute parents for the dropdown
+		const { parents, selectedPath: selectedParentPath } = resolveParentSelection({
+			app: this.app,
+			indexer: this.indexer,
+			file: this.currentFile,
+			prioritizeParentProp: this.plugin.settingsStore.currentSettings.prioritizeParentProp,
+			overridePath: this.parentOverridePath,
+		});
 		if (this.header) {
 			this.header.update({
 				currentFileName: this.currentFile.basename,
 				isFolderNote: isFolder,
 				hierarchySource: this.hierarchySource,
+				parents,
+				selectedParentPath,
 			});
 		}
 
@@ -737,6 +757,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			filterEvaluator: filterEvaluator,
 			hierarchySource: this.hierarchySource,
 			mocFilePath: this.currentFile.path,
+			parentOverridePath: this.parentOverridePath,
 		});
 
 		// If Cytoscape doesn't exist yet, do full initialization
@@ -752,6 +773,19 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 			this.renderAndFitGraph(nodes, edges);
 			this.updateTrackedElements(nodes, edges);
+			this.pendingGraphData = null;
+			this.isUpdating = false;
+			return;
+		}
+
+		if (this.forceFullRebuild) {
+			this.forceFullRebuild = false;
+			this.destroyGraph();
+			this.initializeCytoscape();
+			if (this.cy) {
+				this.renderAndFitGraph(nodes, edges);
+				this.updateTrackedElements(nodes, edges);
+			}
 			this.pendingGraphData = null;
 			this.isUpdating = false;
 			return;

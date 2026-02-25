@@ -214,6 +214,20 @@ Traverses upward to find the topmost ancestor, then renders the full tree with y
 
 This uses the same traversal algorithm as the Graph view, respecting the **Prioritize Parent** setting for notes with multiple parents.
 
+## Parent Selection
+
+When a note has **multiple parents**, a dropdown appears in the MOC toolbar. It lets you choose which parent the upward traversal should follow when building the tree from the top parent.
+
+- **Default**: The parent specified by the [Prioritize Parent](../configuration#hierarchy) setting, or the first parent if none is configured.
+- **Override**: Select a different parent from the dropdown. The tree rebuilds immediately with the new root.
+- **Ephemeral**: The override resets whenever you switch to a different file.
+
+The dropdown is hidden when:
+- The current file has fewer than 2 parents
+- **Render Related** is enabled
+- The hierarchy source is MOC Content
+- Viewing a folder note
+
 ## Render Related
 
 Enable the **Render Related** checkbox in the toolbar to switch to a purely related-based tree. Instead of showing the children hierarchy, the tree displays only notes linked via the `Related` frontmatter property, expanded recursively with cycle detection.

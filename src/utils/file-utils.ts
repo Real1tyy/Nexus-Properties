@@ -1,5 +1,6 @@
-import { extractDisplayName } from "@real1ty-obsidian-plugins";
+import { extractDisplayName, extractFilePath } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
+import type { Indexer } from "../core/indexer";
 
 /**
  * Builds a proper file path for wiki links, handling root directory correctly.
@@ -96,4 +97,64 @@ export function resolveDisplayName(app: App, pathOrWikiLink: string, titleProp: 
 		}
 	}
 	return extractDisplayName(pathOrWikiLink);
+}
+
+export interface ParentOption {
+	path: string;
+	displayName: string;
+}
+
+interface ResolveParentSelectionOptions {
+	app: App;
+	indexer: Indexer;
+	file: TFile;
+	prioritizeParentProp: string;
+	overridePath?: string;
+}
+
+interface ParentSelectionResult {
+	parents: ParentOption[];
+	selectedPath: string | undefined;
+}
+
+/**
+ * Resolves a file's parents from its relationships and determines which parent
+ * should be selected in the dropdown (override → prioritized prop → first).
+ */
+export function resolveParentSelection(options: ResolveParentSelectionOptions): ParentSelectionResult {
+	const { app, indexer, file, prioritizeParentProp, overridePath } = options;
+	const parents: ParentOption[] = [];
+
+	const cache = app.metadataCache.getFileCache(file);
+	const frontmatter = cache?.frontmatter;
+	if (frontmatter) {
+		const relations = indexer.extractRelationships(file, frontmatter);
+		for (const wikiLink of relations.parent) {
+			const linkPath = extractFilePath(wikiLink);
+			const resolved = app.metadataCache.getFirstLinkpathDest(linkPath, file.path);
+			if (resolved) {
+				const displayName = extractDisplayName(resolved.path);
+				parents.push({ path: resolved.path, displayName });
+			}
+		}
+	}
+
+	let selectedPath = overridePath;
+	if (!selectedPath && parents.length >= 2) {
+		if (prioritizeParentProp && frontmatter?.[prioritizeParentProp]) {
+			const prioritizedValue = String(frontmatter[prioritizeParentProp]).trim();
+			const prioritizedPath = extractFilePath(prioritizedValue);
+			const match = parents.find(
+				(p) => p.path === prioritizedPath || extractDisplayName(p.path) === extractDisplayName(prioritizedPath)
+			);
+			if (match) {
+				selectedPath = match.path;
+			}
+		}
+		if (!selectedPath) {
+			selectedPath = parents[0].path;
+		}
+	}
+
+	return { parents, selectedPath };
 }

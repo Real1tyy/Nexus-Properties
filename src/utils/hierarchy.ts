@@ -9,6 +9,8 @@ interface HierarchyTraversalOptions {
 	includeRoot?: boolean;
 	/** Path to mark as the current file in the tree (for highlighting) */
 	highlightPath?: string;
+	/** Start upward traversal from this parent path instead of the current file */
+	parentOverridePath?: string;
 }
 
 export interface TreeNode {
@@ -195,8 +197,9 @@ export function buildHierarchyTreeFromTopParent(
 	startFile: TFile,
 	options: HierarchyTraversalOptions & FindTopmostParentOptions = {}
 ): TreeNode {
-	const { prioritizeParentProp, ...traversalOptions } = options;
-	const rootPath = findTopmostParent(app, indexer, startFile.path, { prioritizeParentProp });
+	const { prioritizeParentProp, parentOverridePath, ...traversalOptions } = options;
+	// When a parent override is set, use it directly as the root
+	const rootPath = parentOverridePath ?? findTopmostParent(app, indexer, startFile.path, { prioritizeParentProp });
 	const rootFile = app.vault.getAbstractFileByPath(rootPath);
 
 	const fileToUse = rootFile instanceof TFile ? rootFile : startFile;

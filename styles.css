@@ -2017,6 +2017,54 @@ button.nexus-properties-hierarchy-source-button:active {
 	border-color: var(--interactive-accent);
 }
 
+/* Parent override dropdown (Graph view) */
+.nexus-properties-graph-parent-dropdown {
+	padding: 4px 8px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: all 0.15s;
+	max-width: 160px;
+}
+
+.nexus-properties-graph-parent-dropdown:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-properties-graph-parent-dropdown:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+}
+
+/* Parent override dropdown (MOC view) */
+.nexus-properties-moc-parent-dropdown {
+	padding: 4px 8px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: all 0.15s;
+	max-width: 160px;
+}
+
+.nexus-properties-moc-parent-dropdown:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+
+.nexus-properties-moc-parent-dropdown:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+}
+
 /* Root mode toggle */
 .nexus-properties-moc-root-toggle {
 	display: flex;

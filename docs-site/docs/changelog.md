@@ -14,6 +14,7 @@ All notable changes to Nexus Properties will be documented here.
 
 ### Added
 
+- **Parent Selection Dropdown**: When a note has multiple parents, a dropdown appears in both the Graph view header and MOC view toolbar letting you choose which parent to follow when traversing upward. The default selection respects the Prioritize Parent setting. The override is ephemeral — it resets when you switch files. Hidden in related mode, current-file-only mode, MOC content mode, and for folder notes. [Learn more →](features/graph-views#parent-selection) | [MOC →](features/moc-view#parent-selection)
 - **Vault Statistics in Settings**: New "Statistics" tab in settings displays vault-wide metrics — total indexed nodes, tree count, average and max tree depth, and relationship counts. Computed automatically when the tab is opened. [Learn more →](features/vault-statistics)
 - **Render Related in MOC view**: New "Render Related" checkbox in the MOC toolbar recursively adds related nodes (from frontmatter) as children at every level of the tree. Works with both Properties and MOC Content hierarchy sources. [Learn more →](features/moc-view#render-related)
 - **Folder note forest in MOC view**: When viewing a folder note, the MOC view renders a forest of trees — one per file in the folder — matching the Graph view's folder note behavior. The Bases view is removed from the toggle cycle for folder notes. [Learn more →](features/moc-view#folder-note-forest)
