@@ -2024,7 +2024,7 @@ button.nexus-properties-hierarchy-source-button:active {
 	background: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
-	color: var(--text-muted);
+	color: var(--text-normal);
 	cursor: pointer;
 	transition: all 0.15s;
 	max-width: 160px;
@@ -2039,6 +2039,12 @@ button.nexus-properties-hierarchy-source-button:active {
 .nexus-properties-graph-parent-dropdown:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
+	color: var(--text-normal);
+}
+
+.nexus-properties-graph-parent-dropdown option {
+	background: var(--background-primary);
+	color: var(--text-normal);
 }
 
 /* Parent override dropdown (MOC view) */
@@ -2048,7 +2054,7 @@ button.nexus-properties-hierarchy-source-button:active {
 	background: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
-	color: var(--text-muted);
+	color: var(--text-normal);
 	cursor: pointer;
 	transition: all 0.15s;
 	max-width: 160px;
@@ -2063,6 +2069,12 @@ button.nexus-properties-hierarchy-source-button:active {
 .nexus-properties-moc-parent-dropdown:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
+	color: var(--text-normal);
+}
+
+.nexus-properties-moc-parent-dropdown option {
+	background: var(--background-primary);
+	color: var(--text-normal);
 }
 
 /* Root mode toggle */
