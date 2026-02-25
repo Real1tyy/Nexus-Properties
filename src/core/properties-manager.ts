@@ -311,16 +311,18 @@ export class PropertiesManager {
 			this.accumulatedDiffs.delete(filePath);
 
 			const mergedDiff = mergeFrontmatterDiffs(diffs);
+			const filteredDiff = this.filterExcludedProperties(mergedDiff);
+			if (!filteredDiff.hasChanges) return;
 
 			if (this.settings.propagateFrontmatterToChildren) {
-				void this.propagateFrontmatterToChildren(childrenPaths, relationships, mergedDiff);
+				void this.propagateFrontmatterToChildren(childrenPaths, relationships, filteredDiff);
 			} else if (this.settings.askBeforePropagatingFrontmatter) {
 				const fileContext = getFileContext(this.app, filePath);
 				new FrontmatterPropagationModal(this.app, {
 					eventTitle: fileContext.baseName,
-					diff: mergedDiff,
+					diff: filteredDiff,
 					instanceCount: childrenPaths.length,
-					onConfirm: () => this.propagateFrontmatterToChildren(childrenPaths, relationships, mergedDiff),
+					onConfirm: () => this.propagateFrontmatterToChildren(childrenPaths, relationships, filteredDiff),
 				}).open();
 			}
 		}, this.settings.propagationDebounceMs);
@@ -333,27 +335,7 @@ export class PropertiesManager {
 		relationships: FileRelationships,
 		frontmatterDiff: FrontmatterDiff
 	): Promise<void> {
-		if (childrenPaths.length === 0) {
-			return;
-		}
-
-		const allChanges = [...frontmatterDiff.added, ...frontmatterDiff.modified, ...frontmatterDiff.deleted];
-		if (allChanges.length === 0) {
-			return;
-		}
-
-		const excludedProps = parseExcludedProps(this.settings);
-
-		// Filter changes to only include non-excluded properties
-		const filteredAdded = frontmatterDiff.added.filter((change: FrontmatterChange) => !excludedProps.has(change.key));
-		const filteredModified = frontmatterDiff.modified.filter(
-			(change: FrontmatterChange) => !excludedProps.has(change.key)
-		);
-		const filteredDeleted = frontmatterDiff.deleted.filter(
-			(change: FrontmatterChange) => !excludedProps.has(change.key)
-		);
-
-		if (filteredAdded.length === 0 && filteredModified.length === 0 && filteredDeleted.length === 0) {
+		if (childrenPaths.length === 0 || !frontmatterDiff.hasChanges) {
 			return;
 		}
 
@@ -362,16 +344,9 @@ export class PropertiesManager {
 		}
 
 		try {
-			const filteredChanges = [...filteredAdded, ...filteredModified, ...filteredDeleted];
 			await Promise.all(
 				childrenPaths.map((childPath) =>
-					applyFrontmatterChanges(this.app, childPath, relationships.frontmatter, {
-						added: filteredAdded,
-						modified: filteredModified,
-						deleted: filteredDeleted,
-						changes: filteredChanges,
-						hasChanges: filteredChanges.length > 0,
-					})
+					applyFrontmatterChanges(this.app, childPath, relationships.frontmatter, frontmatterDiff)
 				)
 			);
 		} catch {
@@ -381,5 +356,17 @@ export class PropertiesManager {
 				this.filesBeingPropagated.delete(childPath);
 			}
 		}
+	}
+
+	private filterExcludedProperties(diff: FrontmatterDiff): FrontmatterDiff {
+		const excludedProps = parseExcludedProps(this.settings);
+		const isAllowed = (change: FrontmatterChange) => !excludedProps.has(change.key);
+
+		const added = diff.added.filter(isAllowed);
+		const modified = diff.modified.filter(isAllowed);
+		const deleted = diff.deleted.filter(isAllowed);
+		const changes = [...added, ...modified, ...deleted];
+
+		return { added, modified, deleted, changes, hasChanges: changes.length > 0 };
 	}
 }
