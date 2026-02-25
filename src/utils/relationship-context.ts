@@ -1,6 +1,6 @@
 import { getFileContext, parsePropertyLinks } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
-import type { FileRelationships } from "../core/indexer";
+import type { FileRelationships } from "../types/constants";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
 

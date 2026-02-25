@@ -1,10 +1,15 @@
 import type { App } from "obsidian";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { GraphBuilder } from "../src/core/graph-builder";
+import { HierarchyProvider } from "../src/core/hierarchy";
 import type { Indexer } from "../src/core/indexer";
 import type { SettingsStore } from "../src/core/settings-store";
 
 describe("Folder Notes Graph Building", () => {
+	afterEach(() => {
+		HierarchyProvider.resetInstance();
+	});
+
 	const createMockApp = (files: { path: string; frontmatter?: Record<string, any> }[]): App => {
 		// Create case-insensitive map (store with normalized lowercase keys, but preserve original paths)
 		const fileMap = new Map(files.map((f) => [f.path.toLowerCase(), { ...f, originalPath: f.path }]));
@@ -64,15 +69,21 @@ describe("Folder Notes Graph Building", () => {
 	};
 
 	const createMockSettingsStore = (): SettingsStore => {
+		const settings = {
+			hierarchyMaxDepth: 10,
+			filterExpressions: [],
+			colorRules: [],
+			defaultNodeColor: "#e9f2ff",
+			prioritizeParentProp: "",
+			hierarchySource: "properties" as const,
+		};
 		return {
 			settings$: {
-				value: {
-					hierarchyMaxDepth: 10,
-					filterExpressions: [],
-					colorRules: [],
-					defaultNodeColor: "#e9f2ff",
-				},
+				value: settings,
 				subscribe: vi.fn(),
+			},
+			get currentSettings() {
+				return settings;
 			},
 		} as any;
 	};

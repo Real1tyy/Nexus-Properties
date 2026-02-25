@@ -1,4 +1,4 @@
-import type { NexusPropertiesSettings } from "./settings";
+import type { Frontmatter, NexusPropertiesSettings } from "./settings";
 
 const _PLUGIN_ID = "nexus-properties";
 
@@ -80,6 +80,15 @@ export const SCAN_CONCURRENCY = 10;
 
 export type RelationshipType = "parent" | "children" | "related";
 export type NodeCreationType = "parent" | "child" | "related";
+
+export interface FileRelationships {
+	filePath: string;
+	mtime: number;
+	parent: string[];
+	children: string[];
+	related: string[];
+	frontmatter: Frontmatter;
+}
 
 interface RelationshipConfig {
 	type: RelationshipType;

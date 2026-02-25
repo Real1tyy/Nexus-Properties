@@ -2,16 +2,15 @@ import {
 	ColorEvaluator,
 	extractDisplayName,
 	extractFilePath,
-	type FileContext,
 	FilterEvaluator,
 	getFileContext,
 	getFolderPath,
 	isFolderNote,
 } from "@real1ty-obsidian-plugins";
 import type { ElementDefinition } from "cytoscape";
-import { type App, TFile } from "obsidian";
+import type { App, TFile } from "obsidian";
 import type { NexusPropertiesSettings } from "../types/settings";
-import type { TreeNode } from "../utils/hierarchy";
+import { buildRelatedTree, getRelationships, resolveWikiLink, type TreeNode } from "../utils/hierarchy";
 import { HierarchyProvider, type HierarchySourceType } from "./hierarchy";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
@@ -45,13 +44,10 @@ interface GraphBuilderOptions {
 	parentOverridePath?: string;
 }
 
-interface ValidFileContext extends FileContext {
-	wikiLink: string;
-}
-
 /**
  * Builds graph data (nodes and edges) from file relationships.
- * Handles both hierarchy and constellation view modes.
+ * Delegates tree construction to HierarchyProvider and utility functions,
+ * then converts TreeNode structures to GraphData for rendering.
  */
 export class GraphBuilder {
 	private readonly filterEvaluator: FilterEvaluator<NexusPropertiesSettings>;
@@ -59,7 +55,6 @@ export class GraphBuilder {
 	private allRelatedMaxDepth: number;
 	private hierarchyMaxDepth: number;
 	private maintainIndirectConnections: boolean;
-	private prioritizeParentProp: string;
 	private titleProp: string;
 	private depthOverride: number | null = null;
 	private hierarchySource: HierarchySourceType = "properties";
@@ -76,7 +71,6 @@ export class GraphBuilder {
 			this.allRelatedMaxDepth = settings.allRelatedMaxDepth;
 			this.hierarchyMaxDepth = settings.hierarchyMaxDepth;
 			this.maintainIndirectConnections = settings.maintainIndirectConnections;
-			this.prioritizeParentProp = settings.prioritizeParentProp;
 			this.titleProp = settings.titleProp;
 			this.hierarchySource = settings.hierarchySource;
 		};
@@ -101,55 +95,10 @@ export class GraphBuilder {
 	}
 
 	/**
-	 * Get the prioritized parent for a given node, if configured and valid.
-	 * Returns the path of the prioritized parent if it exists in the node's parent list, otherwise undefined.
+	 * Creates a nodeFilter callback that applies the frontmatter property filters.
 	 */
-	private getPrioritizedParent(
-		frontmatter: Record<string, unknown>,
-		validParents: ValidFileContext[]
-	): string | undefined {
-		if (!this.prioritizeParentProp || !frontmatter[this.prioritizeParentProp]) {
-			return undefined;
-		}
-
-		const prioritizedParentValue = String(frontmatter[this.prioritizeParentProp]).trim();
-
-		const prioritizedPath = extractFilePath(prioritizedParentValue);
-
-		const matchingParent = validParents.find((ctx) => {
-			const parentPath = extractFilePath(ctx.wikiLink);
-
-			return parentPath === prioritizedPath || ctx.path === prioritizedPath;
-		});
-
-		return matchingParent?.path;
-	}
-
-	private resolveValidContexts(wikiLinks: string[], excludePaths: Set<string>, sourcePath: string): ValidFileContext[] {
-		return wikiLinks
-			.map((wikiLink) => {
-				const linkPath = extractFilePath(wikiLink);
-				const resolvedFile = this.app.metadataCache.getFirstLinkpathDest(linkPath, sourcePath);
-
-				if (!resolvedFile) {
-					return {
-						wikiLink,
-						file: null,
-						frontmatter: null,
-						path: "",
-						pathWithExt: "",
-					};
-				}
-
-				const fileContext = getFileContext(this.app, resolvedFile.path);
-				return { wikiLink, ...fileContext };
-			})
-			.filter((ctx): ctx is ValidFileContext => {
-				if (ctx.file === null || !ctx.frontmatter || excludePaths.has(ctx.path)) {
-					return false;
-				}
-				return this.filterEvaluator.evaluateFilters(ctx.frontmatter);
-			});
+	private createNodeFilter(): (frontmatter: Record<string, unknown>) => boolean {
+		return (frontmatter) => this.filterEvaluator.evaluateFilters(frontmatter);
 	}
 
 	private createNodeElement(pathOrWikiLink: string, level: number, isSource: boolean): ElementDefinition {
@@ -180,34 +129,26 @@ export class GraphBuilder {
 		let graphData: GraphData;
 
 		const isFolder = isFolderNote(options.sourcePath);
-		const effectiveHierarchySource = options.hierarchySource ?? this.hierarchySource;
 
 		if (isFolder) {
 			if (options.renderRelated) {
 				graphData = this.buildFolderRelatedGraphData(options.sourcePath);
 			} else {
-				graphData = this.buildFolderHierarchyGraphData(options.sourcePath);
+				graphData = await this.buildFolderHierarchyGraphData(options.sourcePath, options.hierarchySource);
 			}
 		} else if (options.renderRelated) {
 			if (options.includeAllRelated) {
 				const constellationData = this.buildRecursiveConstellations(options.sourcePath);
 				graphData = this.convertConstellationsToGraphData(constellationData);
 			} else {
-				graphData = this.buildRelatedGraphData(options.sourcePath);
+				graphData = this.buildRelatedGraph(options.sourcePath);
 			}
-		} else if (effectiveHierarchySource === "moc-content") {
-			graphData = await this.buildMocBasedHierarchyGraph(
-				options.sourcePath,
-				options.startFromCurrent,
-				options.mocFilePath,
-				options.parentOverridePath
-			);
 		} else {
-			graphData = this.buildHierarchyGraphData(
+			graphData = await this.buildHierarchyGraph(
 				options.sourcePath,
 				options.startFromCurrent,
-				undefined,
-				true,
+				options.hierarchySource,
+				options.mocFilePath,
 				options.parentOverridePath
 			);
 		}
@@ -215,161 +156,71 @@ export class GraphBuilder {
 		return this.applyGraphFilters(graphData, options.searchQuery, options.filterEvaluator);
 	}
 
-	private buildRelatedGraphData(sourcePath: string): GraphData {
-		const processedPaths = new Set<string>([sourcePath]);
-		const sourceNode = this.createNodeElement(sourcePath, 0, true);
-
-		const { file, frontmatter } = getFileContext(this.app, sourcePath);
-		if (!file || !frontmatter) {
-			return { nodes: [sourceNode], edges: [] };
-		}
-
-		const relations = this.indexer.extractRelationships(file, frontmatter);
-
-		const validContexts = this.resolveValidContexts(relations.related, processedPaths, sourcePath);
-
-		const relatedNodes = validContexts.map((ctx) => this.createNodeElement(ctx.pathWithExt, 1, false));
-
-		const edges = validContexts.map((ctx) => ({
-			data: { source: sourcePath, target: ctx.path },
-		}));
-
-		return {
-			nodes: [sourceNode, ...relatedNodes],
-			edges,
-		};
-	}
-
-	private buildHierarchyGraphData(
-		sourcePath: string,
-		startFromCurrent: boolean,
-		sharedProcessedPaths?: Set<string>,
-		allowSourceHighlight = true,
-		parentOverridePath?: string
-	): GraphData {
-		const nodes: ElementDefinition[] = [];
-		const edges: ElementDefinition[] = [];
-		const processedPaths = sharedProcessedPaths || new Set<string>();
-
-		const effectiveDepth = this.getEffectiveHierarchyMaxDepth();
-		const rootPath = startFromCurrent
-			? sourcePath
-			: this.depthOverride !== null
-				? this.findTopmostParent(sourcePath, effectiveDepth)
-				: this.findTopmostParent(sourcePath, 50);
-
-		const rootNode = this.createNodeElement(rootPath, 0, allowSourceHighlight && rootPath === sourcePath);
-		nodes.push(rootNode);
-		processedPaths.add(rootPath);
-
-		const queue: Array<{ path: string; level: number }> = [{ path: rootPath, level: 0 }];
-
-		while (queue.length > 0) {
-			const { path: currentPath, level: currentLevel } = queue.shift()!;
-
-			const { file, frontmatter } = getFileContext(this.app, currentPath);
-			if (!file || !frontmatter) continue;
-
-			// Check if we can add children (next level must be within depth limit)
-			if (currentLevel + 1 >= effectiveDepth) continue;
-
-			const relations = this.indexer.extractRelationships(file, frontmatter);
-			let validChildren = this.resolveValidContexts(relations.children, processedPaths, currentPath);
-
-			// When a parent override is set, only allow the source file to appear
-			// as a child of the override parent, not whichever parent discovers it first
-			if (parentOverridePath && currentPath !== parentOverridePath) {
-				validChildren = validChildren.filter((ctx) => ctx.path !== sourcePath);
-			}
-
-			const childNodes = validChildren.map((ctx) =>
-				this.createNodeElement(ctx.pathWithExt, currentLevel + 1, allowSourceHighlight && ctx.path === sourcePath)
-			);
-
-			const childEdges = validChildren.map((ctx) => ({
-				data: { source: currentPath, target: ctx.path },
-			}));
-
-			nodes.push(...childNodes);
-			edges.push(...childEdges);
-
-			validChildren.forEach((ctx) => {
-				processedPaths.add(ctx.path);
-				queue.push({ path: ctx.path, level: currentLevel + 1 });
-			});
-		}
-
-		return { nodes, edges };
-	}
-
-	private findTopmostParent(startPath: string, maxDepth: number = 50): string {
-		const visited = new Set<string>();
-		let topmostParent = startPath;
-		let maxLevel = 0;
-
-		const dfsUpwards = (filePath: string, currentLevel: number): void => {
-			if (currentLevel >= maxDepth || visited.has(filePath)) return;
-			visited.add(filePath);
-
-			if (currentLevel > maxLevel) {
-				maxLevel = currentLevel;
-				topmostParent = filePath;
-			}
-
-			const { file, frontmatter } = getFileContext(this.app, filePath);
-			if (!file || !frontmatter) return;
-
-			const relations = this.indexer.extractRelationships(file, frontmatter);
-			const validParents = this.resolveValidContexts(relations.parent, visited, filePath);
-
-			// Check if this node has a prioritized parent
-			const prioritizedParentPath = this.getPrioritizedParent(frontmatter, validParents);
-			if (prioritizedParentPath) {
-				dfsUpwards(prioritizedParentPath, currentLevel + 1);
-				return;
-			}
-
-			// Otherwise, explore all parents (first come first serve)
-			for (const ctx of validParents) {
-				dfsUpwards(ctx.path, currentLevel + 1);
-			}
-		};
-
-		dfsUpwards(startPath, 0);
-		return topmostParent;
-	}
-
 	/**
-	 * Build graph data from MOC content (bullet list hierarchy).
+	 * Build a related graph using the shared buildRelatedTree utility.
+	 * Single-level: maxDepth=1 ensures only direct related nodes are included.
 	 */
-	private async buildMocBasedHierarchyGraph(
-		sourcePath: string,
-		startFromCurrent: boolean,
-		mocFilePath?: string,
-		parentOverridePath?: string
-	): Promise<GraphData> {
+	private buildRelatedGraph(sourcePath: string): GraphData {
+		const { file } = getFileContext(this.app, sourcePath);
+		if (!file) {
+			return { nodes: [this.createNodeElement(sourcePath, 0, true)], edges: [] };
+		}
+
+		const tree = buildRelatedTree(this.app, this.indexer, file as TFile, {
+			maxDepth: 1,
+			nodeFilter: this.createNodeFilter(),
+		});
+
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
 		const processedPaths = new Set<string>();
+		this.convertTreeToGraphData(tree, nodes, edges, processedPaths, sourcePath);
+		return { nodes, edges };
+	}
 
-		const provider = HierarchyProvider.getInstance(this.app, this.indexer, this.settingsStore);
-
-		const file = this.app.vault.getAbstractFileByPath(sourcePath);
-		if (!(file instanceof TFile)) {
-			return { nodes, edges };
+	/**
+	 * Build a hierarchy graph using HierarchyProvider.
+	 * Handles both properties and moc-content hierarchy sources transparently.
+	 */
+	private async buildHierarchyGraph(
+		sourcePath: string,
+		startFromCurrent: boolean,
+		hierarchySource?: HierarchySourceType,
+		mocFilePath?: string,
+		parentOverridePath?: string,
+		sharedProcessedPaths?: Set<string>,
+		allowSourceHighlight = true
+	): Promise<GraphData> {
+		const { file } = getFileContext(this.app, sourcePath);
+		if (!file) {
+			return { nodes: [], edges: [] };
 		}
 
+		const provider = HierarchyProvider.getInstance(this.app, this.indexer, this.settingsStore);
+		const effectiveSource = hierarchySource ?? this.hierarchySource;
+		const effectiveDepth = this.getEffectiveHierarchyMaxDepth();
+
 		const options = {
+			// Only pass maxDepth to tree building when depth override is active (slider).
+			// Otherwise, let findTopmostParent use its default (50) and rely on
+			// convertTreeToGraphData to enforce the configured depth limit.
+			...(this.depthOverride !== null ? { maxDepth: effectiveDepth } : {}),
 			highlightPath: sourcePath,
-			mocFilePath: mocFilePath || sourcePath,
+			mocFilePath: effectiveSource === "moc-content" ? mocFilePath || sourcePath : undefined,
 			parentOverridePath,
+			nodeFilter: this.createNodeFilter(),
 		};
 
+		const tFile = file as TFile;
 		const tree = startFromCurrent
-			? await provider.buildTree(file, "moc-content", options)
-			: await provider.buildTreeFromTopParent(file, "moc-content", options);
+			? await provider.buildTree(tFile, effectiveSource, options)
+			: await provider.buildTreeFromTopParent(tFile, effectiveSource, options);
 
-		this.convertTreeToGraphData(tree, nodes, edges, processedPaths, sourcePath);
+		const nodes: ElementDefinition[] = [];
+		const edges: ElementDefinition[] = [];
+		const processedPaths = sharedProcessedPaths ?? new Set<string>();
+		const highlightPath = allowSourceHighlight ? sourcePath : undefined;
+		this.convertTreeToGraphData(tree, nodes, edges, processedPaths, highlightPath);
 		return { nodes, edges };
 	}
 
@@ -381,7 +232,7 @@ export class GraphBuilder {
 		nodes: ElementDefinition[],
 		edges: ElementDefinition[],
 		processedPaths: Set<string>,
-		sourcePath: string,
+		sourcePath: string | undefined,
 		parentPath?: string,
 		level = 0
 	): void {
@@ -409,6 +260,7 @@ export class GraphBuilder {
 		const constellations: ConstellationNode[] = [];
 		const allNodePaths = new Set<string>([sourcePath]);
 		const edges: ElementDefinition[] = [];
+		const nodeFilter = this.createNodeFilter();
 
 		// Queue of constellation centers to process with their level
 		const queue: Array<{ centerPath: string; level: number }> = [{ centerPath: sourcePath, level: 0 }];
@@ -419,11 +271,20 @@ export class GraphBuilder {
 			// Safety check to prevent infinite loops
 			if (level >= this.getEffectiveAllRelatedMaxDepth()) continue;
 
-			const { file, frontmatter } = getFileContext(this.app, centerPath);
-			if (!file || !frontmatter) continue;
+			const relationships = getRelationships(this.app, this.indexer, centerPath);
+			if (!relationships) continue;
 
-			const relations = this.indexer.extractRelationships(file, frontmatter);
-			const validOrbitals = this.resolveValidContexts(relations.related, allNodePaths, centerPath);
+			const validOrbitals: Array<{ path: string }> = [];
+			for (const wikiLink of relationships.related) {
+				const resolvedPath = resolveWikiLink(this.app, wikiLink, centerPath);
+				if (!resolvedPath || allNodePaths.has(resolvedPath)) continue;
+
+				const orbitalRels = getRelationships(this.app, this.indexer, resolvedPath);
+				if (!orbitalRels) continue;
+				if (!nodeFilter(orbitalRels.frontmatter)) continue;
+
+				validOrbitals.push({ path: resolvedPath });
+			}
 
 			// Create constellation if there are orbitals
 			if (validOrbitals.length > 0 || level === 0) {
@@ -629,17 +490,35 @@ export class GraphBuilder {
 		return { nodes: allNodes, edges: allEdges };
 	}
 
-	private buildFolderHierarchyGraphData(sourcePath: string): GraphData {
+	private async buildFolderHierarchyGraphData(
+		sourcePath: string,
+		hierarchySource?: HierarchySourceType
+	): Promise<GraphData> {
 		const nodes: ElementDefinition[] = [];
 		const edges: ElementDefinition[] = [];
 		const processedPaths = new Set<string>();
 
-		this.processFolderFiles(sourcePath, processedPaths, (filePath, paths) => {
-			// For folder notes, don't highlight any node as source (all nodes equal)
-			const treeData = this.buildHierarchyGraphData(filePath, false, paths, false);
+		const filePaths = this.getFilesInFolder(sourcePath);
+
+		for (const filePath of filePaths) {
+			if (processedPaths.has(filePath)) continue;
+
+			const { file, frontmatter } = getFileContext(this.app, filePath);
+			if (!file || !frontmatter) continue;
+			if (!this.filterEvaluator.evaluateFilters(frontmatter)) continue;
+
+			const treeData = await this.buildHierarchyGraph(
+				filePath,
+				false,
+				hierarchySource,
+				undefined,
+				undefined,
+				processedPaths,
+				false
+			);
 			nodes.push(...treeData.nodes);
 			edges.push(...treeData.edges);
-		});
+		}
 
 		return { nodes, edges };
 	}

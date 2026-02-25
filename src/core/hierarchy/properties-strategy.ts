@@ -1,14 +1,14 @@
 import { getFileContext, parseWikiLink } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
-import type { Indexer } from "../indexer";
-import type { NexusPropertiesSettings } from "../../types/settings";
 import type { RelationshipType } from "../../types/constants";
+import type { NexusPropertiesSettings } from "../../types/settings";
 import {
 	buildHierarchyTree,
 	buildHierarchyTreeFromTopParent,
 	collectRelatedNodesRecursively,
 	type TreeNode,
 } from "../../utils/hierarchy";
+import type { Indexer } from "../indexer";
 import type { HierarchyStrategy, HierarchyTraversalOptions } from "./hierarchy-strategy";
 
 /**
@@ -28,8 +28,8 @@ export class PropertiesStrategy implements HierarchyStrategy {
 
 	buildTreeFromTopParent(startFile: TFile, options: HierarchyTraversalOptions = {}): TreeNode {
 		return buildHierarchyTreeFromTopParent(this.app, this.indexer, startFile, {
-			...options,
 			prioritizeParentProp: this.getSettings().prioritizeParentProp,
+			...options,
 		});
 	}
 

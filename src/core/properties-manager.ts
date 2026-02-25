@@ -13,13 +13,14 @@ import {
 } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
 import type { BehaviorSubject, Observable, Subscription } from "rxjs";
+import type { FileRelationships } from "../types/constants";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { parseExcludedProps } from "../utils/frontmatter-utils";
 import { getChildrenRecursively } from "../utils/hierarchy";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
 import { buildTitleLink } from "../utils/string-utils";
-import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
+import type { Indexer, IndexerEvent } from "./indexer";
 
 export class PropertiesManager {
 	private subscription: Subscription | null = null;

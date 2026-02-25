@@ -8,17 +8,8 @@ import {
 import type { App, TFile } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { BehaviorSubject, Subject } from "rxjs";
-import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
+import { type FileRelationships, RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
-
-export interface FileRelationships {
-	filePath: string;
-	mtime: number;
-	parent: string[];
-	children: string[];
-	related: string[];
-	frontmatter: Frontmatter;
-}
 
 type IndexerEventType = "file-changed" | "file-deleted";
 

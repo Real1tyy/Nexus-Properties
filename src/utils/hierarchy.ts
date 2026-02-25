@@ -1,16 +1,20 @@
 import { extractFilePath, getFileContext, normalizeProperty, parsePropertyLinks } from "@real1ty-obsidian-plugins";
-import { type App, TFile } from "obsidian";
-import type { FileRelationships, Indexer } from "../core/indexer";
-import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
+import type { App, TFile } from "obsidian";
+import type { Indexer } from "../core/indexer";
+import { RELATIONSHIP_CONFIGS, type FileRelationships, type RelationshipType } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 
-interface HierarchyTraversalOptions {
+export interface HierarchyTraversalOptions {
 	maxDepth?: number;
 	includeRoot?: boolean;
 	/** Path to mark as the current file in the tree (for highlighting) */
 	highlightPath?: string;
 	/** Start upward traversal from this parent path instead of the current file */
 	parentOverridePath?: string;
+	/** Property name to prioritize when choosing which parent to traverse upward */
+	prioritizeParentProp?: string;
+	/** Filter callback — nodes whose frontmatter fails this check are excluded from traversal */
+	nodeFilter?: (frontmatter: Record<string, unknown>) => boolean;
 }
 
 export interface TreeNode {
@@ -26,7 +30,7 @@ export interface TreeNode {
  *
  * @returns FileRelationships or null if the file doesn't exist or has no frontmatter
  */
-function getRelationships(app: App, indexer: Indexer, filePath: string): FileRelationships | null {
+export function getRelationships(app: App, indexer: Indexer, filePath: string): FileRelationships | null {
 	const { file, frontmatter } = getFileContext(app, filePath);
 	if (!file || !frontmatter) return null;
 	return indexer.extractRelationships(file, frontmatter);
@@ -37,7 +41,7 @@ function getRelationships(app: App, indexer: Indexer, filePath: string): FileRel
  *
  * @returns Resolved file path, or null if unresolvable
  */
-function resolveWikiLink(app: App, wikiLink: string, sourcePath: string): string | null {
+export function resolveWikiLink(app: App, wikiLink: string, sourcePath: string): string | null {
 	const linkPath = extractFilePath(wikiLink);
 	const resolved = app.metadataCache.getFirstLinkpathDest(linkPath, sourcePath);
 	return resolved?.path ?? null;
@@ -59,7 +63,7 @@ export function buildHierarchyTree(
 	startFile: TFile,
 	options: HierarchyTraversalOptions = {}
 ): TreeNode {
-	const { maxDepth = Number.POSITIVE_INFINITY, highlightPath, parentOverridePath } = options;
+	const { maxDepth = Number.POSITIVE_INFINITY, highlightPath, parentOverridePath, nodeFilter } = options;
 	const visited = new Set<string>();
 
 	const buildNode = (filePath: string, depth: number): TreeNode => {
@@ -88,6 +92,11 @@ export function buildHierarchyTree(
 			if (parentOverridePath && resolvedPath === highlightPath && filePath !== parentOverridePath) {
 				continue;
 			}
+			// Apply node filter on the child's frontmatter
+			if (nodeFilter) {
+				const childRels = getRelationships(app, indexer, resolvedPath);
+				if (childRels && !nodeFilter(childRels.frontmatter)) continue;
+			}
 			node.children.push(buildNode(resolvedPath, depth + 1));
 		}
 
@@ -95,11 +104,6 @@ export function buildHierarchyTree(
 	};
 
 	return buildNode(startFile.path, 0);
-}
-
-interface FindTopmostParentOptions {
-	maxDepth?: number;
-	prioritizeParentProp?: string;
 }
 
 /**
@@ -116,9 +120,9 @@ export function findTopmostParent(
 	app: App,
 	indexer: Indexer,
 	startPath: string,
-	options: FindTopmostParentOptions = {}
+	options: HierarchyTraversalOptions = {}
 ): string {
-	const { maxDepth = 50, prioritizeParentProp } = options;
+	const { maxDepth = 50, prioritizeParentProp, nodeFilter } = options;
 	const visited = new Set<string>();
 	let topmostParent = startPath;
 	let maxLevel = 0;
@@ -131,7 +135,12 @@ export function findTopmostParent(
 				return { wikiLink, path: resolvedPath };
 			})
 			.filter((ctx): ctx is { wikiLink: string; path: string } => {
-				return ctx !== null && !excludePaths.has(ctx.path);
+				if (ctx === null || excludePaths.has(ctx.path)) return false;
+				if (nodeFilter) {
+					const rels = getRelationships(app, indexer, ctx.path);
+					if (rels && !nodeFilter(rels.frontmatter)) return false;
+				}
+				return true;
 			});
 	};
 
@@ -199,18 +208,17 @@ export function buildHierarchyTreeFromTopParent(
 	app: App,
 	indexer: Indexer,
 	startFile: TFile,
-	options: HierarchyTraversalOptions & FindTopmostParentOptions = {}
+	options: HierarchyTraversalOptions = {}
 ): TreeNode {
-	const { prioritizeParentProp, ...traversalOptions } = options;
 	const rootPath = options.parentOverridePath
-		? findTopmostParent(app, indexer, options.parentOverridePath, { prioritizeParentProp })
-		: findTopmostParent(app, indexer, startFile.path, { prioritizeParentProp });
+		? findTopmostParent(app, indexer, options.parentOverridePath, options)
+		: findTopmostParent(app, indexer, startFile.path, options);
 	const rootFile = app.vault.getAbstractFileByPath(rootPath);
 
-	const fileToUse = rootFile instanceof TFile ? rootFile : startFile;
+	const fileToUse = rootFile ? (rootFile as TFile) : startFile;
 	return buildHierarchyTree(app, indexer, fileToUse, {
-		...traversalOptions,
-		highlightPath: traversalOptions.highlightPath ?? startFile.path,
+		...options,
+		highlightPath: options.highlightPath ?? startFile.path,
 	});
 }
 
@@ -312,14 +320,20 @@ export function augmentTreeWithRelated(app: App, indexer: Indexer, root: TreeNod
  * Builds a tree rooted at a file, expanding only related properties recursively.
  * No children hierarchy is included — purely related-based traversal.
  */
-export function buildRelatedTree(app: App, indexer: Indexer, startFile: TFile): TreeNode {
+export function buildRelatedTree(
+	app: App,
+	indexer: Indexer,
+	startFile: TFile,
+	options: HierarchyTraversalOptions = {}
+): TreeNode {
+	const { nodeFilter, maxDepth = Number.POSITIVE_INFINITY } = options;
 	const visited = new Set<string>();
 
-	const buildNode = (filePath: string): TreeNode => {
+	const buildNode = (filePath: string, depth: number): TreeNode => {
 		const nodeName = filePath.replace(/\.md$/, "").split("/").pop() || filePath;
 		const node: TreeNode = { path: filePath, name: nodeName, children: [] };
 
-		if (visited.has(filePath)) return node;
+		if (visited.has(filePath) || depth >= maxDepth) return node;
 		visited.add(filePath);
 
 		const relationships = getRelationships(app, indexer, filePath);
@@ -327,15 +341,18 @@ export function buildRelatedTree(app: App, indexer: Indexer, startFile: TFile): 
 
 		for (const wikiLink of relationships.related) {
 			const resolvedPath = resolveWikiLink(app, wikiLink, filePath);
-			if (resolvedPath && !visited.has(resolvedPath)) {
-				node.children.push(buildNode(resolvedPath));
+			if (!resolvedPath || visited.has(resolvedPath)) continue;
+			if (nodeFilter) {
+				const childRels = getRelationships(app, indexer, resolvedPath);
+				if (childRels && !nodeFilter(childRels.frontmatter)) continue;
 			}
+			node.children.push(buildNode(resolvedPath, depth + 1));
 		}
 
 		return node;
 	};
 
-	return buildNode(startFile.path);
+	return buildNode(startFile.path, 0);
 }
 
 /** Collects all descendant nodes of a tree node (flat list). */

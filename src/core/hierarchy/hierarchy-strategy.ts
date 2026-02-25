@@ -13,6 +13,8 @@ export interface HierarchyTraversalOptions {
 	mocFilePath?: string;
 	/** Start upward traversal from this parent path instead of the current file */
 	parentOverridePath?: string;
+	/** Filter callback — nodes whose frontmatter fails this check are excluded from traversal */
+	nodeFilter?: (frontmatter: Record<string, unknown>) => boolean;
 }
 
 /**
