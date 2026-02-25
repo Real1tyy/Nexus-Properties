@@ -8,6 +8,21 @@ import useBaseUrl from "@docusaurus/useBaseUrl";
 
 Access: Settings (`Ctrl/Cmd+,`) → **Nexus Properties**
 
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/SettingsShowcaseWithSearch.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/SettingsShowcaseWithSearch.mp4")} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 ## User Interface
 
 **Show Ribbon Icon** (default: `true`): Display graph icon in left ribbon

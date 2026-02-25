@@ -188,6 +188,13 @@ Each level is indented to show parent-child relationships clearly. Items with ch
 
 ## Search
 
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video controls autoPlay loop muted playsInline style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/MocViewSearch.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 A persistent search bar appears between the toolbar and the tree. Type a query to filter the tree by node name (case-insensitive substring match).
 
 When an intermediate node doesn't match the query but has matching descendants, the node is removed and its children are re-parented to the nearest visible ancestor. This maintains connections through the tree rather than hiding entire branches.
@@ -238,6 +245,13 @@ This uses the same traversal algorithm as the Graph view, respecting the **Prior
 
 ## Parent Selection
 
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video controls autoPlay loop muted playsInline style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/DynamicParentSelectionDropdown.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 When a note has **multiple parents**, a dropdown appears in the MOC toolbar. It lets you choose which parent the upward traversal should follow when building the tree from the top parent.
 
 - **Default**: The parent specified by the [Prioritize Parent](../configuration#hierarchy) setting, or the first parent if none is configured.
@@ -252,6 +266,13 @@ The dropdown is hidden when:
 
 ## Render Related
 
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video controls autoPlay loop muted playsInline style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/RenderRelatedMoc.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 Enable the **Render Related** checkbox in the toolbar to switch to a purely related-based tree. Instead of showing the children hierarchy, the tree displays only notes linked via the `Related` frontmatter property, expanded recursively with cycle detection.
 
 ```
@@ -264,6 +285,13 @@ Enable the **Render Related** checkbox in the toolbar to switch to a purely rela
 Related nodes are always read from frontmatter properties, regardless of the hierarchy source setting.
 
 ## Folder Note Forest
+
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video controls autoPlay loop muted playsInline style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}>
+    <source src={useBaseUrl("/video/FolderNoteGraphAndMocViews.webm")} type="video/webm" />
+    Your browser does not support the video tag.
+  </video>
+</div>
 
 When viewing a **folder note** (a note whose filename matches its parent folder name, e.g., `projects/projects.md`), the MOC view automatically renders a **forest of trees** — one tree per file in the folder and its subfolders.
 
