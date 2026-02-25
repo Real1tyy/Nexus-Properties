@@ -214,6 +214,23 @@ Traverses upward to find the topmost ancestor, then renders the full tree with y
 
 This uses the same traversal algorithm as the Graph view, respecting the **Prioritize Parent** setting for notes with multiple parents.
 
+## Render Related
+
+Enable the **Render Related** checkbox in the toolbar to recursively add related notes as children at every level of the tree.
+
+When enabled, each node in the tree is augmented with its `Related` frontmatter property values. Those related nodes are then expanded further — their own related nodes are added, and so on recursively until all connections are exhausted (with cycle detection to prevent infinite loops).
+
+```
+- [[Active File]]
+    - [[Child 1]]
+        - [[Related to Child 1]]     ← added by Render Related
+            - [[Related to Related]] ← recursive expansion
+    - [[Child 2]]
+    - [[Related to Active File]]     ← added by Render Related
+```
+
+This works with both **Properties** and **MOC Content** hierarchy sources. Regardless of the hierarchy source, related nodes are always read from frontmatter properties.
+
 ## Navigation
 
 ### Click

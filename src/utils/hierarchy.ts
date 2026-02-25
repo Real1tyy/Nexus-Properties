@@ -1,4 +1,4 @@
-import { extractFilePath, getFileContext, parsePropertyLinks } from "@real1ty-obsidian-plugins";
+import { extractFilePath, getFileContext, normalizeProperty, parsePropertyLinks } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
 import type { FileRelationships, Indexer } from "../core/indexer";
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
@@ -16,6 +16,29 @@ export interface TreeNode {
 	name: string;
 	children: TreeNode[];
 	isCurrentFile?: boolean;
+}
+
+/**
+ * Resolves a file path to its relationships using the indexer.
+ * Combines getFileContext + extractRelationships into a single call.
+ *
+ * @returns FileRelationships or null if the file doesn't exist or has no frontmatter
+ */
+function getRelationships(app: App, indexer: Indexer, filePath: string): FileRelationships | null {
+	const { file, frontmatter } = getFileContext(app, filePath);
+	if (!file || !frontmatter) return null;
+	return indexer.extractRelationships(file, frontmatter);
+}
+
+/**
+ * Resolves a wiki link to a file path using Obsidian's link resolution.
+ *
+ * @returns Resolved file path, or null if unresolvable
+ */
+function resolveWikiLink(app: App, wikiLink: string, sourcePath: string): string | null {
+	const linkPath = extractFilePath(wikiLink);
+	const resolved = app.metadataCache.getFirstLinkpathDest(linkPath, sourcePath);
+	return resolved?.path ?? null;
 }
 
 /**
@@ -52,21 +75,13 @@ export function buildHierarchyTree(
 		}
 		visited.add(filePath);
 
-		const file = app.vault.getAbstractFileByPath(filePath);
-		if (!(file instanceof TFile)) return node;
-
-		const cache = app.metadataCache.getFileCache(file);
-		const frontmatter = cache?.frontmatter;
-		if (!frontmatter) return node;
-
-		const relationships = indexer.extractRelationships(file, frontmatter);
+		const relationships = getRelationships(app, indexer, filePath);
+		if (!relationships) return node;
 
 		for (const wikiLink of relationships.children) {
-			const linkPath = extractFilePath(wikiLink);
-			const resolved = app.metadataCache.getFirstLinkpathDest(linkPath, filePath);
-
-			if (resolved && !visited.has(resolved.path)) {
-				node.children.push(buildNode(resolved.path, depth + 1));
+			const resolvedPath = resolveWikiLink(app, wikiLink, filePath);
+			if (resolvedPath && !visited.has(resolvedPath)) {
+				node.children.push(buildNode(resolvedPath, depth + 1));
 			}
 		}
 
@@ -105,10 +120,9 @@ export function findTopmostParent(
 	const resolveValidParents = (wikiLinks: string[], excludePaths: Set<string>, sourcePath: string) => {
 		return wikiLinks
 			.map((wikiLink) => {
-				const linkPath = extractFilePath(wikiLink);
-				const resolved = app.metadataCache.getFirstLinkpathDest(linkPath, sourcePath);
-				if (!resolved) return null;
-				return { wikiLink, path: resolved.path };
+				const resolvedPath = resolveWikiLink(app, wikiLink, sourcePath);
+				if (!resolvedPath) return null;
+				return { wikiLink, path: resolvedPath };
 			})
 			.filter((ctx): ctx is { wikiLink: string; path: string } => {
 				return ctx !== null && !excludePaths.has(ctx.path);
@@ -143,18 +157,13 @@ export function findTopmostParent(
 			topmostParent = filePath;
 		}
 
-		const file = app.vault.getAbstractFileByPath(filePath);
-		if (!(file instanceof TFile)) return;
+		const relationships = getRelationships(app, indexer, filePath);
+		if (!relationships) return;
 
-		const cache = app.metadataCache.getFileCache(file);
-		const frontmatter = cache?.frontmatter;
-		if (!frontmatter) return;
-
-		const relationships = indexer.extractRelationships(file, frontmatter);
 		const validParents = resolveValidParents(relationships.parent, visited, filePath);
 
 		// Check for prioritized parent
-		const prioritizedPath = getPrioritizedParent(frontmatter, validParents);
+		const prioritizedPath = getPrioritizedParent(relationships.frontmatter, validParents);
 		if (prioritizedPath) {
 			dfsUpwards(prioritizedPath, currentLevel + 1);
 			return;
@@ -220,37 +229,84 @@ export function collectRelatedNodesRecursively(
 	const result = new Set<string>();
 
 	const traverse = (filePath: string, depth = 0) => {
-		if (visited.has(filePath)) {
-			return;
-		}
+		if (visited.has(filePath) || depth >= maxDepth) return;
 		visited.add(filePath);
 
-		if (depth >= maxDepth) {
-			return;
-		}
+		const relationships = getRelationships(app, indexer, filePath);
+		if (!relationships) return;
 
-		const file = app.vault.getAbstractFileByPath(filePath);
-		if (!(file instanceof TFile)) return;
-
-		const cache = app.metadataCache.getFileCache(file);
-		const frontmatter = cache?.frontmatter;
-		if (!frontmatter) return;
-
-		const relationships = indexer.extractRelationships(file, frontmatter);
-		const links = relationships[relationshipType];
-
-		for (const wikiLink of links) {
-			const linkPath = extractFilePath(wikiLink);
-			const resolved = app.metadataCache.getFirstLinkpathDest(linkPath, filePath);
-
-			if (resolved && !visited.has(resolved.path)) {
-				result.add(resolved.path);
-				traverse(resolved.path, depth + 1);
+		for (const wikiLink of relationships[relationshipType]) {
+			const resolvedPath = resolveWikiLink(app, wikiLink, filePath);
+			if (resolvedPath && !visited.has(resolvedPath)) {
+				result.add(resolvedPath);
+				traverse(resolvedPath, depth + 1);
 			}
 		}
 	};
 
 	traverse(startFile.path);
+	return result;
+}
+
+/**
+ * Augments an existing tree by recursively adding "Related" nodes from frontmatter
+ * as additional children at every level. Works with any tree regardless of hierarchy source.
+ * Uses breadth-first traversal so that all level-1 related nodes are added before
+ * level-2, ensuring lower levels render first in the tree.
+ *
+ * @param app - Obsidian app instance
+ * @param indexer - Indexer instance for extracting relationships
+ * @param root - Tree root node to augment (mutated in place)
+ */
+export function augmentTreeWithRelated(app: App, indexer: Indexer, root: TreeNode): void {
+	const visited = new Set<string>();
+
+	// Collect all existing nodes in the tree so we don't revisit them
+	const collectExisting = (node: TreeNode): void => {
+		visited.add(node.path);
+		for (const child of node.children) {
+			collectExisting(child);
+		}
+	};
+	collectExisting(root);
+
+	// BFS queue: each entry is a parent node whose related nodes we need to fetch
+	const queue: TreeNode[] = [root, ...getAllDescendants(root)];
+
+	while (queue.length > 0) {
+		// Process entire current level before moving to next
+		const currentLevel = [...queue];
+		queue.length = 0;
+
+		for (const parentNode of currentLevel) {
+			const relationships = getRelationships(app, indexer, parentNode.path);
+			if (!relationships) continue;
+
+			for (const wikiLink of relationships.related) {
+				const resolvedPath = resolveWikiLink(app, wikiLink, parentNode.path);
+				if (resolvedPath && !visited.has(resolvedPath)) {
+					visited.add(resolvedPath);
+					const name = resolvedPath.replace(/\.md$/, "").split("/").pop() || resolvedPath;
+					const relatedNode: TreeNode = {
+						path: resolvedPath,
+						name,
+						children: [],
+					};
+					parentNode.children.push(relatedNode);
+					queue.push(relatedNode);
+				}
+			}
+		}
+	}
+}
+
+/** Collects all descendant nodes of a tree node (flat list). */
+function getAllDescendants(node: TreeNode): TreeNode[] {
+	const result: TreeNode[] = [];
+	for (const child of node.children) {
+		result.push(child);
+		result.push(...getAllDescendants(child));
+	}
 	return result;
 }
 
@@ -308,7 +364,7 @@ export function getChildrenRecursively(
 						if (config.type === "children") {
 							const propName = config.getProp(settings);
 							const childrenValue = childFrontmatter[propName];
-							childRelationships.children = parsePropertyLinks(childrenValue);
+							childRelationships.children = normalizeProperty(childrenValue);
 							break;
 						}
 					}

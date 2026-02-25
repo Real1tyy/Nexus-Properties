@@ -6,7 +6,7 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
-## 2.0.0 - 24.2.2026
+## 2.0.0 - 25.2.2026
 
 ### Changed
 
@@ -14,10 +14,8 @@ All notable changes to Nexus Properties will be documented here.
 
 ### Added
 
+- **Render Related in MOC view**: New "Render Related" checkbox in the MOC toolbar recursively adds related nodes (from frontmatter) as children at every level of the tree. Works with both Properties and MOC Content hierarchy sources. [Learn more →](features/moc-view#render-related)
 - **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery) page to see the plugin in action.
-
-### Added
-
 - **Settings search**: Search across all settings tabs to quickly find any setting. Type in the search box to filter settings by name or description. [Learn more →](configuration)
 - **Dedicated MOC settings tab**: MOC configuration (enable MOC content reading, hierarchy source, display properties) is now in its own **Settings → MOC** tab for easier access. [Learn more →](features/moc-view)
 - **Settings footer links**: Settings footer now includes links to Other Plugins and the Nexus Properties YouTube playlist.
@@ -25,6 +23,8 @@ All notable changes to Nexus Properties will be documented here.
 ### Fixed
 
 - **MOC view title property support**: MOC view now uses the [title property](features/moc-view#tree-structure) to display note names, matching the behavior of Graph and Bases views. Previously, MOC view always showed raw filenames.
+- **Recursive propagation dialogs**: Fixed a bug where propagating frontmatter to children would trigger additional propagation dialogs (or redundant auto-propagation) for each child. The system now correctly skips the propagation check for children that were just propagated to. [Learn more →](configuration#hierarchy)
+- **Propagation only reaching direct children**: Fixed a bug where frontmatter propagation only applied to direct children instead of all descendants. Grandchildren and deeper levels were silently skipped due to wiki link brackets being stripped before the recursive traversal. [Learn more →](configuration#hierarchy)
 
 ---
 

@@ -2128,6 +2128,30 @@ button.nexus-properties-hierarchy-source-button:active {
 	flex-shrink: 0;
 }
 
+/* Render Related checkbox in MOC toolbar */
+.nexus-properties-moc-toggle-container {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+}
+
+.nexus-properties-moc-toggle-checkbox {
+	cursor: pointer;
+	width: 14px;
+	height: 14px;
+}
+
+.nexus-properties-moc-toggle-label {
+	color: var(--text-muted);
+	cursor: pointer;
+	user-select: none;
+}
+
+.nexus-properties-moc-toggle-label:hover {
+	color: var(--text-normal);
+}
+
 /* Link styling */
 .nexus-properties-moc-link {
 	color: var(--text-normal);

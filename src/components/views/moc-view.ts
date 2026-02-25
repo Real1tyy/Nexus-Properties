@@ -1,13 +1,13 @@
 import { RegisteredEventsComponent, renderPropertyValue, type PropertyRendererConfig } from "@real1ty-obsidian-plugins";
-import { type App, Component, TFile } from "obsidian";
+import { Component, TFile, type App } from "obsidian";
 import type { Subscription } from "rxjs";
-import type { Indexer } from "../../core/indexer";
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
+import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
-import { resolveDisplayName } from "../../utils/file-utils";
 import { cls } from "../../utils/css";
-import { type TreeNode } from "../../utils/hierarchy";
+import { resolveDisplayName } from "../../utils/file-utils";
+import { augmentTreeWithRelated, type TreeNode } from "../../utils/hierarchy";
 
 export class MocView extends RegisteredEventsComponent {
 	private settingsSubscription: Subscription | null = null;
@@ -17,6 +17,7 @@ export class MocView extends RegisteredEventsComponent {
 	private collapsedNodes: Set<string> = new Set();
 	private treeContainer: HTMLElement | null = null;
 	private useTopParentAsRoot = false;
+	private showRelated = false;
 	private rootModeBtn: HTMLButtonElement | null = null;
 	private component: Component;
 
@@ -79,6 +80,11 @@ export class MocView extends RegisteredEventsComponent {
 			const tree = this.useTopParentAsRoot
 				? await provider.buildTreeFromTopParent(activeFile, this.hierarchySource, options)
 				: await provider.buildTree(activeFile, this.hierarchySource, options);
+
+			if (this.showRelated) {
+				augmentTreeWithRelated(this.app, this.indexer, tree);
+			}
+
 			this.renderTree(tree, this.treeContainer, 0);
 		} finally {
 			this.isUpdating = false;
@@ -108,6 +114,29 @@ export class MocView extends RegisteredEventsComponent {
 
 		const rightGroup = toolbar.createDiv({
 			cls: cls("moc-toolbar-group"),
+		});
+
+		const relatedContainer = rightGroup.createDiv({
+			cls: cls("moc-toggle-container"),
+		});
+		const relatedCheckbox = relatedContainer.createEl("input", {
+			type: "checkbox",
+		});
+		relatedCheckbox.addClass(cls("moc-toggle-checkbox"));
+		relatedCheckbox.checked = this.showRelated;
+		relatedContainer.createEl("label", {
+			text: "Render Related",
+			cls: cls("moc-toggle-label"),
+		});
+		relatedCheckbox.addEventListener("change", () => {
+			this.showRelated = relatedCheckbox.checked;
+			this.lastFilePath = null;
+			this.render();
+		});
+		relatedContainer.style.cursor = "pointer";
+		relatedContainer.addEventListener("click", (e) => {
+			if (e.target === relatedCheckbox) return;
+			relatedCheckbox.click();
 		});
 
 		this.rootModeBtn = rightGroup.createEl("button", {
