@@ -14,6 +14,7 @@ All notable changes to Nexus Properties will be documented here.
 
 ### Added
 
+- **Vault Statistics in Settings**: New "Statistics" tab in settings displays vault-wide metrics — total indexed nodes, tree count, average and max tree depth, and relationship counts. Computed automatically when the tab is opened. [Learn more →](features/vault-statistics)
 - **Render Related in MOC view**: New "Render Related" checkbox in the MOC toolbar recursively adds related nodes (from frontmatter) as children at every level of the tree. Works with both Properties and MOC Content hierarchy sources. [Learn more →](features/moc-view#render-related)
 - **Folder note forest in MOC view**: When viewing a folder note, the MOC view renders a forest of trees — one per file in the folder — matching the Graph view's folder note behavior. The Bases view is removed from the toggle cycle for folder notes. [Learn more →](features/moc-view#folder-note-forest)
 - **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery) page to see the plugin in action.

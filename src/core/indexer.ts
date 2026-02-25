@@ -87,6 +87,10 @@ export class Indexer {
 		await this.genericIndexer.resync();
 	}
 
+	getRelationshipsSnapshot(): ReadonlyMap<string, FileRelationships> {
+		return this.relationshipsCache;
+	}
+
 	shouldIndexFile(filePath: string): boolean {
 		if (this.settings.directories.includes("*")) {
 			return true;

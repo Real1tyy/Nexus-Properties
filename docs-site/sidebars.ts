@@ -30,6 +30,7 @@ const sidebars: SidebarsConfig = {
 				"features/excluded-properties",
 				"features/bases-view",
 				"features/moc-view",
+				"features/vault-statistics",
 			],
 		},
 		"hotkeys",

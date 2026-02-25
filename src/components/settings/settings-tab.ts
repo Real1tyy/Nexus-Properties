@@ -1,5 +1,5 @@
 import { SettingsNavigation, SettingsUIBuilder, type SettingsSection } from "@real1ty-obsidian-plugins";
-import { type App, PluginSettingTab } from "obsidian";
+import { PluginSettingTab, type App } from "obsidian";
 
 import type NexusPropertiesPlugin from "src/main";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
@@ -9,6 +9,7 @@ import { GraphDisplaySettingsSection } from "./sections/graph-display-section";
 import { MocSection } from "./sections/moc-section";
 import { PropertiesSection } from "./sections/properties-section";
 import { RulesSection } from "./sections/rules-section";
+import { StatisticsSection } from "./sections/statistics-section";
 
 export class NexusPropertiesSettingsTab extends PluginSettingTab {
 	plugin: NexusPropertiesPlugin;
@@ -28,6 +29,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			bases: new BasesViewSettingsSection(this.plugin, uiBuilder),
 			moc: new MocSection(uiBuilder),
 			rules: new RulesSection(this.plugin, uiBuilder),
+			statistics: new StatisticsSection(this.plugin),
 		};
 
 		const sections: SettingsSection[] = [
@@ -37,6 +39,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			{ id: "bases", label: "Bases", display: (el) => settingsInstances.bases.render(el) },
 			{ id: "moc", label: "MOC", display: (el) => settingsInstances.moc.render(el) },
 			{ id: "rules", label: "Rules", display: (el) => settingsInstances.rules.render(el) },
+			{ id: "statistics", label: "Statistics", display: (el) => settingsInstances.statistics.render(el) },
 		];
 
 		this.navigation = new SettingsNavigation({
