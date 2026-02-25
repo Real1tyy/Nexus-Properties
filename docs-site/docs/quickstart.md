@@ -100,7 +100,7 @@ If you have notes with bullet-list hierarchies (Map of Content files), switch to
     - [[Swimming]]
 ```
 
-Enable in Settings → General → Hierarchy Source → **MOC Content**, or use the toggle button that appears when viewing a valid MOC file. See [MOC View](features/moc-view#moc-content-hierarchy) for details.
+Enable in Settings → MOC → Hierarchy Source → **MOC Content**, or use the toggle button that appears when viewing a valid MOC file. See [MOC View](features/moc-view#moc-content-hierarchy) for details.
 
 ## Next Steps
 

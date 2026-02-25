@@ -1,5 +1,6 @@
 import {
 	ColorEvaluator,
+	extractDisplayName,
 	extractFilePath,
 	type FileContext,
 	FilterEvaluator,
@@ -10,11 +11,10 @@ import {
 import type { ElementDefinition } from "cytoscape";
 import { type App, TFile } from "obsidian";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { resolveDisplayName } from "../utils/file-utils";
+import type { TreeNode } from "../utils/hierarchy";
+import { HierarchyProvider, type HierarchySourceType } from "./hierarchy";
 import type { Indexer } from "./indexer";
 import type { SettingsStore } from "./settings-store";
-import { HierarchyProvider, type HierarchySourceType } from "./hierarchy";
-import type { TreeNode } from "../utils/hierarchy";
 
 interface GraphData {
 	nodes: ElementDefinition[];
