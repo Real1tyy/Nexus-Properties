@@ -1,4 +1,10 @@
-import { extractFilePath, getFileContext, normalizeProperty, parsePropertyLinks } from "@real1ty-obsidian-plugins";
+import {
+	extractDisplayName,
+	extractFilePath,
+	getFileContext,
+	normalizeProperty,
+	parsePropertyLinks,
+} from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
 import { RELATIONSHIP_CONFIGS, type FileRelationships, type RelationshipType } from "../types/constants";
 import type { HierarchyTraversalOptions, RelationshipResolver } from "../types/hierarchy";
@@ -56,7 +62,7 @@ export function buildHierarchyTree(
 	const visited = new Set<string>();
 
 	const buildNode = (filePath: string, depth: number): TreeNode => {
-		const name = filePath.replace(/\.md$/, "").split("/").pop() || filePath;
+		const name = extractDisplayName(filePath);
 
 		const node: TreeNode = {
 			path: filePath,
@@ -256,6 +262,7 @@ export function collectRelatedNodesRecursively(
 /**
  * Builds a tree rooted at a file, expanding only related properties recursively.
  * No children hierarchy is included — purely related-based traversal.
+ * Uses BFS so level 1 contains all direct related items before expanding deeper.
  */
 export function buildRelatedTree(
 	app: App,
@@ -266,30 +273,35 @@ export function buildRelatedTree(
 	const { nodeFilter, maxDepth = Number.POSITIVE_INFINITY } = options;
 	const visited = new Set<string>();
 
-	const buildNode = (filePath: string, depth: number): TreeNode => {
-		const nodeName = filePath.replace(/\.md$/, "").split("/").pop() || filePath;
-		const node: TreeNode = { path: filePath, name: nodeName, children: [] };
+	const rootPath = startFile.path;
+	const root: TreeNode = { path: rootPath, name: extractDisplayName(rootPath), children: [] };
+	visited.add(rootPath);
 
-		if (visited.has(filePath) || depth >= maxDepth) return node;
-		visited.add(filePath);
+	const queue: Array<[TreeNode, number]> = [[root, 0]];
 
-		const relationships = getRelationships(app, indexer, filePath);
-		if (!relationships) return node;
+	while (queue.length > 0) {
+		const [parentNode, depth] = queue.shift()!;
+		if (depth >= maxDepth) continue;
+
+		const relationships = getRelationships(app, indexer, parentNode.path);
+		if (!relationships) continue;
 
 		for (const wikiLink of relationships.related) {
-			const resolvedPath = resolveWikiLink(app, wikiLink, filePath);
+			const resolvedPath = resolveWikiLink(app, wikiLink, parentNode.path);
 			if (!resolvedPath || visited.has(resolvedPath)) continue;
 			if (nodeFilter) {
 				const childRels = getRelationships(app, indexer, resolvedPath);
 				if (childRels && !nodeFilter(childRels.frontmatter)) continue;
 			}
-			node.children.push(buildNode(resolvedPath, depth + 1));
+
+			visited.add(resolvedPath);
+			const childNode: TreeNode = { path: resolvedPath, name: extractDisplayName(resolvedPath), children: [] };
+			parentNode.children.push(childNode);
+			queue.push([childNode, depth + 1]);
 		}
+	}
 
-		return node;
-	};
-
-	return buildNode(startFile.path, 0);
+	return root;
 }
 
 /**
