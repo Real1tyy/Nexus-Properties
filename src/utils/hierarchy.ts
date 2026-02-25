@@ -202,7 +202,7 @@ export function buildHierarchyTreeFromTopParent(
 	const fileToUse = rootFile instanceof TFile ? rootFile : startFile;
 	return buildHierarchyTree(app, indexer, fileToUse, {
 		...traversalOptions,
-		highlightPath: startFile.path,
+		highlightPath: traversalOptions.highlightPath ?? startFile.path,
 	});
 }
 
@@ -298,6 +298,36 @@ export function augmentTreeWithRelated(app: App, indexer: Indexer, root: TreeNod
 			}
 		}
 	}
+}
+
+/**
+ * Builds a tree rooted at a file, expanding only related properties recursively.
+ * No children hierarchy is included — purely related-based traversal.
+ */
+export function buildRelatedTree(app: App, indexer: Indexer, startFile: TFile): TreeNode {
+	const visited = new Set<string>();
+
+	const buildNode = (filePath: string): TreeNode => {
+		const nodeName = filePath.replace(/\.md$/, "").split("/").pop() || filePath;
+		const node: TreeNode = { path: filePath, name: nodeName, children: [] };
+
+		if (visited.has(filePath)) return node;
+		visited.add(filePath);
+
+		const relationships = getRelationships(app, indexer, filePath);
+		if (!relationships) return node;
+
+		for (const wikiLink of relationships.related) {
+			const resolvedPath = resolveWikiLink(app, wikiLink, filePath);
+			if (resolvedPath && !visited.has(resolvedPath)) {
+				node.children.push(buildNode(resolvedPath));
+			}
+		}
+
+		return node;
+	};
+
+	return buildNode(startFile.path);
 }
 
 /** Collects all descendant nodes of a tree node (flat list). */

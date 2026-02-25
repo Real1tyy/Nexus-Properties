@@ -1,4 +1,10 @@
-import { RegisteredEventsComponent, renderPropertyValue, type PropertyRendererConfig } from "@real1ty-obsidian-plugins";
+import {
+	getFolderPath,
+	isFolderNote,
+	RegisteredEventsComponent,
+	renderPropertyValue,
+	type PropertyRendererConfig,
+} from "@real1ty-obsidian-plugins";
 import { Component, TFile, type App } from "obsidian";
 import type { Subscription } from "rxjs";
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
@@ -7,7 +13,7 @@ import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
 import { resolveDisplayName } from "../../utils/file-utils";
-import { augmentTreeWithRelated, type TreeNode } from "../../utils/hierarchy";
+import { buildRelatedTree, type TreeNode } from "../../utils/hierarchy";
 
 export class MocView extends RegisteredEventsComponent {
 	private settingsSubscription: Subscription | null = null;
@@ -65,33 +71,93 @@ export class MocView extends RegisteredEventsComponent {
 				return;
 			}
 
-			this.createToolbar();
+			const isFolder = isFolderNote(activeFile.path);
+			this.createToolbar(isFolder);
 			this.treeContainer = this.contentEl.createDiv({
 				cls: cls("moc-tree-container"),
 			});
 
 			const provider = HierarchyProvider.getInstance(this.app, this.indexer, this.plugin.settingsStore);
 
-			const options = {
-				prioritizeParentProp: this.currentSettings.prioritizeParentProp,
-				mocFilePath: activeFile.path,
-			};
-
-			const tree = this.useTopParentAsRoot
-				? await provider.buildTreeFromTopParent(activeFile, this.hierarchySource, options)
-				: await provider.buildTree(activeFile, this.hierarchySource, options);
-
-			if (this.showRelated) {
-				augmentTreeWithRelated(this.app, this.indexer, tree);
+			if (isFolder) {
+				await this.renderFolderForest(activeFile, provider);
+			} else {
+				await this.renderSingleTree(activeFile, provider);
 			}
-
-			this.renderTree(tree, this.treeContainer, 0);
 		} finally {
 			this.isUpdating = false;
 		}
 	}
 
-	private createToolbar(): void {
+	private async renderSingleTree(activeFile: TFile, provider: HierarchyProvider): Promise<void> {
+		let tree: TreeNode;
+
+		if (this.showRelated) {
+			// Related mode: build tree purely from related properties (no children hierarchy)
+			tree = buildRelatedTree(this.app, this.indexer, activeFile);
+		} else {
+			const options = {
+				prioritizeParentProp: this.currentSettings.prioritizeParentProp,
+				mocFilePath: activeFile.path,
+			};
+
+			tree = this.useTopParentAsRoot
+				? await provider.buildTreeFromTopParent(activeFile, this.hierarchySource, options)
+				: await provider.buildTree(activeFile, this.hierarchySource, options);
+		}
+
+		this.renderTree(tree, this.treeContainer!, 0);
+	}
+
+	private async renderFolderForest(folderNoteFile: TFile, provider: HierarchyProvider): Promise<void> {
+		const folderPath = getFolderPath(folderNoteFile.path);
+		const allFiles = this.app.vault.getMarkdownFiles();
+
+		// Get all files in folder + subfolders, excluding the folder note itself
+		const filesInFolder = allFiles.filter((file) => {
+			if (file.path === folderNoteFile.path) return false;
+			const fileFolder = getFolderPath(file.path);
+			return fileFolder === folderPath || fileFolder.startsWith(`${folderPath}/`);
+		});
+
+		const processedPaths = new Set<string>();
+
+		for (const file of filesInFolder) {
+			if (processedPaths.has(file.path)) continue;
+
+			const cache = this.app.metadataCache.getFileCache(file);
+			if (!cache?.frontmatter) continue;
+
+			let tree: TreeNode;
+
+			if (this.showRelated) {
+				// Related mode: build tree purely from related properties (no children hierarchy)
+				tree = buildRelatedTree(this.app, this.indexer, file);
+			} else {
+				// Hierarchy mode: build from top parent
+				const options = {
+					prioritizeParentProp: this.currentSettings.prioritizeParentProp,
+					mocFilePath: file.path,
+					highlightPath: "", // No highlighting in folder forest (all nodes equal)
+				};
+				tree = await provider.buildTreeFromTopParent(file, this.hierarchySource, options);
+			}
+
+			// Collect all paths in this tree to avoid duplicating shared subtrees
+			this.collectTreePaths(tree, processedPaths);
+
+			this.renderTree(tree, this.treeContainer!, 0);
+		}
+	}
+
+	private collectTreePaths(node: TreeNode, paths: Set<string>): void {
+		paths.add(node.path);
+		for (const child of node.children) {
+			this.collectTreePaths(child, paths);
+		}
+	}
+
+	private createToolbar(isFolder = false): void {
 		const toolbar = this.contentEl.createDiv({
 			cls: cls("moc-toolbar"),
 		});
@@ -139,11 +205,14 @@ export class MocView extends RegisteredEventsComponent {
 			relatedCheckbox.click();
 		});
 
-		this.rootModeBtn = rightGroup.createEl("button", {
-			cls: `${cls("moc-toolbar-btn")} ${cls("moc-root-toggle")} ${this.useTopParentAsRoot ? cls("moc-root-toggle-active") : ""}`,
-		});
-		this.updateRootModeButton();
-		this.rootModeBtn.addEventListener("click", () => this.toggleRootMode());
+		// Root mode toggle is not applicable for folder notes (forest always uses top parent)
+		if (!isFolder) {
+			this.rootModeBtn = rightGroup.createEl("button", {
+				cls: `${cls("moc-toolbar-btn")} ${cls("moc-root-toggle")} ${this.useTopParentAsRoot ? cls("moc-root-toggle-active") : ""}`,
+			});
+			this.updateRootModeButton();
+			this.rootModeBtn.addEventListener("click", () => this.toggleRootMode());
+		}
 	}
 
 	private updateRootModeButton(): void {

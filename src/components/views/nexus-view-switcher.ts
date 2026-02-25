@@ -1,3 +1,4 @@
+import { isFolderNote } from "@real1ty-obsidian-plugins";
 import { ItemView, Platform, type TFile, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
@@ -81,7 +82,12 @@ export class NexusViewSwitcher extends ItemView {
 
 		this.registerEvent(
 			this.app.workspace.on("active-leaf-change", async () => {
-				if (this.currentMode === "bases" && this.basesView) {
+				// Auto-switch away from bases view when navigating to a folder note
+				if (this.currentMode === "bases" && this.isActiveFileFolderNote()) {
+					this.currentMode = "graph";
+					this.updateArchivedToggleVisibility();
+					await this.renderViewContent();
+				} else if (this.currentMode === "bases" && this.basesView) {
 					await this.basesView.updateActiveFile();
 				}
 				if (this.currentMode === "moc" && this.mocView) {
@@ -89,6 +95,11 @@ export class NexusViewSwitcher extends ItemView {
 				}
 				await this.checkMocContent();
 				await this.updateStatistics();
+
+				// Update toggle button text (available modes may have changed)
+				if (this.toggleButton) {
+					this.toggleButton.textContent = this.getToggleButtonText();
+				}
 			})
 		);
 
@@ -148,7 +159,7 @@ export class NexusViewSwitcher extends ItemView {
 	 * Toggle between graph, bases, and moc views
 	 */
 	async toggleView(): Promise<void> {
-		const modes: ViewMode[] = ["graph", "bases", "moc"];
+		const modes = this.getAvailableModes();
 		const currentIndex = modes.indexOf(this.currentMode);
 		const nextIndex = (currentIndex + 1) % modes.length;
 		this.currentMode = modes[nextIndex];
@@ -162,14 +173,27 @@ export class NexusViewSwitcher extends ItemView {
 		await this.renderViewContent();
 	}
 
+	private isActiveFileFolderNote(): boolean {
+		const activeFile = this.app.workspace.getActiveFile();
+		return activeFile ? isFolderNote(activeFile.path) : false;
+	}
+
+	private getAvailableModes(): ViewMode[] {
+		return this.isActiveFileFolderNote() ? ["graph", "moc"] : ["graph", "bases", "moc"];
+	}
+
 	private getToggleButtonText(): string {
-		switch (this.currentMode) {
+		const modes = this.getAvailableModes();
+		const currentIndex = modes.indexOf(this.currentMode);
+		const nextMode = modes[(currentIndex + 1) % modes.length];
+
+		switch (nextMode) {
 			case "graph":
-				return "Switch to Bases";
-			case "bases":
-				return "Switch to MOC";
-			case "moc":
 				return "Switch to Graph";
+			case "bases":
+				return "Switch to Bases";
+			case "moc":
+				return "Switch to MOC";
 		}
 	}
 

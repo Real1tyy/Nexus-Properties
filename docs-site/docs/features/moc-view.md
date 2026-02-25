@@ -216,20 +216,44 @@ This uses the same traversal algorithm as the Graph view, respecting the **Prior
 
 ## Render Related
 
-Enable the **Render Related** checkbox in the toolbar to recursively add related notes as children at every level of the tree.
-
-When enabled, each node in the tree is augmented with its `Related` frontmatter property values. Those related nodes are then expanded further — their own related nodes are added, and so on recursively until all connections are exhausted (with cycle detection to prevent infinite loops).
+Enable the **Render Related** checkbox in the toolbar to switch to a purely related-based tree. Instead of showing the children hierarchy, the tree displays only notes linked via the `Related` frontmatter property, expanded recursively with cycle detection.
 
 ```
 - [[Active File]]
-    - [[Child 1]]
-        - [[Related to Child 1]]     ← added by Render Related
-            - [[Related to Related]] ← recursive expansion
-    - [[Child 2]]
-    - [[Related to Active File]]     ← added by Render Related
+    - [[Related Note 1]]
+        - [[Related to Related 1]]   ← recursive expansion
+    - [[Related Note 2]]
 ```
 
-This works with both **Properties** and **MOC Content** hierarchy sources. Regardless of the hierarchy source, related nodes are always read from frontmatter properties.
+Related nodes are always read from frontmatter properties, regardless of the hierarchy source setting.
+
+## Folder Note Forest
+
+When viewing a **folder note** (a note whose filename matches its parent folder name, e.g., `projects/projects.md`), the MOC view automatically renders a **forest of trees** — one tree per file in the folder and its subfolders.
+
+This mirrors the Graph view's folder note behavior: instead of showing a single tree rooted at the current file, the view builds a separate hierarchy tree for every file in the folder, starting each from its topmost parent.
+
+```
+- [[Top Parent A]]
+    - [[File 1]]
+    - [[File 2]]
+- [[Top Parent B]]
+    - [[File 3]]
+        - [[File 4]]
+```
+
+Files that already appear in another tree are skipped to avoid duplication.
+
+When **Render Related** is enabled, the forest switches to a purely related-based view: each file's tree shows only its `Related` frontmatter connections (recursively), with no children hierarchy. This mirrors the Graph view's folder note related mode.
+
+### Toolbar differences
+
+- The **Root Mode Toggle** (Current / Top Parent) is hidden for folder notes, since the forest always builds from top parents.
+- **Expand All** and **Collapse All** still work across the entire forest.
+
+### View switcher behavior
+
+When a folder note is active, the **Bases view** is removed from the toggle cycle. The view switcher cycles between **Graph** and **MOC** only. If you navigate to a folder note while on the Bases view, the view automatically switches to Graph.
 
 ## Navigation
 

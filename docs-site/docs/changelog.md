@@ -15,6 +15,7 @@ All notable changes to Nexus Properties will be documented here.
 ### Added
 
 - **Render Related in MOC view**: New "Render Related" checkbox in the MOC toolbar recursively adds related nodes (from frontmatter) as children at every level of the tree. Works with both Properties and MOC Content hierarchy sources. [Learn more →](features/moc-view#render-related)
+- **Folder note forest in MOC view**: When viewing a folder note, the MOC view renders a forest of trees — one per file in the folder — matching the Graph view's folder note behavior. The Bases view is removed from the toggle cycle for folder notes. [Learn more →](features/moc-view#folder-note-forest)
 - **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery) page to see the plugin in action.
 - **Settings search**: Search across all settings tabs to quickly find any setting. Type in the search box to filter settings by name or description. [Learn more →](configuration)
 - **Dedicated MOC settings tab**: MOC configuration (enable MOC content reading, hierarchy source, display properties) is now in its own **Settings → MOC** tab for easier access. [Learn more →](features/moc-view)
@@ -25,6 +26,8 @@ All notable changes to Nexus Properties will be documented here.
 - **MOC view title property support**: MOC view now uses the [title property](features/moc-view#tree-structure) to display note names, matching the behavior of Graph and Bases views. Previously, MOC view always showed raw filenames.
 - **Recursive propagation dialogs**: Fixed a bug where propagating frontmatter to children would trigger additional propagation dialogs (or redundant auto-propagation) for each child. The system now correctly skips the propagation check for children that were just propagated to. [Learn more →](configuration#hierarchy)
 - **Propagation only reaching direct children**: Fixed a bug where frontmatter propagation only applied to direct children instead of all descendants. Grandchildren and deeper levels were silently skipped due to wiki link brackets being stripped before the recursive traversal. [Learn more →](configuration#hierarchy)
+- **Title property excluded from propagation**: The Title property is now correctly excluded from frontmatter propagation. Previously it could be propagated to children, overwriting their own auto-generated title. [Learn more →](configuration#hierarchy)
+- **Propagation modal showing internal properties**: Fixed a bug where the "Ask before propagating" modal displayed changes to internal Nexus properties (Parent, Child, Related, etc.) that would never actually be propagated. Internal properties are now filtered out before the modal is shown, and the modal no longer appears if only internal properties changed. [Learn more →](configuration#hierarchy)
 
 ---
 
