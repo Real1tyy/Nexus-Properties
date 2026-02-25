@@ -1,25 +1,24 @@
 import {
+	FrontmatterPropagationModal,
 	addLinkToProperty,
 	applyFrontmatterChanges,
-	type FrontmatterChange,
-	type FrontmatterDiff,
-	FrontmatterPropagationModal,
 	formatWikiLink,
 	getFileContext,
 	mergeFrontmatterDiffs,
 	parsePropertyLinks,
 	removeMarkdownExtension,
 	withFileContext,
+	type FrontmatterChange,
+	type FrontmatterDiff,
 } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
-import type { Observable, Subscription } from "rxjs";
-import type { BehaviorSubject } from "rxjs";
+import type { BehaviorSubject, Observable, Subscription } from "rxjs";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { parseExcludedProps } from "../utils/frontmatter-utils";
 import { getChildrenRecursively } from "../utils/hierarchy";
-import { buildTitleLink } from "../utils/string-utils";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
+import { buildTitleLink } from "../utils/string-utils";
 import type { FileRelationships, Indexer, IndexerEvent } from "./indexer";
 
 export class PropertiesManager {
@@ -372,9 +371,15 @@ export class PropertiesManager {
 				)
 			);
 		} finally {
-			for (const childPath of childrenPaths) {
-				this.filesBeingPropagated.delete(childPath);
-			}
+			// Delay removal so the guard is still active when async file-change
+			// events arrive from the indexer. Without this, each child would
+			// re-trigger propagation (or show the "ask" modal again) because
+			// the guard is cleared before the vault emits change events.
+			setTimeout(() => {
+				for (const childPath of childrenPaths) {
+					this.filesBeingPropagated.delete(childPath);
+				}
+			}, this.settings.propagationDebounceMs + 500);
 		}
 	}
 }
