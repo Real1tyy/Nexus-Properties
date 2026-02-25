@@ -16,6 +16,12 @@ All notable changes to Nexus Properties will be documented here.
 
 - **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery) page to see the plugin in action.
 
+### Added
+
+- **Settings search**: Search across all settings tabs to quickly find any setting. Type in the search box to filter settings by name or description. [Learn more →](configuration)
+- **Dedicated MOC settings tab**: MOC configuration (enable MOC content reading, hierarchy source, display properties) is now in its own **Settings → MOC** tab for easier access. [Learn more →](features/moc-view)
+- **Settings footer links**: Settings footer now includes links to Other Plugins and the Nexus Properties YouTube playlist.
+
 ### Fixed
 
 - **MOC view title property support**: MOC view now uses the [title property](features/moc-view#tree-structure) to display note names, matching the behavior of Graph and Bases views. Previously, MOC view always showed raw filenames.
@@ -83,8 +89,8 @@ In this example:
 - Only hierarchical views (Children/Parents) are available
 
 **Settings**:
-- **Hierarchy Source** (Settings → General): Choose "Properties" or "MOC Content"
-- **Enable MOC Content Reading** (Settings → General): Enable/disable MOC content detection (default: enabled)
+- **Hierarchy Source** (Settings → MOC): Choose "Properties" or "MOC Content"
+- **Enable MOC Content Reading** (Settings → MOC): Enable/disable MOC content detection (default: enabled)
 
 See [MOC Content Hierarchy](features/moc-view#moc-content-hierarchy) for detailed documentation and examples.
 
@@ -122,7 +128,7 @@ New tree-based view that renders your hierarchy as an indented outline with clic
 - **Indented Outline**: Each level is indented to show parent-child relationships clearly
 - **Clickable Links**: All items are rendered as wiki links - click to navigate directly to any file
 - **Ctrl+Click**: Open notes in a new tab
-- **Display Properties**: Configure frontmatter properties to show next to each note (Settings → Bases → Display properties)
+- **Display Properties**: Configure frontmatter properties to show next to each note (Settings → MOC → Display properties)
 - **Cycle Detection**: Handles circular relationships without infinite loops
 - **Three-Way Toggle**: Switch between Graph → Bases → MOC views using the toggle button
 - **Root Mode Toggle**: Switch between "Current" (current file as root) and "Top Parent" (topmost ancestor as root)

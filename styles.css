@@ -206,12 +206,19 @@
 
 /* Settings navigation tabs */
 .nexus-properties-settings-nav {
+	margin-bottom: 24px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	padding-bottom: 16px;
+}
+
+.nexus-properties-nav-buttons {
 	display: flex;
+	align-items: center;
 	gap: 8px;
 	flex-wrap: wrap;
 }
 
-.nexus-properties-settings-nav-button {
+.nexus-properties-nav-buttons button {
 	padding: 8px 16px;
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 6px;
@@ -221,21 +228,47 @@
 	transition: all 0.2s ease;
 }
 
-.nexus-properties-settings-nav-button.nexus-properties-settings-nav-button-active {
+.nexus-properties-nav-buttons button.nexus-properties-active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 }
 
-.nexus-properties-settings-nav-button:hover:not(
-		.nexus-properties-settings-nav-button-active
-	) {
+.nexus-properties-nav-buttons button:hover:not(.nexus-properties-active) {
 	background-color: var(--background-modifier-hover);
 }
 
-/* Settings section container */
-.nexus-properties-settings-section-container {
-	margin-top: 1em;
-	padding-bottom: 0.5em;
+/* Settings search */
+.nexus-properties-settings-search {
+	margin-left: auto;
+	flex-shrink: 0;
+}
+
+.nexus-properties-settings-search-input {
+	padding: 6px 10px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background-color: var(--background-secondary);
+	color: var(--text-normal);
+	font-size: var(--font-ui-small);
+	width: 150px;
+	transition: width 0.2s ease;
+}
+
+.nexus-properties-settings-search-input:focus {
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+	width: 200px;
+}
+
+.nexus-properties-settings-search-section {
+	margin-bottom: 8px;
+}
+
+.nexus-properties-settings-search-no-results {
+	padding: 24px;
+	text-align: center;
+	color: var(--text-muted);
+	font-style: italic;
 }
 
 /* Settings footer */

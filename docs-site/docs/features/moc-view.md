@@ -75,7 +75,7 @@ When viewing this file with MOC Content mode enabled:
 
 
 
-Settings → General → **Enable MOC content reading** (default: enabled)
+Settings → MOC → **Enable MOC content reading** (default: enabled)
 
 This allows the plugin to detect and parse MOC structures in your notes.
 
@@ -85,7 +85,7 @@ Two ways to switch:
 
 1. **Quick Toggle Button**: When viewing a file with valid MOC content (3+ links, 2+ levels), a button appears next to the view toggle. Click to switch between "Properties" and "MOC Content".
 
-2. **Settings**: Settings → General → **Hierarchy Source** → Choose "MOC Content"
+2. **Settings**: Settings → MOC → **Hierarchy Source** → Choose "MOC Content"
 
 ### Valid MOC Detection
 
@@ -232,7 +232,7 @@ Open note in a new tab.
 
 ## Display Properties
 
-Show frontmatter properties next to each note in the tree. Configure in **Settings → Bases → Display properties**.
+Show frontmatter properties next to each note in the tree. Configure in **Settings → MOC → Display properties**.
 
 Enter a comma-separated list of property names (e.g., `status, priority, tags`). Properties containing wiki links are rendered as clickable links.
 
