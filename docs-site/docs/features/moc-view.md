@@ -186,6 +186,28 @@ MOC displays notes in a hierarchical outline format. Note names respect the **ti
 
 Each level is indented to show parent-child relationships clearly. Items with children have a collapse/expand chevron.
 
+## Search
+
+A persistent search bar appears between the toolbar and the tree. Type a query to filter the tree by node name (case-insensitive substring match).
+
+When an intermediate node doesn't match the query but has matching descendants, the node is removed and its children are re-parented to the nearest visible ancestor. This maintains connections through the tree rather than hiding entire branches.
+
+```
+Full tree:
+- [[Project A]]
+    - [[Design]]
+        - [[UI Mockups]]
+        - [[Color Palette]]
+    - [[Development]]
+
+Search: "ui" →
+- [[UI Mockups]]
+```
+
+In this example, "Project A" and "Design" don't match "ui", but "UI Mockups" does — so it gets promoted to the top level. "Color Palette" and "Development" are removed because they don't match and have no matching descendants.
+
+Search works in all modes: single-tree, folder-forest, and Render Related. Clearing the search restores the full tree.
+
 ## Root Mode Toggle
 
 Switch between two root modes using the toggle button in the toolbar:

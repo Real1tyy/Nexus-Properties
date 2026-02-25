@@ -14,6 +14,7 @@ import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
 import { resolveDisplayName, resolveParentSelection, type ParentOption } from "../../utils/file-utils";
 import { buildRelatedTree, type TreeNode } from "../../utils/hierarchy";
+import { MocSearch } from "../input-managers/moc-search";
 
 export class MocView extends RegisteredEventsComponent {
 	private settingsSubscription: Subscription | null = null;
@@ -28,6 +29,8 @@ export class MocView extends RegisteredEventsComponent {
 	private parentOverridePath: string | undefined;
 	private parentDropdown: HTMLSelectElement | null = null;
 	private parentSelectorContainer: HTMLElement | null = null;
+	private mocSearch: MocSearch | null = null;
+	private searchRowEl: HTMLElement | null = null;
 	private component: Component;
 
 	constructor(
@@ -71,6 +74,12 @@ export class MocView extends RegisteredEventsComponent {
 
 			this.lastFilePath = currentFilePath;
 
+			// Detach search row before emptying so we can reuse it
+			const hadSearchFocus = this.searchRowEl?.contains(document.activeElement) ?? false;
+			if (this.searchRowEl) {
+				this.searchRowEl.detach();
+			}
+
 			this.contentEl.empty();
 			this.contentEl.addClass(cls("moc-view"));
 
@@ -81,6 +90,16 @@ export class MocView extends RegisteredEventsComponent {
 
 			const isFolder = isFolderNote(activeFile.path);
 			this.createToolbar(isFolder);
+
+			// Create search row once, reuse across re-renders
+			if (!this.mocSearch) {
+				this.searchRowEl = createDiv({ cls: cls("moc-search-row") });
+				this.mocSearch = new MocSearch(this.searchRowEl, () => {
+					this.lastFilePath = null;
+					this.render();
+				});
+			}
+			this.contentEl.appendChild(this.searchRowEl!);
 
 			// Compute parents and populate dropdown
 			const { parents, selectedPath } = resolveParentSelection({
@@ -110,6 +129,10 @@ export class MocView extends RegisteredEventsComponent {
 			} else {
 				await this.renderSingleTree(activeFile, provider);
 			}
+
+			if (hadSearchFocus) {
+				this.mocSearch?.focus();
+			}
 		} finally {
 			this.isUpdating = false;
 		}
@@ -133,7 +156,15 @@ export class MocView extends RegisteredEventsComponent {
 				: await provider.buildTree(activeFile, this.hierarchySource, options);
 		}
 
-		this.renderTree(tree, this.treeContainer!, 0);
+		const query = this.mocSearch?.getCurrentValue() ?? "";
+		if (query) {
+			const filtered = this.filterTree(tree, query);
+			for (const node of filtered) {
+				this.renderTree(node, this.treeContainer!, 0);
+			}
+		} else {
+			this.renderTree(tree, this.treeContainer!, 0);
+		}
 	}
 
 	private async renderFolderForest(folderNoteFile: TFile, provider: HierarchyProvider): Promise<void> {
@@ -173,7 +204,15 @@ export class MocView extends RegisteredEventsComponent {
 			// Collect all paths in this tree to avoid duplicating shared subtrees
 			this.collectTreePaths(tree, processedPaths);
 
-			this.renderTree(tree, this.treeContainer!, 0);
+			const query = this.mocSearch?.getCurrentValue() ?? "";
+			if (query) {
+				const filtered = this.filterTree(tree, query);
+				for (const node of filtered) {
+					this.renderTree(node, this.treeContainer!, 0);
+				}
+			} else {
+				this.renderTree(tree, this.treeContainer!, 0);
+			}
 		}
 	}
 
@@ -182,6 +221,22 @@ export class MocView extends RegisteredEventsComponent {
 		for (const child of node.children) {
 			this.collectTreePaths(child, paths);
 		}
+	}
+
+	private filterTree(node: TreeNode, query: string): TreeNode[] {
+		const filteredChildren: TreeNode[] = [];
+		for (const child of node.children) {
+			filteredChildren.push(...this.filterTree(child, query));
+		}
+
+		const displayName = resolveDisplayName(this.app, node.path, this.currentSettings.titleProp);
+		if (this.mocSearch?.shouldInclude(displayName)) {
+			return [{ ...node, children: filteredChildren }];
+		} else if (filteredChildren.length > 0) {
+			// Re-parent: promote children of non-matching intermediate nodes
+			return filteredChildren;
+		}
+		return [];
 	}
 
 	private createToolbar(isFolder = false): void {
@@ -500,6 +555,9 @@ export class MocView extends RegisteredEventsComponent {
 		if (this.component) {
 			this.component.unload();
 		}
+		this.mocSearch?.destroy();
+		this.mocSearch = null;
+		this.searchRowEl = null;
 		this.lastFilePath = null;
 		this.isUpdating = false;
 		this.collapsedNodes.clear();

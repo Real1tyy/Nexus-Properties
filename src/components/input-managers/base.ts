@@ -11,6 +11,7 @@ export abstract class InputFilterManager {
 	protected currentValue = "";
 	protected persistentlyVisible = false;
 	protected onHide?: () => void;
+	protected debounceMs: number;
 
 	constructor(
 		protected parentEl: HTMLElement,
@@ -18,8 +19,10 @@ export abstract class InputFilterManager {
 		protected cssClass: string,
 		protected onFilterChange: FilterChangeCallback,
 		initiallyVisible: boolean,
-		onHide?: () => void
+		onHide?: () => void,
+		debounceMs?: number
 	) {
+		this.debounceMs = debounceMs ?? DEFAULT_DEBOUNCE_MS;
 		const classes = initiallyVisible ? `${cssClass}-container` : `${cssClass}-container ${cls("hidden")}`;
 		this.containerEl = this.parentEl.createEl("div", {
 			cls: classes,
@@ -62,7 +65,7 @@ export abstract class InputFilterManager {
 
 		this.debounceTimer = window.setTimeout(() => {
 			this.applyFilterImmediately();
-		}, DEFAULT_DEBOUNCE_MS);
+		}, this.debounceMs);
 	}
 
 	private applyFilterImmediately(): void {
