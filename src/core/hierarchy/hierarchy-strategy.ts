@@ -1,21 +1,9 @@
 import type { TFile } from "obsidian";
 import type { RelationshipType } from "../../types/constants";
+import type { HierarchyTraversalOptions } from "../../types/hierarchy";
 import type { TreeNode } from "../../utils/hierarchy";
 
 export type HierarchySourceType = "properties" | "moc-content";
-
-export interface HierarchyTraversalOptions {
-	maxDepth?: number;
-	includeRoot?: boolean;
-	highlightPath?: string;
-	prioritizeParentProp?: string;
-	/** MOC file path - required when using moc-content source */
-	mocFilePath?: string;
-	/** Start upward traversal from this parent path instead of the current file */
-	parentOverridePath?: string;
-	/** Filter callback — nodes whose frontmatter fails this check are excluded from traversal */
-	nodeFilter?: (frontmatter: Record<string, unknown>) => boolean;
-}
 
 /**
  * Strategy interface for hierarchy building.

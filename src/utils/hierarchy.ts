@@ -1,21 +1,10 @@
 import { extractFilePath, getFileContext, normalizeProperty, parsePropertyLinks } from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
-import type { Indexer } from "../core/indexer";
 import { RELATIONSHIP_CONFIGS, type FileRelationships, type RelationshipType } from "../types/constants";
+import type { HierarchyTraversalOptions, RelationshipResolver } from "../types/hierarchy";
 import type { NexusPropertiesSettings } from "../types/settings";
 
-export interface HierarchyTraversalOptions {
-	maxDepth?: number;
-	includeRoot?: boolean;
-	/** Path to mark as the current file in the tree (for highlighting) */
-	highlightPath?: string;
-	/** Start upward traversal from this parent path instead of the current file */
-	parentOverridePath?: string;
-	/** Property name to prioritize when choosing which parent to traverse upward */
-	prioritizeParentProp?: string;
-	/** Filter callback — nodes whose frontmatter fails this check are excluded from traversal */
-	nodeFilter?: (frontmatter: Record<string, unknown>) => boolean;
-}
+export type { HierarchyTraversalOptions };
 
 export interface TreeNode {
 	path: string;
@@ -30,7 +19,7 @@ export interface TreeNode {
  *
  * @returns FileRelationships or null if the file doesn't exist or has no frontmatter
  */
-export function getRelationships(app: App, indexer: Indexer, filePath: string): FileRelationships | null {
+export function getRelationships(app: App, indexer: RelationshipResolver, filePath: string): FileRelationships | null {
 	const { file, frontmatter } = getFileContext(app, filePath);
 	if (!file || !frontmatter) return null;
 	return indexer.extractRelationships(file, frontmatter);
@@ -59,7 +48,7 @@ export function resolveWikiLink(app: App, wikiLink: string, sourcePath: string):
  */
 export function buildHierarchyTree(
 	app: App,
-	indexer: Indexer,
+	indexer: RelationshipResolver,
 	startFile: TFile,
 	options: HierarchyTraversalOptions = {}
 ): TreeNode {
@@ -118,7 +107,7 @@ export function buildHierarchyTree(
  */
 export function findTopmostParent(
 	app: App,
-	indexer: Indexer,
+	indexer: RelationshipResolver,
 	startPath: string,
 	options: HierarchyTraversalOptions = {}
 ): string {
@@ -206,7 +195,7 @@ export function findTopmostParent(
  */
 export function buildHierarchyTreeFromTopParent(
 	app: App,
-	indexer: Indexer,
+	indexer: RelationshipResolver,
 	startFile: TFile,
 	options: HierarchyTraversalOptions = {}
 ): TreeNode {
@@ -235,7 +224,7 @@ export function buildHierarchyTreeFromTopParent(
  */
 export function collectRelatedNodesRecursively(
 	app: App,
-	indexer: Indexer,
+	indexer: RelationshipResolver,
 	startFile: TFile,
 	relationshipType: RelationshipType,
 	options: HierarchyTraversalOptions = {}
@@ -265,64 +254,12 @@ export function collectRelatedNodesRecursively(
 }
 
 /**
- * Augments an existing tree by recursively adding "Related" nodes from frontmatter
- * as additional children at every level. Works with any tree regardless of hierarchy source.
- * Uses breadth-first traversal so that all level-1 related nodes are added before
- * level-2, ensuring lower levels render first in the tree.
- *
- * @param app - Obsidian app instance
- * @param indexer - Indexer instance for extracting relationships
- * @param root - Tree root node to augment (mutated in place)
- */
-export function augmentTreeWithRelated(app: App, indexer: Indexer, root: TreeNode): void {
-	const visited = new Set<string>();
-
-	// Collect all existing nodes in the tree so we don't revisit them
-	const collectExisting = (node: TreeNode): void => {
-		visited.add(node.path);
-		for (const child of node.children) {
-			collectExisting(child);
-		}
-	};
-	collectExisting(root);
-
-	// BFS queue: each entry is a parent node whose related nodes we need to fetch
-	const queue: TreeNode[] = [root, ...getAllDescendants(root)];
-
-	while (queue.length > 0) {
-		// Process entire current level before moving to next
-		const currentLevel = [...queue];
-		queue.length = 0;
-
-		for (const parentNode of currentLevel) {
-			const relationships = getRelationships(app, indexer, parentNode.path);
-			if (!relationships) continue;
-
-			for (const wikiLink of relationships.related) {
-				const resolvedPath = resolveWikiLink(app, wikiLink, parentNode.path);
-				if (resolvedPath && !visited.has(resolvedPath)) {
-					visited.add(resolvedPath);
-					const name = resolvedPath.replace(/\.md$/, "").split("/").pop() || resolvedPath;
-					const relatedNode: TreeNode = {
-						path: resolvedPath,
-						name,
-						children: [],
-					};
-					parentNode.children.push(relatedNode);
-					queue.push(relatedNode);
-				}
-			}
-		}
-	}
-}
-
-/**
  * Builds a tree rooted at a file, expanding only related properties recursively.
  * No children hierarchy is included — purely related-based traversal.
  */
 export function buildRelatedTree(
 	app: App,
-	indexer: Indexer,
+	indexer: RelationshipResolver,
 	startFile: TFile,
 	options: HierarchyTraversalOptions = {}
 ): TreeNode {
@@ -353,16 +290,6 @@ export function buildRelatedTree(
 	};
 
 	return buildNode(startFile.path, 0);
-}
-
-/** Collects all descendant nodes of a tree node (flat list). */
-function getAllDescendants(node: TreeNode): TreeNode[] {
-	const result: TreeNode[] = [];
-	for (const child of node.children) {
-		result.push(child);
-		result.push(...getAllDescendants(child));
-	}
-	return result;
 }
 
 /**

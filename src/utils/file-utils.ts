@@ -1,6 +1,6 @@
 import { extractDisplayName, extractFilePath } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
-import type { Indexer } from "../core/indexer";
+import type { RelationshipResolver } from "../types/hierarchy";
 
 /**
  * Builds a proper file path for wiki links, handling root directory correctly.
@@ -106,7 +106,7 @@ export interface ParentOption {
 
 interface ResolveParentSelectionOptions {
 	app: App;
-	indexer: Indexer;
+	indexer: RelationshipResolver;
 	file: TFile;
 	prioritizeParentProp: string;
 	overridePath?: string;

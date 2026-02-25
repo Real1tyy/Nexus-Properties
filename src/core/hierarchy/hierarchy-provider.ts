@@ -8,13 +8,14 @@
  */
 
 import type { App, TFile } from "obsidian";
+import type { RelationshipType } from "../../types/constants";
+import type { HierarchyTraversalOptions } from "../../types/hierarchy";
+import type { TreeNode } from "../../utils/hierarchy";
 import type { Indexer } from "../indexer";
 import type { SettingsStore } from "../settings-store";
-import type { RelationshipType } from "../../types/constants";
-import type { TreeNode } from "../../utils/hierarchy";
-import { PropertiesStrategy } from "./properties-strategy";
+import type { HierarchySourceType, HierarchyStrategy } from "./hierarchy-strategy";
 import { MocContentStrategy } from "./moc-content-strategy";
-import type { HierarchyStrategy, HierarchySourceType, HierarchyTraversalOptions } from "./hierarchy-strategy";
+import { PropertiesStrategy } from "./properties-strategy";
 
 /**
  * Singleton Hierarchy Provider using Strategy pattern.

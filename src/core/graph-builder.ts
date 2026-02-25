@@ -78,10 +78,6 @@ export class GraphBuilder {
 		settingsStore.settings$.subscribe(applySettings);
 	}
 
-	public setHierarchySource(source: HierarchySourceType): void {
-		this.hierarchySource = source;
-	}
-
 	public setDepthOverride(depth: number | null): void {
 		this.depthOverride = depth;
 	}

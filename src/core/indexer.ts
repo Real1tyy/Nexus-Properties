@@ -9,6 +9,7 @@ import type { App, TFile } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { BehaviorSubject, Subject } from "rxjs";
 import { type FileRelationships, RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
+import type { RelationshipResolver } from "../types/hierarchy";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
 
 type IndexerEventType = "file-changed" | "file-deleted";
@@ -26,7 +27,7 @@ export interface IndexerEvent {
  * Wrapper around the generic Indexer from utils that adds relationship tracking.
  * Listens to generic indexer events and enhances them with relationship data.
  */
-export class Indexer {
+export class Indexer implements RelationshipResolver {
 	private settings: NexusPropertiesSettings;
 	private genericIndexer: GenericIndexer;
 	private settingsSubscription: Subscription | null = null;

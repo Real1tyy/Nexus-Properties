@@ -1,6 +1,7 @@
 import { getFileContext, parseWikiLink } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
 import type { RelationshipType } from "../../types/constants";
+import type { HierarchyTraversalOptions } from "../../types/hierarchy";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import {
 	buildHierarchyTree,
@@ -9,7 +10,7 @@ import {
 	type TreeNode,
 } from "../../utils/hierarchy";
 import type { Indexer } from "../indexer";
-import type { HierarchyStrategy, HierarchyTraversalOptions } from "./hierarchy-strategy";
+import type { HierarchyStrategy } from "./hierarchy-strategy";
 
 /**
  * Properties-based hierarchy strategy.
