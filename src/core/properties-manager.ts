@@ -52,7 +52,11 @@ export class PropertiesManager {
 					this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
 				}
 
-				if (!this.filesBeingPropagated.has(event.filePath)) {
+				if (this.filesBeingPropagated.has(event.filePath)) {
+					// Consume the flag: this child was just propagated to,
+					// so skip its propagation check exactly once.
+					this.filesBeingPropagated.delete(event.filePath);
+				} else {
 					void this.updateTitleProperty(event.filePath, event.newRelationships);
 					this.handleFrontmatterPropagation(event.filePath, event.newRelationships, event.frontmatterDiff);
 				}
@@ -370,16 +374,12 @@ export class PropertiesManager {
 					})
 				)
 			);
-		} finally {
-			// Delay removal so the guard is still active when async file-change
-			// events arrive from the indexer. Without this, each child would
-			// re-trigger propagation (or show the "ask" modal again) because
-			// the guard is cleared before the vault emits change events.
-			setTimeout(() => {
-				for (const childPath of childrenPaths) {
-					this.filesBeingPropagated.delete(childPath);
-				}
-			}, this.settings.propagationDebounceMs + 500);
+		} catch {
+			// If propagation fails, remove flags so future edits aren't blocked.
+			// On success, flags are consumed by the event handler in start().
+			for (const childPath of childrenPaths) {
+				this.filesBeingPropagated.delete(childPath);
+			}
 		}
 	}
 }
