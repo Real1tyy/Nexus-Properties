@@ -59,7 +59,7 @@ export function buildHierarchyTree(
 	startFile: TFile,
 	options: HierarchyTraversalOptions = {}
 ): TreeNode {
-	const { maxDepth = Number.POSITIVE_INFINITY, highlightPath } = options;
+	const { maxDepth = Number.POSITIVE_INFINITY, highlightPath, parentOverridePath } = options;
 	const visited = new Set<string>();
 
 	const buildNode = (filePath: string, depth: number): TreeNode => {
@@ -82,9 +82,13 @@ export function buildHierarchyTree(
 
 		for (const wikiLink of relationships.children) {
 			const resolvedPath = resolveWikiLink(app, wikiLink, filePath);
-			if (resolvedPath && !visited.has(resolvedPath)) {
-				node.children.push(buildNode(resolvedPath, depth + 1));
+			if (!resolvedPath || visited.has(resolvedPath)) continue;
+			// When a parent override is set, only allow the highlighted file
+			// to appear as a child of the override parent
+			if (parentOverridePath && resolvedPath === highlightPath && filePath !== parentOverridePath) {
+				continue;
 			}
+			node.children.push(buildNode(resolvedPath, depth + 1));
 		}
 
 		return node;
@@ -197,9 +201,10 @@ export function buildHierarchyTreeFromTopParent(
 	startFile: TFile,
 	options: HierarchyTraversalOptions & FindTopmostParentOptions = {}
 ): TreeNode {
-	const { prioritizeParentProp, parentOverridePath, ...traversalOptions } = options;
-	// When a parent override is set, use it directly as the root
-	const rootPath = parentOverridePath ?? findTopmostParent(app, indexer, startFile.path, { prioritizeParentProp });
+	const { prioritizeParentProp, ...traversalOptions } = options;
+	const rootPath = options.parentOverridePath
+		? findTopmostParent(app, indexer, options.parentOverridePath, { prioritizeParentProp })
+		: findTopmostParent(app, indexer, startFile.path, { prioritizeParentProp });
 	const rootFile = app.vault.getAbstractFileByPath(rootPath);
 
 	const fileToUse = rootFile instanceof TFile ? rootFile : startFile;

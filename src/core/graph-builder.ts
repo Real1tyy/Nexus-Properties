@@ -252,14 +252,11 @@ export class GraphBuilder {
 		const processedPaths = sharedProcessedPaths || new Set<string>();
 
 		const effectiveDepth = this.getEffectiveHierarchyMaxDepth();
-		// When a parent override is set, use it directly as the root
-		const rootPath = parentOverridePath
-			? parentOverridePath
-			: startFromCurrent
-				? sourcePath
-				: this.depthOverride !== null
-					? this.findTopmostParent(sourcePath, effectiveDepth)
-					: this.findTopmostParent(sourcePath, 50);
+		const rootPath = startFromCurrent
+			? sourcePath
+			: this.depthOverride !== null
+				? this.findTopmostParent(sourcePath, effectiveDepth)
+				: this.findTopmostParent(sourcePath, 50);
 
 		const rootNode = this.createNodeElement(rootPath, 0, allowSourceHighlight && rootPath === sourcePath);
 		nodes.push(rootNode);
@@ -277,7 +274,13 @@ export class GraphBuilder {
 			if (currentLevel + 1 >= effectiveDepth) continue;
 
 			const relations = this.indexer.extractRelationships(file, frontmatter);
-			const validChildren = this.resolveValidContexts(relations.children, processedPaths, currentPath);
+			let validChildren = this.resolveValidContexts(relations.children, processedPaths, currentPath);
+
+			// When a parent override is set, only allow the source file to appear
+			// as a child of the override parent, not whichever parent discovers it first
+			if (parentOverridePath && currentPath !== parentOverridePath) {
+				validChildren = validChildren.filter((ctx) => ctx.path !== sourcePath);
+			}
 
 			const childNodes = validChildren.map((ctx) =>
 				this.createNodeElement(ctx.pathWithExt, currentLevel + 1, allowSourceHighlight && ctx.path === sourcePath)
