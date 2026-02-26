@@ -6,6 +6,14 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 2.0.1 - 26.2.2026
+
+### Improved
+
+- **Graph view header layout**: Redesigned the graph view header for a more compact layout. The title now displays just the file name (without the "Relationship Graph:" prefix), controls sit inline on a single row, and the parent dropdown appears first for quicker access. Long titles word-break instead of pushing controls to a new line. [Learn more →](features/graph-views#parent-selection)
+
+---
+
 ## 2.0.0 - 25.2.2026
 
 ### Changed

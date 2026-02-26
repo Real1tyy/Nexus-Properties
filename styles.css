@@ -573,18 +573,18 @@
 	color: var(--text-normal);
 	font-size: 1.1em;
 	font-weight: 600;
-	flex: 1 1 240px;
+	flex: 1 1 0;
 	min-width: 0;
 	overflow-wrap: break-word;
 	word-wrap: break-word;
-	word-break: normal;
+	word-break: break-word;
 }
 
 .nexus-properties-graph-controls-container {
 	display: flex;
 	flex-direction: row;
 	align-items: center;
-	flex-wrap: wrap;
+	flex-wrap: nowrap;
 	justify-content: flex-end;
 	gap: 0.75em;
 	flex-shrink: 0;
@@ -670,51 +670,51 @@
 	}
 
 	/* Shorten toggle label text on mobile */
-	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(
-			1
-		)
+	/* nth-child(1) is parent dropdown — no label to shorten */
+	.nexus-properties-graph-view-header
+		.nexus-properties-graph-toggle-container:nth-child(2)
 		.nexus-properties-graph-toggle-label::before {
 		content: "Related";
 	}
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(1)
+		.nexus-properties-graph-toggle-container:nth-child(2)
 		.nexus-properties-graph-toggle-label {
 		font-size: 0;
 	}
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(1)
+		.nexus-properties-graph-toggle-container:nth-child(2)
 		.nexus-properties-graph-toggle-label::before {
 		font-size: 1rem;
 	}
 
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(2)
+		.nexus-properties-graph-toggle-container:nth-child(3)
 		.nexus-properties-graph-toggle-label::before {
 		content: "All";
 	}
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(2)
+		.nexus-properties-graph-toggle-container:nth-child(3)
 		.nexus-properties-graph-toggle-label {
 		font-size: 0;
 	}
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(2)
+		.nexus-properties-graph-toggle-container:nth-child(3)
 		.nexus-properties-graph-toggle-label::before {
 		font-size: 1rem;
 	}
 
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(3)
+		.nexus-properties-graph-toggle-container:nth-child(4)
 		.nexus-properties-graph-toggle-label::before {
 		content: "Current";
 	}
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(3)
+		.nexus-properties-graph-toggle-container:nth-child(4)
 		.nexus-properties-graph-toggle-label {
 		font-size: 0;
 	}
 	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(3)
+		.nexus-properties-graph-toggle-container:nth-child(4)
 		.nexus-properties-graph-toggle-label::before {
 		font-size: 1rem;
 	}

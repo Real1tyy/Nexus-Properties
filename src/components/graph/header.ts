@@ -66,6 +66,19 @@ export class GraphHeader {
 			cls: cls("graph-controls-container"),
 		});
 
+		// Parent override dropdown (first in controls row)
+		this.parentDropdownContainer = this.controlsContainer.createEl("div", {
+			cls: cls("graph-toggle-container"),
+		});
+		this.parentDropdown = this.parentDropdownContainer.createEl("select", {
+			cls: cls("graph-parent-dropdown"),
+		});
+		this.parentDropdown.addEventListener("change", () => {
+			const selectedPath = this.parentDropdown?.value ?? "";
+			this.props.onParentOverrideChange?.(selectedPath);
+		});
+		this.populateParentDropdown();
+
 		// Render Related checkbox
 		this.relatedToggleContainer = this.controlsContainer.createEl("div", {
 			cls: cls("graph-toggle-container"),
@@ -132,19 +145,6 @@ export class GraphHeader {
 
 		this.makeContainerClickable(this.startFromCurrentContainer, this.toggleCheckbox);
 
-		// Parent override dropdown
-		this.parentDropdownContainer = this.controlsContainer.createEl("div", {
-			cls: cls("graph-toggle-container"),
-		});
-		this.parentDropdown = this.parentDropdownContainer.createEl("select", {
-			cls: cls("graph-parent-dropdown"),
-		});
-		this.parentDropdown.addEventListener("change", () => {
-			const selectedPath = this.parentDropdown?.value ?? "";
-			this.props.onParentOverrideChange?.(selectedPath);
-		});
-		this.populateParentDropdown();
-
 		this.updateVisibility();
 	}
 
@@ -166,16 +166,17 @@ export class GraphHeader {
 
 	updateTitle(fileName: string): void {
 		if (this.titleEl) {
-			this.titleEl.textContent = `Relationship Graph: ${fileName}`;
+			this.titleEl.textContent = fileName;
 		}
 	}
 
 	private updateVisibility(): void {
-		const hideParentDropdown = () => {
+		const setParentDropdownHidden = (hidden: boolean) => {
 			if (this.parentDropdownContainer) {
-				this.parentDropdownContainer.toggleClass(cls("hidden"), true);
+				this.parentDropdownContainer.toggleClass(cls("hidden"), hidden);
 			}
 		};
+		const hideParentDropdown = () => setParentDropdownHidden(true);
 
 		// When hierarchy source is MOC content, hide all related-based options
 		if (this.props.hierarchySource === "moc-content") {
@@ -220,9 +221,7 @@ export class GraphHeader {
 		// Parent dropdown: hide when related mode, startFromCurrent, or fewer than 2 parents
 		const parentCount = this.props.parents?.length ?? 0;
 		const shouldHideParent = this.props.renderRelated || this.props.startFromCurrent || parentCount < 2;
-		if (this.parentDropdownContainer) {
-			this.parentDropdownContainer.toggleClass(cls("hidden"), shouldHideParent);
-		}
+		setParentDropdownHidden(shouldHideParent);
 	}
 
 	update(props: Partial<GraphHeaderProps>): void {
