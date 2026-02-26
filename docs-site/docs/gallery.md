@@ -297,6 +297,86 @@ Visual guide to Nexus Properties features. For detailed documentation on each fe
   </video>
 </div>
 
+### [Configuration](configuration) — Settings Showcase
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/SettingsShowcaseWithSearch.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/SettingsShowcaseWithSearch.mp4")} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### [Graph Views](features/graph-views#parent-selection) — Parent Selection
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/DynamicParentSelectionDropdown.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/DynamicParentSelectionDropdown.mp4")} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### [MOC View](features/moc-view#search) — Search
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/MocViewSearch.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/MocViewSearch.mp4")} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### [MOC View](features/moc-view#render-related) — Render Related
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/RenderRelatedMoc.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/RenderRelatedMoc.mp4")} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
+### [MOC View](features/moc-view#folder-note-forest) — Folder Note Forest
+<div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>
+  <video
+    controls
+    autoPlay
+    loop
+    muted
+    playsInline
+    style={{"width": "100%", "maxWidth": "800px", "borderRadius": "8px"}}
+  >
+    <source src={useBaseUrl("/video/FolderNoteGraphAndMocViews.webm")} type="video/webm" />
+    <source src={useBaseUrl("/video/FolderNoteGraphAndMocViews.mp4")} type="video/mp4" />
+    Your browser does not support the video tag.
+  </video>
+</div>
+
 ## Screenshots
 
 ### [Hierarchical View](features/graph-views)
