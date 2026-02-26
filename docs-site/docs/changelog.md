@@ -6,6 +6,14 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 2.0.2 - 26.2.2026
+
+### Fixed
+
+- **Graph view stuck after viewing non-markdown files**: Fixed a bug where navigating from a PDF (or other non-markdown file) back to markdown files would permanently show "This file has no frontmatter properties" until switching views. The graph now correctly clears the empty state and re-renders when returning to a valid file. [Learn more →](features/graph-views)
+
+---
+
 ## 2.0.1 - 26.2.2026
 
 ### Improved

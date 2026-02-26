@@ -652,9 +652,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			return;
 		}
 
-		const { frontmatter } = this.app.metadataCache.getFileCache(file) ?? {};
+		const cache = this.app.metadataCache.getFileCache(file);
 
-		if (!frontmatter && !isFolderNote(file.path)) {
+		// Only show empty state if the cache IS ready but the file truly has no frontmatter.
+		// If cache is null, metadata hasn't been processed yet — proceed and let the
+		// indexer/metadata listeners trigger a re-render when the cache becomes available.
+		if (cache && !cache.frontmatter && !isFolderNote(file.path)) {
 			this.showEmptyState("This file has no frontmatter properties.");
 			return;
 		}
@@ -762,6 +765,10 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		// If Cytoscape doesn't exist yet, do full initialization
 		if (!this.cy) {
+			// Clear any leftover empty state content before reinitializing
+			if (this.graphContainerEl) {
+				this.graphContainerEl.empty();
+			}
 			this.initializeCytoscape();
 
 			// If initialization failed, store the graph data and wait for container to become visible
