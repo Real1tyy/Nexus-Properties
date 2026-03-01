@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { stripParentPrefix } from "../src/utils/string-utils";
+import { replaceParentPrefix, stripParentPrefix } from "../src/utils/string-utils";
 
 describe("stripParentPrefix", () => {
 	describe("pattern 1: parent name + space", () => {
@@ -122,6 +122,76 @@ describe("stripParentPrefix", () => {
 			expect(stripParentPrefix("Sports - Basketball", "Sports")).toBe("Basketball");
 			expect(stripParentPrefix("Sports Soccer", "Sports")).toBe("Soccer");
 			expect(stripParentPrefix("Sports-Tennis", "Sports")).toBe("Tennis");
+		});
+	});
+});
+
+describe("replaceParentPrefix", () => {
+	describe("basic replacements", () => {
+		it("should replace parent prefix with dash separator", () => {
+			expect(replaceParentPrefix("Project - Task 1", "Project", "Initiative")).toBe("Initiative - Task 1");
+		});
+
+		it("should replace parent prefix with space separator", () => {
+			expect(replaceParentPrefix("Project Task 1", "Project", "Initiative")).toBe("Initiative Task 1");
+		});
+
+		it("should replace parent prefix with dash-no-space separator", () => {
+			expect(replaceParentPrefix("Project-Feature", "Project", "Initiative")).toBe("Initiative-Feature");
+		});
+
+		it("should replace parent prefix with en-dash separator", () => {
+			expect(replaceParentPrefix("Project – Task 1", "Project", "Initiative")).toBe("Initiative – Task 1");
+		});
+
+		it("should replace parent prefix with em-dash separator", () => {
+			expect(replaceParentPrefix("Project — Task 1", "Project", "Initiative")).toBe("Initiative — Task 1");
+		});
+	});
+
+	describe("preserves separator and remainder", () => {
+		it("should preserve the exact separator characters", () => {
+			expect(replaceParentPrefix("Alpha - Beta - Gamma", "Alpha", "Omega")).toBe("Omega - Beta - Gamma");
+		});
+
+		it("should preserve multiple words after separator", () => {
+			expect(replaceParentPrefix("Team Weekly Review Notes", "Team", "Group")).toBe("Group Weekly Review Notes");
+		});
+	});
+
+	describe("returns null for non-matching inputs", () => {
+		it("should return null when display name does not start with old parent name", () => {
+			expect(replaceParentPrefix("Unrelated Note", "Project", "Initiative")).toBeNull();
+		});
+
+		it("should return null when old parent name is empty", () => {
+			expect(replaceParentPrefix("Some Name", "", "New")).toBeNull();
+		});
+
+		it("should return null when there is no separator after parent name", () => {
+			expect(replaceParentPrefix("ProjectExtra", "Project", "Initiative")).toBeNull();
+		});
+
+		it("should return null for exact match without separator", () => {
+			expect(replaceParentPrefix("Project", "Project", "Initiative")).toBeNull();
+		});
+
+		it("should return null for case-sensitive mismatch", () => {
+			expect(replaceParentPrefix("project - Task", "Project", "Initiative")).toBeNull();
+		});
+	});
+
+	describe("edge cases", () => {
+		it("should handle parent names with special characters", () => {
+			expect(replaceParentPrefix("Team (2024) - Review", "Team (2024)", "Team (2025)")).toBe("Team (2025) - Review");
+		});
+
+		it("should handle renaming to a longer name", () => {
+			expect(replaceParentPrefix("A - Child", "A", "LongNewName")).toBe("LongNewName - Child");
+		});
+
+		it("should handle renaming to a shorter name", () => {
+			expect(replaceParentPrefix("LongParentName - Child", "LongParentName", "X")).toBe("X - Child");
 		});
 	});
 });

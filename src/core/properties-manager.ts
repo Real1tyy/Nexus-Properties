@@ -2,6 +2,7 @@ import {
 	FrontmatterPropagationModal,
 	addLinkToProperty,
 	applyFrontmatterChanges,
+	extractDisplayName,
 	formatWikiLink,
 	getFileContext,
 	mergeFrontmatterDiffs,
@@ -19,7 +20,7 @@ import type { NexusPropertiesSettings } from "../types/settings";
 import { parseExcludedProps } from "../utils/frontmatter-utils";
 import { getChildrenRecursively } from "../utils/hierarchy";
 import { getRelationshipContext, getRelationshipDiff } from "../utils/relationship-context";
-import { buildTitleLink } from "../utils/string-utils";
+import { buildTitleLink, replaceParentPrefix } from "../utils/string-utils";
 import type { Indexer, IndexerEvent } from "./indexer";
 
 export class PropertiesManager {
@@ -48,6 +49,8 @@ export class PropertiesManager {
 		this.subscription = events$.subscribe((event) => {
 			if (event.type === "file-deleted" && event.oldRelationships) {
 				this.handleFileDeletion(event.filePath, event.oldRelationships);
+			} else if (event.type === "file-renamed" && event.oldPath && event.newRelationships) {
+				void this.handleFileRename(event.filePath, event.oldPath, event.newRelationships);
 			} else if (event.type === "file-changed" && event.newRelationships) {
 				if (event.oldRelationships) {
 					this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
@@ -78,6 +81,33 @@ export class PropertiesManager {
 		this.propagationDebounceTimers.clear();
 		this.accumulatedDiffs.clear();
 		this.filesBeingPropagated.clear();
+	}
+
+	private async handleFileRename(newPath: string, oldPath: string, newRelationships: FileRelationships): Promise<void> {
+		if (!this.settings.propagateRenameToChildren) return;
+
+		const oldDisplayName = extractDisplayName(oldPath);
+		const newDisplayName = extractDisplayName(newPath);
+
+		if (oldDisplayName === newDisplayName) return;
+
+		const childLinks = parsePropertyLinks(newRelationships.children);
+		if (childLinks.length === 0) return;
+
+		for (const childLink of childLinks) {
+			const childContext = getFileContext(this.app, childLink, { sourcePath: newPath });
+			if (!childContext.file) continue;
+
+			const childDisplayName = extractDisplayName(childContext.file.path);
+			const newChildName = replaceParentPrefix(childDisplayName, oldDisplayName, newDisplayName);
+			if (!newChildName) continue;
+
+			// Preserve the child's folder, only change the filename
+			const folder = childContext.file.parent?.path ?? "";
+			const newChildPath = folder ? `${folder}/${newChildName}.md` : `${newChildName}.md`;
+
+			await this.app.vault.rename(childContext.file, newChildPath);
+		}
 	}
 
 	async rescanAndAssignPropertiesForAllFiles(indexer: Indexer): Promise<void> {

@@ -12,11 +12,12 @@ import { type FileRelationships, RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "
 import type { RelationshipResolver } from "../types/hierarchy";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
 
-type IndexerEventType = "file-changed" | "file-deleted";
+type IndexerEventType = "file-changed" | "file-deleted" | "file-renamed";
 
 export interface IndexerEvent {
 	type: IndexerEventType;
 	filePath: string;
+	oldPath?: string;
 	oldRelationships?: FileRelationships;
 	newRelationships?: FileRelationships;
 	oldFrontmatter?: Frontmatter;
@@ -116,14 +117,22 @@ export class Indexer implements RelationshipResolver {
 		if (genericEvent.type === "file-changed" && genericEvent.source) {
 			const { filePath, source, oldFrontmatter, frontmatterDiff, oldPath } = genericEvent;
 
-			// If this is a rename (oldPath is set), update cache silently without emitting an event.
-			// Obsidian handles link updates, so components just need the updated cache.
+			// If this is a rename (oldPath is set), update cache and emit a rename event.
+			// Obsidian handles link updates, so components just need the updated cache,
+			// but PropertiesManager needs the event to propagate renames to children.
 			if (oldPath) {
 				const file = this.app.vault.getFileByPath(filePath);
 				if (file) {
 					const newRelationships = this.extractRelationships(file, source.frontmatter);
 					this.relationshipsCache.delete(oldPath);
 					this.relationshipsCache.set(filePath, newRelationships);
+
+					this.scanEventsSubject.next({
+						type: "file-renamed",
+						filePath,
+						oldPath,
+						newRelationships,
+					});
 				}
 				return;
 			}

@@ -231,6 +231,10 @@ PriorityParent: "[[preferred-parent]]"
 
 **Auto-Link Siblings** (default: `true`): Automatically mark siblings as related. See [Bidirectional Sync](features/bidirectional-sync#auto-link-siblings) for details.
 
+## Rename Propagation
+
+**Propagate Rename to Children** (default: `true`): When a parent file is renamed, automatically rename children whose filenames start with the old parent name to use the new one. See [Bidirectional Sync](features/bidirectional-sync#rename-propagation) for details.
+
 ## Frontmatter Propagation
 
 <div className="video-container" style={{"textAlign": "center", "marginBottom": "2em"}}>

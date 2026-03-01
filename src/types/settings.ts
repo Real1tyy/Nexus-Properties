@@ -151,6 +151,9 @@ export const NexusPropertiesSettingsSchema = z
 		// MOC view settings
 		mocDisplayProperties: z.array(z.string()).catch([...SETTINGS_DEFAULTS.DEFAULT_MOC_DISPLAY_PROPERTIES]),
 
+		// Rename propagation settings
+		propagateRenameToChildren: z.boolean().catch(SETTINGS_DEFAULTS.PROPAGATE_RENAME_TO_CHILDREN),
+
 		// Frontmatter propagation settings
 		propagateFrontmatterToChildren: z.boolean().catch(SETTINGS_DEFAULTS.PROPAGATE_FRONTMATTER_TO_CHILDREN),
 		askBeforePropagatingFrontmatter: z.boolean().catch(SETTINGS_DEFAULTS.ASK_BEFORE_PROPAGATING_FRONTMATTER),

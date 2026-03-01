@@ -82,6 +82,21 @@ Related: ["[[Task 1]]"]
 
 **When to use**: Enable for cross-referencing siblings, disable for strict hierarchies
 
+## Rename Propagation
+
+When a parent file is renamed, children whose filenames start with the old parent name are automatically renamed to use the new name. The same separator pattern is preserved.
+
+**Example**: Renaming "Project" to "Initiative":
+- "Project - Task 1" → "Initiative - Task 1"
+- "Project - Feature" → "Initiative - Feature"
+- "Unrelated Note" → unchanged (no matching prefix)
+
+Propagation cascades automatically: if "Project - Task 1" has its own children like "Project - Task 1 - Subtask", they are also renamed in the next event cycle ("Initiative - Task 1 - Subtask").
+
+Children stay in their original folder — only the filename changes.
+
+**Setting**: `Propagate Rename to Children` (default: `true`). Configure in Settings → General → Rename propagation.
+
 ## Automatic Maintenance
 
 **File deletion**: All references removed from other notes

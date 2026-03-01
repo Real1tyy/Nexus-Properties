@@ -69,6 +69,9 @@ export const SETTINGS_DEFAULTS = {
 	DEFAULT_HIERARCHY_SOURCE: "properties" as "properties" | "moc-content",
 	DEFAULT_ENABLE_MOC_CONTENT_READING: true,
 
+	// Rename propagation defaults
+	PROPAGATE_RENAME_TO_CHILDREN: true,
+
 	// Frontmatter propagation defaults
 	PROPAGATE_FRONTMATTER_TO_CHILDREN: false,
 	ASK_BEFORE_PROPAGATING_FRONTMATTER: false,

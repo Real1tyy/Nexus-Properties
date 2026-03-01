@@ -41,6 +41,29 @@ export function stripParentPrefix(displayName: string, parentDisplayName: string
 }
 
 /**
+ * Replaces the old parent prefix with a new one in a display name.
+ * Returns the new display name if the old parent prefix matched, or null if no match.
+ *
+ * @param displayName - The child's display name
+ * @param oldParentName - The old parent display name to match
+ * @param newParentName - The new parent display name to replace with
+ * @returns The display name with replaced prefix, or null if no match
+ */
+export function replaceParentPrefix(displayName: string, oldParentName: string, newParentName: string): string | null {
+	if (!oldParentName || !displayName.startsWith(oldParentName)) {
+		return null;
+	}
+
+	const remainder = displayName.slice(oldParentName.length);
+
+	if (!SEPARATOR_PATTERN.test(remainder)) {
+		return null;
+	}
+
+	return newParentName + remainder;
+}
+
+/**
  * Computes the display title for a file based on its basename and parent links.
  * If the file has parents, strips the first parent's name from the basename.
  *

@@ -140,6 +140,15 @@ export class GeneralSection implements SettingsSection {
 					});
 			});
 
+		// Rename Propagation Section
+		new Setting(container).setName("Rename propagation").setHeading();
+
+		this.uiBuilder.addToggle(container, {
+			key: "propagateRenameToChildren",
+			name: "Propagate rename to children",
+			desc: "When a parent file is renamed, automatically rename children whose filenames start with the old parent name to use the new parent name. For example, renaming 'Project' to 'Initiative' will rename 'Project - Task 1' to 'Initiative - Task 1'.",
+		});
+
 		// Frontmatter Propagation Section
 		new Setting(container).setName("Frontmatter propagation").setHeading();
 
