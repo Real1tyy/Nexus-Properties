@@ -221,7 +221,7 @@ ${formulasSection}views:
 ${orderArray}
     filters:
       and:
-        - this.${viewConfig.prop}.contains(file)${archivedFilter}${sortSection}
+        - this["${viewConfig.prop}"].contains(file)${archivedFilter}${sortSection}
 \`\`\`
 `;
 	}
@@ -390,7 +390,7 @@ ${orderArray}${
 
 		const archivedProp = this.currentSettings.archivedProp;
 
-		return `\n        - ${archivedProp} ${this.showArchived ? "==" : "!="} true`;
+		return `\n        - note["${archivedProp}"] ${this.showArchived ? "==" : "!="} true`;
 	}
 
 	private renderEmptyState(message: string): void {

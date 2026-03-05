@@ -6,11 +6,15 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
-## 2.1.0 - 28.2.2026
+## 2.1.0 - 5.3.2026
 
 ### Added
 
 - **Rename propagation to children**: When a parent file is renamed, children whose filenames start with the old parent name are automatically renamed to use the new one. For example, renaming "Project" to "Initiative" renames "Project - Task 1" to "Initiative - Task 1". Cascades recursively through grandchildren. Enabled by default, configurable in Settings → General → Rename propagation. [Learn more →](features/bidirectional-sync#rename-propagation)
+
+### Fixed
+
+- **Bases property syntax**: Property references in Bases queries now use the `note["Property"]` bracket notation, which fixes filtering for multi-word property names. [Learn more →](features/bases-integration)
 
 ---
 
