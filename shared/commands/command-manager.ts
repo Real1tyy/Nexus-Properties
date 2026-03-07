@@ -141,4 +141,41 @@ export class CommandManager {
 		}
 		return this.redoStack[this.redoStack.length - 1].getType();
 	}
+
+	popUndoCommand(): Command | undefined {
+		return this.undoStack.pop();
+	}
+
+	popRedoCommand(): Command | undefined {
+		return this.redoStack.pop();
+	}
+
+	pushToUndoStack(command: Command): void {
+		this.undoStack.push(command);
+		if (this.undoStack.length > this.maxHistorySize) {
+			this.undoStack.shift();
+		}
+	}
+
+	pushToRedoStack(command: Command): void {
+		this.redoStack.push(command);
+	}
+
+	removeFromUndoStack(command: Command): boolean {
+		const index = this.undoStack.indexOf(command);
+		if (index !== -1) {
+			this.undoStack.splice(index, 1);
+			return true;
+		}
+		return false;
+	}
+
+	removeFromRedoStack(command: Command): boolean {
+		const index = this.redoStack.indexOf(command);
+		if (index !== -1) {
+			this.redoStack.splice(index, 1);
+			return true;
+		}
+		return false;
+	}
 }
