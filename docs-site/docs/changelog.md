@@ -6,6 +6,12 @@ sidebar_position: 101
 
 All notable changes to Nexus Properties will be documented here.
 
+## 2.2.0
+
+:::tip Check out Prisma Calendar
+The ultimate calendar plugin for Obsidian — now with AI chat (Claude & GPT), CalDAV sync, scriptable API, and more. [Learn more →](https://matejvavroproductivity.com/tools/prisma-calendar/)
+:::
+
 ## 2.1.0 - 5.3.2026
 
 ### Added

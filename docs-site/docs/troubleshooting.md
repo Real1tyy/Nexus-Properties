@@ -4,9 +4,12 @@ sidebar_position: 99
 
 # Troubleshooting
 
-Common issues and solutions. For general questions, see [FAQ](faq).
+Use this checklist to diagnose common issues. If your problem isn't listed here, please [open a GitHub issue](https://github.com/Real1tyy/Nexus-Properties/issues/new/choose).
 
-## Bases View Filter Errors
+## 🗃️ Bases View Filter Errors
+
+<details>
+<summary>Filter error: Expected String, given File</summary>
 
 **Error:**
 ```
@@ -33,18 +36,28 @@ Valid formats are `null` (no relationship), a single wiki link (`"[[Note]]"`), o
 Nodes created after v1.6.0 use `null` for excluded properties automatically.
 :::
 
+</details>
+
 ---
 
-## Graph Not Showing Nodes
+## 📊 Graph Not Showing Nodes
+
+<details>
+<summary>Files not appearing in the graph</summary>
 
 1. File must be in an [indexed directory](configuration#directory-scanning) (default: `["*"]` scans all)
 2. File needs `Parent`, `Child`, or `Related` properties in frontmatter
 3. Clear any active [filters](features/filtering) to test
 4. Match [view mode](features/graph-views#view-modes) to relationship type (Hierarchical for parent-child, Related for related)
 
+</details>
+
 ---
 
-## Expression Rules Not Working
+## 🎨 Expression Rules Not Working
+
+<details>
+<summary>Color rules or filter expressions not matching</summary>
 
 Applies to both [color rules](features/color-rules) and [filter expressions](features/filtering):
 
@@ -56,9 +69,14 @@ Applies to both [color rules](features/color-rules) and [filter expressions](fea
 6. Verify the property exists using [tooltips](features/tooltips)
 7. Check console for errors: `Ctrl/Cmd+Shift+I`
 
+</details>
+
 ---
 
-## Console Errors
+## 🖥️ Console Errors
+
+<details>
+<summary>How to check for errors</summary>
 
 Open the developer console (`Ctrl/Cmd+Shift+I` → Console tab) to check for errors.
 
@@ -68,11 +86,16 @@ Open the developer console (`Ctrl/Cmd+Shift+I` → Console tab) to check for err
 - **"Circular relationship"** — System prevented a circular link (working as intended)
 - **"Property not found"** — Property doesn't exist in the file's frontmatter
 
+</details>
+
 ---
 
-## Get Help
+## 🐛 Get Help
 
-**Bug report checklist:**
+<details>
+<summary>Bug report checklist</summary>
+
+**Include the following when reporting a bug:**
 - Obsidian version (Help → About)
 - Plugin version (Settings → Community Plugins)
 - Console errors (`Ctrl/Cmd+Shift+I`)
@@ -83,3 +106,5 @@ Open the developer console (`Ctrl/Cmd+Shift+I` → Console tab) to check for err
 - [FAQ](faq) — Common questions
 - [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues) — Bug reports
 - [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions) — Community Q&A
+
+</details>
