@@ -5,8 +5,6 @@
 ![Downloads](https://img.shields.io/github/downloads/Real1tyy/Nexus-Properties/total?label=Downloads&style=for-the-badge)
 ![Release](https://img.shields.io/github/v/release/Real1tyy/Nexus-Properties?label=Latest%20Release&style=for-the-badge)
 ![Stars](https://img.shields.io/github/stars/Real1tyy/Nexus-Properties?style=for-the-badge)
-![License](https://img.shields.io/github/license/Real1tyy/Nexus-Properties?style=for-the-badge)
-![Obsidian](https://img.shields.io/badge/obsidian-plugin-purple.svg?style=for-the-badge)
 
 **Automated property management and interactive relationship visualization for Obsidian — bidirectional sync, graph views, and intelligent property inheritance for power users who want structured knowledge networks.**
 
