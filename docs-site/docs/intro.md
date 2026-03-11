@@ -123,4 +123,4 @@ Built with [Cytoscape.js](https://js.cytoscape.org/) for graph rendering, includ
 
 ## License
 
-Nexus Properties is open source software licensed under the [MIT License](https://github.com/Real1tyy/Nexus-Properties/blob/main/LICENSE).
+Nexus Properties is open source software licensed under the [AGPL-3.0 License](https://github.com/Real1tyy/Nexus-Properties/blob/main/LICENSE).
