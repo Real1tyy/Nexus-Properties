@@ -1,5 +1,6 @@
 import { WhatsNewModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins";
 import { Notice, Plugin, TFile } from "obsidian";
+
 import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
 import { NexusPropertiesSettingsTab, NodeCreationModal, TitlePropertySetupModal } from "./components";
 import { NexusViewSwitcher, VIEW_TYPE_NEXUS_SWITCHER } from "./components/views/nexus-view-switcher";
@@ -139,18 +140,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 	}
 
 	private async initializePlugin() {
-		// Wait for Obsidian's workspace layout to be ready
-		await new Promise<void>((resolve) => this.app.workspace.onLayoutReady(resolve));
-
-		// Wait for metadata cache to be fully initialized
-		// @ts-expect-error - initialized property exists at runtime but not in type definitions
-		if (!this.app.metadataCache.initialized) {
-			await new Promise<void>((resolve) => {
-				// @ts-expect-error - initialized event exists at runtime but not in type definitions
-				this.app.metadataCache.once("initialized", resolve);
-			});
-		}
-
 		this.indexer = new Indexer(this.app, this.settingsStore.settings$);
 
 		this.propertiesManager = new PropertiesManager(this.app, this.settingsStore.settings$);
