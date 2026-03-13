@@ -1,12 +1,13 @@
 import type { Core } from "cytoscape";
 import { type App, Notice, TFile } from "obsidian";
-import type { SettingsStore } from "../../core/settings-store";
+
+import type { NexusPropertiesSettingsStore } from "../../types/settings";
 import type { GraphZoomPreview } from "./zoom-preview";
 
 interface ZoomConfig {
 	getCy: () => Core | null;
 	getPreviewWrapperEl: () => HTMLElement | null;
-	settingsStore: SettingsStore;
+	settingsStore: NexusPropertiesSettingsStore;
 	onToggleStatesChange: (hideFrontmatter: boolean, hideContent: boolean) => void;
 }
 

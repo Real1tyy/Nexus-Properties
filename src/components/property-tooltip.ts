@@ -7,12 +7,13 @@ import {
 } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
 import type { Subscription } from "rxjs";
-import type { SettingsStore } from "../core/settings-store";
+
+import type { NexusPropertiesSettingsStore } from "../types/settings";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { cls } from "../utils/css";
 
 interface PropertyTooltipOptions {
-	settingsStore: SettingsStore;
+	settingsStore: NexusPropertiesSettingsStore;
 	currentFilePath?: string;
 	onFileOpen?: (filePath: string, event: MouseEvent) => void;
 	isZoomMode?: () => boolean;

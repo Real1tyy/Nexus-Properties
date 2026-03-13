@@ -1,12 +1,13 @@
 import { hasLinkInProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins";
 import { type App, Menu, Notice, TFile } from "obsidian";
+
 import { type CommandManager, RemoveRelationshipCommand } from "../../core/commands";
-import type { SettingsStore } from "../../core/settings-store";
+import type { NexusPropertiesSettingsStore } from "../../types/settings";
 
 export class EdgeContextMenu {
 	constructor(
 		private app: App,
-		private settingsStore: SettingsStore,
+		private settingsStore: NexusPropertiesSettingsStore,
 		private commandManager: CommandManager,
 		private onEdgeRemoved?: () => void
 	) {}

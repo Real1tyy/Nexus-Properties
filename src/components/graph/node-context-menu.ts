@@ -1,8 +1,9 @@
 import { extractUserFrontmatter } from "@real1ty-obsidian-plugins";
 import { type App, Menu, Notice, TFile } from "obsidian";
+
 import { type CommandManager, DeleteNodeCommand, EditNodeCommand } from "../../core/commands";
-import type { SettingsStore } from "../../core/settings-store";
 import type { RelationshipType } from "../../types/constants";
+import type { NexusPropertiesSettingsStore } from "../../types/settings";
 import type { Frontmatter } from "../../types/settings";
 import { NodeEditModal } from "../node-edit-modal";
 import { NodePreviewModal } from "../node-preview-modal";
@@ -16,7 +17,7 @@ interface NodeContextMenuCallbacks {
 export class NodeContextMenu {
 	constructor(
 		private app: App,
-		private settingsStore: SettingsStore,
+		private settingsStore: NexusPropertiesSettingsStore,
 		private commandManager: CommandManager,
 		private callbacks: NodeContextMenuCallbacks
 	) {}

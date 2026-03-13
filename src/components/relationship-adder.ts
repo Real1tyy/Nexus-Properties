@@ -1,7 +1,8 @@
 import { type App, Notice } from "obsidian";
+
 import { AddRelationshipCommand, type CommandManager } from "../core/commands";
-import type { SettingsStore } from "../core/settings-store";
 import type { RelationshipType } from "../types/constants";
+import type { NexusPropertiesSettingsStore } from "../types/settings";
 
 /**
  * Handles adding relationships between nodes using a template method pattern.
@@ -14,7 +15,7 @@ export class RelationshipAdder {
 
 	constructor(
 		private app: App,
-		private settingsStore: SettingsStore,
+		private settingsStore: NexusPropertiesSettingsStore,
 		private commandManager: CommandManager,
 		private onRelationshipAdded?: () => void
 	) {}

@@ -1,7 +1,8 @@
 import { filterPropertiesForDisplay } from "@real1ty-obsidian-plugins";
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
-import type { SettingsStore } from "../../core/settings-store";
+
+import type { NexusPropertiesSettingsStore } from "../../types/settings";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
 import { PropertyRenderer } from "../property-renderer";
@@ -9,7 +10,7 @@ import { PropertyRenderer } from "../property-renderer";
 interface GraphZoomPreviewProps {
 	file: TFile;
 	onExit: () => void;
-	settingsStore: SettingsStore;
+	settingsStore: NexusPropertiesSettingsStore;
 	initialHideFrontmatter: boolean;
 	initialHideContent: boolean;
 	onToggleStatesChange?: (hideFrontmatter: boolean, hideContent: boolean) => void;

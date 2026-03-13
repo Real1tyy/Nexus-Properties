@@ -8,11 +8,12 @@
  */
 
 import type { App, TFile } from "obsidian";
+
 import type { RelationshipType } from "../../types/constants";
 import type { HierarchyTraversalOptions } from "../../types/hierarchy";
+import type { NexusPropertiesSettingsStore } from "../../types/settings";
 import type { TreeNode } from "../../utils/hierarchy";
 import type { Indexer } from "../indexer";
-import type { SettingsStore } from "../settings-store";
 import type { HierarchySourceType, HierarchyStrategy } from "./hierarchy-strategy";
 import { MocContentStrategy } from "./moc-content-strategy";
 import { PropertiesStrategy } from "./properties-strategy";
@@ -28,13 +29,13 @@ export class HierarchyProvider {
 	private propertiesStrategy: PropertiesStrategy;
 	private mocContentStrategy: MocContentStrategy;
 
-	private constructor(app: App, indexer: Indexer, settingsStore: SettingsStore) {
+	private constructor(app: App, indexer: Indexer, settingsStore: NexusPropertiesSettingsStore) {
 		const getSettings = () => settingsStore.currentSettings;
 		this.propertiesStrategy = new PropertiesStrategy(app, indexer, getSettings);
 		this.mocContentStrategy = new MocContentStrategy(app, indexer, getSettings);
 	}
 
-	static getInstance(app: App, indexer: Indexer, settingsStore: SettingsStore): HierarchyProvider {
+	static getInstance(app: App, indexer: Indexer, settingsStore: NexusPropertiesSettingsStore): HierarchyProvider {
 		if (!HierarchyProvider.instance) {
 			HierarchyProvider.instance = new HierarchyProvider(app, indexer, settingsStore);
 		}

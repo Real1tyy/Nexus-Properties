@@ -1,4 +1,5 @@
 import { WhatsNewModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins";
+import { SettingsStore } from "@real1ty-obsidian-plugins";
 import { Notice, Plugin, TFile } from "obsidian";
 
 import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
@@ -8,17 +9,18 @@ import { CommandManager } from "./core/commands";
 import { Indexer } from "./core/indexer";
 import { NodeCreator } from "./core/node-creator";
 import { PropertiesManager } from "./core/properties-manager";
-import { SettingsStore } from "./core/settings-store";
+import type { NexusPropertiesSettingsStore } from "./types/settings";
+import { NexusPropertiesSettingsSchema } from "./types/settings";
 
 export default class NexusPropertiesPlugin extends Plugin {
-	settingsStore!: SettingsStore;
+	settingsStore!: NexusPropertiesSettingsStore;
 	indexer!: Indexer;
 	propertiesManager!: PropertiesManager;
 	nodeCreator!: NodeCreator;
 	commandManager!: CommandManager;
 
 	async onload() {
-		this.settingsStore = new SettingsStore(this);
+		this.settingsStore = new SettingsStore(this, NexusPropertiesSettingsSchema);
 		await this.settingsStore.loadSettings();
 
 		this.commandManager = new CommandManager({ showNotices: true });

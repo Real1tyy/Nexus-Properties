@@ -9,11 +9,12 @@ import {
 } from "@real1ty-obsidian-plugins";
 import type { ElementDefinition } from "cytoscape";
 import type { App, TFile } from "obsidian";
+
 import type { NexusPropertiesSettings } from "../types/settings";
+import type { NexusPropertiesSettingsStore } from "../types/settings";
 import { buildRelatedTree, getRelationships, resolveWikiLink, type TreeNode } from "../utils/hierarchy";
 import { HierarchyProvider, type HierarchySourceType } from "./hierarchy";
 import type { Indexer } from "./indexer";
-import type { SettingsStore } from "./settings-store";
 
 interface GraphData {
 	nodes: ElementDefinition[];
@@ -62,7 +63,7 @@ export class GraphBuilder {
 	constructor(
 		private readonly app: App,
 		private readonly indexer: Indexer,
-		private readonly settingsStore: SettingsStore
+		private readonly settingsStore: NexusPropertiesSettingsStore
 	) {
 		this.filterEvaluator = new FilterEvaluator(settingsStore.settings$);
 		this.colorEvaluator = new ColorEvaluator(settingsStore.settings$);

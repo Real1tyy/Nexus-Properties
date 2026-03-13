@@ -1,9 +1,10 @@
 import type { App } from "obsidian";
 import { afterEach, describe, expect, it, vi } from "vitest";
+
 import { GraphBuilder } from "../src/core/graph-builder";
 import { HierarchyProvider } from "../src/core/hierarchy";
 import type { Indexer } from "../src/core/indexer";
-import type { SettingsStore } from "../src/core/settings-store";
+import type { NexusPropertiesSettingsStore } from "../src/types/settings";
 
 describe("Folder Notes Graph Building", () => {
 	afterEach(() => {
@@ -68,7 +69,7 @@ describe("Folder Notes Graph Building", () => {
 		} as any;
 	};
 
-	const createMockSettingsStore = (): SettingsStore => {
+	const createMockSettingsStore = (): NexusPropertiesSettingsStore => {
 		const settings = {
 			hierarchyMaxDepth: 10,
 			filterExpressions: [],

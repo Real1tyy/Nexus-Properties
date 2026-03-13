@@ -1,4 +1,6 @@
+import type { SettingsStore } from "@real1ty-obsidian-plugins";
 import { z } from "zod";
+
 import { SETTINGS_DEFAULTS } from "./constants";
 
 export type Frontmatter = Record<string, unknown>;
@@ -168,3 +170,5 @@ export const NexusPropertiesSettingsSchema = z
 	.strip();
 
 export type NexusPropertiesSettings = z.infer<typeof NexusPropertiesSettingsSchema>;
+
+export type NexusPropertiesSettingsStore = SettingsStore<typeof NexusPropertiesSettingsSchema>;
