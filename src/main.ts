@@ -1,5 +1,10 @@
-import { WhatsNewModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins";
-import { SettingsStore } from "@real1ty-obsidian-plugins";
+import {
+	activateView,
+	type LeafPlacement,
+	SettingsStore,
+	WhatsNewModal,
+	type WhatsNewModalConfig,
+} from "@real1ty-obsidian-plugins";
 import { Notice, Plugin, TFile } from "obsidian";
 
 import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
@@ -173,25 +178,12 @@ export default class NexusPropertiesPlugin extends Plugin {
 	}
 
 	private async toggleRelationshipGraphView(): Promise<void> {
-		const { workspace } = this.app;
-
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
-
-		if (existingLeaves.length > 0) {
-			// View exists, reveal/focus it
-			const firstLeaf = existingLeaves[0];
-			workspace.revealLeaf(firstLeaf);
-		} else {
-			const settings = this.settingsStore.currentSettings;
-			const leaf = settings.viewLeafPosition === "right" ? workspace.getRightLeaf(false) : workspace.getLeftLeaf(false);
-			if (leaf) {
-				await leaf.setViewState({
-					type: VIEW_TYPE_NEXUS_SWITCHER,
-					active: true,
-				});
-				workspace.revealLeaf(leaf);
-			}
-		}
+		const placement: LeafPlacement =
+			this.settingsStore.currentSettings.viewLeafPosition === "right" ? "right-sidebar" : "left-sidebar";
+		await activateView(this.app.workspace, {
+			viewType: VIEW_TYPE_NEXUS_SWITCHER,
+			placement,
+		});
 	}
 
 	private async toggleViewMode(): Promise<void> {
