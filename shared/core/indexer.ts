@@ -55,6 +55,18 @@ export interface IndexerConfig {
 	 * the default "file-deleted" + "file-changed" pair.
 	 */
 	emitRenameEvents?: boolean;
+
+	/**
+	 * When provided, scanAllFiles() uses these instead of vault.getMarkdownFiles().
+	 * Used by child tables that receive pre-filtered files from their parent.
+	 */
+	preloadedFiles?: TFile[];
+
+	/**
+	 * Directory prefix for this indexer's scope. Files under this prefix
+	 * that fail includeFile() are stored as descendant files for child indexers.
+	 */
+	directoryPrefix?: string;
 }
 
 /**
@@ -90,6 +102,11 @@ export interface IndexerEvent {
 	isRename?: boolean;
 }
 
+type NormalizedIndexerConfig = Required<
+	Pick<IndexerConfig, "includeFile" | "excludedDiffProps" | "scanConcurrency" | "debounceMs" | "emitRenameEvents">
+> &
+	Pick<IndexerConfig, "preloadedFiles" | "directoryPrefix">;
+
 type FileIntent =
 	| { kind: "changed"; file: TFile; path: string; oldPath?: string }
 	| { kind: "deleted"; path: string; isRename?: boolean }
@@ -103,7 +120,7 @@ type FileIntent =
  * that needs to track file changes with frontmatter.
  */
 export class Indexer {
-	private config: Required<IndexerConfig>;
+	private config: NormalizedIndexerConfig;
 	private fileSub: Subscription | null = null;
 	private configSubscription: Subscription | null = null;
 	private readonly app: App;
@@ -112,9 +129,14 @@ export class Indexer {
 	private scanEventsSubject = new Subject<IndexerEvent>();
 	private indexingCompleteSubject = new RxBehaviorSubject<boolean>(false);
 	private frontmatterCache: Map<string, IndexerFrontmatter> = new Map();
+	private _descendantFiles: TFile[] = [];
 
 	public readonly events$: Observable<IndexerEvent>;
 	public readonly indexingComplete$: Observable<boolean>;
+
+	get descendantFiles(): ReadonlyArray<TFile> {
+		return this._descendantFiles;
+	}
 
 	constructor(app: App, configStore: BehaviorSubject<IndexerConfig>) {
 		this.app = app;
@@ -136,13 +158,15 @@ export class Indexer {
 		this.indexingComplete$ = this.indexingCompleteSubject.asObservable();
 	}
 
-	private normalizeConfig(config: IndexerConfig): Required<IndexerConfig> {
+	private normalizeConfig(config: IndexerConfig): NormalizedIndexerConfig {
 		return {
 			includeFile: config.includeFile || (() => true),
 			excludedDiffProps: config.excludedDiffProps || new Set(),
 			scanConcurrency: config.scanConcurrency || DEFAULT_SCAN_CONCURRENCY,
 			debounceMs: config.debounceMs || DEFAULT_DEBOUNCE_MS,
 			emitRenameEvents: config.emitRenameEvents || false,
+			preloadedFiles: config.preloadedFiles,
+			directoryPrefix: config.directoryPrefix,
 		};
 	}
 
@@ -165,11 +189,13 @@ export class Indexer {
 		this.fileSub = null;
 		this.configSubscription?.unsubscribe();
 		this.configSubscription = null;
+		this._descendantFiles = [];
 		this.indexingCompleteSubject.complete();
 	}
 
 	resync(): void {
 		this.frontmatterCache.clear();
+		this._descendantFiles = [];
 		this.indexingCompleteSubject.next(false);
 		void this.scanAllFiles();
 	}
@@ -179,8 +205,20 @@ export class Indexer {
 	 */
 	private async scanAllFiles(): Promise<void> {
 		try {
-			const allFiles = this.vault.getMarkdownFiles();
-			const files = allFiles.filter((file) => this.config.includeFile(file.path));
+			const allFiles = this.config.preloadedFiles ?? this.vault.getMarkdownFiles();
+			const files: TFile[] = [];
+			const descendants: TFile[] = [];
+			const dirPrefix = this.config.directoryPrefix ? this.config.directoryPrefix + "/" : undefined;
+
+			for (const file of allFiles) {
+				if (this.config.includeFile(file.path)) {
+					files.push(file);
+				} else if (dirPrefix && file.path.startsWith(dirPrefix)) {
+					descendants.push(file);
+				}
+			}
+
+			this._descendantFiles = descendants;
 
 			const results$ = from(files).pipe(
 				mergeMap(async (file) => {
@@ -239,6 +277,17 @@ export class Indexer {
 		});
 	}
 
+	/**
+	 * Create an observable from vault "modify" events.
+	 * Catches content-only changes that don't trigger metadataCache "changed".
+	 */
+	private fromVaultModify(): Observable<TFile> {
+		return fromEventPattern<TAbstractFile>(
+			(handler) => this.vault.on("modify", handler),
+			(handler) => this.vault.off("modify", handler)
+		).pipe(filter((f): f is TFile => Indexer.isMarkdownFile(f)));
+	}
+
 	private static isMarkdownFile(f: TAbstractFile): f is TFile {
 		return f instanceof TFile && f.extension === "md";
 	}
@@ -268,20 +317,25 @@ export class Indexer {
 	/**
 	 * Build the file system events observable stream.
 	 *
-	 * Listens to exactly three events (see docs/obsidian/event-firing-order.md):
+	 * Listens to four events (see docs/obsidian/event-firing-order.md):
 	 *
-	 * 1. metadataCache "changed" — covers both file creation and modification.
-	 *    vault.on("create") and vault.on("modify") are redundant because
-	 *    metadataCache "changed" always fires after them with fresh frontmatter.
+	 * 1. metadataCache "changed" — covers file creation and frontmatter modifications.
 	 *
-	 * 2. metadataCache "deleted" — covers file deletion.
+	 * 2. vault.on("modify") — covers content-only changes that don't trigger
+	 *    metadataCache "changed" (e.g., plain text edits with no metadata-relevant
+	 *    elements). Merged with metadataCache "changed" and debounced by path so
+	 *    that when both fire for the same modification, only the last event
+	 *    (metadataCache "changed") within the debounce window is processed.
+	 *
+	 * 3. metadataCache "deleted" — covers file deletion.
 	 *    Fires before vault.on("delete"), making vault delete redundant.
 	 *
-	 * 3. vault.on("rename") — the only event for renames.
+	 * 4. vault.on("rename") — the only event for renames.
 	 *    metadataCache does NOT emit changed/deleted on rename.
 	 */
 	private buildFileSystemEvents$(): Observable<IndexerEvent> {
 		const metadataChanged$ = this.fromMetadataCacheChanged().pipe(this.toRelevantFiles());
+		const vaultModified$ = this.fromVaultModify().pipe(this.toRelevantFiles());
 		const metadataDeleted$ = this.fromMetadataCacheDeleted().pipe(this.toRelevantFiles());
 
 		const renamed$ = fromEventPattern<[TAbstractFile, string]>(
@@ -289,7 +343,8 @@ export class Indexer {
 			(handler) => this.vault.off("rename", handler)
 		);
 
-		const changedIntents$ = metadataChanged$.pipe(
+		const changed$ = merge(vaultModified$, metadataChanged$);
+		const changedIntents$ = changed$.pipe(
 			this.debounceByPath(this.config.debounceMs, (f) => f.path),
 			map((file): FileIntent => ({ kind: "changed", file, path: file.path }))
 		);

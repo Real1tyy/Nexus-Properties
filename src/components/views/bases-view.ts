@@ -1,10 +1,18 @@
-import { IncludedPropertiesEvaluator, RegisteredEventsComponent } from "@real1ty-obsidian-plugins";
+import {
+	BaseBuilder,
+	type BaseFilterNode,
+	BasePresets,
+	BaseRenderer,
+	Filter,
+	IncludedPropertiesEvaluator,
+	RegisteredEventsComponent,
+} from "@real1ty-obsidian-plugins";
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
+
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
-import { buildBasesFilePathFilters } from "../../utils/bases-utils";
 import { cls } from "../../utils/css";
 
 export type BaseViewType = "children" | "parent" | "related" | "all-children" | "all-parent" | "all-related";
@@ -205,120 +213,64 @@ export class BasesView extends RegisteredEventsComponent {
 	}
 
 	private buildNormalBasesMarkdown(activeFile: TFile): string {
-		const orderArray = this.buildOrderArray(activeFile);
 		const viewConfig = this.getViewConfig(this.selectedViewType);
-		const archivedFilter = this.getArchivedFilter();
-		const formulasSection = this.buildFormulasSection();
-		const sortSection = this.buildSortSection();
-		const viewType = this.currentSettings.basesViewType;
-
-		return `
-\`\`\`base
-${formulasSection}views:
-  - type: ${viewType}
-    name: ${viewConfig.name}
-    order:
-${orderArray}
-    filters:
-      and:
-        - this["${viewConfig.prop}"].contains(file)${archivedFilter}${sortSection}
-\`\`\`
-`;
+		return this.renderBase(activeFile, viewConfig.name, {
+			viewFilters: [Filter.reverseContains(viewConfig.prop)],
+		});
 	}
 
 	private async buildAllViewMarkdownAsync(activeFile: TFile): Promise<string> {
-		// Extract relationship type from "all-children" / "all-parent" / "all-related"
 		const relationshipType = this.selectedViewType.replace("all-", "") as "children" | "parent" | "related";
-
 		const provider = HierarchyProvider.getInstance(this.app, this.plugin.indexer, this.plugin.settingsStore);
-
 		const allNodes = await provider.collectRelatedNodesRecursively(activeFile, relationshipType, this.hierarchySource, {
 			mocFilePath: activeFile.path,
 		});
 
-		const orderArray = this.buildOrderArray(activeFile);
-		const viewName = this.getAllViewName(relationshipType, allNodes.size);
-		const filePathFilters = buildBasesFilePathFilters(Array.from(allNodes));
-		const archivedFilter = this.getArchivedFilter();
-		const formulasSection = this.buildFormulasSection();
-		const sortSection = this.buildSortSection();
-		const viewType = this.currentSettings.basesViewType;
-
-		return `
-\`\`\`base
-${formulasSection}filters:
-  or:
-${filePathFilters}
-views:
-  - type: ${viewType}
-    name: ${viewName}
-    order:
-${orderArray}${
-			archivedFilter
-				? `
-    filters:
-      and:${archivedFilter}`
-				: ""
-		}${sortSection}
-\`\`\`
-`;
+		return this.renderBase(activeFile, this.getAllViewName(relationshipType, allNodes.size), {
+			topLevelFilter: BasePresets.filePathList(Array.from(allNodes)),
+		});
 	}
 
 	private async buildMocDirectChildrenMarkdownAsync(activeFile: TFile): Promise<string> {
 		const provider = HierarchyProvider.getInstance(this.app, this.plugin.indexer, this.plugin.settingsStore);
-
-		// Get only direct children (level 0 descendants from MOC file)
 		const directChildren = await provider.findChildren(activeFile.path, "moc-content", activeFile.path);
-
-		const orderArray = this.buildOrderArray(activeFile);
 		const prefix = this.showArchived ? "Archived " : "";
-		const viewName = `${prefix}Children (${directChildren.length})`;
-		const filePathFilters = buildBasesFilePathFilters(directChildren);
-		const archivedFilter = this.getArchivedFilter();
-		const formulasSection = this.buildFormulasSection();
-		const sortSection = this.buildSortSection();
-		const viewType = this.currentSettings.basesViewType;
 
-		if (directChildren.length === 0) {
-			return `
-\`\`\`base
-${formulasSection}filters:
-  - file.path = "___no_match___"
-views:
-  - type: ${viewType}
-    name: ${viewName}
-    order:
-${orderArray}${sortSection}
-\`\`\`
-`;
-		}
-
-		return `
-\`\`\`base
-${formulasSection}filters:
-  or:
-${filePathFilters}
-views:
-  - type: ${viewType}
-    name: ${viewName}
-    order:
-${orderArray}${
-			archivedFilter
-				? `
-    filters:
-      and:${archivedFilter}`
-				: ""
-		}${sortSection}
-\`\`\`
-`;
+		return this.renderBase(activeFile, `${prefix}Children (${directChildren.length})`, {
+			topLevelFilter: BasePresets.filePathList(directChildren),
+		});
 	}
 
-	private buildOrderArray(activeFile: TFile): string {
-		const includedProperties = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
-		if (includedProperties[0] === "file.name" && this.currentSettings.titlePropertyMode === "enabled") {
-			includedProperties[0] = this.currentSettings.titleProp;
+	private renderBase(
+		activeFile: TFile,
+		viewName: string,
+		opts: { topLevelFilter?: BaseFilterNode; viewFilters?: BaseFilterNode[] } = {}
+	): string {
+		const viewFilters = [...(opts.viewFilters ?? [])];
+		const archivedFilter = this.getArchivedFilterNode();
+		if (archivedFilter) viewFilters.push(archivedFilter);
+
+		const rawFormulas = this.currentSettings.basesCustomFormulas;
+		const rawSort = this.currentSettings.basesCustomSort;
+
+		const order = this.includedPropertiesEvaluator.evaluateIncludedProperties(activeFile.path);
+		if (order[0] === "file.name" && this.currentSettings.titlePropertyMode === "enabled") {
+			order[0] = this.currentSettings.titleProp;
 		}
-		return includedProperties.map((prop) => `      - ${prop}`).join("\n");
+
+		const builder = BaseBuilder.create();
+		if (rawFormulas?.trim()) builder.rawFormulas(rawFormulas);
+		if (opts.topLevelFilter) builder.filter(opts.topLevelFilter);
+
+		builder.addView({
+			type: this.currentSettings.basesViewType as "table",
+			name: viewName,
+			order,
+			...(viewFilters.length > 0 && { filter: Filter.and(...viewFilters) }),
+			...(rawSort?.trim() ? { rawSort } : {}),
+		});
+
+		return BaseRenderer.renderCodeBlock(builder.build());
 	}
 
 	private getAllViewName(relationshipType: "children" | "parent" | "related", count: number): string {
@@ -335,62 +287,25 @@ ${orderArray}${
 		}
 	}
 
-	private buildFormulasSection(): string {
-		// Don't use trim() - it removes leading spaces from first line, breaking indentation
-		const formulas = this.currentSettings.basesCustomFormulas;
-		if (!formulas || formulas.trim() === "") {
-			return "";
-		}
-		return `formulas:\n${formulas}\n`;
-	}
-
-	private buildSortSection(): string {
-		// Don't use trim() - it removes leading spaces from first line, breaking indentation
-		const sort = this.currentSettings.basesCustomSort;
-		if (!sort || sort.trim() === "") {
-			return "";
-		}
-		return `\n    sort:\n${sort}`;
-	}
-
-	private getViewConfig(viewType: BaseViewType): {
-		name: string;
-		prop: string;
-	} {
+	private getViewConfig(viewType: BaseViewType): { name: string; prop: string } {
 		const prefix = this.showArchived ? "Archived " : "";
 		switch (viewType) {
 			case "children":
-				return {
-					name: `${prefix}Children`,
-					prop: this.currentSettings.childrenProp,
-				};
+				return { name: `${prefix}Children`, prop: this.currentSettings.childrenProp };
 			case "parent":
-				return {
-					name: `${prefix}Parent`,
-					prop: this.currentSettings.parentProp,
-				};
+				return { name: `${prefix}Parent`, prop: this.currentSettings.parentProp };
 			case "related":
-				return {
-					name: `${prefix}Related`,
-					prop: this.currentSettings.relatedProp,
-				};
+				return { name: `${prefix}Related`, prop: this.currentSettings.relatedProp };
 			default:
-				// For all-* types, this shouldn't be called
-				return {
-					name: `${prefix}All`,
-					prop: this.currentSettings.childrenProp,
-				};
+				return { name: `${prefix}All`, prop: this.currentSettings.childrenProp };
 		}
 	}
 
-	private getArchivedFilter(): string {
-		if (!this.currentSettings.excludeArchived) {
-			return "";
-		}
-
-		const archivedProp = this.currentSettings.archivedProp;
-
-		return `\n        - note["${archivedProp}"] ${this.showArchived ? "==" : "!="} true`;
+	private getArchivedFilterNode(): BaseFilterNode | null {
+		if (!this.currentSettings.excludeArchived) return null;
+		return this.showArchived
+			? Filter.eq(this.currentSettings.archivedProp, true)
+			: Filter.neq(this.currentSettings.archivedProp, true);
 	}
 
 	private renderEmptyState(message: string): void {

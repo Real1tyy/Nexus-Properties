@@ -1,5 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
-import { type Command, MacroCommand, CommandManager } from "@real1ty-obsidian-plugins";
+import { type Command, CommandManager, MacroCommand } from "@real1ty-obsidian-plugins";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock obsidian module used by shared library and CommandManager
 vi.mock("obsidian", () => ({
@@ -8,6 +8,15 @@ vi.mock("obsidian", () => ({
 		constructor() {}
 		open() {}
 		close() {}
+	},
+	ItemView: class {
+		constructor() {}
+		getViewType() {
+			return "";
+		}
+		getDisplayText() {
+			return "";
+		}
 	},
 }));
 

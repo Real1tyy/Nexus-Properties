@@ -122,6 +122,28 @@ export function normalizePath(path: string): string {
 	return normalized;
 }
 
+export class WorkspaceLeaf {}
+
+export class ItemView {
+	leaf: any;
+	containerEl: HTMLElement;
+	contentEl: HTMLElement;
+
+	constructor(leaf: any) {
+		this.leaf = leaf;
+		this.containerEl = document.createElement("div");
+		this.contentEl = document.createElement("div");
+	}
+
+	getViewType(): string {
+		return "";
+	}
+
+	getDisplayText(): string {
+		return "";
+	}
+}
+
 export class Notice {}
 
 export class Menu {

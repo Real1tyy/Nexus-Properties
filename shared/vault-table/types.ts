@@ -1,5 +1,6 @@
 import type { App, TFile } from "obsidian";
 
+import type { CommandManager } from "../commands/command-manager";
 import type { FrontmatterDiff } from "../file/frontmatter-diff";
 import type { SerializableSchema } from "./create-mapped-schema";
 
@@ -13,6 +14,10 @@ interface VaultTableDefBase<TData, TSchema extends SerializableSchema<TData> = S
 	invalidStrategy?: InvalidStrategy;
 	debounceMs?: number;
 	filePathResolver?: (directory: string, fileName: string) => string;
+	history?: VaultTableHistoryConfig;
+	templatePath?: string;
+	preloadedFiles?: TFile[];
+	parentProperty?: string;
 }
 
 interface FileVaultTableDef<
@@ -49,6 +54,15 @@ export function defineChildren<T extends VaultTableDefMap>(defs: T): T {
 	return defs;
 }
 
+export const HISTORY_MAX_SIZE = 50;
+export const HISTORY_SHOW_NOTICES = false;
+
+export interface VaultTableHistoryConfig {
+	maxSize?: number;
+	showNotices?: boolean;
+	commandManager?: CommandManager;
+}
+
 export type VaultTableConfig<
 	TData,
 	TSchema extends SerializableSchema<TData> = SerializableSchema<TData>,
@@ -82,6 +96,7 @@ export type VaultTableEvent<TData, TRow = VaultRow<TData>> =
 			filePath: string;
 			oldRow: TRow;
 			newRow: TRow;
-			diff: FrontmatterDiff;
+			diff?: FrontmatterDiff;
+			contentChanged: boolean;
 	  }
 	| { type: "row-deleted"; id: string; filePath: string; oldRow: TRow };
