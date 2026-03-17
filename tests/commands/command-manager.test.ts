@@ -18,6 +18,11 @@ vi.mock("obsidian", () => ({
 			return "";
 		}
 	},
+	FuzzySuggestModal: class {
+		constructor() {}
+		open() {}
+		close() {}
+	},
 }));
 
 // Helper to create a mock command
