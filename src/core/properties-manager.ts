@@ -1,19 +1,20 @@
 import {
-	FrontmatterPropagationModal,
 	addLinkToProperty,
 	applyFrontmatterChanges,
 	extractDisplayName,
 	formatWikiLink,
+	type FrontmatterChange,
+	type FrontmatterDiff,
 	getFileContext,
 	mergeFrontmatterDiffs,
 	parsePropertyLinks,
 	removeMarkdownExtension,
+	showFrontmatterPropagationModal,
 	withFileContext,
-	type FrontmatterChange,
-	type FrontmatterDiff,
 } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
 import type { BehaviorSubject, Observable, Subscription } from "rxjs";
+
 import type { FileRelationships } from "../types/constants";
 import { RELATIONSHIP_CONFIGS } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
@@ -349,12 +350,12 @@ export class PropertiesManager {
 				void this.propagateFrontmatterToChildren(childrenPaths, relationships, filteredDiff);
 			} else if (this.settings.askBeforePropagatingFrontmatter) {
 				const fileContext = getFileContext(this.app, filePath);
-				new FrontmatterPropagationModal(this.app, {
+				showFrontmatterPropagationModal(this.app, {
 					eventTitle: fileContext.baseName,
 					diff: filteredDiff,
 					instanceCount: childrenPaths.length,
 					onConfirm: () => this.propagateFrontmatterToChildren(childrenPaths, relationships, filteredDiff),
-				}).open();
+				});
 			}
 		}, this.settings.propagationDebounceMs);
 

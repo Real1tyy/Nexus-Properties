@@ -25,6 +25,8 @@ function resolveFieldDescriptor(key: string, prop: JSONSchemaProperty, optional:
 		key,
 		label,
 		optional,
+		...(prop.description !== undefined ? { description: prop.description } : {}),
+		...(prop.placeholder !== undefined ? { placeholder: prop.placeholder } : {}),
 		...(prop.default !== undefined ? { defaultValue: prop.default } : {}),
 	};
 
@@ -35,7 +37,14 @@ function resolveFieldDescriptor(key: string, prop: JSONSchemaProperty, optional:
 
 	switch (prop.type) {
 		case "string": {
-			if (prop.enum) return { ...base, type: "enum", enumValues: extractEnumValues(prop) };
+			if (prop.enum) {
+				return {
+					...base,
+					type: "enum",
+					enumValues: extractEnumValues(prop),
+					...(prop.enumLabels ? { enumLabels: prop.enumLabels } : {}),
+				};
+			}
 			if (prop.format === "date-time") return { ...base, type: "datetime" };
 			if (prop.format === "date" || DATE_KEY_PATTERN.test(key)) return { ...base, type: "date" };
 			return { ...base, type: "string" };
@@ -69,4 +78,12 @@ export function introspectShape(shape: ZodRawShape): SchemaFieldDescriptor[] {
 		const optional = isOptionalField(key, required);
 		return resolveFieldDescriptor(key, prop, optional);
 	});
+}
+
+export function introspectField(key: string, field: z.ZodType): SchemaFieldDescriptor {
+	const [descriptor] = introspectShape({ [key]: field });
+	if (!descriptor) {
+		throw new Error(`Could not introspect field "${key}"`);
+	}
+	return descriptor;
 }
