@@ -1,12 +1,13 @@
 import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
-
 import type NexusPropertiesPlugin from "src/main";
-import type { NexusPropertiesSettingsSchema } from "src/types/settings";
-import { cls } from "../../../utils/css";
+import { NexusPropertiesSettingsSchema } from "src/types/settings";
 
+import { cls } from "../../../utils/css";
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
+
+const S = NexusPropertiesSettingsSchema.shape;
 
 export class GeneralSection implements SettingsSection {
 	readonly id = "general";
@@ -23,48 +24,45 @@ export class GeneralSection implements SettingsSection {
 	render(container: HTMLElement): void {
 		this.container = container;
 
-		// User Interface Section
 		new Setting(container).setName("User Interface").setHeading();
 
-		this.uiBuilder.addToggle(container, {
-			key: "showRibbonIcon",
-			name: "Show ribbon icon",
-			desc: "Display the relationship graph icon in the left ribbon. Restart Obsidian after changing this setting.",
-		});
+		this.uiBuilder.addSchemaField(container, { showRibbonIcon: S.showRibbonIcon }, { name: "Show ribbon icon" });
 
-		this.uiBuilder.addDropdown(container, {
-			key: "viewLeafPosition",
-			name: "View sidebar position",
-			desc: "Choose which sidebar (left or right) to open the Nexus Properties view in.",
-			options: {
-				left: "Left sidebar",
-				right: "Right sidebar",
-			},
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ viewLeafPosition: S.viewLeafPosition },
+			{
+				name: "View sidebar position",
+				options: {
+					left: "Left sidebar",
+					right: "Right sidebar",
+				},
+			}
+		);
 
-		this.uiBuilder.addToggle(container, {
-			key: "showViewSwitcherHeader",
-			name: "Show view switcher header",
-			desc: "Display the header with toggle button in the Nexus Properties view. Changes apply immediately.",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ showViewSwitcherHeader: S.showViewSwitcherHeader },
+			{ name: "Show view switcher header" }
+		);
 
-		this.uiBuilder.addToggle(container, {
-			key: "showSimpleStatistics",
-			name: "Show simple statistics",
-			desc: "Display direct parent, children, and related counts in the view switcher header.",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ showSimpleStatistics: S.showSimpleStatistics },
+			{ name: "Show simple statistics" }
+		);
 
-		this.uiBuilder.addToggle(container, {
-			key: "showRecursiveStatistics",
-			name: "Show recursive statistics",
-			desc: "Display recursive (all) parent, children, and related counts in the view switcher header.",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ showRecursiveStatistics: S.showRecursiveStatistics },
+			{ name: "Show recursive statistics" }
+		);
 
-		this.uiBuilder.addToggle(container, {
-			key: "showDepthSlider",
-			name: "Show depth slider in graph view",
-			desc: "Display a slider in the graph view header to temporarily adjust the recursion depth for statistics and hierarchy rendering. Depth controls how many levels up/down to traverse from the current node.",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ showDepthSlider: S.showDepthSlider },
+			{ name: "Show depth slider in graph view" }
+		);
 
 		this.uiBuilder.addArrayManager(container, {
 			key: "directories",
@@ -108,7 +106,6 @@ export class GeneralSection implements SettingsSection {
 			],
 		});
 
-		// Indexing Section
 		new Setting(container).setName("Manual indexing").setHeading();
 
 		new Setting(container)
@@ -140,16 +137,14 @@ export class GeneralSection implements SettingsSection {
 					});
 			});
 
-		// Rename Propagation Section
 		new Setting(container).setName("Rename propagation").setHeading();
 
-		this.uiBuilder.addToggle(container, {
-			key: "propagateRenameToChildren",
-			name: "Propagate rename to children",
-			desc: "When a parent file is renamed, automatically rename children whose filenames start with the old parent name to use the new parent name. For example, renaming 'Project' to 'Initiative' will rename 'Project - Task 1' to 'Initiative - Task 1'.",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ propagateRenameToChildren: S.propagateRenameToChildren },
+			{ name: "Propagate rename to children" }
+		);
 
-		// Frontmatter Propagation Section
 		new Setting(container).setName("Frontmatter propagation").setHeading();
 
 		this.uiBuilder.addMutuallyExclusiveToggles(
@@ -169,30 +164,25 @@ export class GeneralSection implements SettingsSection {
 			() => this.rerender()
 		);
 
-		this.uiBuilder.addText(container, {
-			key: "excludedPropagatedProps",
-			name: "Excluded propagation properties",
-			desc: "Comma-separated list of frontmatter property names to exclude from propagation. These properties will not be copied to child files. Relationship properties (Parent, Child, Related, _ZettelID) and Prioritize Parent are always excluded automatically.",
-			placeholder: "status, archived, date",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ excludedPropagatedProps: S.excludedPropagatedProps },
+			{ name: "Excluded propagation properties", placeholder: "status, archived, date" }
+		);
 
-		this.uiBuilder.addSlider(container, {
-			key: "propagationDebounceMs",
-			name: "Propagation debounce delay",
-			desc: "Delay in milliseconds before propagating frontmatter changes to children. Multiple rapid changes within this window will be accumulated and applied together.",
-			min: 100,
-			max: 10000,
-			step: 100,
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ propagationDebounceMs: S.propagationDebounceMs },
+			{ name: "Propagation debounce delay", step: 100 }
+		);
 
 		new Setting(container).setName("Excluded properties").setHeading();
 
-		this.uiBuilder.addTextArray(container, {
-			key: "defaultExcludedProperties",
-			name: "Default excluded properties",
-			desc: "Comma-separated list of frontmatter properties to ALWAYS exclude from copying when creating new nodes. These are excluded regardless of any rules below.",
-			placeholder: "e.g., Parent, Child, Related, _ZettelID",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ defaultExcludedProperties: S.defaultExcludedProperties },
+			{ placeholder: "e.g., Parent, Child, Related, _ZettelID" }
+		);
 
 		const excludedPropertiesContainer = container.createDiv(cls("settings-subsection"));
 

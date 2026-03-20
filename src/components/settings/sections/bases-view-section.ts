@@ -1,12 +1,13 @@
 import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
-
 import type NexusPropertiesPlugin from "src/main";
-import type { NexusPropertiesSettingsSchema } from "src/types/settings";
-import { cls } from "../../../utils/css";
+import { NexusPropertiesSettingsSchema } from "src/types/settings";
 
+import { cls } from "../../../utils/css";
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
+
+const S = NexusPropertiesSettingsSchema.shape;
 
 export class BasesViewSettingsSection implements SettingsSection {
 	readonly id = "bases-view";
@@ -28,42 +29,42 @@ export class BasesViewSettingsSection implements SettingsSection {
 				"Configure which frontmatter properties appear as columns in the Bases view tables. Properties are displayed in the order specified."
 			);
 
-		this.uiBuilder.addToggle(container, {
-			key: "showAllRelationshipViews",
-			name: "Show 'All' relationship views",
-			desc: "Add 'All Children', 'All Parents', and 'All Related' options to the Bases view dropdown. These show all nodes recursively traversed from the current file.",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ showAllRelationshipViews: S.showAllRelationshipViews },
+			{ name: "Show 'All' relationship views" }
+		);
 
-		this.uiBuilder.addDropdown(container, {
-			key: "basesViewType",
-			name: "View type",
-			desc: "Choose the default view type for Bases views. Cards shows visual cards, Table displays data in rows and columns, and List shows a simple list.",
-			options: {
-				cards: "Cards (Recommended)",
-				table: "Table",
-				list: "List",
-			},
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ basesViewType: S.basesViewType },
+			{
+				name: "View type",
+				options: {
+					cards: "Cards (Recommended)",
+					table: "Table",
+					list: "List",
+				},
+			}
+		);
 
-		this.uiBuilder.addToggle(container, {
-			key: "excludeArchived",
-			name: "Enable archived filtering",
-			desc: "When enabled, shows separate archived and non-archived views. When disabled, shows all items without filtering.",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ excludeArchived: S.excludeArchived },
+			{ name: "Enable archived filtering" }
+		);
 
-		this.uiBuilder.addText(container, {
-			key: "archivedProp",
-			name: "Archived property name",
-			desc: "Name of the frontmatter property used to mark files as archived (e.g., 'Archived', '_Archived').",
-			placeholder: "Archived",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ archivedProp: S.archivedProp },
+			{ name: "Archived property name", placeholder: "Archived" }
+		);
 
-		this.uiBuilder.addTextArray(container, {
-			key: "defaultBasesIncludedProperties",
-			name: "Default included properties",
-			desc: "Comma-separated list of frontmatter properties to include as columns in Bases view tables. 'file.name' is always included first. These properties apply to all files unless overridden by path-based rules below.",
-			placeholder: "e.g., status, priority, tags",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ defaultBasesIncludedProperties: S.defaultBasesIncludedProperties },
+			{ name: "Default included properties", placeholder: "e.g., status, priority, tags" }
+		);
 
 		new Setting(container).setName("Custom sorting").setHeading();
 

@@ -1,8 +1,11 @@
 import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
-import type { NexusPropertiesSettingsSchema } from "src/types/settings";
-import type { SettingsSection } from "../types";
 import { SETTINGS_DEFAULTS } from "src/types/constants";
+import { NexusPropertiesSettingsSchema } from "src/types/settings";
+
+import type { SettingsSection } from "../types";
+
+const S = NexusPropertiesSettingsSchema.shape;
 
 export class PropertiesSection implements SettingsSection {
 	readonly id = "properties";
@@ -13,29 +16,21 @@ export class PropertiesSection implements SettingsSection {
 	render(container: HTMLElement): void {
 		new Setting(container).setName("Property Display").setHeading();
 
-		this.uiBuilder.addToggle(container, {
-			key: "hideEmptyProperties",
-			name: "Hide empty properties",
-			desc: "Hide properties with empty, null, or undefined values in tooltips and previews",
-		});
+		this.uiBuilder.addSchemaField(container, { hideEmptyProperties: S.hideEmptyProperties });
 
-		this.uiBuilder.addToggle(container, {
-			key: "hideUnderscoreProperties",
-			name: "Hide underscore properties",
-			desc: "Hide properties that start with an underscore (_) in tooltips and previews",
-		});
+		this.uiBuilder.addSchemaField(container, { hideUnderscoreProperties: S.hideUnderscoreProperties });
 
-		this.uiBuilder.addToggle(container, {
-			key: "zoomHideFrontmatterByDefault",
-			name: "Zoom: hide frontmatter by default",
-			desc: "When entering zoom preview, frontmatter starts hidden by default",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ zoomHideFrontmatterByDefault: S.zoomHideFrontmatterByDefault },
+			{ name: "Zoom: hide frontmatter by default" }
+		);
 
-		this.uiBuilder.addToggle(container, {
-			key: "zoomHideContentByDefault",
-			name: "Zoom: hide content by default",
-			desc: "When entering zoom preview, file content starts hidden by default",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ zoomHideContentByDefault: S.zoomHideContentByDefault },
+			{ name: "Zoom: hide content by default" }
+		);
 
 		new Setting(container).setName("Direct Relationships").setHeading();
 
@@ -45,46 +40,37 @@ export class PropertiesSection implements SettingsSection {
 				"Configure property names for direct bidirectional relationships. When you set a relationship in one direction, the plugin automatically updates the reverse relationship."
 			);
 
-		this.uiBuilder.addToggle(container, {
-			key: "autoLinkSiblings",
-			name: "Auto-link siblings",
-			desc: "Automatically mark nodes as related when they share the same parent (siblings are related to each other)",
-		});
+		this.uiBuilder.addSchemaField(container, { autoLinkSiblings: S.autoLinkSiblings }, { name: "Auto-link siblings" });
 
-		this.uiBuilder.addText(container, {
-			key: "parentProp",
-			name: "Parent property",
-			desc: "Property name for parent reference (bidirectional with children)",
-			placeholder: "parent",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ parentProp: S.parentProp },
+			{ name: "Parent property", placeholder: "parent" }
+		);
 
-		this.uiBuilder.addText(container, {
-			key: "childrenProp",
-			name: "Children property",
-			desc: "Property name for children references (bidirectional with parent)",
-			placeholder: "children",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ childrenProp: S.childrenProp },
+			{ name: "Children property", placeholder: "children" }
+		);
 
-		this.uiBuilder.addText(container, {
-			key: "relatedProp",
-			name: "Related property",
-			desc: "Property name for related files (bidirectional - automatically syncs between linked files)",
-			placeholder: "related",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ relatedProp: S.relatedProp },
+			{ name: "Related property", placeholder: "related" }
+		);
 
-		this.uiBuilder.addText(container, {
-			key: "prioritizeParentProp",
-			name: "Prioritize parent property",
-			desc: "Optional property name to specify which parent should be prioritized when building hierarchy graphs. If a node has multiple parents and this property is set with a parent's name, that parent will be chosen.",
-			placeholder: "PriorityParent",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ prioritizeParentProp: S.prioritizeParentProp },
+			{ name: "Prioritize parent property", placeholder: "PriorityParent" }
+		);
 
-		this.uiBuilder.addText(container, {
-			key: "zettelIdProp",
-			name: "Zettel ID property",
-			desc: "Property name for unique timestamp identifier assigned to new nodes",
-			placeholder: "_ZettelID",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ zettelIdProp: S.zettelIdProp },
+			{ name: "Zettel ID property", placeholder: "_ZettelID" }
+		);
 
 		new Setting(container).setName("Automatic Title Property").setHeading();
 
@@ -94,29 +80,29 @@ export class PropertiesSection implements SettingsSection {
 				"Configure automatic title property assignment. When enabled, the plugin adds a Title property to files with the filename stripped of its parent prefix (e.g., 'Parent - Child.md' becomes 'Child'). This title is used in Graph and Bases views for cleaner display."
 			);
 
-		this.uiBuilder.addDropdown(container, {
-			key: "titlePropertyMode",
-			name: "Title property mode",
-			desc: "Enable to automatically add title properties to files. Disable to use raw file names in Bases view. Graph view always strips prefixes regardless of this setting.",
-			options: {
-				enabled: "Enabled - Add title properties",
-				disabled: "Disabled - Use file names",
-				unknown: "Not configured",
-			},
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ titlePropertyMode: S.titlePropertyMode },
+			{
+				name: "Title property mode",
+				options: {
+					enabled: "Enabled - Add title properties",
+					disabled: "Disabled - Use file names",
+					unknown: "Not configured",
+				},
+			}
+		);
 
-		this.uiBuilder.addText(container, {
-			key: "titleProp",
-			name: "Title property name",
-			desc: "Property name for auto-assigned title (file name with parent prefix stripped)",
-			placeholder: SETTINGS_DEFAULTS.DEFAULT_TITLE_PROP,
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ titleProp: S.titleProp },
+			{ name: "Title property name", placeholder: SETTINGS_DEFAULTS.DEFAULT_TITLE_PROP }
+		);
 
-		this.uiBuilder.addText(container, {
-			key: "excludeTitleDirectories",
-			name: "Exclude directories from title",
-			desc: "Comma-separated directory paths to exclude from automatic title property assignment (e.g., Templates, Daily Notes)",
-			placeholder: "Templates, Daily Notes",
-		});
+		this.uiBuilder.addSchemaField(
+			container,
+			{ excludeTitleDirectories: S.excludeTitleDirectories },
+			{ name: "Exclude directories from title", placeholder: "Templates, Daily Notes" }
+		);
 	}
 }

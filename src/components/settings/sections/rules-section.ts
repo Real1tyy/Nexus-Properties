@@ -1,13 +1,14 @@
 import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
-
 import type NexusPropertiesPlugin from "src/main";
 import { SETTINGS_DEFAULTS } from "src/types/constants";
-import type { NexusPropertiesSettingsSchema } from "src/types/settings";
-import { cls } from "../../../utils/css";
+import { NexusPropertiesSettingsSchema } from "src/types/settings";
 
+import { cls } from "../../../utils/css";
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
+
+const S = NexusPropertiesSettingsSchema.shape;
 
 export class RulesSection implements SettingsSection {
 	readonly id = "rules";
@@ -130,7 +131,6 @@ export class RulesSection implements SettingsSection {
 	}
 
 	private addPreFillPresetSelector(container: HTMLElement): void {
-		// Create info box explaining the difference
 		const infoContainer = container.createDiv(cls("settings-info-box"));
 		infoContainer.createEl("strong", { text: "Pre-fill vs Default Filters:" });
 		const infoList = infoContainer.createEl("ul");
@@ -141,7 +141,6 @@ export class RulesSection implements SettingsSection {
 			text: "Pre-fill preset below is optional - fills the filter input on startup but can be cleared by the user",
 		});
 
-		// Store reference for re-rendering
 		this.preFillPresetContainer = container.createDiv();
 		this.renderPreFillPresetDropdown();
 	}
@@ -158,10 +157,8 @@ export class RulesSection implements SettingsSection {
 				"Automatically fill the filter input with this preset when the graph opens. Users can clear or modify it."
 			)
 			.addDropdown((dropdown) => {
-				// Add empty option
 				dropdown.addOption("", "None");
 
-				// Add all filter presets
 				settings.filterPresets.forEach((preset) => {
 					if (preset.name) {
 						dropdown.addOption(preset.name, preset.name);
@@ -237,7 +234,6 @@ export class RulesSection implements SettingsSection {
 			multiline: true,
 		});
 
-		// Add pre-fill preset selector
 		this.addPreFillPresetSelector(container);
 
 		new Setting(container).setName("Filter presets").setHeading();
