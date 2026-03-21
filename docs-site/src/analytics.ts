@@ -28,7 +28,7 @@ function getSessionAttribution(): UtmParams {
 	if (!sessionAttribution) {
 		const params = new URLSearchParams(window.location.search);
 		sessionAttribution = {
-			utmSource: params.get("utm_source") || "docs-site",
+			utmSource: params.get("utm_source") || `${getPluginSlug()}-docs`,
 			utmMedium: params.get("utm_medium") || "docs",
 			utmContent: params.get("utm_content") || getPluginSlug(),
 		};
@@ -54,16 +54,12 @@ function cleanTrackingParams(): void {
 }
 
 function send(path: string, body: Record<string, unknown>): void {
-	const blob = new Blob([JSON.stringify(body)], { type: "text/plain" });
-	if (navigator.sendBeacon) {
-		navigator.sendBeacon(`${ANALYTICS_ENDPOINT}${path}`, blob);
-	} else {
-		fetch(`${ANALYTICS_ENDPOINT}${path}`, {
-			method: "POST",
-			body: blob,
-			keepalive: true,
-		}).catch(() => {});
-	}
+	fetch(`${ANALYTICS_ENDPOINT}${path}`, {
+		method: "POST",
+		headers: { "Content-Type": "text/plain" },
+		body: JSON.stringify(body),
+		keepalive: true,
+	}).catch(() => {});
 }
 
 function getScrollDepth(): number {
