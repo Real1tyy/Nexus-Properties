@@ -33,6 +33,8 @@ const config: Config = {
 		locales: ["en"],
 	},
 
+	clientModules: [require.resolve("./src/analytics")],
+
 	presets: [
 		[
 			"classic",
@@ -187,6 +189,10 @@ const config: Config = {
 						{
 							label: "Sponsorship options",
 							href: "https://matejvavroproductivity.com/support/",
+						},
+						{
+							label: "Privacy Policy",
+							to: "/privacy",
 						},
 					],
 				},
