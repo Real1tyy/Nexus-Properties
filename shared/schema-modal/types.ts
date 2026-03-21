@@ -49,6 +49,10 @@ export interface ArrayFieldDescriptor extends BaseFieldDescriptor {
 	itemType: "string" | "number";
 }
 
+export interface SecretFieldDescriptor extends BaseFieldDescriptor {
+	type: "secret";
+}
+
 export type SchemaFieldDescriptor =
 	| StringFieldDescriptor
 	| NumberFieldDescriptor
@@ -57,7 +61,8 @@ export type SchemaFieldDescriptor =
 	| DatetimeFieldDescriptor
 	| EnumFieldDescriptor
 	| ToggleFieldDescriptor
-	| ArrayFieldDescriptor;
+	| ArrayFieldDescriptor
+	| SecretFieldDescriptor;
 
 export type SchemaFieldType = SchemaFieldDescriptor["type"];
 
@@ -88,13 +93,18 @@ interface SchemaModalConfigBase<T> {
 	title: string;
 	shape: ZodRawShape;
 	fieldOverrides?: Record<string, FieldOverride>;
-	extraFields?: (el: HTMLElement, values: Record<string, unknown>, ctx: ComponentContext) => void;
+	extraFields?: (
+		el: HTMLElement,
+		values: Record<string, unknown>,
+		ctx: ComponentContext,
+		setValues: (partial: Partial<Record<string, unknown>>) => void
+	) => void;
 	existing?: { id: string; data: Partial<T> };
 	nameField?: boolean | { placeholder?: string };
 }
 
 interface SchemaModalWithSubmit<T> extends SchemaModalConfigBase<T> {
-	onSubmit: (name: string, values: T) => void | Promise<void>;
+	onSubmit: (name: string, values: T) => void | false | Promise<void | false>;
 	upsert?: never;
 }
 
@@ -112,10 +122,17 @@ export type SchemaFormMode = "edit" | "readonly";
 export interface SchemaFormConfig<T> {
 	shape: ZodRawShape;
 	prefix: string;
+	app?: App | undefined;
 	mode?: SchemaFormMode | undefined;
 	fieldOverrides?: Record<string, FieldOverride> | undefined;
 	existing?: Partial<T> | undefined;
-	extraFields?: ((el: HTMLElement, values: Record<string, unknown>) => void) | undefined;
+	extraFields?:
+		| ((
+				el: HTMLElement,
+				values: Record<string, unknown>,
+				setValues: (partial: Partial<Record<string, unknown>>) => void
+		  ) => void)
+		| undefined;
 }
 
 export interface SchemaFormValidationSuccess<T> {

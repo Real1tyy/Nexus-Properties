@@ -27,6 +27,7 @@ export * from "./styles";
 export * from "./license";
 export * from "./settings/sync-store";
 export * from "./utils/list-utils";
+export * from "./utils/utm";
 export * from "./vault-table";
 // File explorer utilities
 export * from "./file-explorer";
@@ -40,6 +41,8 @@ export * from "./tabbed-container";
 export * from "./grid-layout";
 // Page header (configurable action buttons in view headers)
 export * from "./page-header";
+// Context menu (configurable right-click menu with persistence)
+export * from "./context-menu";
 // Schema-driven modal (auto-generated create/edit forms from Zod schemas)
 export * from "./schema-modal";
 // Zod validation schemas (reusable transforms and primitives)

@@ -1,8 +1,8 @@
-import { SettingsNavigation, SettingsUIBuilder, type SettingsSection } from "@real1ty-obsidian-plugins";
-import { PluginSettingTab, type App } from "obsidian";
-
+import { buildUtmUrl, SettingsNavigation, type SettingsSection, SettingsUIBuilder } from "@real1ty-obsidian-plugins";
+import { type App, PluginSettingTab } from "obsidian";
 import type NexusPropertiesPlugin from "src/main";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
+
 import { BasesViewSettingsSection } from "./sections/bases-view-section";
 import { GeneralSection } from "./sections/general-section";
 import { GraphDisplaySettingsSection } from "./sections/graph-display-section";
@@ -46,13 +46,45 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 			cssPrefix: "nexus-properties-",
 			sections,
 			footerLinks: [
-				{ text: "Documentation", href: "https://real1tyy.github.io/Nexus-Properties/" },
-				{ text: "Changelog", href: "https://real1tyy.github.io/Nexus-Properties/changelog" },
-				{ text: "Other Plugins", href: "https://matejvavroproductivity.com/tools/" },
-				{ text: "Support", href: "https://matejvavroproductivity.com/support/" },
+				{
+					text: "Documentation",
+					href: buildUtmUrl(
+						"https://real1tyy.github.io/Nexus-Properties/",
+						"nexus-properties",
+						"settings",
+						"documentation"
+					),
+				},
+				{
+					text: "Changelog",
+					href: buildUtmUrl(
+						"https://real1tyy.github.io/Nexus-Properties/changelog",
+						"nexus-properties",
+						"settings",
+						"changelog"
+					),
+				},
+				{
+					text: "Other Plugins",
+					href: buildUtmUrl(
+						"https://matejvavroproductivity.com/tools/",
+						"nexus-properties",
+						"settings",
+						"product-page"
+					),
+				},
+				{
+					text: "Support",
+					href: buildUtmUrl("https://matejvavroproductivity.com/support/", "nexus-properties", "settings", "support"),
+				},
 				{
 					text: "Playlist",
-					href: "https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be",
+					href: buildUtmUrl(
+						"https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be",
+						"nexus-properties",
+						"settings",
+						"youtube"
+					),
 				},
 			],
 		});

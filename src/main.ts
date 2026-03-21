@@ -1,5 +1,6 @@
 import {
 	activateView,
+	buildUtmUrl,
 	type LeafPlacement,
 	SettingsStore,
 	WhatsNewModal,
@@ -143,7 +144,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 			callback: () => this.executeViewSwitcherMethod("toggleBasesViewBackward"),
 		});
 
-		this.initializePlugin();
+		void this.initializePlugin();
 	}
 
 	private async initializePlugin() {
@@ -162,7 +163,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.checkTitlePropertySetup();
 	}
 
-	async onunload() {
+	onunload(): void {
 		this.propertiesManager?.stop();
 		this.indexer?.stop();
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
@@ -341,10 +342,30 @@ export default class NexusPropertiesPlugin extends Plugin {
 				pluginName: "Nexus Properties",
 				changelogContent: CHANGELOG_CONTENT,
 				links: {
-					github: "https://github.com/Real1tyy/Nexus-Properties",
-					support: "https://matejvavroproductivity.com/support/",
-					changelog: "https://real1tyy.github.io/Nexus-Properties/changelog",
-					documentation: "https://real1tyy.github.io/Nexus-Properties/",
+					github: buildUtmUrl(
+						"https://github.com/Real1tyy/Nexus-Properties",
+						"nexus-properties",
+						"whats-new",
+						"github"
+					),
+					support: buildUtmUrl(
+						"https://matejvavroproductivity.com/support/",
+						"nexus-properties",
+						"whats-new",
+						"support"
+					),
+					changelog: buildUtmUrl(
+						"https://real1tyy.github.io/Nexus-Properties/changelog",
+						"nexus-properties",
+						"whats-new",
+						"changelog"
+					),
+					documentation: buildUtmUrl(
+						"https://real1tyy.github.io/Nexus-Properties/",
+						"nexus-properties",
+						"whats-new",
+						"documentation"
+					),
 				} as WhatsNewModalConfig["links"] & { github: string },
 			};
 
@@ -373,21 +394,25 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		if (titlePropertyMode === "unknown") {
 			new TitlePropertySetupModal(this.app, {
-				onEnable: async () => {
-					await this.settingsStore.updateSettings((settings) => ({
-						...settings,
-						titlePropertyMode: "enabled",
-					}));
-					new Notice("✅ Title property enabled. Running initial scan...");
-					await this.triggerFullRescan();
-					new Notice("✅ Title properties have been added to all indexed files.");
+				onEnable: () => {
+					void (async () => {
+						await this.settingsStore.updateSettings((settings) => ({
+							...settings,
+							titlePropertyMode: "enabled",
+						}));
+						new Notice("✅ Title property enabled. Running initial scan...");
+						await this.triggerFullRescan();
+						new Notice("✅ Title properties have been added to all indexed files.");
+					})();
 				},
-				onDisable: async () => {
-					await this.settingsStore.updateSettings((settings) => ({
-						...settings,
-						titlePropertyMode: "disabled",
-					}));
-					new Notice("Title property disabled. File names will be used in Bases view.");
+				onDisable: () => {
+					void (async () => {
+						await this.settingsStore.updateSettings((settings) => ({
+							...settings,
+							titlePropertyMode: "disabled",
+						}));
+						new Notice("Title property disabled. File names will be used in Bases view.");
+					})();
 				},
 			}).open();
 		}

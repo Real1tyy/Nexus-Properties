@@ -1,4 +1,4 @@
-import { Setting } from "obsidian";
+import { type App, SecretComponent, Setting } from "obsidian";
 import { z } from "zod";
 
 import { introspectShape } from "./introspect";
@@ -96,7 +96,7 @@ export function coerceFormValues(
 				}
 				break;
 			default:
-				result[desc.key] = raw === "" ? undefined : raw;
+				result[desc.key] = raw === "" && desc.optional ? undefined : raw;
 		}
 	}
 	return result;
@@ -238,6 +238,22 @@ function renderDropdownField(
 	});
 }
 
+function renderSecretField(
+	el: HTMLElement,
+	desc: SchemaFieldDescriptor,
+	override: FieldOverride | undefined,
+	values: Record<string, unknown>,
+	app?: App
+): void {
+	if (!app) return;
+
+	applyFieldMeta(new Setting(el), desc, override).addComponent((component) =>
+		new SecretComponent(app, component).setValue(String(values[desc.key] ?? "")).onChange((v) => {
+			values[desc.key] = v;
+		})
+	);
+}
+
 function renderArrayField(
 	el: HTMLElement,
 	desc: ArrayFieldDescriptor,
@@ -264,7 +280,8 @@ function renderEditField(
 	el: HTMLElement,
 	desc: SchemaFieldDescriptor,
 	override: FieldOverride | undefined,
-	values: Record<string, unknown>
+	values: Record<string, unknown>,
+	app?: App
 ): void {
 	if (override?.render) {
 		override.render(el, values[desc.key], (v) => (values[desc.key] = v));
@@ -294,10 +311,15 @@ function renderEditField(
 		case "array":
 			renderArrayField(el, desc, override, values);
 			break;
+		case "secret":
+			renderSecretField(el, desc, override, values, app);
+			break;
 	}
 }
 
 // ─── Readonly Mode Field Renderer ───────────────────────────
+
+const SECRET_MASK = "••••••••";
 
 function formatReadonlyValue(desc: SchemaFieldDescriptor, value: unknown): string {
 	if (value === undefined || value === null || value === "") return "—";
@@ -306,6 +328,8 @@ function formatReadonlyValue(desc: SchemaFieldDescriptor, value: unknown): strin
 		case "boolean":
 		case "toggle":
 			return coerceToggleValue(value) ? "Yes" : "No";
+		case "secret":
+			return SECRET_MASK;
 		case "array":
 			return Array.isArray(value) ? value.join(", ") || "—" : String(value);
 		default:
@@ -338,17 +362,30 @@ function renderFields(
 	overrides: Record<string, FieldOverride>,
 	values: Record<string, unknown>,
 	mode: SchemaFormMode,
-	extraFields?: (el: HTMLElement, values: Record<string, unknown>) => void
+	app?: App,
+	extraFields?: (
+		el: HTMLElement,
+		values: Record<string, unknown>,
+		setValues: (partial: Partial<Record<string, unknown>>) => void
+	) => void,
+	setValuesFn?: (partial: Partial<Record<string, unknown>>) => void
 ): void {
-	const fieldRenderer = mode === "readonly" ? renderReadonlyField : renderEditField;
-
 	for (const desc of descriptors) {
 		const override = overrides[desc.key];
 		if (override?.hidden) continue;
-		fieldRenderer(container, desc, override, values);
+		if (mode === "readonly") {
+			renderReadonlyField(container, desc, override, values);
+		} else {
+			renderEditField(container, desc, override, values, app);
+		}
 	}
 
-	extraFields?.(container, values);
+	const noopSetValues = (partial: Partial<Record<string, unknown>>) => {
+		for (const [key, val] of Object.entries(partial)) {
+			if (val !== undefined) values[key] = val;
+		}
+	};
+	extraFields?.(container, values, setValuesFn ?? noopSetValues);
 }
 
 export function renderSchemaForm<T>(container: HTMLElement, config: SchemaFormConfig<T>): SchemaFormHandle<T> {
@@ -357,7 +394,17 @@ export function renderSchemaForm<T>(container: HTMLElement, config: SchemaFormCo
 	const values = initValues<T>(descriptors, overrides, config.existing);
 	let currentMode: SchemaFormMode = config.mode ?? "edit";
 
-	renderFields(container, descriptors, overrides, values, currentMode, config.extraFields);
+	const formEl = container.createDiv();
+
+	function setValues(partial: Partial<Record<string, unknown>>): void {
+		for (const [key, val] of Object.entries(partial)) {
+			if (val !== undefined) values[key] = val;
+		}
+		formEl.empty();
+		renderFields(formEl, descriptors, overrides, values, currentMode, config.app, config.extraFields, setValues);
+	}
+
+	renderFields(formEl, descriptors, overrides, values, currentMode, config.app, config.extraFields, setValues);
 
 	function validate(): SchemaFormValidationResult<T> {
 		const coerced = coerceFormValues(values, descriptors);
@@ -376,20 +423,12 @@ export function renderSchemaForm<T>(container: HTMLElement, config: SchemaFormCo
 
 	function setMode(mode: SchemaFormMode): void {
 		currentMode = mode;
-		container.empty();
-		renderFields(container, descriptors, overrides, values, currentMode, config.extraFields);
-	}
-
-	function setValues(partial: Partial<Record<string, unknown>>): void {
-		for (const [key, val] of Object.entries(partial)) {
-			if (val !== undefined) values[key] = val;
-		}
-		container.empty();
-		renderFields(container, descriptors, overrides, values, currentMode, config.extraFields);
+		formEl.empty();
+		renderFields(formEl, descriptors, overrides, values, currentMode, config.app, config.extraFields, setValues);
 	}
 
 	function destroy(): void {
-		container.empty();
+		formEl.empty();
 	}
 
 	return {
