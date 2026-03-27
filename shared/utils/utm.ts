@@ -10,10 +10,9 @@ export type PluginSlug =
 	| "core-finance"
 	| "reality-custom";
 
-export type UiContext = "settings" | "whats-new" | "pro-gate" | "notice" | "ribbon" | "command";
-
-export function buildUtmUrl(url: string, source: PluginSlug, medium: UiContext, content: string): string {
+export function buildUtmUrl(url: string, slug: PluginSlug, source: string, medium: string, content: string): string {
 	const u = new URL(url);
+	u.searchParams.set("utm_campaign", slug.replaceAll("-", "_"));
 	u.searchParams.set("utm_source", source);
 	u.searchParams.set("utm_medium", medium);
 	u.searchParams.set("utm_content", content);
@@ -36,19 +35,28 @@ export function buildSettingsFooterLinks(slug: PluginSlug, config: PluginLinksCo
 	const links: PluginLink[] = [];
 
 	if (config.productPageUrl) {
-		links.push({ text: "Product Page", href: buildUtmUrl(config.productPageUrl, slug, "settings", "product-page") });
+		links.push({
+			text: "Product Page",
+			href: buildUtmUrl(config.productPageUrl, slug, "plugin", "settings", "product_page"),
+		});
 	}
-	links.push({ text: "Documentation", href: buildUtmUrl(config.docsBaseUrl, slug, "settings", "documentation") });
+	links.push({
+		text: "Documentation",
+		href: buildUtmUrl(config.docsBaseUrl, slug, "plugin", "settings", "documentation"),
+	});
 	links.push({
 		text: "Changelog",
-		href: buildUtmUrl(`${config.docsBaseUrl}/changelog`, slug, "settings", "changelog"),
+		href: buildUtmUrl(`${config.docsBaseUrl}/changelog`, slug, "plugin", "settings", "changelog"),
 	});
 	links.push({
 		text: "Support",
-		href: buildUtmUrl("https://matejvavroproductivity.com/support/", slug, "settings", "support"),
+		href: buildUtmUrl("https://matejvavroproductivity.com/support/", slug, "plugin", "settings", "support"),
 	});
 	if (config.youtubeUrl) {
-		links.push({ text: "Video Tutorials", href: buildUtmUrl(config.youtubeUrl, slug, "settings", "youtube") });
+		links.push({
+			text: "Video Tutorials",
+			href: buildUtmUrl(config.youtubeUrl, slug, "plugin", "settings", "youtube"),
+		});
 	}
 
 	return links;
@@ -65,14 +73,15 @@ export function buildWhatsNewLinks(
 	youtube: string;
 } {
 	return {
-		support: buildUtmUrl("https://matejvavroproductivity.com/support/", slug, "whats-new", "support"),
-		changelog: buildUtmUrl(`${config.docsBaseUrl}/changelog`, slug, "whats-new", "changelog"),
-		documentation: buildUtmUrl(config.docsBaseUrl, slug, "whats-new", "documentation"),
-		...(config.githubUrl ? { github: buildUtmUrl(config.githubUrl, slug, "whats-new", "github") } : {}),
+		support: buildUtmUrl("https://matejvavroproductivity.com/support/", slug, "plugin", "whats_new", "support"),
+		changelog: buildUtmUrl(`${config.docsBaseUrl}/changelog`, slug, "plugin", "whats_new", "changelog"),
+		documentation: buildUtmUrl(config.docsBaseUrl, slug, "plugin", "whats_new", "documentation"),
+		...(config.githubUrl ? { github: buildUtmUrl(config.githubUrl, slug, "plugin", "whats_new", "github") } : {}),
 		youtube: buildUtmUrl(
 			"https://www.youtube.com/@MatejVavroProductivity?sub_confirmation=1",
 			slug,
-			"whats-new",
+			"plugin",
+			"whats_new",
 			"youtube"
 		),
 	};
