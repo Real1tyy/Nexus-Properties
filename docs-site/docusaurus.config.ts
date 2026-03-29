@@ -106,7 +106,7 @@ const config: Config = {
 					position: "left",
 				},
 				{
-					href: "https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be",
+					href: "https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be&utm_campaign=nexus_properties&utm_source=docs&utm_medium=navbar&utm_content=youtube_playlist",
 					label: "YouTube Playlist",
 					position: "left",
 				},
@@ -145,7 +145,7 @@ const config: Config = {
 						},
 						{
 							label: "YouTube Playlist",
-							href: "https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be",
+							href: "https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be&utm_campaign=nexus_properties&utm_source=docs&utm_medium=footer&utm_content=youtube_playlist",
 						},
 					],
 				},
@@ -188,7 +188,7 @@ const config: Config = {
 						},
 						{
 							label: "Sponsorship options",
-							href: "https://matejvavroproductivity.com/support/",
+							href: "https://matejvavroproductivity.com/support/?utm_campaign=nexus_properties&utm_source=docs&utm_medium=footer&utm_content=sponsorship",
 						},
 						{
 							label: "Privacy Policy",

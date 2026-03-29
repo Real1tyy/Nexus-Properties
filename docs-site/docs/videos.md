@@ -62,7 +62,7 @@ description: Complete video guide collection for Nexus Properties
 
 For the full collection of Nexus Properties tutorials and updates, check out the complete playlist on YouTube:
 
-**[📺 Watch the Complete Nexus Properties Playlist](https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be)**
+**[📺 Watch the Complete Nexus Properties Playlist](https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be&utm_campaign=nexus_properties&utm_source=docs&utm_medium=videos&utm_content=youtube_playlist)**
 
 The playlist includes all tutorials, feature updates, and walkthroughs in one convenient location.
 

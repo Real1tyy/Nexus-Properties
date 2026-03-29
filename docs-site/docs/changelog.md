@@ -9,7 +9,7 @@ All notable changes to Nexus Properties will be documented here.
 ## 2.2.0
 
 :::tip Check out Prisma Calendar
-The ultimate calendar plugin for Obsidian — now with AI chat (Claude & GPT), CalDAV sync, scriptable API, and more. [Learn more →](https://matejvavroproductivity.com/tools/prisma-calendar/)
+The ultimate calendar plugin for Obsidian — now with AI chat (Claude & GPT), CalDAV sync, scriptable API, and more. [Learn more →](https://matejvavroproductivity.com/tools/prisma-calendar/?utm_campaign=nexus_properties&utm_source=docs&utm_medium=changelog&utm_content=prisma_calendar)
 :::
 
 ## 2.1.0 - 5.3.2026
@@ -53,7 +53,7 @@ The ultimate calendar plugin for Obsidian — now with AI chat (Claude & GPT), C
 - **Vault Statistics in Settings**: New "Statistics" tab in settings displays vault-wide metrics — total indexed nodes, tree count, average and max tree depth, and relationship counts. Computed automatically when the tab is opened. [Learn more →](features/vault-statistics)
 - **Render Related in MOC view**: New "Render Related" checkbox in the MOC toolbar recursively adds related nodes (from frontmatter) as children at every level of the tree. Works with both Properties and MOC Content hierarchy sources. [Learn more →](features/moc-view#render-related)
 - **Folder note forest in MOC view**: When viewing a folder note, the MOC view renders a forest of trees — one per file in the folder — matching the Graph view's folder note behavior. The Bases view is removed from the toggle cycle for folder notes. [Learn more →](features/moc-view#folder-note-forest)
-- **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery) page to see the plugin in action.
+- **Video tutorials and feature clips**: Full video tutorials and feature-specific clips have been added covering every major feature of Nexus Properties. Check out the [Gallery](https://real1tyy.github.io/Nexus-Properties/gallery?utm_campaign=nexus_properties&utm_source=docs&utm_medium=changelog&utm_content=gallery) page to see the plugin in action.
 - **Settings search**: Search across all settings tabs to quickly find any setting. Type in the search box to filter settings by name or description. [Learn more →](configuration)
 - **Dedicated MOC settings tab**: MOC configuration (enable MOC content reading, hierarchy source, display properties) is now in its own **Settings → MOC** tab for easier access. [Learn more →](features/moc-view)
 - **Settings footer links**: Settings footer now includes links to Other Plugins and the Nexus Properties YouTube playlist.
@@ -84,7 +84,7 @@ The ultimate calendar plugin for Obsidian — now with AI chat (Claude & GPT), C
 
 ### New Video
 
-- [Nexus Properties — Graph, Bases & MOCs Feature Improvements](https://www.youtube.com/watch?v=JLvChLFp-do)
+- [Nexus Properties — Graph, Bases & MOCs Feature Improvements](https://www.youtube.com/watch?v=JLvChLFp-do&utm_campaign=nexus_properties&utm_source=docs&utm_medium=changelog&utm_content=youtube_video)
 
 ### New Features
 
@@ -414,7 +414,7 @@ Automatic changelog notifications keep you informed about new features and impro
 
 ### New Video
 
-- [How I Structure Complex Knowledge in Obsidian (Nexus Properties)](https://www.youtube.com/watch?v=SJIu1qB-wBU)
+- [How I Structure Complex Knowledge in Obsidian (Nexus Properties)](https://www.youtube.com/watch?v=SJIu1qB-wBU&utm_campaign=nexus_properties&utm_source=docs&utm_medium=changelog&utm_content=youtube_video)
 
 ### New Features
 
@@ -609,7 +609,7 @@ Nexus Properties now provides a fully optimized mobile experience with comprehen
 
 ### New Video
 
-- [Nexus Properties — A Hierarchical Knowledge System for Obsidian](https://www.youtube.com/watch?v=Im0SfuBHamo)
+- [Nexus Properties — A Hierarchical Knowledge System for Obsidian](https://www.youtube.com/watch?v=Im0SfuBHamo&utm_campaign=nexus_properties&utm_source=docs&utm_medium=changelog&utm_content=youtube_video)
 
 ### New Features
 
@@ -656,4 +656,4 @@ See [Contributing Guide](contributing) for how to suggest features, report bugs,
 
 - **Issues**: [GitHub Issues](https://github.com/Real1tyy/Nexus-Properties/issues)
 - **Discussions**: [GitHub Discussions](https://github.com/Real1tyy/Nexus-Properties/discussions)
-- **Sponsor**: [Support My Work](https://matejvavroproductivity.com/support/)
+- **Sponsor**: [Support My Work](https://matejvavroproductivity.com/support/?utm_campaign=nexus_properties&utm_source=docs&utm_medium=changelog&utm_content=support)

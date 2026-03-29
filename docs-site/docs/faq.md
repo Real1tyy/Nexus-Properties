@@ -104,6 +104,6 @@ Check the [Troubleshooting guide](troubleshooting) for common issues and solutio
 <details>
 <summary>How can I support the project?</summary>
 
-Subscribe to the [YouTube channel](https://www.youtube.com/@real1tyy), share the plugin with others, or [donate](https://matejvavroproductivity.com/support/). See the [Support page](support) for all options.
+Subscribe to the [YouTube channel](https://www.youtube.com/@real1tyy?utm_campaign=nexus_properties&utm_source=docs&utm_medium=faq&utm_content=youtube_channel), share the plugin with others, or [donate](https://matejvavroproductivity.com/support/?utm_campaign=nexus_properties&utm_source=docs&utm_medium=faq&utm_content=donate). See the [Support page](support) for all options.
 
 </details>

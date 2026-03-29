@@ -14,11 +14,11 @@
 
 ## Video Tutorials
 
-**[View All Video Tutorials →](https://real1tyy.github.io/Nexus-Properties/videos)**
+**[View All Video Tutorials →](https://real1tyy.github.io/Nexus-Properties/videos?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_videos)**
 
 ### Full Tutorial — Zero to Mastery
 
-<a href="https://www.youtube.com/watch?v=Im0SfuBHamo" target="_blank">
+<a href="https://www.youtube.com/watch?v=Im0SfuBHamo&utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_youtube_demo" target="_blank">
   <img src="https://img.youtube.com/vi/Im0SfuBHamo/maxresdefault.jpg" alt="Nexus Properties - Full Tutorial" style="width:100%;">
 </a>
 
@@ -28,16 +28,16 @@
 
 <table>
 <tr>
-<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/bases-view"><img src="docs-site/static/img/screenshots/bases-cards-view.png" alt="Bases View" /></a></td>
-<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/node-layout"><img src="docs-site/static/img/screenshots/MultiRow.png" alt="Multi-Row Layout" /></a></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/bases-view?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_features_bases_view"><img src="docs-site/static/img/screenshots/bases-cards-view.png" alt="Bases View" /></a></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/node-layout?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_features_node_layout"><img src="docs-site/static/img/screenshots/MultiRow.png" alt="Multi-Row Layout" /></a></td>
 </tr>
 <tr>
-<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/graph-views"><img src="docs-site/static/img/screenshots/all-related-view.png" alt="All Related View" /></a></td>
-<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/moc-view"><img src="docs-site/static/img/screenshots/bases-moc-view.png" alt="MOC View" /></a></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/graph-views?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_features_graph_views"><img src="docs-site/static/img/screenshots/all-related-view.png" alt="All Related View" /></a></td>
+<td width="50%"><a href="https://real1tyy.github.io/Nexus-Properties/features/moc-view?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_features_moc_view"><img src="docs-site/static/img/screenshots/bases-moc-view.png" alt="MOC View" /></a></td>
 </tr>
 </table>
 
-See the [full documentation](https://real1tyy.github.io/Nexus-Properties/) for all features and video demos.
+See the [full documentation](https://real1tyy.github.io/Nexus-Properties/?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_documentation) for all features and video demos.
 
 ---
 
@@ -60,12 +60,12 @@ Built for **system builders** with large, long-lived vaults who think in hierarc
 
 ## Documentation
 
-**[View Full Documentation →](https://real1tyy.github.io/Nexus-Properties/)**
+**[View Full Documentation →](https://real1tyy.github.io/Nexus-Properties/?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_documentation)**
 
 Quick Links:
 
-- [Installation](https://real1tyy.github.io/Nexus-Properties/installation) · [Quick Start](https://real1tyy.github.io/Nexus-Properties/quickstart) · [Configuration](https://real1tyy.github.io/Nexus-Properties/configuration)
-- [Features Overview](https://real1tyy.github.io/Nexus-Properties/features/overview) · [FAQ](https://real1tyy.github.io/Nexus-Properties/faq) · [Troubleshooting](https://real1tyy.github.io/Nexus-Properties/troubleshooting)
+- [Installation](https://real1tyy.github.io/Nexus-Properties/installation?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_installation) · [Quick Start](https://real1tyy.github.io/Nexus-Properties/quickstart?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_quickstart) · [Configuration](https://real1tyy.github.io/Nexus-Properties/configuration?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_configuration)
+- [Features Overview](https://real1tyy.github.io/Nexus-Properties/features/overview?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_features) · [FAQ](https://real1tyy.github.io/Nexus-Properties/faq?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_faq) · [Troubleshooting](https://real1tyy.github.io/Nexus-Properties/troubleshooting?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_troubleshooting)
 
 ---
 
@@ -101,7 +101,7 @@ BRAT handles updates automatically, so you always have the latest version.
 
 Nexus Properties is **fully optimized for mobile devices** with touch-friendly interfaces, responsive layouts, and gesture support.
 
-See the [Mobile Support Documentation](https://real1tyy.github.io/Nexus-Properties/mobile) for details.
+See the [Mobile Support Documentation](https://real1tyy.github.io/Nexus-Properties/mobile?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_mobile) for details.
 
 ---
 
@@ -145,7 +145,7 @@ Auto-propagate frontmatter changes to children recursively, with optional confir
 
 If you find Nexus Properties useful and want to support its ongoing development, please consider becoming a sponsor. Your contribution helps ensure continuous maintenance, bug fixes, and the introduction of new features.
 
-- [Support My Work](https://matejvavroproductivity.com/support/)
+- [Support My Work](https://matejvavroproductivity.com/support/?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_support)
 
 Every contribution, no matter the size, is greatly appreciated!
 
@@ -157,7 +157,7 @@ Every contribution, no matter the size, is greatly appreciated!
 
 ## Contributing
 
-PRs welcome! Contributions are licensed under AGPL-3.0. See [Contributing Guide](https://real1tyy.github.io/Nexus-Properties/contributing) for details.
+PRs welcome! Contributions are licensed under AGPL-3.0. See [Contributing Guide](https://real1tyy.github.io/Nexus-Properties/contributing?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_contributing) for details.
 
 ---
 

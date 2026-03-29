@@ -10,7 +10,7 @@ If you find Nexus Properties valuable and want to support its continued developm
 
 The best way to support my work is by using my tools. I build Obsidian plugins and productivity software designed to make your workflow better.
 
-**👉 [Browse all my tools](https://matejvavroproductivity.com/tools/)**
+**👉 [Browse all my tools](https://matejvavroproductivity.com/tools/?utm_campaign=nexus_properties&utm_source=docs&utm_medium=support&utm_content=browse_tools)**
 
 ## 📺 YouTube Channel
 
@@ -22,7 +22,7 @@ I create **video content** about productivity, Obsidian, and digital setups, inc
 
 - **Share the videos** — Help others discover valuable productivity content
 
-**Check out my [YouTube channel](https://www.youtube.com/channel/UCGzPa-p5w4vH80NhFQWGFjg)**
+**Check out my [YouTube channel](https://www.youtube.com/channel/UCGzPa-p5w4vH80NhFQWGFjg?utm_campaign=nexus_properties&utm_source=docs&utm_medium=support&utm_content=youtube_channel)**
 
 ## 🌟 Spread the Word
 
@@ -50,7 +50,7 @@ If you'd like to support the development financially, any contribution is **high
 
 - **Keep evolving** the ecosystem with quality tools
 
-**[View all donation methods](https://matejvavroproductivity.com/support/)**
+**[View all donation methods](https://matejvavroproductivity.com/support/?utm_campaign=nexus_properties&utm_source=docs&utm_medium=support&utm_content=donate)**
 
 **Every amount, no matter how small, makes a real difference.** Thank you for your support!
 

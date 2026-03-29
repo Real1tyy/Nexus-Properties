@@ -51,6 +51,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					href: buildUtmUrl(
 						"https://real1tyy.github.io/Nexus-Properties/",
 						"nexus-properties",
+						"plugin",
 						"settings",
 						"documentation"
 					),
@@ -60,6 +61,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					href: buildUtmUrl(
 						"https://real1tyy.github.io/Nexus-Properties/changelog",
 						"nexus-properties",
+						"plugin",
 						"settings",
 						"changelog"
 					),
@@ -69,19 +71,27 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 					href: buildUtmUrl(
 						"https://matejvavroproductivity.com/tools/",
 						"nexus-properties",
+						"plugin",
 						"settings",
-						"product-page"
+						"other_plugins"
 					),
 				},
 				{
 					text: "Support",
-					href: buildUtmUrl("https://matejvavroproductivity.com/support/", "nexus-properties", "settings", "support"),
+					href: buildUtmUrl(
+						"https://matejvavroproductivity.com/support/",
+						"nexus-properties",
+						"plugin",
+						"settings",
+						"support"
+					),
 				},
 				{
 					text: "Playlist",
 					href: buildUtmUrl(
 						"https://www.youtube.com/playlist?list=PLMVJknbUasLC_wSYpzTG2TpqXSq_2B8Be",
 						"nexus-properties",
+						"plugin",
 						"settings",
 						"youtube"
 					),

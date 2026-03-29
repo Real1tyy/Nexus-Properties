@@ -345,25 +345,29 @@ export default class NexusPropertiesPlugin extends Plugin {
 					github: buildUtmUrl(
 						"https://github.com/Real1tyy/Nexus-Properties",
 						"nexus-properties",
-						"whats-new",
+						"plugin",
+						"whats_new",
 						"github"
 					),
 					support: buildUtmUrl(
 						"https://matejvavroproductivity.com/support/",
 						"nexus-properties",
-						"whats-new",
+						"plugin",
+						"whats_new",
 						"support"
 					),
 					changelog: buildUtmUrl(
 						"https://real1tyy.github.io/Nexus-Properties/changelog",
 						"nexus-properties",
-						"whats-new",
+						"plugin",
+						"whats_new",
 						"changelog"
 					),
 					documentation: buildUtmUrl(
 						"https://real1tyy.github.io/Nexus-Properties/",
 						"nexus-properties",
-						"whats-new",
+						"plugin",
+						"whats_new",
 						"documentation"
 					),
 				} as WhatsNewModalConfig["links"] & { github: string },
@@ -384,7 +388,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 		if (existingLeaves.length > 0) {
 			const switcherView = existingLeaves[0].view;
 			if (switcherView instanceof NexusViewSwitcher) {
-				switcherView.triggerUpdate();
+				void switcherView.triggerUpdate();
 			}
 		}
 	}
