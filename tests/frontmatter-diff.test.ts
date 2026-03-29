@@ -1,10 +1,11 @@
 import {
 	compareFrontmatter,
-	type FrontmatterChange,
 	formatChangeForDisplay,
+	type FrontmatterChange,
 	mergeFrontmatterDiffs,
 } from "@real1ty-obsidian-plugins";
 import { describe, expect, it } from "vitest";
+
 import type { Frontmatter } from "../src/types/settings";
 
 describe("compareFrontmatter", () => {
@@ -638,15 +639,15 @@ describe("mergeFrontmatterDiffs", () => {
 
 		expect(merged.hasChanges).toBe(true);
 		expect(merged.changes).toHaveLength(3);
-		expect(merged.added).toHaveLength(0);
-		expect(merged.modified).toHaveLength(2);
+		expect(merged.added).toHaveLength(1);
+		expect(merged.modified).toHaveLength(1);
 		expect(merged.deleted).toHaveLength(1);
 
-		const categoryChange = merged.modified.find((c: FrontmatterChange) => c.key === "category");
+		const categoryChange = merged.added.find((c: FrontmatterChange) => c.key === "category");
 		expect(categoryChange).toBeDefined();
 		expect(categoryChange?.oldValue).toBe(undefined);
 		expect(categoryChange?.newValue).toBe("personal");
-		expect(categoryChange?.changeType).toBe("modified");
+		expect(categoryChange?.changeType).toBe("added");
 
 		const priorityChange = merged.modified.find((c: FrontmatterChange) => c.key === "priority");
 		expect(priorityChange).toBeDefined();
