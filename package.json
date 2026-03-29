@@ -4,8 +4,9 @@
 	"description": "Automated property management plugin for Obsidian that syncs parent-child and related relationships bidirectionally with recursive tree properties.",
 	"main": "main.js",
 	"scripts": {
+		"build:css": "sass src/styles/styles.scss styles.css --no-source-map --style=compressed",
 		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"build": "pnpm build:css && tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
 		"typecheck": "tsc -noEmit -skipLibCheck",
 		"test": "vitest run",
 		"test:watch": "vitest",
