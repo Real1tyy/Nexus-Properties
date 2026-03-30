@@ -1,6 +1,19 @@
-import { type App, MarkdownView, type TFile, type Vault } from "obsidian";
+import { type App, MarkdownView, type TFile, TFolder, type Vault } from "obsidian";
 import type { z } from "zod";
+
+import type { Repository } from "../repository";
 import { isFolderNote } from "./file";
+import { ensureDirectory } from "./file-utils";
+
+export interface CodeBlockBinding {
+	unsubscribe: () => void;
+}
+
+export interface CodeBlockBindOptions {
+	onChange?: () => void;
+	/** When true, creates the directory and file with an empty code block if missing. */
+	createIfMissing?: boolean;
+}
 
 export interface CodeBlockRepositoryConfig<T> {
 	codeFence: string;
@@ -9,7 +22,7 @@ export interface CodeBlockRepositoryConfig<T> {
 	sort?: (a: T, b: T) => number;
 }
 
-export class CodeBlockRepository<T> {
+export class CodeBlockRepository<T> implements Repository<T> {
 	private readonly codeFence: string;
 	private readonly itemSchema: z.ZodType<T>;
 	private readonly idField: (keyof T & string) | null;
@@ -18,6 +31,8 @@ export class CodeBlockRepository<T> {
 	private itemMap = new Map<string, T>();
 	private sortedItems: T[] = [];
 	private boundFile: { app: App; file: TFile } | null = null;
+	// Incremented before our own writes, decremented in the vault listener to skip self-triggered reloads.
+	private pendingSelfWrites = 0;
 
 	constructor(config: CodeBlockRepositoryConfig<T>) {
 		this.codeFence = config.codeFence;
@@ -40,6 +55,77 @@ export class CodeBlockRepository<T> {
 		this.populateIndex(items);
 	}
 
+	/**
+	 * Binds the repository to a file path. Loads from the file if it exists.
+	 * When `createIfMissing` is true, creates the directory and file with an
+	 * empty code block before loading. Registers a vault modify listener to
+	 * reload on external changes.
+	 */
+	async bind(app: App, filePath: string, options?: CodeBlockBindOptions): Promise<CodeBlockBinding> {
+		const { onChange, createIfMissing = false } = options ?? {};
+
+		let file = this.resolveFile(app, filePath);
+
+		if (!file && createIfMissing) {
+			file = await this.createBackingFile(app, filePath);
+		}
+
+		if (file) {
+			await this.load(app, file);
+			onChange?.();
+		}
+
+		const vaultRef = app.vault.on("modify", (modified) => {
+			if (modified.path !== filePath) return;
+			if (this.pendingSelfWrites > 0) {
+				this.pendingSelfWrites--;
+				return;
+			}
+			const current = this.resolveFile(app, filePath);
+			if (current) {
+				void this.load(app, current).then(() => onChange?.());
+			}
+		});
+
+		return {
+			unsubscribe: () => {
+				app.vault.offref(vaultRef);
+			},
+		};
+	}
+
+	/**
+	 * Rebinds the repository to a new file path. Unsubscribes the old binding,
+	 * clears the index, and creates a new binding.
+	 */
+	async rebind(
+		oldBinding: CodeBlockBinding,
+		app: App,
+		filePath: string,
+		options?: CodeBlockBindOptions
+	): Promise<CodeBlockBinding> {
+		oldBinding.unsubscribe();
+		this.itemMap.clear();
+		this.sortedItems = [];
+		this.boundFile = null;
+		return this.bind(app, filePath, options);
+	}
+
+	private resolveFile(app: App, filePath: string): TFile | null {
+		const file = app.vault.getAbstractFileByPath(filePath);
+		if (!file || file instanceof TFolder) return null;
+		return file as TFile;
+	}
+
+	private async createBackingFile(app: App, filePath: string): Promise<TFile> {
+		const lastSlash = filePath.lastIndexOf("/");
+		if (lastSlash > 0) {
+			await ensureDirectory(app, filePath.substring(0, lastSlash));
+		}
+		const content = `\`\`\`${this.codeFence}\n[]\n\`\`\`\n`;
+		return (await app.vault.create(filePath, content)) as TFile;
+	}
+
 	getAll(): T[] {
 		return [...this.sortedItems];
 	}
@@ -48,7 +134,11 @@ export class CodeBlockRepository<T> {
 		return this.itemMap.get(id);
 	}
 
-	async create(item: T): Promise<void> {
+	has(id: string): boolean {
+		return this.itemMap.has(id);
+	}
+
+	async create(item: T): Promise<T> {
 		const key = this.extractId(item);
 		if (this.itemMap.has(key)) {
 			throw new Error(`Item with ID "${key}" already exists`);
@@ -56,9 +146,10 @@ export class CodeBlockRepository<T> {
 		this.itemMap.set(key, item);
 		this.rebuildSorted();
 		await this.persist();
+		return item;
 	}
 
-	async update(id: string, partial: Partial<T>): Promise<void> {
+	async update(id: string, partial: Partial<T>): Promise<T> {
 		const existing = this.itemMap.get(id);
 		if (!existing) {
 			throw new Error(`Item with ID "${id}" not found`);
@@ -72,6 +163,7 @@ export class CodeBlockRepository<T> {
 		this.itemMap.set(newKey, updated);
 		this.rebuildSorted();
 		await this.persist();
+		return updated;
 	}
 
 	async delete(id: string): Promise<void> {
@@ -167,6 +259,7 @@ export class CodeBlockRepository<T> {
 			`\`\`\`${this.codeFence}\n${raw}\n\`\`\``
 		);
 
+		this.pendingSelfWrites++;
 		await app.vault.modify(file, updatedContent);
 
 		if (shouldPreserveEditorState && cursor && scrollInfo) {

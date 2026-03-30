@@ -1,11 +1,12 @@
-import { cls } from "../../core/css-utils";
-import type { BarLayout, PackedTask } from "../gantt-types";
+import type { ClsFn } from "../../core/css-utils";
+import type { BarLayout, GanttInteractionHooks, PackedTask } from "../gantt-types";
 
 export function renderBars(
 	container: HTMLElement,
 	bars: BarLayout[],
 	taskMap: Map<string, PackedTask>,
-	onClick: (filePath: string) => void
+	hooks: GanttInteractionHooks,
+	cls: ClsFn
 ): void {
 	container.empty();
 
@@ -26,6 +27,13 @@ export function renderBars(
 		const label = barEl.createSpan({ cls: cls("gantt-bar-label") });
 		label.textContent = task.title;
 
-		barEl.addEventListener("click", () => onClick(task.filePath));
+		barEl.addEventListener("click", (e) => hooks.onBarClick?.(task.id, e));
+
+		barEl.addEventListener("contextmenu", (e) => {
+			if (hooks.onBarContextMenu) {
+				e.preventDefault();
+				hooks.onBarContextMenu(task.id, e);
+			}
+		});
 	}
 }

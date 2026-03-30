@@ -1,14 +1,23 @@
-import { cls } from "../../core/css-utils";
-import type { ArrowLayout, BarLayout, GanttConfig, PackedTask, Viewport } from "../gantt-types";
+import { SVG } from "@svgdotjs/svg.js";
+
+import { createCssUtils } from "../../core/css-utils";
+import type { ArrowLayout, BarLayout, GanttConfig, GanttInteractionHooks, PackedTask, Viewport } from "../gantt-types";
 import { GANTT_DEFAULTS, MS_PER_DAY } from "../gantt-types";
-import { buildViewport } from "../time-scale";
+import { createPanHandler } from "../pan-handler";
+import { injectGanttStyles } from "../styles";
+import { buildViewport, todayStartMs } from "../time-scale";
 import { renderArrows } from "./gantt-arrows";
 import { renderBars } from "./gantt-bars";
 import { renderGrid } from "./gantt-grid";
 import { renderHeader } from "./gantt-header";
 
-const SVG_NS = "http://www.w3.org/2000/svg";
-const BAR_EXCLUDE_SELECTOR = ".prisma-gantt-bar";
+const WEEK_MS = 7 * MS_PER_DAY;
+const MONTH_MS = 30 * MS_PER_DAY;
+
+export interface GanttRendererConfig {
+	cssPrefix: string;
+	ganttConfig?: Partial<GanttConfig>;
+}
 
 export interface GanttRenderData {
 	taskMap: Map<string, PackedTask>;
@@ -20,150 +29,147 @@ export interface GanttRenderData {
 
 export type LayoutFn = (viewport: Viewport) => GanttRenderData;
 
-export class GanttRenderer {
-	private readonly config: GanttConfig;
-	private headerContent: HTMLElement;
-	private bodyWrapper: HTMLElement;
-	private svgLayer: SVGElement;
-	private barLayer: HTMLElement;
-	private viewportStartMs: number;
-	private layoutFn: LayoutFn | null = null;
-	private cleanupPan: (() => void) | null = null;
+export interface GanttRendererHandle {
+	readonly toolbarLeft: HTMLElement;
+	readonly toolbarRight: HTMLElement;
+	render: (layoutFn: LayoutFn, centerOnTasks?: { startMs: number; endMs: number }[]) => void;
+	scrollToToday: () => void;
+	destroy: () => void;
+}
 
-	constructor(
-		private readonly container: HTMLElement,
-		private readonly onClick: (filePath: string) => void,
-		config?: Partial<GanttConfig>
-	) {
-		this.config = { ...GANTT_DEFAULTS, ...config };
+export function createGanttRenderer(
+	container: HTMLElement,
+	hooks: GanttInteractionHooks,
+	rendererConfig: GanttRendererConfig
+): GanttRendererHandle {
+	const config: GanttConfig = { ...GANTT_DEFAULTS, ...rendererConfig.ganttConfig };
+	const { cls } = createCssUtils(rendererConfig.cssPrefix);
+	const markerId = `${rendererConfig.cssPrefix}gantt-arrowhead`;
+	injectGanttStyles(rendererConfig.cssPrefix);
 
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		const daysVisible = this.containerWidth / this.config.pxPerDay;
-		this.viewportStartMs = today.getTime() - (daysVisible / 2) * MS_PER_DAY;
+	let viewportStartMs = 0;
+	let layoutFn: LayoutFn | null = null;
+	let cleanupPan: (() => void) | null = null;
 
-		const headerWrapper = container.createDiv({ cls: cls("gantt-header-wrapper") });
-		this.headerContent = headerWrapper.createDiv({ cls: cls("gantt-header") });
+	// ─── DOM scaffold ───────────────────────────────────────────
 
-		this.bodyWrapper = container.createDiv({ cls: cls("gantt-body") });
+	const toolbar = container.createDiv({ cls: cls("gantt-toolbar") });
+	const toolbarLeft = toolbar.createDiv({ cls: cls("gantt-toolbar-left") });
+	const toolbarRight = toolbar.createDiv({ cls: cls("gantt-toolbar-right") });
 
-		this.svgLayer = document.createElementNS(SVG_NS, "svg");
-		this.svgLayer.classList.add(cls("gantt-svg-layer"));
-		this.bodyWrapper.appendChild(this.svgLayer);
+	const headerWrapper = container.createDiv({ cls: cls("gantt-header-wrapper") });
+	const headerContent = headerWrapper.createDiv({ cls: cls("gantt-header") });
 
-		this.barLayer = this.bodyWrapper.createDiv({ cls: cls("gantt-bar-layer") });
+	const bodyWrapper = container.createDiv({ cls: cls("gantt-body") });
+	const gridSvg = SVG().addTo(bodyWrapper).addClass(cls("gantt-grid-svg"));
 
-		this.cleanupPan = this.setupPan();
+	const barLayer = bodyWrapper.createDiv({ cls: cls("gantt-bar-layer") });
+	const barContainer = barLayer.createDiv({ cls: cls("gantt-bar-container") });
+	const arrowSvg = SVG().addTo(barLayer).addClass(cls("gantt-arrow-svg"));
+
+	// ─── Viewport helpers ───────────────────────────────────────
+
+	function getContainerWidth(): number {
+		return container.clientWidth || 800;
 	}
 
-	private get containerWidth(): number {
-		return this.container.clientWidth || 800;
+	function getContainerHeight(): number {
+		return bodyWrapper.clientHeight || container.clientHeight || 400;
 	}
 
-	private get containerHeight(): number {
-		return this.bodyWrapper.clientHeight || this.container.clientHeight || 400;
+	function getDaysVisible(): number {
+		return getContainerWidth() / config.pxPerDay;
 	}
 
-	private buildViewport(): Viewport {
-		return buildViewport(this.viewportStartMs, this.containerWidth, this.containerHeight, this.config.pxPerDay);
+	function getViewport(): Viewport {
+		return buildViewport(viewportStartMs, getContainerWidth(), getContainerHeight(), config.pxPerDay);
 	}
 
-	private setupPan(): () => void {
-		let isDragging = false;
-		let startX = 0;
-		let startY = 0;
-		let origStartMs = 0;
-		let origScrollTop = 0;
+	// ─── Navigation ─────────────────────────────────────────────
 
-		const onMouseDown = (e: MouseEvent): void => {
-			const target = e.target as HTMLElement;
-			if (target.closest(BAR_EXCLUDE_SELECTOR)) return;
-			isDragging = true;
-			startX = e.clientX;
-			startY = e.clientY;
-			origStartMs = this.viewportStartMs;
-			origScrollTop = this.bodyWrapper.scrollTop;
-			this.bodyWrapper.style.cursor = "grabbing";
-			e.preventDefault();
-		};
-
-		const onMouseMove = (e: MouseEvent): void => {
-			if (!isDragging) return;
-			const dx = e.clientX - startX;
-			const dy = e.clientY - startY;
-			const msDelta = (dx / this.config.pxPerDay) * MS_PER_DAY;
-			this.viewportStartMs = origStartMs - msDelta;
-			this.bodyWrapper.scrollTop = origScrollTop - dy;
-			this.repaint();
-		};
-
-		const onMouseUp = (): void => {
-			if (!isDragging) return;
-			isDragging = false;
-			this.bodyWrapper.style.cursor = "";
-		};
-
-		this.bodyWrapper.addEventListener("mousedown", onMouseDown);
-		document.addEventListener("mousemove", onMouseMove);
-		document.addEventListener("mouseup", onMouseUp);
-
-		return () => {
-			this.bodyWrapper.removeEventListener("mousedown", onMouseDown);
-			document.removeEventListener("mousemove", onMouseMove);
-			document.removeEventListener("mouseup", onMouseUp);
-		};
+	function shiftViewport(deltaMs: number): void {
+		viewportStartMs += deltaMs;
+		repaint();
 	}
 
-	private repaint(): void {
-		if (!this.layoutFn) return;
-		const viewport = this.buildViewport();
-		const data = this.layoutFn(viewport);
-		this.renderFrame(viewport, data);
+	function scrollToToday(): void {
+		viewportStartMs = todayStartMs() - (getDaysVisible() / 2) * MS_PER_DAY;
+		repaint();
 	}
 
-	private renderFrame(viewport: Viewport, data: GanttRenderData): void {
-		const dataHeight = data.rowCount * (this.config.barHeight + this.config.rowPadding) + this.config.rowPadding;
-		const contentHeight = Math.max(dataHeight, this.containerHeight);
+	const nav = toolbarLeft.createDiv({ cls: cls("gantt-nav") });
+	const makeBtn = (label: string, icon: string, onClick: () => void): void => {
+		const btn = nav.createEl("button", { cls: cls("gantt-nav-btn"), attr: { "aria-label": label } });
+		btn.textContent = icon;
+		btn.addEventListener("click", onClick);
+	};
 
-		renderHeader(this.headerContent, viewport, this.config);
-		renderGrid(this.svgLayer, viewport, data.rowCount, this.config, contentHeight);
-		renderBars(this.barLayer, data.bars, data.taskMap, this.onClick);
-		renderArrows(this.svgLayer, data.arrows);
+	makeBtn("Back 1 month", "\u00AB", () => shiftViewport(-MONTH_MS));
+	makeBtn("Back 1 week", "\u2039", () => shiftViewport(-WEEK_MS));
 
-		this.barLayer.style.width = `${viewport.widthPx}px`;
-		this.barLayer.style.minHeight = `${contentHeight}px`;
+	const todayBtn = nav.createEl("button", { cls: cls("gantt-nav-btn", "gantt-today-btn"), text: "Today" });
+	todayBtn.addEventListener("click", scrollToToday);
+
+	makeBtn("Forward 1 week", "\u203A", () => shiftViewport(WEEK_MS));
+	makeBtn("Forward 1 month", "\u00BB", () => shiftViewport(MONTH_MS));
+
+	// ─── Pan interaction ────────────────────────────────────────
+
+	viewportStartMs = todayStartMs() - (getDaysVisible() / 2) * MS_PER_DAY;
+
+	cleanupPan = createPanHandler(bodyWrapper, config.pxPerDay, `.${cls("gantt-bar")}`, {
+		getViewportStartMs: () => viewportStartMs,
+		setViewportStartMs: (ms) => {
+			viewportStartMs = ms;
+		},
+		repaint,
+	});
+
+	// ─── Rendering ──────────────────────────────────────────────
+
+	function repaint(): void {
+		if (!layoutFn) return;
+		const viewport = getViewport();
+		const data = layoutFn(viewport);
+		renderFrame(viewport, data);
 	}
 
-	setLayoutFn(fn: LayoutFn): void {
-		this.layoutFn = fn;
+	function renderFrame(viewport: Viewport, data: GanttRenderData): void {
+		const dataHeight = data.rowCount * (config.barHeight + config.rowPadding) + config.rowPadding;
+		const gridHeight = Math.max(dataHeight, getContainerHeight());
+
+		renderHeader(headerContent, viewport, config, cls);
+		renderGrid(gridSvg, viewport, data.rowCount, config, gridHeight, cls);
+		renderBars(barContainer, data.bars, data.taskMap, hooks, cls);
+		renderArrows(arrowSvg, data.arrows, hooks, cls, markerId);
+
+		barLayer.style.width = `${viewport.widthPx}px`;
+		barLayer.style.minHeight = `${gridHeight}px`;
+
+		arrowSvg.size(viewport.widthPx, gridHeight);
 	}
 
-	render(layoutFn: LayoutFn, centerOnTasks?: { startMs: number; endMs: number }[]): void {
-		this.layoutFn = layoutFn;
+	// ─── Public API ─────────────────────────────────────────────
+
+	function render(fn: LayoutFn, centerOnTasks?: { startMs: number; endMs: number }[]): void {
+		layoutFn = fn;
 
 		if (centerOnTasks && centerOnTasks.length > 0) {
 			const minStart = Math.min(...centerOnTasks.map((t) => t.startMs));
 			const maxEnd = Math.max(...centerOnTasks.map((t) => t.endMs));
 			const dataCenter = (minStart + maxEnd) / 2;
-			const daysVisible = this.containerWidth / this.config.pxPerDay;
-			this.viewportStartMs = dataCenter - (daysVisible / 2) * MS_PER_DAY;
+			viewportStartMs = dataCenter - (getDaysVisible() / 2) * MS_PER_DAY;
 		}
 
-		this.repaint();
+		repaint();
 	}
 
-	scrollToToday(): void {
-		const today = new Date();
-		today.setHours(0, 0, 0, 0);
-		const daysVisible = this.containerWidth / this.config.pxPerDay;
-		this.viewportStartMs = today.getTime() - (daysVisible / 2) * MS_PER_DAY;
-		this.repaint();
+	function destroy(): void {
+		cleanupPan?.();
+		cleanupPan = null;
+		layoutFn = null;
+		container.empty();
 	}
 
-	destroy(): void {
-		this.cleanupPan?.();
-		this.cleanupPan = null;
-		this.layoutFn = null;
-		this.container.empty();
-	}
+	return { toolbarLeft, toolbarRight, render, scrollToToday, destroy };
 }
