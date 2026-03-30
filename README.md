@@ -88,7 +88,7 @@ BRAT handles updates automatically, so you always have the latest version.
 
 ### Manual Installation
 
-1. Go to [Releases](https://github.com/Real1tyy/Nexus-Properties/releases)
+1. Go to [Releases](https://github.com/Real1tyy/Nexus-Properties/releases?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_releases)
 2. Download `main.js`, `manifest.json`, and `styles.css`
 3. Create folder: `{VaultFolder}/.obsidian/plugins/nexus-properties/`
 4. Move downloaded files into the folder
