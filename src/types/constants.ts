@@ -99,7 +99,11 @@ interface RelationshipConfig {
 	getReverseProp: (settings: NexusPropertiesSettings) => string;
 }
 
-export const RELATIONSHIP_CONFIGS: RelationshipConfig[] = [
+function defineRelationshipConfigs<const T extends readonly RelationshipConfig[]>(configs: T): T {
+	return configs;
+}
+
+export const RELATIONSHIP_CONFIGS = defineRelationshipConfigs([
 	{
 		type: "parent",
 		getProp: (s) => s.parentProp,
@@ -115,4 +119,14 @@ export const RELATIONSHIP_CONFIGS: RelationshipConfig[] = [
 		getProp: (s) => s.relatedProp,
 		getReverseProp: (s) => s.relatedProp,
 	},
-];
+]);
+
+// Compile-time assertion: fails if a RelationshipType variant is added without a config entry.
+type ConfiguredTypes = (typeof RELATIONSHIP_CONFIGS)[number]["type"];
+type _Assert<A, B> = [A] extends [B] ? A : never;
+type _AllTypesCovered = _Assert<RelationshipType, ConfiguredTypes>;
+type _AllConfigsValid = _Assert<ConfiguredTypes, RelationshipType>;
+export function _checkRelationshipCoverage(_k: _AllTypesCovered): void {}
+export function _checkRelationshipValidity(_k: _AllConfigsValid): void {}
+_checkRelationshipCoverage("parent" as RelationshipType);
+_checkRelationshipValidity("parent" as ConfiguredTypes);
