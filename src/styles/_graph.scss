@@ -1,0 +1,316 @@
+@use "variables" as *;
+
+.nexus-properties-graph-view {
+  &-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    height: 100%;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  &-header {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: $spacing-md;
+    padding: $spacing-md;
+    border-bottom: $input-border-width solid var(--background-modifier-border);
+    background-color: var(--background-secondary);
+    flex-shrink: 0;
+  }
+
+  &-title {
+    margin: 0;
+    color: var(--text-normal);
+    font-size: $font-size-lg;
+    font-weight: 600;
+    flex: 1 1 0;
+    min-width: 0;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    word-break: break-word;
+  }
+
+  &-container {
+    flex: 1;
+    width: 100%;
+    min-height: 0;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    background: var(--background-primary);
+
+    > div {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      height: 100%;
+    }
+  }
+}
+
+.nexus-properties-graph-controls-container {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  flex-wrap: nowrap;
+  justify-content: flex-end;
+  gap: 0.75em;
+  flex-shrink: 0;
+}
+
+.nexus-properties-graph-toggle {
+  &-container {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    font-size: $font-size-md;
+  }
+
+  &-checkbox {
+    cursor: pointer;
+    width: $toggle-checkbox-size;
+    height: $toggle-checkbox-size;
+  }
+
+  &-label {
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: var(--text-normal);
+    }
+  }
+}
+
+// Search row
+.nexus-properties-graph-search-row {
+  display: flex;
+  gap: $spacing-sm;
+  padding: 0.75em $spacing-md;
+  background-color: var(--background-secondary);
+  border-bottom: $input-border-width solid var(--background-modifier-border);
+  flex-shrink: 0;
+  animation: slideDown $transition-normal;
+
+  &.nexus-properties-hidden {
+    display: none;
+  }
+}
+
+.nexus-properties-graph-search-input-container {
+  flex: 1;
+}
+
+// Shared input styling
+.nexus-properties-graph-view-content {
+  .nexus-properties-graph-search-input,
+  .nexus-properties-graph-filter-input,
+  .nexus-properties-graph-filter-preset-select {
+    width: 100%;
+    height: $input-height;
+    padding: 0.65em $spacing-md;
+    margin: 0;
+    background-color: var(--background-primary);
+    border: $input-border-width solid var(--background-modifier-border);
+    border-radius: $border-radius;
+    color: var(--text-normal);
+    font-family: var(--font-text);
+    font-size: $font-size-base;
+    font-weight: normal;
+    box-sizing: border-box;
+    transition: border-color $transition-normal;
+    vertical-align: middle;
+    line-height: 1.4;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: var(--interactive-accent);
+      box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
+    }
+  }
+
+  .nexus-properties-graph-search-input,
+  .nexus-properties-graph-filter-input {
+    &::placeholder {
+      color: var(--text-faint);
+    }
+  }
+
+  .nexus-properties-graph-filter-input {
+    font-family: var(--font-monospace);
+
+    &::placeholder {
+      font-family: var(--font-text);
+    }
+  }
+
+  .nexus-properties-graph-filter-preset-select {
+    width: auto;
+    min-width: 120px;
+    padding: 0.65em 2.2em 0.65em $spacing-md;
+    cursor: pointer;
+
+    &:focus {
+      outline: none;
+      background-color: var(--interactive-hover);
+      border-color: var(--interactive-accent);
+      box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+    }
+
+    option {
+      background-color: var(--background-primary);
+      color: var(--text-normal);
+    }
+
+    &:hover {
+      border-color: var(--interactive-accent);
+    }
+  }
+}
+
+// Filter row
+.nexus-properties-graph-filter-row {
+  display: flex;
+  gap: $spacing-sm;
+  padding: 0.75em $spacing-md;
+  background-color: var(--background-secondary);
+  border-bottom: $input-border-width solid var(--background-modifier-border);
+  flex-shrink: 0;
+  animation: slideDown $transition-normal;
+
+  &.nexus-properties-hidden {
+    display: none;
+  }
+}
+
+// Preset selector container
+.nexus-properties-graph-filter-preset-container {
+  flex-shrink: 0;
+  position: relative;
+
+  &::after {
+    content: "▼";
+    position: absolute;
+    right: 0.85em;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: var(--text-muted);
+    font-size: 0.65em;
+    line-height: 1;
+  }
+
+  &:hover::after {
+    color: var(--text-normal);
+  }
+}
+
+.nexus-properties-graph-filter-input-container {
+  flex: 1;
+}
+
+// Empty state
+.nexus-properties-graph-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: var(--text-muted);
+  font-size: $font-size-base;
+  padding: $spacing-xl;
+  text-align: center;
+}
+
+// Zoom indicator
+.nexus-properties-zoom-indicator {
+  display: flex;
+  align-items: center;
+  margin-left: 8px;
+  padding: 0;
+  background-color: var(--background-primary);
+  border: $input-border-width solid var(--background-modifier-border);
+  border-radius: $border-radius;
+  flex-shrink: 0;
+  transition: border-color $transition-normal;
+
+  &:hover {
+    border-color: var(--interactive-accent);
+  }
+
+}
+
+input.nexus-properties-zoom-indicator-input {
+  width: 60px;
+  padding: 0.65em $spacing-md;
+  background-color: transparent;
+  border: none;
+  color: var(--text-normal);
+  font-size: $font-size-base;
+  font-family: var(--font-monospace);
+  text-align: center;
+  outline: none;
+  cursor: text;
+  box-shadow: none;
+
+  &:focus {
+    background-color: var(--interactive-hover);
+    border-radius: $border-radius-sm;
+  }
+}
+
+// Parent override dropdown (graph view)
+.nexus-properties-graph-parent-dropdown {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: $border-radius-sm;
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all $transition-fast;
+  max-width: 160px;
+
+  &:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+    border-color: var(--interactive-accent);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+    color: var(--text-normal);
+  }
+
+  option {
+    background: var(--background-primary);
+    color: var(--text-normal);
+  }
+}
+
+// Graph container when inside switcher
+.nexus-properties-graph-container {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  height: 100%;
+}
+
+// Zoom preview wrapper
+.nexus-properties-graph-zoom-preview-wrapper {
+  width: 100%;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}

@@ -5,7 +5,8 @@
 	"main": "main.js",
 	"scripts": {
 		"dev": "node esbuild.config.mjs",
-		"build": "tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"build": "pnpm build:css && tsc -noEmit -skipLibCheck && node esbuild.config.mjs production",
+		"build:css": "sass src/styles/styles.scss styles.css --no-source-map",
 		"typecheck": "tsc -noEmit -skipLibCheck",
 		"test": "vitest run",
 		"test:watch": "vitest",
@@ -31,6 +32,7 @@
 		"@types/node": "^24.10.9",
 		"builtin-modules": "5.0.0",
 		"esbuild": "0.25.11",
+		"sass": "^1.87.0",
 		"jsdom": "^27.4.0",
 		"knip": "^5.81.0",
 		"obsidian": "1.11.4",

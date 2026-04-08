@@ -1,0 +1,163 @@
+@use "variables" as *;
+
+.nexus-properties-view-switcher {
+  &-header {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: $spacing-sm;
+    background-color: var(--background-secondary);
+    border-bottom: 1px solid var(--background-modifier-border);
+    flex-shrink: 0;
+    gap: $spacing-md;
+  }
+
+  &-buttons {
+    display: flex;
+    gap: $spacing-sm;
+    align-items: center;
+    justify-self: center;
+    grid-column: 2;
+  }
+
+  &-stats {
+    display: flex;
+    gap: 20px;
+    flex-shrink: 0;
+    align-items: center;
+    justify-self: start;
+    overflow: hidden;
+    max-width: 100%;
+
+    &-column {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+  }
+
+  &-stat-item {
+    font-size: 0.8em;
+    color: var(--text-muted);
+    white-space: nowrap;
+    font-weight: 500;
+  }
+
+  &-archived-toggle {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    justify-self: end;
+    grid-column: 3;
+    cursor: pointer;
+    padding: 0.4em 0.8em;
+    border-radius: $border-radius-sm;
+    transition: background-color $transition-normal;
+
+    &:hover {
+      background-color: var(--background-modifier-hover);
+    }
+  }
+
+  &-archived-checkbox {
+    cursor: pointer;
+  }
+
+  &-archived-label {
+    font-size: $font-size-md;
+    color: var(--text-normal);
+    user-select: none;
+  }
+
+  &-depth-slider {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    justify-self: end;
+    grid-column: 3;
+    padding: 0.4em 0.8em;
+    border-radius: $border-radius-sm;
+  }
+
+  &-depth-label {
+    font-size: $font-size-md;
+    color: var(--text-normal);
+    user-select: none;
+    white-space: nowrap;
+  }
+
+  &-depth-input {
+    width: 80px;
+    cursor: pointer;
+    accent-color: var(--interactive-accent);
+  }
+
+  &-depth-value {
+    font-size: $font-size-md;
+    color: var(--text-normal);
+    font-weight: 600;
+    min-width: 1.5em;
+    text-align: center;
+  }
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+    padding-bottom: 0;
+  }
+}
+
+button.nexus-properties-view-toggle-button {
+  padding: 0.65em $spacing-md;
+  min-height: 42px;
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  border: $input-border-width solid var(--background-modifier-border);
+  border-radius: $border-radius;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-family: var(--font-text);
+  box-shadow: none;
+  transition:
+    background-color $transition-normal,
+    border-color $transition-normal;
+
+  &:hover {
+    background-color: var(--interactive-hover);
+    border-color: var(--interactive-accent);
+  }
+
+  &:active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+  }
+}
+
+button.nexus-properties-hierarchy-source-button {
+  padding: 0.65em $spacing-md;
+  min-height: 42px;
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  border: $input-border-width solid var(--background-modifier-border);
+  border-radius: $border-radius;
+  cursor: pointer;
+  font-size: $font-size-base;
+  font-family: var(--font-text);
+  box-shadow: none;
+  transition:
+    background-color $transition-normal,
+    border-color $transition-normal;
+
+  &:hover {
+    background-color: var(--interactive-hover);
+    border-color: var(--interactive-accent);
+  }
+
+  &:active {
+    background-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+  }
+}

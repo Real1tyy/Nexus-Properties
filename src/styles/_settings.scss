@@ -1,0 +1,460 @@
+@use "variables" as *;
+
+// Info boxes
+.nexus-properties-settings-info-box {
+  margin: $spacing-md 0;
+  padding: $spacing-md;
+  background-color: var(--background-secondary);
+  border-radius: $border-radius;
+  border-left: 3px solid var(--interactive-accent);
+
+  h3,
+  h4 {
+    margin-top: $spacing-sm;
+    margin-bottom: $spacing-sm;
+    color: var(--text-normal);
+  }
+
+  p {
+    margin: $spacing-sm 0;
+    color: var(--text-muted);
+    line-height: 1.5;
+  }
+
+  &-example {
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    padding: $spacing-md;
+    margin: $spacing-sm 0;
+    font-family: var(--font-monospace);
+    font-size: $font-size-md;
+    overflow-x: auto;
+    white-space: pre;
+  }
+}
+
+// Example grid layout
+.nexus-properties-example-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: $spacing-md;
+  margin: $spacing-md 0;
+}
+
+.nexus-properties-example-section h4 {
+  margin-top: 0;
+  color: var(--text-normal);
+  font-size: $font-size-base;
+}
+
+@media (max-width: $tablet-breakpoint) {
+  .nexus-properties-example-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+// Settings headings
+.setting-item.setting-item-heading {
+  border-top: 1px solid var(--background-modifier-border);
+  margin-top: $spacing-lg;
+  padding-top: $spacing-lg;
+
+  &:first-child {
+    border-top: none;
+    margin-top: 0;
+    padding-top: 0;
+  }
+}
+
+// Setting descriptions
+.setting-item-description {
+  color: var(--text-muted);
+  font-size: $font-size-md;
+  line-height: 1.4;
+}
+
+.nexus-properties-section-description {
+  padding-bottom: $spacing-md;
+}
+
+.nexus-properties-settings-subsection {
+  margin-bottom: $spacing-sm;
+  padding-bottom: $spacing-xs;
+}
+
+// Empty state
+.nexus-properties-settings-empty-state {
+  padding: $spacing-lg;
+  margin: $spacing-md 0;
+  background-color: var(--background-secondary);
+  border-radius: $border-radius;
+  border: 1px dashed var(--background-modifier-border);
+  color: var(--text-muted);
+  text-align: center;
+  font-size: $font-size-base;
+  line-height: 1.6;
+}
+
+.nexus-properties-directories-list {
+  margin-bottom: $spacing-md;
+}
+
+// Info note box
+.nexus-properties-settings-info-note {
+  margin-top: $spacing-md;
+  padding: $spacing-md;
+  background-color: var(--background-secondary);
+  border-radius: $border-radius-sm;
+}
+
+// Warning box
+.nexus-properties-settings-warning-box {
+  margin: $spacing-md 0;
+  padding: 1em 1.2em;
+  background-color: $color-error-bg;
+  border-radius: $border-radius;
+  border-left: 4px solid var(--text-error);
+  box-shadow: $shadow-sm;
+
+  strong {
+    color: var(--text-error);
+    font-size: 1em;
+    display: block;
+    margin-bottom: $spacing-sm;
+  }
+
+  p {
+    margin: $spacing-sm 0 0;
+    color: var(--text-normal);
+    line-height: 1.6;
+    font-size: $font-size-base;
+  }
+}
+
+// Navigation tabs
+.nexus-properties-settings-nav {
+  margin-bottom: 24px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  padding-bottom: 16px;
+}
+
+.nexus-properties-nav-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+
+  button {
+    padding: 8px 16px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius;
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+    cursor: pointer;
+    transition: all $transition-normal;
+
+    &.nexus-properties-active {
+      background-color: var(--interactive-accent);
+      color: var(--text-on-accent);
+    }
+
+    &:hover:not(.nexus-properties-active) {
+      background-color: var(--background-modifier-hover);
+    }
+  }
+}
+
+// Settings search
+.nexus-properties-settings-search {
+  margin-left: auto;
+  flex-shrink: 0;
+
+  &-input {
+    padding: 6px 10px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius;
+    background-color: var(--background-secondary);
+    color: var(--text-normal);
+    font-size: var(--font-ui-small);
+    width: 150px;
+    transition: width $transition-normal;
+
+    &:focus {
+      border-color: var(--interactive-accent);
+      box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
+      width: 200px;
+    }
+  }
+
+  &-section {
+    margin-bottom: 8px;
+  }
+
+  &-no-results {
+    padding: 24px;
+    text-align: center;
+    color: var(--text-muted);
+    font-style: italic;
+  }
+}
+
+// Footer
+.nexus-properties-settings-footer {
+  margin-top: 2rem;
+  text-align: center;
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+
+  &-links {
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    flex-wrap: wrap;
+  }
+}
+
+.nexus-properties-settings-support-link {
+  text-decoration: none;
+  color: var(--text-accent);
+}
+
+// Color example items
+.nexus-properties-color-example {
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 6px;
+
+    .nexus-properties-settings-info-box-example {
+      flex: 0 0 auto;
+    }
+  }
+
+  &-dot {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    background-color: var(--example-color);
+    border: 1px solid var(--background-modifier-border);
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  &-description {
+    color: var(--text-muted);
+    font-size: var(--font-ui-smaller);
+  }
+}
+
+.nexus-properties-color-arrow {
+  flex-shrink: 0;
+  color: var(--text-muted);
+}
+
+// Color rule items
+.nexus-properties-color-rule {
+  &-item {
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: var(--background-secondary);
+  }
+
+  &-main-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  &-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+
+    input[type="checkbox"] {
+      flex-shrink: 0;
+      cursor: pointer;
+    }
+  }
+
+  &-order {
+    font-size: $color-rule-font-size;
+    font-weight: bold;
+    color: var(--text-muted);
+    min-width: $color-rule-order-width;
+    flex-shrink: 0;
+  }
+
+  &-expression-input {
+    flex: 1;
+    min-width: 0;
+    padding: 4px 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    font-family: var(--font-monospace);
+    font-size: var(--font-ui-small);
+
+    &:focus {
+      outline: none;
+      border-color: var(--interactive-accent);
+    }
+  }
+
+  &-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  &-picker-wrapper {
+    display: flex;
+    align-items: center;
+
+    .setting-item {
+      border: none;
+      padding: 0;
+      margin: 0;
+      background: transparent;
+    }
+
+    .setting-item-control {
+      display: flex;
+      align-items: center;
+    }
+  }
+
+  &-controls {
+    display: flex;
+    gap: 4px;
+  }
+
+  &-btn {
+    padding: 4px 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    transition: all $transition-fast;
+
+    &:hover {
+      background-color: var(--background-modifier-hover);
+    }
+
+    &-delete {
+      color: var(--text-error);
+
+      &:hover {
+        background-color: var(--background-modifier-error);
+        border-color: var(--text-error);
+      }
+    }
+  }
+}
+
+// Excluded/included properties inputs
+.nexus-properties-excluded-properties-input,
+.nexus-properties-included-properties-input {
+  min-width: 200px;
+  padding: 4px 8px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: $border-radius-sm;
+  background-color: var(--background-primary);
+  color: var(--text-normal);
+  font-family: var(--font-monospace);
+  font-size: $font-size-md;
+  margin-right: 8px;
+
+  &:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+  }
+}
+
+// Filter preset styles
+.nexus-properties-filter-preset {
+  &-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background-color: var(--background-secondary);
+  }
+
+  &-name-input {
+    flex: 0 0 $filter-preset-name-width;
+    padding: 6px 10px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    color: var(--text-normal);
+    font-family: var(--font-text);
+    font-size: $font-size-md;
+    transition: border-color $transition-normal;
+
+    &:focus {
+      outline: none;
+      border-color: var(--interactive-accent);
+    }
+  }
+
+  &-expression-input {
+    flex: 1;
+    min-width: 0;
+    padding: 6px 10px;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    color: var(--text-normal);
+    font-family: var(--font-monospace);
+    font-size: $font-size-sm;
+    transition: border-color $transition-normal;
+
+    &:focus {
+      outline: none;
+      border-color: var(--interactive-accent);
+    }
+  }
+
+  &-btn-delete {
+    padding: 4px 10px;
+    background-color: transparent;
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    color: var(--text-error);
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+    transition: all $transition-normal;
+    flex-shrink: 0;
+
+    &:hover {
+      background-color: var(--background-modifier-error);
+      border-color: var(--text-error);
+    }
+  }
+}
+
+// Array manager
+.nexus-properties-settings-array-manager-list {
+  margin-bottom: $spacing-md;
+
+  & + .setting-item .setting-item-control input[type="text"] {
+    min-width: 400px;
+    flex: 1;
+  }
+}

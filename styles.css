@@ -1,74 +1,21 @@
-/* Nexus Properties Plugin Styles */
-
-/* Override Obsidian's default view-content padding for Nexus Properties views */
+@charset "UTF-8";
 .workspace-leaf-content .view-content.nexus-properties-view-switcher-content {
 	padding: var(--size-4-3);
 	overflow: hidden;
 }
 
-/* Node Creation Modal */
-.nexus-node-creation-modal {
-	display: flex;
-	flex-direction: column;
-	align-items: center;
-	justify-content: center;
+.nexus-properties-hidden {
+	display: none;
+}
+
+.nexus-properties-graph-toggle-container.nexus-properties-hidden {
+	display: none;
+}
+
+.vertical-tab-content-container {
 	padding: 2em;
-	min-width: 500px;
 }
 
-.nexus-node-creation-title {
-	text-align: center;
-	margin-bottom: 1.5em;
-	font-size: 1.5em;
-	color: var(--text-normal);
-}
-
-.nexus-node-creation-input-container {
-	width: 100%;
-	margin-bottom: 1.5em;
-}
-
-.modal-content.nexus-node-creation-modal
-	.nexus-node-creation-input-container
-	input.nexus-node-creation-input {
-	width: 100%;
-	padding: 0.75em 1em;
-	font-size: 1.5em;
-	text-align: center;
-	border: 2px solid var(--background-modifier-border);
-	border-radius: 6px;
-	background-color: var(--background-primary);
-	color: var(--text-normal);
-	transition: border-color 0.2s ease;
-}
-
-.modal-content.nexus-node-creation-modal
-	.nexus-node-creation-input-container
-	input.nexus-node-creation-input:focus {
-	outline: none;
-	border-color: var(--interactive-accent);
-}
-
-.nexus-node-creation-buttons {
-	display: flex;
-	gap: 1em;
-	justify-content: center;
-	width: 100%;
-}
-
-.nexus-node-creation-button {
-	padding: 0.6em 2em;
-	font-size: 1.15em;
-	border-radius: 6px;
-	cursor: pointer;
-	transition: all 0.2s ease;
-}
-
-.nexus-node-creation-button:hover {
-	transform: translateY(-1px);
-}
-
-/* Settings info boxes */
 .nexus-properties-settings-info-box {
 	margin: 1em 0;
 	padding: 1em;
@@ -76,21 +23,17 @@
 	border-radius: 6px;
 	border-left: 3px solid var(--interactive-accent);
 }
-
 .nexus-properties-settings-info-box h3,
 .nexus-properties-settings-info-box h4 {
 	margin-top: 0.5em;
 	margin-bottom: 0.5em;
 	color: var(--text-normal);
 }
-
 .nexus-properties-settings-info-box p {
 	margin: 0.5em 0;
 	color: var(--text-muted);
 	line-height: 1.5;
 }
-
-/* Code examples in settings */
 .nexus-properties-settings-info-box-example {
 	background-color: var(--background-primary);
 	border: 1px solid var(--background-modifier-border);
@@ -103,7 +46,6 @@
 	white-space: pre;
 }
 
-/* Example grid layout */
 .nexus-properties-example-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
@@ -122,39 +64,32 @@
 		grid-template-columns: 1fr;
 	}
 }
-
-/* Settings headings */
 .setting-item.setting-item-heading {
 	border-top: 1px solid var(--background-modifier-border);
 	margin-top: 1.5em;
 	padding-top: 1.5em;
 }
-
 .setting-item.setting-item-heading:first-child {
 	border-top: none;
 	margin-top: 0;
 	padding-top: 0;
 }
 
-/* Setting descriptions */
 .setting-item-description {
 	color: var(--text-muted);
 	font-size: 0.9em;
 	line-height: 1.4;
 }
 
-/* Section description with bottom spacing */
 .nexus-properties-section-description {
 	padding-bottom: 1em;
 }
 
-/* Settings subsection container */
 .nexus-properties-settings-subsection {
 	margin-bottom: 0.5em;
 	padding-bottom: 0.25em;
 }
 
-/* Settings empty state */
 .nexus-properties-settings-empty-state {
 	padding: 1.5em;
 	margin: 1em 0;
@@ -167,12 +102,10 @@
 	line-height: 1.6;
 }
 
-/* Directories list container */
 .nexus-properties-directories-list {
 	margin-bottom: 1em;
 }
 
-/* Settings info note box */
 .nexus-properties-settings-info-note {
 	margin-top: 1em;
 	padding: 1em;
@@ -180,7 +113,6 @@
 	border-radius: 4px;
 }
 
-/* Settings warning box */
 .nexus-properties-settings-warning-box {
 	margin: 1em 0;
 	padding: 1em 1.2em;
@@ -189,14 +121,12 @@
 	border-left: 4px solid var(--text-error);
 	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
 }
-
 .nexus-properties-settings-warning-box strong {
 	color: var(--text-error);
 	font-size: 1em;
 	display: block;
 	margin-bottom: 0.5em;
 }
-
 .nexus-properties-settings-warning-box p {
 	margin: 0.5em 0 0;
 	color: var(--text-normal);
@@ -204,7 +134,6 @@
 	font-size: 0.95em;
 }
 
-/* Settings navigation tabs */
 .nexus-properties-settings-nav {
 	margin-bottom: 24px;
 	border-bottom: 1px solid var(--background-modifier-border);
@@ -217,7 +146,6 @@
 	gap: 8px;
 	flex-wrap: wrap;
 }
-
 .nexus-properties-nav-buttons button {
 	padding: 8px 16px;
 	border: 1px solid var(--background-modifier-border);
@@ -227,22 +155,18 @@
 	cursor: pointer;
 	transition: all 0.2s ease;
 }
-
 .nexus-properties-nav-buttons button.nexus-properties-active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 }
-
 .nexus-properties-nav-buttons button:hover:not(.nexus-properties-active) {
 	background-color: var(--background-modifier-hover);
 }
 
-/* Settings search */
 .nexus-properties-settings-search {
 	margin-left: auto;
 	flex-shrink: 0;
 }
-
 .nexus-properties-settings-search-input {
 	padding: 6px 10px;
 	border: 1px solid var(--background-modifier-border);
@@ -253,17 +177,14 @@
 	width: 150px;
 	transition: width 0.2s ease;
 }
-
 .nexus-properties-settings-search-input:focus {
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 2px rgba(var(--interactive-accent-rgb), 0.2);
 	width: 200px;
 }
-
 .nexus-properties-settings-search-section {
 	margin-bottom: 8px;
 }
-
 .nexus-properties-settings-search-no-results {
 	padding: 24px;
 	text-align: center;
@@ -271,14 +192,12 @@
 	font-style: italic;
 }
 
-/* Settings footer */
 .nexus-properties-settings-footer {
 	margin-top: 2rem;
 	text-align: center;
 	font-size: var(--font-ui-smaller);
 	color: var(--text-faint);
 }
-
 .nexus-properties-settings-footer-links {
 	display: flex;
 	justify-content: center;
@@ -291,25 +210,15 @@
 	color: var(--text-accent);
 }
 
-/* Color example list items */
 .nexus-properties-color-example-item {
 	display: flex;
 	align-items: center;
 	gap: 8px;
 	margin-bottom: 6px;
 }
-
-.nexus-properties-color-example-item
-	.nexus-properties-settings-info-box-example {
+.nexus-properties-color-example-item .nexus-properties-settings-info-box-example {
 	flex: 0 0 auto;
 }
-
-.nexus-properties-color-arrow {
-	flex-shrink: 0;
-	color: var(--text-muted);
-}
-
-/* Color example dot in examples */
 .nexus-properties-color-example-dot {
 	display: inline-block;
 	width: 16px;
@@ -320,13 +229,16 @@
 	vertical-align: middle;
 	flex-shrink: 0;
 }
-
 .nexus-properties-color-example-description {
 	color: var(--text-muted);
 	font-size: var(--font-ui-smaller);
 }
 
-/* Color rule items - Compact single row layout */
+.nexus-properties-color-arrow {
+	flex-shrink: 0;
+	color: var(--text-muted);
+}
+
 .nexus-properties-color-rule-item {
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 6px;
@@ -334,13 +246,11 @@
 	margin-bottom: 8px;
 	background-color: var(--background-secondary);
 }
-
 .nexus-properties-color-rule-main-row {
 	display: flex;
 	align-items: center;
 	gap: 12px;
 }
-
 .nexus-properties-color-rule-left {
 	display: flex;
 	align-items: center;
@@ -348,7 +258,10 @@
 	flex: 1;
 	min-width: 0;
 }
-
+.nexus-properties-color-rule-left input[type=checkbox] {
+	flex-shrink: 0;
+	cursor: pointer;
+}
 .nexus-properties-color-rule-order {
 	font-size: 11px;
 	font-weight: bold;
@@ -356,12 +269,6 @@
 	min-width: 20px;
 	flex-shrink: 0;
 }
-
-.nexus-properties-color-rule-left input[type="checkbox"] {
-	flex-shrink: 0;
-	cursor: pointer;
-}
-
 .nexus-properties-color-rule-expression-input {
 	flex: 1;
 	min-width: 0;
@@ -373,10 +280,54 @@
 	font-family: var(--font-monospace);
 	font-size: var(--font-ui-small);
 }
-
 .nexus-properties-color-rule-expression-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
+}
+.nexus-properties-color-rule-right {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	flex-shrink: 0;
+}
+.nexus-properties-color-rule-picker-wrapper {
+	display: flex;
+	align-items: center;
+}
+.nexus-properties-color-rule-picker-wrapper .setting-item {
+	border: none;
+	padding: 0;
+	margin: 0;
+	background: transparent;
+}
+.nexus-properties-color-rule-picker-wrapper .setting-item-control {
+	display: flex;
+	align-items: center;
+}
+.nexus-properties-color-rule-controls {
+	display: flex;
+	gap: 4px;
+}
+.nexus-properties-color-rule-btn {
+	padding: 4px 8px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+	cursor: pointer;
+	font-size: 14px;
+	line-height: 1;
+	transition: all 0.15s ease;
+}
+.nexus-properties-color-rule-btn:hover {
+	background-color: var(--background-modifier-hover);
+}
+.nexus-properties-color-rule-btn-delete {
+	color: var(--text-error);
+}
+.nexus-properties-color-rule-btn-delete:hover {
+	background-color: var(--background-modifier-error);
+	border-color: var(--text-error);
 }
 
 .nexus-properties-excluded-properties-input,
@@ -391,68 +342,12 @@
 	font-size: 0.9em;
 	margin-right: 8px;
 }
-
 .nexus-properties-excluded-properties-input:focus,
 .nexus-properties-included-properties-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
 
-.nexus-properties-color-rule-right {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	flex-shrink: 0;
-}
-
-.nexus-properties-color-rule-picker-wrapper {
-	display: flex;
-	align-items: center;
-}
-
-.nexus-properties-color-rule-picker-wrapper .setting-item {
-	border: none;
-	padding: 0;
-	margin: 0;
-	background: transparent;
-}
-
-.nexus-properties-color-rule-picker-wrapper .setting-item-control {
-	display: flex;
-	align-items: center;
-}
-
-.nexus-properties-color-rule-controls {
-	display: flex;
-	gap: 4px;
-}
-
-.nexus-properties-color-rule-btn {
-	padding: 4px 8px;
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	background-color: var(--background-primary);
-	color: var(--text-normal);
-	cursor: pointer;
-	font-size: 14px;
-	line-height: 1;
-	transition: all 0.15s ease;
-}
-
-.nexus-properties-color-rule-btn:hover {
-	background-color: var(--background-modifier-hover);
-}
-
-.nexus-properties-color-rule-btn-delete {
-	color: var(--text-error);
-}
-
-.nexus-properties-color-rule-btn-delete:hover {
-	background-color: var(--background-modifier-error);
-	border-color: var(--text-error);
-}
-
-/* Filter preset styles */
 .nexus-properties-filter-preset-item {
 	display: flex;
 	align-items: center;
@@ -463,7 +358,6 @@
 	margin-bottom: 8px;
 	background-color: var(--background-secondary);
 }
-
 .nexus-properties-filter-preset-name-input {
 	flex: 0 0 180px;
 	padding: 6px 10px;
@@ -475,12 +369,10 @@
 	font-size: 0.9em;
 	transition: border-color 0.2s ease;
 }
-
 .nexus-properties-filter-preset-name-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
-
 .nexus-properties-filter-preset-expression-input {
 	flex: 1;
 	min-width: 0;
@@ -493,12 +385,10 @@
 	font-size: 0.85em;
 	transition: border-color 0.2s ease;
 }
-
 .nexus-properties-filter-preset-expression-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
-
 .nexus-properties-filter-preset-btn-delete {
 	padding: 4px 10px;
 	background-color: transparent;
@@ -511,41 +401,19 @@
 	transition: all 0.2s ease;
 	flex-shrink: 0;
 }
-
 .nexus-properties-filter-preset-btn-delete:hover {
 	background-color: var(--background-modifier-error);
 	border-color: var(--text-error);
 }
 
-/* Settings array manager */
 .nexus-properties-settings-array-manager-list {
 	margin-bottom: 1em;
 }
-
-/* Make array manager input fields wider */
-.nexus-properties-settings-array-manager-list + .setting-item
-	.setting-item-control
-	input[type="text"] {
+.nexus-properties-settings-array-manager-list + .setting-item .setting-item-control input[type=text] {
 	min-width: 400px;
 	flex: 1;
 }
 
-/* Settings container spacing */
-.vertical-tab-content-container {
-	padding: 2em;
-}
-
-/* Utility classes */
-.nexus-properties-hidden {
-	display: none;
-}
-
-/* Override display for toggle containers when hidden */
-.nexus-properties-graph-toggle-container.nexus-properties-hidden {
-	display: none;
-}
-
-/* Relationship Graph View */
 .nexus-properties-graph-view-content {
 	display: flex;
 	flex-direction: column;
@@ -555,7 +423,6 @@
 	padding: 0;
 	overflow: hidden;
 }
-
 .nexus-properties-graph-view-header {
 	display: flex;
 	flex-direction: row;
@@ -567,7 +434,6 @@
 	background-color: var(--background-secondary);
 	flex-shrink: 0;
 }
-
 .nexus-properties-graph-view-title {
 	margin: 0;
 	color: var(--text-normal);
@@ -578,6 +444,21 @@
 	overflow-wrap: break-word;
 	word-wrap: break-word;
 	word-break: break-word;
+}
+.nexus-properties-graph-view-container {
+	flex: 1;
+	width: 100%;
+	min-height: 0;
+	height: 100%;
+	position: relative;
+	overflow: hidden;
+	background: var(--background-primary);
+}
+.nexus-properties-graph-view-container > div {
+	position: relative;
+	z-index: 1;
+	width: 100%;
+	height: 100%;
 }
 
 .nexus-properties-graph-controls-container {
@@ -596,379 +477,20 @@
 	gap: 0.5em;
 	font-size: 0.9em;
 }
-
 .nexus-properties-graph-toggle-checkbox {
 	cursor: pointer;
 	width: 16px;
 	height: 16px;
 }
-
 .nexus-properties-graph-toggle-label {
 	color: var(--text-muted);
 	cursor: pointer;
 	user-select: none;
 }
-
 .nexus-properties-graph-toggle-label:hover {
 	color: var(--text-normal);
 }
 
-/* ============================================
-   MOBILE OPTIMIZATIONS (< 600px)
-   ============================================ */
-@media (max-width: 600px) {
-	/* ===== GRAPH HEADER - COMPACT MODE ===== */
-	.nexus-properties-graph-view-header {
-		padding: 0.3em 0.5em;
-		gap: 0.3em;
-		min-height: auto;
-		flex-wrap: wrap;
-	}
-
-	/* Hide the "Relationship Graph: FileName" title text completely on mobile */
-	body .nexus-properties-graph-view-title {
-		display: none;
-	}
-
-	/* Controls container now includes filter preset - force single row */
-	.nexus-properties-graph-controls-container {
-		flex: 1 1 100%;
-		flex-wrap: nowrap;
-		justify-content: space-between;
-		gap: 0.3em;
-		align-items: center;
-	}
-
-	/* Move filter preset selector to header row with controls */
-	.nexus-properties-graph-view-header
-	.nexus-properties-graph-filter-preset-container {
-		order: 1;
-		flex-shrink: 0;
-	}
-
-	/* Make toggle containers much smaller and compact */
-	.nexus-properties-graph-toggle-container {
-		padding: 0.25em 0.4em;
-		font-size: 0.65em;
-		gap: 0.25em;
-		border-width: 1px;
-		min-width: 0;
-		white-space: nowrap;
-		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
-	}
-
-	/* Smaller checkbox */
-	.nexus-properties-graph-toggle-checkbox {
-		width: 11px;
-		height: 11px;
-		flex-shrink: 0;
-	}
-
-	/* Shorter labels for mobile */
-	.nexus-properties-graph-toggle-label {
-		font-size: 1em; /* Relative to container's 0.65em */
-	}
-
-	/* Shorten toggle label text on mobile */
-	/* nth-child(1) is parent dropdown — no label to shorten */
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(2)
-		.nexus-properties-graph-toggle-label::before {
-		content: "Related";
-	}
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(2)
-		.nexus-properties-graph-toggle-label {
-		font-size: 0;
-	}
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(2)
-		.nexus-properties-graph-toggle-label::before {
-		font-size: 1rem;
-	}
-
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(3)
-		.nexus-properties-graph-toggle-label::before {
-		content: "All";
-	}
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(3)
-		.nexus-properties-graph-toggle-label {
-		font-size: 0;
-	}
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(3)
-		.nexus-properties-graph-toggle-label::before {
-		font-size: 1rem;
-	}
-
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(4)
-		.nexus-properties-graph-toggle-label::before {
-		content: "Current";
-	}
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(4)
-		.nexus-properties-graph-toggle-label {
-		font-size: 0;
-	}
-	.nexus-properties-graph-view-header
-		.nexus-properties-graph-toggle-container:nth-child(4)
-		.nexus-properties-graph-toggle-label::before {
-		font-size: 1rem;
-	}
-
-	/* ===== COMBINED SEARCH/FILTER ROW ===== */
-	/* Hide individual rows, we'll combine them */
-	.nexus-properties-graph-search-row {
-		display: none;
-	}
-
-	.nexus-properties-graph-filter-row {
-		display: flex;
-		padding: 0.3em 0.5em;
-		gap: 0.3em;
-		align-items: center;
-	}
-
-	/* Search and filter inputs share the row - 50% each */
-	.nexus-properties-graph-search-input-container,
-	.nexus-properties-graph-filter-input-container {
-		flex: 1 1 calc(50% - 0.15em);
-		min-width: 0;
-	}
-
-	/* Move search input to filter row on mobile */
-	.nexus-properties-graph-filter-row
-	.nexus-properties-graph-search-input-container {
-		display: flex;
-	}
-
-	/* Smaller input heights on mobile */
-	.nexus-properties-graph-view-content .nexus-properties-graph-search-input,
-	.nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
-		height: 2em;
-		padding: 0.35em 0.5em;
-		font-size: 0.8em;
-		border-radius: 4px;
-		width: 100%;
-	}
-
-	/* Filter preset selector in header - smaller */
-	.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-preset-select {
-		height: 2em;
-		min-width: 70px;
-		padding: 0.25em 1.6em 0.25em 0.4em;
-		font-size: 0.65em;
-		border-radius: 4px;
-		border-width: 1px;
-	}
-
-	.nexus-properties-graph-filter-preset-container::after {
-		font-size: 0.55em;
-		right: 0.5em;
-	}
-
-	/* Hide filter preset from its normal location in filter row */
-	.nexus-properties-graph-filter-row
-	.nexus-properties-graph-filter-preset-container {
-		display: none;
-	}
-
-	/* ===== HIDE ZOOM INDICATOR ON MOBILE ===== */
-	body .nexus-properties-zoom-indicator {
-		display: none;
-	}
-
-	/* ===== ZOOM MODE - HIDE EVERYTHING EXCEPT PREVIEW ===== */
-	/* When zoom preview exists, hide header/search/filter */
-	body .nexus-properties-graph-view-content:has(
-			.nexus-properties-graph-zoom-preview
-		)
-		.nexus-properties-graph-view-header,
-	body
-		.nexus-properties-graph-view-content:has(
-			.nexus-properties-graph-zoom-preview
-		)
-		.nexus-properties-graph-search-row,
-	body
-		.nexus-properties-graph-view-content:has(
-			.nexus-properties-graph-zoom-preview
-		)
-		.nexus-properties-graph-filter-row {
-		display: none;
-	}
-
-	/* ===== ZOOM PREVIEW - COMPACT CONTROLS ===== */
-	body .nexus-properties-graph-zoom-preview-controls {
-		padding: 0.5em 0.6em;
-		gap: 0.3em;
-		min-height: auto;
-		flex-wrap: wrap;
-	}
-
-	/* Compact zoom preview title on mobile (20% smaller) */
-	body .nexus-properties-graph-zoom-preview-title {
-		font-size: 0.72em;
-		flex: 1 1 100%;
-		margin-bottom: 0.25em;
-	}
-
-	/* Toggles container takes full width */
-	body .nexus-properties-graph-zoom-preview-toggles {
-		flex: 1 1 100%;
-		justify-content: space-between;
-		gap: 0.3em;
-	}
-
-	/* Compact toggle buttons in zoom preview */
-	body .nexus-properties-graph-zoom-preview-toggles
-		.nexus-properties-graph-toggle-container {
-		padding: 0.3em 0.4em;
-		font-size: 0.7em;
-		gap: 0.25em;
-		flex: 1; /* Equal width distribution */
-		justify-content: center;
-	}
-
-	/* Adjust checkbox size in zoom preview */
-	body .nexus-properties-graph-zoom-preview-toggles
-		.nexus-properties-graph-toggle-checkbox {
-		width: 11px;
-		height: 11px;
-	}
-
-	/* Shorter toggle labels */
-	body .nexus-properties-graph-zoom-preview-toggles
-		.nexus-properties-graph-toggle-label {
-		overflow: hidden;
-		text-overflow: ellipsis;
-		white-space: nowrap;
-	}
-
-	/* Reduce zoom preview heights on mobile */
-	body .nexus-properties-graph-zoom-preview {
-		max-height: min(50vh, var(--zoom-preview-max-height, 200px));
-	}
-
-	body .nexus-properties-graph-zoom-preview-frontmatter {
-		padding: 0.3em;
-		gap: 0.2em;
-		grid-template-columns: repeat(
-				auto-fill,
-				minmax(var(--mobile-frontmatter-property-width, 100px), 1fr)
-			);
-		font-size: 0.75em;
-		max-height: min(30vh, var(--zoom-preview-frontmatter-height, 70px));
-	}
-
-	body .nexus-properties-graph-zoom-preview-property {
-		padding: 0.25em;
-		gap: 0.15em;
-	}
-
-	body .nexus-properties-graph-zoom-preview-property-key {
-		font-size: 0.7em;
-	}
-
-	body .nexus-properties-graph-zoom-preview-property-value {
-		font-size: 0.8em;
-		gap: 0.15em;
-	}
-
-	body .nexus-properties-graph-zoom-preview-content {
-		padding: 0.3em;
-		font-size: 0.8em;
-	}
-
-	body .nexus-properties-graph-zoom-preview-content p {
-		margin: 0.3em 0;
-	}
-
-	body .nexus-properties-graph-zoom-preview-content p:first-child {
-		margin-top: 0;
-	}
-
-	body .nexus-properties-graph-zoom-preview-content p:last-child {
-		margin-bottom: 0;
-	}
-
-	/* ===== VIEW SWITCHER BUTTON - 30% SMALLER ===== */
-	body .nexus-properties-view-switcher-header {
-		padding: 0.3em 0.4em;
-		gap: 0.5em;
-		grid-template-columns: 1fr auto 1fr;
-	}
-
-	body .nexus-properties-view-switcher-stats {
-		gap: 10px;
-		flex-shrink: 1;
-		max-width: 100%;
-		overflow: hidden;
-	}
-
-	body .nexus-properties-view-switcher-stats-column {
-		gap: 2px;
-	}
-
-	body .nexus-properties-view-switcher-stat-item {
-		font-size: 0.56em;
-	}
-
-	body .nexus-properties-view-switcher-buttons {
-		gap: 0.25em;
-	}
-
-	body button.nexus-properties-view-toggle-button {
-		padding: 0.25em 0.4em;
-		min-height: 20px;
-		font-size: 0.6em;
-		border-radius: 3px;
-		border-width: 1px;
-		flex-shrink: 0;
-	}
-
-	body button.nexus-properties-hierarchy-source-button {
-		padding: 0.25em 0.4em;
-		min-height: 20px;
-		font-size: 0.6em;
-		border-radius: 3px;
-		border-width: 1px;
-		flex-shrink: 0;
-	}
-
-	/* ===== BASES VIEW - COMPACT SELECTORS ===== */
-	body .nexus-properties-bases-view-selector {
-		padding: 6px;
-	}
-
-	body .nexus-properties-bases-select {
-		font-size: 11px;
-		white-space: nowrap;
-		overflow: hidden;
-		text-overflow: ellipsis;
-		border-width: 1.2px;
-	}
-
-	/* ===== FORCE FULL-WIDTH SIDEBAR ON MOBILE ===== */
-	/* Target Obsidian's sidebar when Nexus Properties view is active */
-	.workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content),
-	.workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
-		width: 100%;
-		max-width: 100%;
-		min-width: 100%;
-	}
-
-	/* Also ensure the leaf itself is full width */
-	.workspace-leaf:has(.nexus-properties-view-switcher-content) {
-		width: 100%;
-		max-width: 100%;
-	}
-}
-
-/* Search Row - contains search input (matches filter row structure) */
 .nexus-properties-graph-search-row {
 	display: flex;
 	gap: 0.5em;
@@ -976,25 +498,21 @@
 	background-color: var(--background-secondary);
 	border-bottom: 2px solid var(--background-modifier-border);
 	flex-shrink: 0;
-	animation: slideDown 0.2s ease-out;
+	animation: slideDown 0.2s ease;
 }
-
 .nexus-properties-graph-search-row.nexus-properties-hidden {
 	display: none;
 }
 
-/* Search input container */
 .nexus-properties-graph-search-input-container {
 	flex: 1;
 }
 
-/* Shared input styling for consistency - force exact same height */
 .nexus-properties-graph-view-content .nexus-properties-graph-search-input,
 .nexus-properties-graph-view-content .nexus-properties-graph-filter-input,
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-preset-select {
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
 	width: 100%;
-	height: 2.8em; /* Fixed height to ensure consistency */
+	height: 2.8em;
 	padding: 0.65em 1em;
 	margin: 0;
 	background-color: var(--background-primary);
@@ -1008,29 +526,47 @@
 	transition: border-color 0.2s ease;
 	vertical-align: middle;
 	line-height: 1.4;
-	/* Reset any browser defaults */
 	appearance: none;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 }
-
 .nexus-properties-graph-view-content .nexus-properties-graph-search-input:focus,
 .nexus-properties-graph-view-content .nexus-properties-graph-filter-input:focus,
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-preset-select:focus {
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
 }
-
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-search-input::placeholder,
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-input::placeholder {
+.nexus-properties-graph-view-content .nexus-properties-graph-search-input::placeholder,
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input::placeholder {
 	color: var(--text-faint);
 }
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
+	font-family: var(--font-monospace);
+}
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-input::placeholder {
+	font-family: var(--font-text);
+}
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
+	width: auto;
+	min-width: 120px;
+	padding: 0.65em 2.2em 0.65em 1em;
+	cursor: pointer;
+}
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:focus {
+	outline: none;
+	background-color: var(--interactive-hover);
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
+}
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select option {
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+}
+.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select:hover {
+	border-color: var(--interactive-accent);
+}
 
-/* Graph filter row - contains preset selector and filter input */
 .nexus-properties-graph-filter-row {
 	display: flex;
 	gap: 0.5em;
@@ -1038,19 +574,16 @@
 	background-color: var(--background-secondary);
 	border-bottom: 2px solid var(--background-modifier-border);
 	flex-shrink: 0;
-	animation: slideDown 0.2s ease-out;
+	animation: slideDown 0.2s ease;
 }
-
 .nexus-properties-graph-filter-row.nexus-properties-hidden {
 	display: none;
 }
 
-/* Preset selector container */
 .nexus-properties-graph-filter-preset-container {
 	flex-shrink: 0;
 	position: relative;
 }
-
 .nexus-properties-graph-filter-preset-container::after {
 	content: "▼";
 	position: absolute;
@@ -1062,71 +595,12 @@
 	font-size: 0.65em;
 	line-height: 1;
 }
-
-/* Preset selector specific overrides */
-.nexus-properties-graph-view-content
-.nexus-properties-graph-filter-preset-select {
-	width: auto;
-	min-width: 120px;
-	padding: 0.65em 2.2em 0.65em 1em; /* Override padding for dropdown arrow space */
-	cursor: pointer;
-}
-
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-preset-select:focus {
-	outline: none;
-	background-color: var(--interactive-hover);
-	border-color: var(--interactive-accent);
-	box-shadow: 0 0 0 2px var(--background-modifier-border-focus);
-}
-
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-preset-select
-	option {
-	background-color: var(--background-primary);
-	color: var(--text-normal);
-}
-
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-preset-select:hover {
-	border-color: var(--interactive-accent);
-}
-
 .nexus-properties-graph-filter-preset-container:hover::after {
 	color: var(--text-normal);
 }
 
-/* Filter input container */
 .nexus-properties-graph-filter-input-container {
 	flex: 1;
-}
-
-/* Filter input specific override - use monospace font for expressions */
-.nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
-	font-family: var(--font-monospace);
-}
-
-.nexus-properties-graph-view-content
-	.nexus-properties-graph-filter-input::placeholder {
-	font-family: var(--font-text); /* Placeholder uses regular font */
-}
-
-/* Wrapper for zoom preview - sits between header and graph */
-.nexus-properties-graph-zoom-preview-wrapper {
-	width: 100%;
-	flex-shrink: 0;
-	position: relative;
-	z-index: 10;
-}
-
-.nexus-properties-graph-view-container {
-	flex: 1;
-	width: 100%;
-	min-height: 0;
-	height: 100%; /* Ensure full height for Cytoscape container */
-	position: relative;
-	overflow: hidden;
-	background: var(--background-primary);
 }
 
 .nexus-properties-graph-empty-state {
@@ -1140,15 +614,6 @@
 	text-align: center;
 }
 
-/* Ensure Cytoscape renders properly */
-.nexus-properties-graph-view-container > div {
-	position: relative;
-	z-index: 1;
-	width: 100%;
-	height: 100%;
-}
-
-/* Zoom Indicator */
 .nexus-properties-zoom-indicator {
 	display: flex;
 	align-items: center;
@@ -1158,9 +623,8 @@
 	border: 2px solid var(--background-modifier-border);
 	border-radius: 6px;
 	flex-shrink: 0;
-	transition: border-color 0.2s;
+	transition: border-color 0.2s ease;
 }
-
 .nexus-properties-zoom-indicator:hover {
 	border-color: var(--interactive-accent);
 }
@@ -1178,32 +642,119 @@ input.nexus-properties-zoom-indicator-input {
 	cursor: text;
 	box-shadow: none;
 }
-
 input.nexus-properties-zoom-indicator-input:focus {
 	background-color: var(--interactive-hover);
 	border-radius: 4px;
 }
 
-/* Node Preview Modal */
+.nexus-properties-graph-parent-dropdown {
+	padding: 4px 8px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-normal);
+	cursor: pointer;
+	transition: all 0.15s ease;
+	max-width: 160px;
+}
+.nexus-properties-graph-parent-dropdown:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+.nexus-properties-graph-parent-dropdown:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	color: var(--text-normal);
+}
+.nexus-properties-graph-parent-dropdown option {
+	background: var(--background-primary);
+	color: var(--text-normal);
+}
+
+.nexus-properties-graph-container {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	height: 100%;
+}
+
+.nexus-properties-graph-zoom-preview-wrapper {
+	width: 100%;
+	flex-shrink: 0;
+	position: relative;
+	z-index: 10;
+}
+
+.nexus-node-creation-modal {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	padding: 2em;
+	min-width: 500px;
+}
+.nexus-node-creation-title {
+	text-align: center;
+	margin-bottom: 1.5em;
+	font-size: 1.5em;
+	color: var(--text-normal);
+}
+.nexus-node-creation-input-container {
+	width: 100%;
+	margin-bottom: 1.5em;
+}
+.nexus-node-creation-buttons {
+	display: flex;
+	gap: 1em;
+	justify-content: center;
+	width: 100%;
+}
+.nexus-node-creation-button {
+	padding: 0.6em 2em;
+	font-size: 1.15em;
+	border-radius: 6px;
+	cursor: pointer;
+	transition: all 0.2s ease;
+}
+.nexus-node-creation-button:hover {
+	transform: translateY(-1px);
+}
+
+.modal-content.nexus-node-creation-modal .nexus-node-creation-input-container input.nexus-node-creation-input {
+	width: 100%;
+	padding: 0.75em 1em;
+	font-size: 1.5em;
+	text-align: center;
+	border: 2px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background-color: var(--background-primary);
+	color: var(--text-normal);
+	transition: border-color 0.2s ease;
+}
+.modal-content.nexus-node-creation-modal .nexus-node-creation-input-container input.nexus-node-creation-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+}
+
 .nexus-properties-node-preview-modal .modal-content {
 	max-width: 700px;
 }
-
 .nexus-properties-node-preview-header h2 {
 	margin: 0 0 1.5em 0;
 	color: var(--text-normal);
 	cursor: pointer;
-	transition: color 0.2s;
+	transition: color 0.2s ease;
 }
-
 .nexus-properties-node-preview-header h2:hover {
 	color: var(--interactive-accent);
 }
-
 .nexus-properties-node-preview-section {
 	margin-bottom: 1.5em;
 }
-
 .nexus-properties-node-preview-section-title {
 	margin: 0 0 1em 0;
 	color: var(--text-muted);
@@ -1212,12 +763,10 @@ input.nexus-properties-zoom-indicator-input:focus {
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 }
-
 .nexus-properties-node-preview-props-grid {
 	display: grid;
 	gap: 1em;
 }
-
 .nexus-properties-node-preview-prop-item {
 	display: grid;
 	grid-template-columns: 150px 1fr;
@@ -1227,40 +776,33 @@ input.nexus-properties-zoom-indicator-input:focus {
 	border-radius: 6px;
 	border-left: 3px solid var(--background-modifier-border);
 }
-
 .nexus-properties-node-preview-prop-key {
 	font-weight: 600;
 	color: var(--text-normal);
 	word-break: break-word;
 }
-
 .nexus-properties-node-preview-prop-value {
 	color: var(--text-muted);
 	word-break: break-word;
 }
-
 .nexus-properties-node-preview-prop-link {
 	color: var(--link-color);
 	text-decoration: none;
 	cursor: pointer;
-	transition: color 0.2s;
+	transition: color 0.2s ease;
 }
-
 .nexus-properties-node-preview-prop-link:hover {
 	color: var(--link-color-hover);
 	text-decoration: underline;
 }
-
 .nexus-properties-node-preview-prop-empty {
 	color: var(--text-faint);
 	font-style: italic;
 }
-
 .nexus-properties-node-preview-prop-separator {
 	color: var(--text-faint);
 	margin: 0 0.25em;
 }
-
 .nexus-properties-node-preview-empty {
 	color: var(--text-muted);
 	font-style: italic;
@@ -1268,15 +810,12 @@ input.nexus-properties-zoom-indicator-input:focus {
 	padding: 2em;
 }
 
-/* Node Edit Modal */
 .nexus-properties-node-edit-modal .modal-content {
 	max-width: 800px;
 }
-
 .nexus-properties-node-edit-section {
 	margin-bottom: 1.5em;
 }
-
 .nexus-properties-node-edit-header {
 	display: flex;
 	justify-content: space-between;
@@ -1285,14 +824,12 @@ input.nexus-properties-zoom-indicator-input:focus {
 	padding-bottom: 0.5em;
 	border-bottom: 1px solid var(--background-modifier-border);
 }
-
 .nexus-properties-node-edit-section-title {
 	margin: 0;
 	color: var(--text-normal);
 	font-size: 1em;
 	font-weight: 600;
 }
-
 .nexus-properties-node-edit-props-container {
 	display: flex;
 	flex-direction: column;
@@ -1303,7 +840,6 @@ input.nexus-properties-zoom-indicator-input:focus {
 	background-color: var(--background-secondary);
 	border-radius: 6px;
 }
-
 .nexus-properties-node-edit-prop-row {
 	display: grid;
 	grid-template-columns: 200px 1fr auto;
@@ -1313,9 +849,7 @@ input.nexus-properties-zoom-indicator-input:focus {
 	background-color: var(--background-primary);
 	border-radius: 4px;
 }
-
-.nexus-properties-node-edit-prop-key-input,
-.nexus-properties-node-edit-prop-value-input {
+.nexus-properties-node-edit-prop-key-input, .nexus-properties-node-edit-prop-value-input {
 	width: 100%;
 	padding: 0.5em;
 	background-color: var(--background-primary);
@@ -1324,13 +858,10 @@ input.nexus-properties-zoom-indicator-input:focus {
 	color: var(--text-normal);
 	font-family: var(--font-text);
 }
-
-.nexus-properties-node-edit-prop-key-input:focus,
-.nexus-properties-node-edit-prop-value-input:focus {
+.nexus-properties-node-edit-prop-key-input:focus, .nexus-properties-node-edit-prop-value-input:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
-
 .nexus-properties-node-edit-remove-button {
 	padding: 0.25em 0.5em;
 	background-color: var(--background-modifier-error);
@@ -1340,14 +871,240 @@ input.nexus-properties-zoom-indicator-input:focus {
 	cursor: pointer;
 	font-size: 1.2em;
 	line-height: 1;
-	transition: background-color 0.2s;
+	transition: background-color 0.2s ease;
 }
-
 .nexus-properties-node-edit-remove-button:hover {
 	background-color: var(--background-modifier-error-hover);
 }
 
-/* Toggle containers */
+.nexus-whats-new-modal .modal {
+	max-width: 800px;
+	width: 90%;
+}
+.nexus-whats-new-plugin-name {
+	color: var(--link-color);
+	text-decoration: none;
+	transition: all 0.2s ease;
+	position: relative;
+	font-weight: 600;
+}
+.nexus-whats-new-plugin-name:hover {
+	color: var(--link-color-hover);
+	text-decoration: none;
+}
+.nexus-whats-new-plugin-name::after {
+	content: "";
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background-color: var(--interactive-accent);
+	transition: width 0.3s ease;
+}
+.nexus-whats-new-plugin-name:hover::after {
+	width: 100%;
+}
+.nexus-whats-new-subtitle {
+	color: var(--text-muted);
+	font-size: 0.9rem;
+	margin: 0 0 1rem 0;
+}
+.nexus-whats-new-support {
+	margin: 0 0 1rem 0;
+	padding: 1rem;
+	background-color: var(--background-secondary);
+	border-radius: 8px;
+}
+.nexus-whats-new-support h3 {
+	margin-top: 0;
+	margin-bottom: 0.5rem;
+	font-size: 1rem;
+}
+.nexus-whats-new-support p {
+	margin: 0.5rem 0;
+	color: var(--text-normal);
+}
+.nexus-whats-new-support a {
+	color: var(--link-color);
+	text-decoration: none;
+	transition: all 0.2s ease;
+	position: relative;
+}
+.nexus-whats-new-support a:hover {
+	color: var(--link-color-hover);
+	text-decoration: none;
+}
+.nexus-whats-new-support a::after {
+	content: "";
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	width: 0;
+	height: 2px;
+	background-color: var(--interactive-accent);
+	transition: width 0.3s ease;
+}
+.nexus-whats-new-support a:hover::after {
+	width: 100%;
+}
+.nexus-whats-new-content {
+	max-height: 400px;
+	overflow-y: auto;
+	margin-bottom: 1rem;
+	padding-right: 0.5rem;
+	border-radius: 8px;
+}
+.nexus-whats-new-content h2 {
+	font-size: 1.3rem;
+	margin-top: 1.5rem;
+	margin-bottom: 0.5rem;
+	color: var(--text-accent);
+}
+.nexus-whats-new-content h3 {
+	font-size: 1.1rem;
+	margin-top: 1rem;
+	margin-bottom: 0.5rem;
+}
+.nexus-whats-new-content ul {
+	padding-left: 1.5rem;
+}
+.nexus-whats-new-content li {
+	margin-bottom: 0.5rem;
+	line-height: 1.6;
+}
+.nexus-whats-new-content code {
+	background: var(--code-background);
+	padding: 0.2em 0.4em;
+	border-radius: 3px;
+	font-size: 0.9em;
+}
+.nexus-whats-new-content pre {
+	background: var(--code-background);
+	padding: 1rem;
+	border-radius: 6px;
+	overflow-x: auto;
+}
+.nexus-whats-new-content a.external-link {
+	color: var(--link-external-color);
+}
+.nexus-whats-new-content a.external-link::after {
+	content: "↗";
+	margin-left: 0.2em;
+	font-size: 0.8em;
+}
+.nexus-whats-new-empty {
+	text-align: center;
+	color: var(--text-muted);
+	padding: 2rem;
+	font-style: italic;
+}
+.nexus-whats-new-sticky-footer {
+	position: sticky;
+	bottom: 0;
+	background: var(--background-primary);
+	padding-top: 0.75rem;
+	margin-top: 0;
+	z-index: 10;
+	border-top: 1px solid var(--background-modifier-border);
+}
+.nexus-whats-new-buttons {
+	display: flex;
+	gap: 0.5rem;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	padding-bottom: 0.5rem;
+	width: 100%;
+}
+.nexus-whats-new-buttons button {
+	flex: 1;
+	min-width: 0;
+	padding: 0.5rem 1rem;
+	border-radius: 4px;
+	cursor: pointer;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--interactive-normal);
+	color: var(--text-normal);
+	transition: all 0.2s ease;
+	text-align: center;
+}
+.nexus-whats-new-buttons button:hover {
+	background: var(--interactive-hover);
+	border-color: var(--interactive-accent);
+	transform: translateY(-1px);
+	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+.nexus-whats-new-buttons button:active {
+	transform: translateY(0);
+	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+}
+
+.nexus-title-property-setup-modal {
+	display: flex;
+	flex-direction: column;
+	padding: 1.5em;
+	max-width: 550px;
+}
+.nexus-title-property-setup-title {
+	text-align: center;
+	margin-bottom: 1em;
+	font-size: 1.3em;
+	color: var(--text-normal);
+}
+.nexus-title-property-setup-description {
+	margin-bottom: 1.5em;
+}
+.nexus-title-property-setup-description p {
+	margin-bottom: 0.75em;
+	line-height: 1.6;
+	color: var(--text-muted);
+}
+.nexus-title-property-setup-warning {
+	background: var(--background-secondary);
+	padding: 0.75em 1em;
+	border-radius: 6px;
+	border-left: 3px solid var(--interactive-accent);
+}
+.nexus-title-property-setup-buttons {
+	display: flex;
+	flex-direction: column;
+	gap: 0.75em;
+	margin-top: 1em;
+}
+.nexus-title-property-setup-button {
+	padding: 0.75em 1.5em;
+	border-radius: 6px;
+	cursor: pointer;
+	border: 1px solid var(--background-modifier-border);
+	background: var(--interactive-normal);
+	color: var(--text-normal);
+	font-size: 1em;
+	transition: all 0.2s ease;
+}
+.nexus-title-property-setup-button:hover {
+	background: var(--interactive-hover);
+	border-color: var(--interactive-accent);
+}
+.nexus-title-property-setup-button.mod-cta {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+	border-color: var(--interactive-accent);
+}
+.nexus-title-property-setup-button.mod-cta:hover {
+	background: var(--interactive-accent-hover);
+	border-color: var(--interactive-accent-hover);
+}
+.nexus-title-property-setup-button-later {
+	background: transparent;
+	color: var(--text-muted);
+	border-color: transparent;
+}
+.nexus-title-property-setup-button-later:hover {
+	background: var(--background-secondary);
+	color: var(--text-normal);
+	border-color: var(--background-modifier-border);
+}
+
 .nexus-properties-graph-toggle-container {
 	display: flex;
 	align-items: center;
@@ -1362,54 +1119,31 @@ input.nexus-properties-zoom-indicator-input:focus {
 	transition: all 0.2s ease;
 	user-select: none;
 }
-
 .nexus-properties-graph-toggle-container:hover {
 	background-color: var(--background-secondary);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
 }
-
 .nexus-properties-graph-toggle-container:active {
 	transform: scale(0.98);
 }
-
-/* Make label not selectable and clickable */
 .nexus-properties-graph-toggle-container .nexus-properties-graph-toggle-label {
 	cursor: pointer;
 	user-select: none;
 }
 
-/* Zoom Mode Preview Overlay */
 .nexus-properties-graph-zoom-preview {
 	position: relative;
 	width: 100%;
 	max-height: var(--zoom-preview-max-height, 280px);
-	background: linear-gradient(
-		to bottom,
-		var(--background-primary) 0%,
-		var(--background-primary) 85%,
-		transparent 100%
-	);
+	background: linear-gradient(to bottom, var(--background-primary) 0%, var(--background-primary) 85%, transparent 100%);
 	border-bottom: 2px solid var(--background-modifier-border);
 	box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
 	overflow: hidden;
 	display: flex;
 	flex-direction: column;
 	backdrop-filter: blur(8px);
-	animation: slideDown 0.3s ease-out;
+	animation: slideDown 0.3s ease;
 }
-
-@keyframes slideDown {
-	from {
-		transform: translateY(-20px);
-		opacity: 0;
-	}
-	to {
-		transform: translateY(0);
-		opacity: 1;
-	}
-}
-
-/* Controls container - header and toggles in flexbox */
 .nexus-properties-graph-zoom-preview-controls {
 	display: flex;
 	justify-content: space-between;
@@ -1419,7 +1153,6 @@ input.nexus-properties-zoom-indicator-input:focus {
 	flex-shrink: 0;
 	gap: 1em;
 }
-
 .nexus-properties-graph-zoom-preview-title {
 	margin: 0;
 	color: var(--text-normal);
@@ -1430,19 +1163,14 @@ input.nexus-properties-zoom-indicator-input:focus {
 	cursor: pointer;
 	transition: color 0.2s ease;
 }
-
 .nexus-properties-graph-zoom-preview-title:hover {
 	color: var(--interactive-accent);
 }
-
-/* Toggles container - right side */
 .nexus-properties-graph-zoom-preview-toggles {
 	display: flex;
 	gap: 0.75em;
 	align-items: center;
 }
-
-/* Body container that wraps frontmatter and content */
 .nexus-properties-graph-zoom-preview-body {
 	flex: 1;
 	min-height: 0;
@@ -1450,7 +1178,12 @@ input.nexus-properties-zoom-indicator-input:focus {
 	flex-direction: column;
 	overflow: hidden;
 }
-
+.nexus-properties-graph-zoom-preview-body.nexus-properties-hidden {
+	display: none;
+}
+.nexus-properties-graph-zoom-preview-body:has(.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden) .nexus-properties-graph-zoom-preview-content {
+	flex: 0 1 auto;
+}
 .nexus-properties-graph-zoom-preview-frontmatter {
 	padding: 0.7em 1.4em;
 	display: grid;
@@ -1463,7 +1196,9 @@ input.nexus-properties-zoom-indicator-input:focus {
 	overflow-y: auto;
 	font-size: 0.9em;
 }
-
+.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden {
+	display: none;
+}
 .nexus-properties-graph-zoom-preview-property {
 	display: flex;
 	flex-direction: column;
@@ -1473,7 +1208,6 @@ input.nexus-properties-zoom-indicator-input:focus {
 	border-radius: 4px;
 	border-left: 2px solid var(--interactive-accent);
 }
-
 .nexus-properties-graph-zoom-preview-property-key {
 	font-size: 0.75em;
 	font-weight: 600;
@@ -1481,7 +1215,6 @@ input.nexus-properties-zoom-indicator-input:focus {
 	text-transform: uppercase;
 	letter-spacing: 0.5px;
 }
-
 .nexus-properties-graph-zoom-preview-property-value {
 	font-size: 0.9em;
 	color: var(--text-normal);
@@ -1490,38 +1223,31 @@ input.nexus-properties-zoom-indicator-input:focus {
 	flex-wrap: wrap;
 	gap: 0.25em;
 }
-
 .nexus-properties-graph-zoom-preview-property-link {
 	color: var(--link-color);
 	text-decoration: none;
 	cursor: pointer;
 	transition: color 0.2s ease;
 }
-
 .nexus-properties-graph-zoom-preview-property-link:hover {
 	color: var(--link-color-hover);
 	text-decoration: underline;
 }
-
 .nexus-properties-graph-zoom-preview-property-text {
 	color: var(--text-normal);
 }
-
 .nexus-properties-graph-zoom-preview-property-empty {
 	color: var(--text-faint);
 	font-style: italic;
 }
-
 .nexus-properties-graph-zoom-preview-property-separator {
 	color: var(--text-muted);
 }
-
 .nexus-properties-graph-zoom-preview-empty {
 	color: var(--text-muted);
 	font-style: italic;
 	padding: 0.5em 0;
 }
-
 .nexus-properties-graph-zoom-preview-content {
 	flex: 1;
 	padding: 0.3em 2em 0.5em 2em;
@@ -1529,7 +1255,9 @@ input.nexus-properties-zoom-indicator-input:focus {
 	overflow-x: hidden;
 	min-height: 0;
 }
-
+.nexus-properties-graph-zoom-preview-content.nexus-properties-hidden {
+	display: none;
+}
 .nexus-properties-graph-zoom-preview-content-text {
 	color: var(--text-muted);
 	font-size: 0.95em;
@@ -1538,52 +1266,35 @@ input.nexus-properties-zoom-indicator-input:focus {
 	word-wrap: break-word;
 }
 
-/* CSS overrides for hidden sections - MUST come after base styles for proper cascade */
-/* These have higher specificity (2 classes) than base styles (1 class) */
-.nexus-properties-graph-zoom-preview-body.nexus-properties-hidden {
-	display: none;
+@keyframes slideDown {
+	from {
+		transform: translateY(-20px);
+		opacity: 0;
+	}
+	to {
+		transform: translateY(0);
+		opacity: 1;
+	}
 }
-
-.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden {
-	display: none;
-}
-
-.nexus-properties-graph-zoom-preview-content.nexus-properties-hidden {
-	display: none;
-}
-
-/* When frontmatter is hidden, content should only take needed space */
-.nexus-properties-graph-zoom-preview-body:has(
-	.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden
-)
-.nexus-properties-graph-zoom-preview-content {
-	flex: 0 1 auto;
-}
-
-/* Scrollbar styling for preview */
 .nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar,
 .nexus-properties-graph-zoom-preview-content::-webkit-scrollbar {
 	width: 8px;
 }
-
 .nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar-track,
 .nexus-properties-graph-zoom-preview-content::-webkit-scrollbar-track {
 	background: var(--background-secondary);
 	border-radius: 4px;
 }
-
 .nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar-thumb,
 .nexus-properties-graph-zoom-preview-content::-webkit-scrollbar-thumb {
 	background: var(--background-modifier-border);
 	border-radius: 4px;
 }
-
 .nexus-properties-graph-zoom-preview-frontmatter::-webkit-scrollbar-thumb:hover,
 .nexus-properties-graph-zoom-preview-content::-webkit-scrollbar-thumb:hover {
 	background: var(--text-faint);
 }
 
-/* Property Tooltip */
 .nexus-properties-property-tooltip {
 	position: fixed;
 	z-index: 1000;
@@ -1596,49 +1307,41 @@ input.nexus-properties-zoom-indicator-input:focus {
 	max-width: 255px;
 	pointer-events: auto;
 }
-
 .nexus-properties-property-tooltip-title {
 	margin-bottom: 0.5em;
 	word-wrap: break-word;
 	word-break: break-word;
 	overflow-wrap: break-word;
 }
-
 .nexus-properties-property-tooltip-title-link {
 	color: var(--text-normal);
 	font-size: 1.1em;
 	font-weight: 600;
 	text-decoration: none;
 	cursor: pointer;
-	transition: color 0.2s;
+	transition: color 0.2s ease;
 }
-
 .nexus-properties-property-tooltip-title-link:hover {
 	color: var(--link-color);
 }
-
 .nexus-properties-property-tooltip-separator {
 	height: 1px;
 	background-color: var(--background-modifier-border);
 	margin: 0.5em -0.85em 0.65em -0.85em;
 }
-
 .nexus-properties-property-tooltip-item {
 	display: flex;
 	gap: 0.5em;
 	margin-bottom: 0.25em;
 }
-
 .nexus-properties-property-tooltip-item:last-child {
 	margin-bottom: 0;
 }
-
 .nexus-properties-property-tooltip-key {
 	color: var(--text-muted);
 	font-weight: 600;
 	flex-shrink: 0;
 }
-
 .nexus-properties-property-tooltip-value {
 	color: var(--text-normal);
 	word-break: break-word;
@@ -1648,9 +1351,8 @@ input.nexus-properties-zoom-indicator-input:focus {
 	color: var(--link-color);
 	text-decoration: none;
 	cursor: pointer;
-	transition: color 0.2s;
+	transition: color 0.2s ease;
 }
-
 .nexus-properties-property-link:hover {
 	color: var(--link-color-hover);
 	text-decoration: underline;
@@ -1660,7 +1362,6 @@ input.nexus-properties-zoom-indicator-input:focus {
 	color: var(--text-muted);
 }
 
-/* View Switcher Styles */
 .nexus-properties-view-switcher-header {
 	display: grid;
 	grid-template-columns: 1fr auto 1fr;
@@ -1671,7 +1372,6 @@ input.nexus-properties-zoom-indicator-input:focus {
 	flex-shrink: 0;
 	gap: 1em;
 }
-
 .nexus-properties-view-switcher-buttons {
 	display: flex;
 	gap: 0.5em;
@@ -1679,7 +1379,6 @@ input.nexus-properties-zoom-indicator-input:focus {
 	justify-self: center;
 	grid-column: 2;
 }
-
 .nexus-properties-view-switcher-stats {
 	display: flex;
 	gap: 20px;
@@ -1689,18 +1388,73 @@ input.nexus-properties-zoom-indicator-input:focus {
 	overflow: hidden;
 	max-width: 100%;
 }
-
 .nexus-properties-view-switcher-stats-column {
 	display: flex;
 	flex-direction: column;
 	gap: 4px;
 }
-
 .nexus-properties-view-switcher-stat-item {
 	font-size: 0.8em;
 	color: var(--text-muted);
 	white-space: nowrap;
 	font-weight: 500;
+}
+.nexus-properties-view-switcher-archived-toggle {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	justify-self: end;
+	grid-column: 3;
+	cursor: pointer;
+	padding: 0.4em 0.8em;
+	border-radius: 4px;
+	transition: background-color 0.2s ease;
+}
+.nexus-properties-view-switcher-archived-toggle:hover {
+	background-color: var(--background-modifier-hover);
+}
+.nexus-properties-view-switcher-archived-checkbox {
+	cursor: pointer;
+}
+.nexus-properties-view-switcher-archived-label {
+	font-size: 0.9em;
+	color: var(--text-normal);
+	user-select: none;
+}
+.nexus-properties-view-switcher-depth-slider {
+	display: flex;
+	align-items: center;
+	gap: 0.5em;
+	justify-self: end;
+	grid-column: 3;
+	padding: 0.4em 0.8em;
+	border-radius: 4px;
+}
+.nexus-properties-view-switcher-depth-label {
+	font-size: 0.9em;
+	color: var(--text-normal);
+	user-select: none;
+	white-space: nowrap;
+}
+.nexus-properties-view-switcher-depth-input {
+	width: 80px;
+	cursor: pointer;
+	accent-color: var(--interactive-accent);
+}
+.nexus-properties-view-switcher-depth-value {
+	font-size: 0.9em;
+	color: var(--text-normal);
+	font-weight: 600;
+	min-width: 1.5em;
+	text-align: center;
+}
+.nexus-properties-view-switcher-content {
+	display: flex;
+	flex-direction: column;
+	height: 100%;
+	min-height: 0;
+	overflow: hidden;
+	padding-bottom: 0;
 }
 
 button.nexus-properties-view-toggle-button {
@@ -1714,22 +1468,17 @@ button.nexus-properties-view-toggle-button {
 	font-size: 0.95em;
 	font-family: var(--font-text);
 	box-shadow: none;
-	transition:
-		background-color 0.2s,
-		border-color 0.2s;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-
 button.nexus-properties-view-toggle-button:hover {
 	background-color: var(--interactive-hover);
 	border-color: var(--interactive-accent);
 }
-
 button.nexus-properties-view-toggle-button:active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
 }
 
-/* Hierarchy source button in view switcher header */
 button.nexus-properties-hierarchy-source-button {
 	padding: 0.65em 1em;
 	min-height: 42px;
@@ -1741,39 +1490,15 @@ button.nexus-properties-hierarchy-source-button {
 	font-size: 0.95em;
 	font-family: var(--font-text);
 	box-shadow: none;
-	transition:
-		background-color 0.2s,
-		border-color 0.2s;
+	transition: background-color 0.2s ease, border-color 0.2s ease;
 }
-
 button.nexus-properties-hierarchy-source-button:hover {
 	background-color: var(--interactive-hover);
 	border-color: var(--interactive-accent);
 }
-
 button.nexus-properties-hierarchy-source-button:active {
 	background-color: var(--interactive-accent);
 	color: var(--text-on-accent);
-}
-
-/* Graph container when inside switcher */
-.nexus-properties-graph-container {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
-	width: 100%;
-	height: 100%; /* Ensure it fills parent height on all platforms */
-}
-
-/* Bases View Styles */
-.nexus-properties-bases-view-content {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
-	width: 100%;
-	overflow: auto;
 }
 
 .nexus-properties-bases-view {
@@ -1783,14 +1508,20 @@ button.nexus-properties-hierarchy-source-button:active {
 	width: 100%;
 	height: 100%;
 }
-
+.nexus-properties-bases-view-content {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	overflow: auto;
+}
 .nexus-properties-bases-view-selector {
 	padding: 8px;
 	border-bottom: 1px solid var(--background-modifier-border);
 	background-color: var(--background-secondary);
 }
 
-/* Select Dropdown Styling */
 .nexus-properties-bases-select {
 	width: 100%;
 	padding: 6px 8px;
@@ -1800,9 +1531,7 @@ button.nexus-properties-hierarchy-source-button:active {
 	color: var(--text-normal);
 	font-size: 13px;
 	cursor: pointer;
-	transition:
-		background 0.15s,
-		border-color 0.15s;
+	transition: background 0.15s ease, border-color 0.15s ease;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -1811,27 +1540,22 @@ button.nexus-properties-hierarchy-source-button:active {
 	background-position: right 8px center;
 	padding-right: 28px;
 }
-
 .nexus-properties-bases-select:hover {
 	background: var(--background-primary-alt);
 	border-color: var(--interactive-accent);
 }
-
 .nexus-properties-bases-select:focus {
 	outline: none;
 	background: var(--background-primary-alt);
 	border-color: var(--interactive-accent);
 	box-shadow: 0 0 0 2px var(--interactive-accent-hover);
 }
-
-/* Select Options Styling */
 .nexus-properties-bases-select option {
 	background: var(--background-primary);
 	color: var(--text-normal);
 	padding: 4px 8px;
 }
 
-/* Bases Hierarchy Source Select */
 .nexus-properties-bases-hierarchy-source-select {
 	width: auto;
 	min-width: 100px;
@@ -1842,9 +1566,7 @@ button.nexus-properties-hierarchy-source-button:active {
 	color: var(--text-muted);
 	font-size: 12px;
 	cursor: pointer;
-	transition:
-		background 0.15s,
-		border-color 0.15s;
+	transition: background 0.15s ease, border-color 0.15s ease;
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	appearance: none;
@@ -1853,568 +1575,43 @@ button.nexus-properties-hierarchy-source-button:active {
 	background-position: right 6px center;
 	padding-right: 24px;
 }
-
 .nexus-properties-bases-hierarchy-source-select:hover {
 	background: var(--background-primary-alt);
 	border-color: var(--interactive-accent);
 	color: var(--text-normal);
 }
-
 .nexus-properties-bases-hierarchy-source-select:focus {
 	outline: none;
 	border-color: var(--interactive-accent);
 }
-
-/* View Switcher Header Archived Toggle */
-.nexus-properties-view-switcher-archived-toggle {
-	display: flex;
-	align-items: center;
-	gap: 0.5em;
-	justify-self: end;
-	grid-column: 3;
-	cursor: pointer;
-	padding: 0.4em 0.8em;
-	border-radius: 4px;
-	transition: background-color 0.2s;
-}
-
-.nexus-properties-view-switcher-archived-toggle:hover {
-	background-color: var(--background-modifier-hover);
-}
-
-.nexus-properties-view-switcher-archived-checkbox {
-	cursor: pointer;
-}
-
-.nexus-properties-view-switcher-archived-label {
-	font-size: 0.9em;
-	color: var(--text-normal);
-	user-select: none;
-}
-
-/* View Switcher Header Depth Slider */
-.nexus-properties-view-switcher-depth-slider {
-	display: flex;
-	align-items: center;
-	gap: 0.5em;
-	justify-self: end;
-	grid-column: 3;
-	padding: 0.4em 0.8em;
-	border-radius: 4px;
-}
-
-.nexus-properties-view-switcher-depth-label {
-	font-size: 0.9em;
-	color: var(--text-normal);
-	user-select: none;
-	white-space: nowrap;
-}
-
-.nexus-properties-view-switcher-depth-input {
-	width: 80px;
-	cursor: pointer;
-	accent-color: var(--interactive-accent);
-}
-
-.nexus-properties-view-switcher-depth-value {
-	font-size: 0.9em;
-	color: var(--text-normal);
-	font-weight: 600;
-	min-width: 1.5em;
-	text-align: center;
-}
-
 
 .nexus-properties-bases-markdown-container {
 	padding: 1em;
 	overflow-y: auto;
 	flex: 1;
 }
-
-/* View Switcher Content Container */
-.nexus-properties-view-switcher-content {
-	display: flex;
-	flex-direction: column;
-	height: 100%;
-	min-height: 0;
-	overflow: hidden;
-	padding-bottom: 0;
-}
-
-/* MOC View Styles */
-.nexus-properties-moc-view-content {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
-	width: 100%;
-	overflow: hidden;
-	background: var(--background-primary);
-}
-
-.nexus-properties-moc-view {
-	display: flex;
-	flex-direction: column;
-	flex: 1;
-	min-height: 0;
-	width: 100%;
-}
-
-/* Toolbar */
-.nexus-properties-moc-toolbar {
-	display: flex;
-	justify-content: space-between;
-	align-items: center;
-	gap: 8px;
-	padding: 8px 12px;
-	border-bottom: 1px solid var(--background-modifier-border);
-	background: var(--background-secondary);
-}
-
-.nexus-properties-moc-toolbar-group {
-	display: flex;
-	gap: 6px;
-	align-items: center;
-}
-
-.nexus-properties-moc-toolbar-btn {
-	padding: 4px 12px;
-	font-size: 12px;
-	background: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	color: var(--text-muted);
-	cursor: pointer;
-	transition: all 0.15s;
-}
-
-.nexus-properties-moc-toolbar-btn:hover {
-	background: var(--background-modifier-hover);
-	color: var(--text-normal);
-	border-color: var(--interactive-accent);
-}
-
-/* Hierarchy source dropdown */
-.nexus-properties-moc-source-dropdown {
-	padding: 4px 8px;
-	font-size: 12px;
-	background: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	color: var(--text-muted);
-	cursor: pointer;
-	transition: all 0.15s;
-}
-
-.nexus-properties-moc-source-dropdown:hover {
-	background: var(--background-modifier-hover);
-	color: var(--text-normal);
-	border-color: var(--interactive-accent);
-}
-
-.nexus-properties-moc-source-dropdown:focus {
-	outline: none;
-	border-color: var(--interactive-accent);
-}
-
-/* Parent override dropdown (Graph view) */
-.nexus-properties-graph-parent-dropdown {
-	padding: 4px 8px;
-	font-size: 12px;
-	background: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	color: var(--text-normal);
-	cursor: pointer;
-	transition: all 0.15s;
-	max-width: 160px;
-}
-
-.nexus-properties-graph-parent-dropdown:hover {
-	background: var(--background-modifier-hover);
-	color: var(--text-normal);
-	border-color: var(--interactive-accent);
-}
-
-.nexus-properties-graph-parent-dropdown:focus {
-	outline: none;
-	border-color: var(--interactive-accent);
-	color: var(--text-normal);
-}
-
-.nexus-properties-graph-parent-dropdown option {
-	background: var(--background-primary);
-	color: var(--text-normal);
-}
-
-/* Parent override dropdown (MOC view) */
-.nexus-properties-moc-parent-dropdown {
-	padding: 4px 8px;
-	font-size: 12px;
-	background: var(--background-primary);
-	border: 1px solid var(--background-modifier-border);
-	border-radius: 4px;
-	color: var(--text-normal);
-	cursor: pointer;
-	transition: all 0.15s;
-	max-width: 160px;
-}
-
-.nexus-properties-moc-parent-dropdown:hover {
-	background: var(--background-modifier-hover);
-	color: var(--text-normal);
-	border-color: var(--interactive-accent);
-}
-
-.nexus-properties-moc-parent-dropdown:focus {
-	outline: none;
-	border-color: var(--interactive-accent);
-	color: var(--text-normal);
-}
-
-.nexus-properties-moc-parent-dropdown option {
-	background: var(--background-primary);
-	color: var(--text-normal);
-}
-
-/* Root mode toggle */
-.nexus-properties-moc-root-toggle {
-	display: flex;
-	align-items: center;
-	gap: 5px;
-	padding: 4px 10px;
-}
-
-.nexus-properties-moc-root-toggle svg {
-	flex-shrink: 0;
-}
-
-.nexus-properties-moc-root-toggle span {
-	white-space: nowrap;
-}
-
-.nexus-properties-moc-root-toggle-active {
-	background: var(--interactive-accent);
-	border-color: var(--interactive-accent);
-	color: var(--text-on-accent);
-}
-
-.nexus-properties-moc-root-toggle-active:hover {
-	background: var(--interactive-accent-hover);
-	border-color: var(--interactive-accent-hover);
-	color: var(--text-on-accent);
-}
-
-/* Search Row */
-.nexus-properties-moc-search-row {
-	display: flex;
-	gap: 0.5em;
-	padding: 0.75em 1em;
-	background-color: var(--background-secondary);
-	border-bottom: 2px solid var(--background-modifier-border);
-	flex-shrink: 0;
-}
-
-.nexus-properties-moc-search-input-container {
-	flex: 1;
-}
-
-.nexus-properties-moc-search-input {
-	width: 100%;
-	height: 2.8em;
-	padding: 0.5em 0.75em;
-	border: 1.5px solid var(--background-modifier-border);
-	border-radius: 6px;
-	background-color: var(--background-primary);
-	color: var(--text-normal);
-	font-size: 0.85em;
-	transition: border-color 0.2s ease, box-shadow 0.2s ease;
-	appearance: none;
-	-webkit-appearance: none;
-	-moz-appearance: none;
-}
-
-.nexus-properties-moc-search-input:focus {
-	outline: none;
-	border-color: var(--interactive-accent);
-	box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
-}
-
-.nexus-properties-moc-search-input::placeholder {
-	color: var(--text-faint);
-}
-
-/* Tree container */
-.nexus-properties-moc-tree-container {
-	padding: 12px;
-	overflow-y: auto;
-	overflow-x: scroll;
-	flex: 1;
-	min-height: 0;
-}
-
-/* Scrollbar styling for MOC tree */
-.nexus-properties-moc-tree-container::-webkit-scrollbar {
-	width: 8px;
-	height: 8px;
-}
-
-.nexus-properties-moc-tree-container::-webkit-scrollbar-track {
-	background: var(--background-secondary);
-	border-radius: 4px;
-}
-
-.nexus-properties-moc-tree-container::-webkit-scrollbar-thumb {
-	background: var(--background-modifier-border);
-	border-radius: 4px;
-}
-
-.nexus-properties-moc-tree-container::-webkit-scrollbar-thumb:hover {
-	background: var(--text-faint);
-}
-
-.nexus-properties-moc-tree-container::-webkit-scrollbar-corner {
-	background: var(--background-secondary);
-}
-
-/* Tree item */
-.nexus-properties-moc-item {
-	position: relative;
-}
-
-.nexus-properties-moc-item-header {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	padding: 6px 4px;
-	border-radius: 6px;
-	transition: background-color 0.1s;
-	white-space: nowrap;
-}
-
-.nexus-properties-moc-item-header:hover {
-	background: var(--background-secondary);
-}
-
-/* Toggle button */
-.nexus-properties-moc-toggle {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	width: 20px;
-	height: 20px;
-	border-radius: 4px;
-	cursor: pointer;
-	color: var(--text-muted);
-	flex-shrink: 0;
-	transition: all 0.15s;
-}
-
-.nexus-properties-moc-toggle:hover {
-	background: var(--background-modifier-hover);
-	color: var(--text-normal);
-}
-
-.nexus-properties-moc-toggle svg {
-	width: 14px;
-	height: 14px;
-}
-
-/* Spacer for items without children */
-.nexus-properties-moc-toggle-spacer {
-	width: 20px;
-	height: 20px;
-	flex-shrink: 0;
-}
-
-/* Render Related checkbox in MOC toolbar */
-.nexus-properties-moc-toggle-container {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	font-size: 12px;
-}
-
-.nexus-properties-moc-toggle-container.nexus-properties-hidden {
-	display: none;
-}
-
-.nexus-properties-moc-toggle-checkbox {
-	cursor: pointer;
-	width: 14px;
-	height: 14px;
-}
-
-.nexus-properties-moc-toggle-label {
-	color: var(--text-muted);
-	cursor: pointer;
-	user-select: none;
-}
-
-.nexus-properties-moc-toggle-label:hover {
-	color: var(--text-normal);
-}
-
-/* Link styling */
-.nexus-properties-moc-link {
-	color: var(--text-normal);
-	text-decoration: none;
-	font-size: 14px;
-	padding: 2px 6px;
-	border-radius: 4px;
-	cursor: pointer;
-	transition: all 0.15s;
-}
-
-.nexus-properties-moc-link:hover {
-	color: var(--text-accent);
-	background: var(--background-modifier-hover);
-}
-
-/* Current file highlight */
-.nexus-properties-moc-link-current {
-	background: var(--interactive-accent);
-	color: var(--text-on-accent) !important;
-	font-weight: 600 !important;
-}
-
-.nexus-properties-moc-link-current:hover {
-	background: var(--interactive-accent-hover);
-	color: var(--text-on-accent);
-}
-
-/* Properties display */
-.nexus-properties-moc-properties {
-	display: flex;
-	align-items: center;
-	gap: 8px;
-	margin-left: auto;
-	padding-left: 12px;
-	flex-shrink: 0;
-}
-
-.nexus-properties-moc-property {
-	display: flex;
-	align-items: center;
-	gap: 4px;
-	font-size: 12px;
-	color: var(--text-muted);
-	white-space: nowrap;
-	padding: 2px 8px;
-	background: var(--background-secondary);
-	border-radius: 4px;
-	flex-shrink: 0;
-}
-
-.nexus-properties-moc-property-text {
-	color: var(--text-muted);
-}
-
-.nexus-properties-moc-property-link {
-	color: var(--text-accent);
-	text-decoration: none;
-	cursor: pointer;
-}
-
-.nexus-properties-moc-property-link:hover {
-	text-decoration: underline;
-}
-
-.nexus-properties-moc-property-separator {
-	color: var(--text-faint);
-}
-
-/* Children container */
-.nexus-properties-moc-children {
-	margin-left: 12px;
-	padding-left: 12px;
-	border-left: 2px solid var(--background-modifier-border);
-}
-
-/* Depth-based styling */
-.nexus-properties-moc-item[data-depth="0"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
-	font-size: 15px;
-	font-weight: 600;
-	color: var(--text-normal);
-}
-
-.nexus-properties-moc-item[data-depth="1"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
-	font-size: 14px;
-	font-weight: 500;
-}
-
-.nexus-properties-moc-item[data-depth="2"] > .nexus-properties-moc-item-header .nexus-properties-moc-link,
-.nexus-properties-moc-item[data-depth="3"] > .nexus-properties-moc-item-header .nexus-properties-moc-link,
-.nexus-properties-moc-item[data-depth="4"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
-	font-size: 13px;
-	font-weight: 400;
-	color: var(--text-muted);
-}
-
-.nexus-properties-moc-item[data-depth="2"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover,
-.nexus-properties-moc-item[data-depth="3"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover,
-.nexus-properties-moc-item[data-depth="4"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover {
-	color: var(--text-normal);
-}
-
-/* Empty state */
-.nexus-properties-moc-empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 2em;
-	font-size: 1.1em;
-	color: var(--text-muted);
-	text-align: center;
-}
-
-.nexus-properties-bases-empty-state {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	padding: 2em;
-	font-size: 1em;
-	color: var(--text-muted);
-	text-align: center;
-}
-
-.nexus-properties-bases-placeholder {
-	display: flex;
-	align-items: center;
-	justify-content: center;
-	flex: 1;
-	font-size: 1.2em;
-	color: var(--text-muted);
-}
-
-/* Dataview table styling in bases view */
 .nexus-properties-bases-markdown-container .dataview {
 	margin: 1em 0;
 }
-
 .nexus-properties-bases-markdown-container .dataview table {
 	width: 100%;
 	border-collapse: collapse;
 }
-
 .nexus-properties-bases-markdown-container .dataview th,
 .nexus-properties-bases-markdown-container .dataview td {
 	padding: 0.5em;
 	border: 1px solid var(--background-modifier-border);
 	text-align: left;
 }
-
 .nexus-properties-bases-markdown-container .dataview th {
 	background-color: var(--background-secondary);
 	font-weight: 600;
 }
 
-/* Bases View Section Styles */
 .nexus-properties-bases-section {
 	margin-bottom: 2em;
 	padding: 0 1em;
 }
-
 .nexus-properties-bases-section-header {
 	margin: 0 0 1em 0;
 	padding-bottom: 0.5em;
@@ -2444,12 +1641,8 @@ button.nexus-properties-hierarchy-source-button:active {
 	background-color: var(--background-primary-alt);
 	border: 1px solid var(--background-modifier-border);
 	border-radius: 4px;
-	transition:
-		background-color 0.2s,
-		border-color 0.2s,
-		transform 0.1s;
+	transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s;
 }
-
 .nexus-properties-bases-file-item:hover {
 	background-color: var(--background-secondary);
 	border-color: var(--interactive-accent);
@@ -2463,275 +1656,595 @@ button.nexus-properties-hierarchy-source-button:active {
 	display: block;
 	cursor: pointer;
 }
-
 .nexus-properties-bases-file-link:hover {
 	color: var(--interactive-accent);
 }
 
-/* What's New Modal */
-.nexus-whats-new-modal .modal {
-	max-width: 800px;
-	width: 90%;
-}
-
-.nexus-whats-new-plugin-name {
-	color: var(--link-color);
-	text-decoration: none;
-	transition: all 0.2s ease;
-	position: relative;
-	font-weight: 600;
-}
-
-.nexus-whats-new-plugin-name:hover {
-	color: var(--link-color-hover);
-	text-decoration: none;
-}
-
-.nexus-whats-new-plugin-name::after {
-	content: "";
-	position: absolute;
-	bottom: -2px;
-	left: 0;
-	width: 0;
-	height: 2px;
-	background-color: var(--interactive-accent);
-	transition: width 0.3s ease;
-}
-
-.nexus-whats-new-plugin-name:hover::after {
-	width: 100%;
-}
-
-.nexus-whats-new-subtitle {
-	color: var(--text-muted);
-	font-size: 0.9rem;
-	margin: 0 0 1rem 0;
-}
-
-.nexus-whats-new-support {
-	margin: 0 0 1rem 0;
-	padding: 1rem;
-	background-color: var(--background-secondary);
-	border-radius: 8px;
-}
-
-.nexus-whats-new-support h3 {
-	margin-top: 0;
-	margin-bottom: 0.5rem;
-	font-size: 1rem;
-}
-
-.nexus-whats-new-support p {
-	margin: 0.5rem 0;
-	color: var(--text-normal);
-}
-
-.nexus-whats-new-support a {
-	color: var(--link-color);
-	text-decoration: none;
-	transition: all 0.2s ease;
-	position: relative;
-}
-
-.nexus-whats-new-support a:hover {
-	color: var(--link-color-hover);
-	text-decoration: none;
-}
-
-.nexus-whats-new-support a::after {
-	content: "";
-	position: absolute;
-	bottom: -2px;
-	left: 0;
-	width: 0;
-	height: 2px;
-	background-color: var(--interactive-accent);
-	transition: width 0.3s ease;
-}
-
-.nexus-whats-new-support a:hover::after {
-	width: 100%;
-}
-
-.nexus-whats-new-content {
-	max-height: 400px;
-	overflow-y: auto;
-	margin-bottom: 1rem;
-	padding-right: 0.5rem;
-	border-radius: 8px;
-}
-
-.nexus-whats-new-content h2 {
-	font-size: 1.3rem;
-	margin-top: 1.5rem;
-	margin-bottom: 0.5rem;
-	color: var(--text-accent);
-}
-
-.nexus-whats-new-content h3 {
-	font-size: 1.1rem;
-	margin-top: 1rem;
-	margin-bottom: 0.5rem;
-}
-
-.nexus-whats-new-content ul {
-	padding-left: 1.5rem;
-}
-
-.nexus-whats-new-content li {
-	margin-bottom: 0.5rem;
-	line-height: 1.6;
-}
-
-.nexus-whats-new-content code {
-	background: var(--code-background);
-	padding: 0.2em 0.4em;
-	border-radius: 3px;
-	font-size: 0.9em;
-}
-
-.nexus-whats-new-content pre {
-	background: var(--code-background);
-	padding: 1rem;
-	border-radius: 6px;
-	overflow-x: auto;
-}
-
-.nexus-whats-new-content a.external-link {
-	color: var(--link-external-color);
-}
-
-.nexus-whats-new-content a.external-link::after {
-	content: "↗";
-	margin-left: 0.2em;
-	font-size: 0.8em;
-}
-
-.nexus-whats-new-empty {
-	text-align: center;
-	color: var(--text-muted);
-	padding: 2rem;
-	font-style: italic;
-}
-
-.nexus-whats-new-sticky-footer {
-	position: sticky;
-	bottom: 0;
-	background: var(--background-primary);
-	padding-top: 0.75rem;
-	margin-top: 0;
-	z-index: 10;
-	border-top: 1px solid var(--background-modifier-border);
-}
-
-.nexus-whats-new-buttons {
+.nexus-properties-bases-empty-state {
 	display: flex;
-	gap: 0.5rem;
-	justify-content: space-between;
-	flex-wrap: wrap;
-	padding-bottom: 0.5rem;
-	width: 100%;
-}
-
-.nexus-whats-new-buttons button {
-	flex: 1;
-	min-width: 0;
-	padding: 0.5rem 1rem;
-	border-radius: 4px;
-	cursor: pointer;
-	border: 1px solid var(--background-modifier-border);
-	background: var(--interactive-normal);
-	color: var(--text-normal);
-	transition: all 0.2s ease;
-	text-align: center;
-}
-
-.nexus-whats-new-buttons button:hover {
-	background: var(--interactive-hover);
-	border-color: var(--interactive-accent);
-	transform: translateY(-1px);
-	box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-}
-
-.nexus-whats-new-buttons button:active {
-	transform: translateY(0);
-	box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-}
-
-/* Title Property Setup Modal */
-.nexus-title-property-setup-modal {
-	display: flex;
-	flex-direction: column;
-	padding: 1.5em;
-	max-width: 550px;
-}
-
-.nexus-title-property-setup-title {
-	text-align: center;
-	margin-bottom: 1em;
-	font-size: 1.3em;
-	color: var(--text-normal);
-}
-
-.nexus-title-property-setup-description {
-	margin-bottom: 1.5em;
-}
-
-.nexus-title-property-setup-description p {
-	margin-bottom: 0.75em;
-	line-height: 1.6;
-	color: var(--text-muted);
-}
-
-.nexus-title-property-setup-warning {
-	background: var(--background-secondary);
-	padding: 0.75em 1em;
-	border-radius: 6px;
-	border-left: 3px solid var(--interactive-accent);
-}
-
-.nexus-title-property-setup-buttons {
-	display: flex;
-	flex-direction: column;
-	gap: 0.75em;
-	margin-top: 1em;
-}
-
-.nexus-title-property-setup-button {
-	padding: 0.75em 1.5em;
-	border-radius: 6px;
-	cursor: pointer;
-	border: 1px solid var(--background-modifier-border);
-	background: var(--interactive-normal);
-	color: var(--text-normal);
+	align-items: center;
+	justify-content: center;
+	padding: 2em;
 	font-size: 1em;
-	transition: all 0.2s ease;
+	color: var(--text-muted);
+	text-align: center;
 }
 
-.nexus-title-property-setup-button:hover {
-	background: var(--interactive-hover);
+.nexus-properties-bases-placeholder {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: 1;
+	font-size: 1.2em;
+	color: var(--text-muted);
+}
+
+.nexus-properties-moc-view {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+}
+.nexus-properties-moc-view-content {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	min-height: 0;
+	width: 100%;
+	overflow: hidden;
+	background: var(--background-primary);
+}
+
+.nexus-properties-moc-toolbar {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border-bottom: 1px solid var(--background-modifier-border);
+	background: var(--background-secondary);
+}
+.nexus-properties-moc-toolbar-group {
+	display: flex;
+	gap: 6px;
+	align-items: center;
+}
+.nexus-properties-moc-toolbar-btn {
+	padding: 4px 12px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+.nexus-properties-moc-toolbar-btn:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
 	border-color: var(--interactive-accent);
 }
 
-.nexus-title-property-setup-button.mod-cta {
+.nexus-properties-moc-source-dropdown {
+	padding: 4px 8px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-muted);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+.nexus-properties-moc-source-dropdown:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+.nexus-properties-moc-source-dropdown:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+}
+
+.nexus-properties-moc-parent-dropdown {
+	padding: 4px 8px;
+	font-size: 12px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 4px;
+	color: var(--text-normal);
+	cursor: pointer;
+	transition: all 0.15s ease;
+	max-width: 160px;
+}
+.nexus-properties-moc-parent-dropdown:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+	border-color: var(--interactive-accent);
+}
+.nexus-properties-moc-parent-dropdown:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	color: var(--text-normal);
+}
+.nexus-properties-moc-parent-dropdown option {
+	background: var(--background-primary);
+	color: var(--text-normal);
+}
+
+.nexus-properties-moc-root-toggle {
+	display: flex;
+	align-items: center;
+	gap: 5px;
+	padding: 4px 10px;
+}
+.nexus-properties-moc-root-toggle svg {
+	flex-shrink: 0;
+}
+.nexus-properties-moc-root-toggle span {
+	white-space: nowrap;
+}
+.nexus-properties-moc-root-toggle-active {
 	background: var(--interactive-accent);
-	color: var(--text-on-accent);
 	border-color: var(--interactive-accent);
+	color: var(--text-on-accent);
 }
-
-.nexus-title-property-setup-button.mod-cta:hover {
+.nexus-properties-moc-root-toggle-active:hover {
 	background: var(--interactive-accent-hover);
 	border-color: var(--interactive-accent-hover);
+	color: var(--text-on-accent);
 }
 
-.nexus-title-property-setup-button-later {
-	background: transparent;
-	color: var(--text-muted);
-	border-color: transparent;
+.nexus-properties-moc-search-row {
+	display: flex;
+	gap: 0.5em;
+	padding: 0.75em 1em;
+	background-color: var(--background-secondary);
+	border-bottom: 2px solid var(--background-modifier-border);
+	flex-shrink: 0;
 }
-
-.nexus-title-property-setup-button-later:hover {
-	background: var(--background-secondary);
+.nexus-properties-moc-search-input-container {
+	flex: 1;
+}
+.nexus-properties-moc-search-input {
+	width: 100%;
+	height: 2.8em;
+	padding: 0.5em 0.75em;
+	border: 1.5px solid var(--background-modifier-border);
+	border-radius: 6px;
+	background-color: var(--background-primary);
 	color: var(--text-normal);
-	border-color: var(--background-modifier-border);
+	font-size: 0.85em;
+	transition: border-color 0.2s ease, box-shadow 0.2s ease;
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+}
+.nexus-properties-moc-search-input:focus {
+	outline: none;
+	border-color: var(--interactive-accent);
+	box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
+}
+.nexus-properties-moc-search-input::placeholder {
+	color: var(--text-faint);
+}
+
+.nexus-properties-moc-tree-container {
+	padding: 12px;
+	overflow-y: auto;
+	overflow-x: scroll;
+	flex: 1;
+	min-height: 0;
+}
+.nexus-properties-moc-tree-container::-webkit-scrollbar {
+	width: 8px;
+	height: 8px;
+}
+.nexus-properties-moc-tree-container::-webkit-scrollbar-track {
+	background: var(--background-secondary);
+	border-radius: 4px;
+}
+.nexus-properties-moc-tree-container::-webkit-scrollbar-thumb {
+	background: var(--background-modifier-border);
+	border-radius: 4px;
+}
+.nexus-properties-moc-tree-container::-webkit-scrollbar-thumb:hover {
+	background: var(--text-faint);
+}
+.nexus-properties-moc-tree-container::-webkit-scrollbar-corner {
+	background: var(--background-secondary);
+}
+
+.nexus-properties-moc-item {
+	position: relative;
+}
+.nexus-properties-moc-item-header {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	padding: 6px 4px;
+	border-radius: 6px;
+	transition: background-color 0.1s;
+	white-space: nowrap;
+}
+.nexus-properties-moc-item-header:hover {
+	background: var(--background-secondary);
+}
+
+.nexus-properties-moc-toggle {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 20px;
+	height: 20px;
+	border-radius: 4px;
+	cursor: pointer;
+	color: var(--text-muted);
+	flex-shrink: 0;
+	transition: all 0.15s ease;
+}
+.nexus-properties-moc-toggle:hover {
+	background: var(--background-modifier-hover);
+	color: var(--text-normal);
+}
+.nexus-properties-moc-toggle svg {
+	width: 14px;
+	height: 14px;
+}
+.nexus-properties-moc-toggle-spacer {
+	width: 20px;
+	height: 20px;
+	flex-shrink: 0;
+}
+.nexus-properties-moc-toggle-container {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+}
+.nexus-properties-moc-toggle-container.nexus-properties-hidden {
+	display: none;
+}
+.nexus-properties-moc-toggle-checkbox {
+	cursor: pointer;
+	width: 14px;
+	height: 14px;
+}
+.nexus-properties-moc-toggle-label {
+	color: var(--text-muted);
+	cursor: pointer;
+	user-select: none;
+}
+.nexus-properties-moc-toggle-label:hover {
+	color: var(--text-normal);
+}
+
+.nexus-properties-moc-link {
+	color: var(--text-normal);
+	text-decoration: none;
+	font-size: 14px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+.nexus-properties-moc-link:hover {
+	color: var(--text-accent);
+	background: var(--background-modifier-hover);
+}
+.nexus-properties-moc-link-current {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent) !important;
+	font-weight: 600 !important;
+}
+.nexus-properties-moc-link-current:hover {
+	background: var(--interactive-accent-hover);
+	color: var(--text-on-accent);
+}
+
+.nexus-properties-moc-properties {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin-left: auto;
+	padding-left: 12px;
+	flex-shrink: 0;
+}
+
+.nexus-properties-moc-property {
+	display: flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 12px;
+	color: var(--text-muted);
+	white-space: nowrap;
+	padding: 2px 8px;
+	background: var(--background-secondary);
+	border-radius: 4px;
+	flex-shrink: 0;
+}
+.nexus-properties-moc-property-text {
+	color: var(--text-muted);
+}
+.nexus-properties-moc-property-link {
+	color: var(--text-accent);
+	text-decoration: none;
+	cursor: pointer;
+}
+.nexus-properties-moc-property-link:hover {
+	text-decoration: underline;
+}
+.nexus-properties-moc-property-separator {
+	color: var(--text-faint);
+}
+
+.nexus-properties-moc-children {
+	margin-left: 12px;
+	padding-left: 12px;
+	border-left: 2px solid var(--background-modifier-border);
+}
+
+.nexus-properties-moc-item[data-depth="0"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+	font-size: 15px;
+	font-weight: 600;
+	color: var(--text-normal);
+}
+
+.nexus-properties-moc-item[data-depth="1"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+	font-size: 14px;
+	font-weight: 500;
+}
+
+.nexus-properties-moc-item[data-depth="2"] > .nexus-properties-moc-item-header .nexus-properties-moc-link,
+.nexus-properties-moc-item[data-depth="3"] > .nexus-properties-moc-item-header .nexus-properties-moc-link,
+.nexus-properties-moc-item[data-depth="4"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+	font-size: 13px;
+	font-weight: 400;
+	color: var(--text-muted);
+}
+.nexus-properties-moc-item[data-depth="2"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover,
+.nexus-properties-moc-item[data-depth="3"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover,
+.nexus-properties-moc-item[data-depth="4"] > .nexus-properties-moc-item-header .nexus-properties-moc-link:hover {
+	color: var(--text-normal);
+}
+
+.nexus-properties-moc-empty-state {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 2em;
+	font-size: 1.1em;
+	color: var(--text-muted);
+	text-align: center;
+}
+
+@media (max-width: 600px) {
+	.nexus-properties-graph-view-header {
+		padding: 0.3em 0.5em;
+		gap: 0.3em;
+		min-height: auto;
+		flex-wrap: wrap;
+	}
+	body .nexus-properties-graph-view-title {
+		display: none;
+	}
+	.nexus-properties-graph-controls-container {
+		flex: 1 1 100%;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+		gap: 0.3em;
+		align-items: center;
+	}
+	.nexus-properties-graph-view-header .nexus-properties-graph-filter-preset-container {
+		order: 1;
+		flex-shrink: 0;
+	}
+	.nexus-properties-graph-toggle-container {
+		padding: 0.25em 0.4em;
+		font-size: 0.65em;
+		gap: 0.25em;
+		border-width: 1px;
+		min-width: 0;
+		white-space: nowrap;
+		box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+	}
+	.nexus-properties-graph-toggle-checkbox {
+		width: 11px;
+		height: 11px;
+		flex-shrink: 0;
+	}
+	.nexus-properties-graph-toggle-label {
+		font-size: 1em;
+	}
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(2) .nexus-properties-graph-toggle-label {
+		font-size: 0;
+	}
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(2) .nexus-properties-graph-toggle-label::before {
+		content: "Related";
+		font-size: 1rem;
+	}
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(3) .nexus-properties-graph-toggle-label {
+		font-size: 0;
+	}
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(3) .nexus-properties-graph-toggle-label::before {
+		content: "All";
+		font-size: 1rem;
+	}
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(4) .nexus-properties-graph-toggle-label {
+		font-size: 0;
+	}
+	.nexus-properties-graph-view-header .nexus-properties-graph-toggle-container:nth-child(4) .nexus-properties-graph-toggle-label::before {
+		content: "Current";
+		font-size: 1rem;
+	}
+	.nexus-properties-graph-search-row {
+		display: none;
+	}
+	.nexus-properties-graph-filter-row {
+		display: flex;
+		padding: 0.3em 0.5em;
+		gap: 0.3em;
+		align-items: center;
+	}
+	.nexus-properties-graph-search-input-container,
+	.nexus-properties-graph-filter-input-container {
+		flex: 1 1 calc(50% - 0.15em);
+		min-width: 0;
+	}
+	.nexus-properties-graph-filter-row .nexus-properties-graph-search-input-container {
+		display: flex;
+	}
+	.nexus-properties-graph-view-content .nexus-properties-graph-search-input,
+	.nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
+		height: 2em;
+		padding: 0.35em 0.5em;
+		font-size: 0.8em;
+		border-radius: 4px;
+		width: 100%;
+	}
+	.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
+		height: 2em;
+		min-width: 70px;
+		padding: 0.25em 1.6em 0.25em 0.4em;
+		font-size: 0.65em;
+		border-radius: 4px;
+		border-width: 1px;
+	}
+	.nexus-properties-graph-filter-preset-container::after {
+		font-size: 0.55em;
+		right: 0.5em;
+	}
+	.nexus-properties-graph-filter-row .nexus-properties-graph-filter-preset-container {
+		display: none;
+	}
+	body .nexus-properties-zoom-indicator {
+		display: none;
+	}
+	body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-view-header,
+	body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-search-row,
+	body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-filter-row {
+		display: none;
+	}
+	body .nexus-properties-graph-zoom-preview-controls {
+		padding: 0.5em 0.6em;
+		gap: 0.3em;
+		min-height: auto;
+		flex-wrap: wrap;
+	}
+	body .nexus-properties-graph-zoom-preview-title {
+		font-size: 0.72em;
+		flex: 1 1 100%;
+		margin-bottom: 0.25em;
+	}
+	body .nexus-properties-graph-zoom-preview-toggles {
+		flex: 1 1 100%;
+		justify-content: space-between;
+		gap: 0.3em;
+	}
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-container {
+		padding: 0.3em 0.4em;
+		font-size: 0.7em;
+		gap: 0.25em;
+		flex: 1;
+		justify-content: center;
+	}
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-checkbox {
+		width: 11px;
+		height: 11px;
+	}
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-label {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+	body .nexus-properties-graph-zoom-preview {
+		max-height: min(50vh, var(--zoom-preview-max-height, 200px));
+	}
+	body .nexus-properties-graph-zoom-preview-frontmatter {
+		padding: 0.3em;
+		gap: 0.2em;
+		grid-template-columns: repeat(auto-fill, minmax(var(--mobile-frontmatter-property-width, 100px), 1fr));
+		font-size: 0.75em;
+		max-height: min(30vh, var(--zoom-preview-frontmatter-height, 70px));
+	}
+	body .nexus-properties-graph-zoom-preview-property {
+		padding: 0.25em;
+		gap: 0.15em;
+	}
+	body .nexus-properties-graph-zoom-preview-property-key {
+		font-size: 0.7em;
+	}
+	body .nexus-properties-graph-zoom-preview-property-value {
+		font-size: 0.8em;
+		gap: 0.15em;
+	}
+	body .nexus-properties-graph-zoom-preview-content {
+		padding: 0.3em;
+		font-size: 0.8em;
+	}
+	body .nexus-properties-graph-zoom-preview-content p {
+		margin: 0.3em 0;
+	}
+	body .nexus-properties-graph-zoom-preview-content p:first-child {
+		margin-top: 0;
+	}
+	body .nexus-properties-graph-zoom-preview-content p:last-child {
+		margin-bottom: 0;
+	}
+	body .nexus-properties-view-switcher-header {
+		padding: 0.3em 0.4em;
+		gap: 0.5em;
+		grid-template-columns: 1fr auto 1fr;
+	}
+	body .nexus-properties-view-switcher-stats {
+		gap: 10px;
+		flex-shrink: 1;
+		max-width: 100%;
+		overflow: hidden;
+	}
+	body .nexus-properties-view-switcher-stats-column {
+		gap: 2px;
+	}
+	body .nexus-properties-view-switcher-stat-item {
+		font-size: 0.56em;
+	}
+	body .nexus-properties-view-switcher-buttons {
+		gap: 0.25em;
+	}
+	body button.nexus-properties-view-toggle-button {
+		padding: 0.25em 0.4em;
+		min-height: 20px;
+		font-size: 0.6em;
+		border-radius: 3px;
+		border-width: 1px;
+		flex-shrink: 0;
+	}
+	body button.nexus-properties-hierarchy-source-button {
+		padding: 0.25em 0.4em;
+		min-height: 20px;
+		font-size: 0.6em;
+		border-radius: 3px;
+		border-width: 1px;
+		flex-shrink: 0;
+	}
+	body .nexus-properties-bases-view-selector {
+		padding: 6px;
+	}
+	body .nexus-properties-bases-select {
+		font-size: 11px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		border-width: 1.2px;
+	}
+	.workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content),
+	.workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
+		width: 100%;
+		max-width: 100%;
+		min-width: 100%;
+	}
+	.workspace-leaf:has(.nexus-properties-view-switcher-content) {
+		width: 100%;
+		max-width: 100%;
+	}
 }

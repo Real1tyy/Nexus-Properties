@@ -1,0 +1,227 @@
+@use "variables" as *;
+
+.nexus-properties-graph-toggle-container {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: 0.4em 0.8em;
+  background-color: var(--background-primary);
+  border-radius: $border-radius;
+  border: 1px solid var(--background-modifier-border);
+  box-shadow: $shadow-md;
+  font-size: $font-size-sm;
+  cursor: pointer;
+  transition: all $transition-normal;
+  user-select: none;
+
+  &:hover {
+    background-color: var(--background-secondary);
+    box-shadow: $shadow-xl;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  .nexus-properties-graph-toggle-label {
+    cursor: pointer;
+    user-select: none;
+  }
+}
+
+// Zoom Mode Preview Overlay
+.nexus-properties-graph-zoom-preview {
+  position: relative;
+  width: 100%;
+  max-height: var(--zoom-preview-max-height, 280px);
+  background: linear-gradient(
+    to bottom,
+    var(--background-primary) 0%,
+    var(--background-primary) 85%,
+    transparent 100%
+  );
+  border-bottom: $input-border-width solid var(--background-modifier-border);
+  box-shadow: $shadow-lg;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  backdrop-filter: blur(8px);
+  animation: slideDown $transition-slow;
+
+  &-controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: $spacing-md $spacing-lg;
+    border-bottom: 1px solid var(--background-modifier-border);
+    flex-shrink: 0;
+    gap: $spacing-md;
+  }
+
+  &-title {
+    margin: 0;
+    color: var(--text-normal);
+    font-size: $font-size-xl;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    transition: color $transition-normal;
+
+    &:hover {
+      color: var(--interactive-accent);
+    }
+  }
+
+  &-toggles {
+    display: flex;
+    gap: 0.75em;
+    align-items: center;
+  }
+
+  &-body {
+    flex: 1;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+
+    &.nexus-properties-hidden {
+      display: none;
+    }
+
+    &:has(.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden) {
+      .nexus-properties-graph-zoom-preview-content {
+        flex: 0 1 auto;
+      }
+    }
+  }
+
+  &-frontmatter {
+    padding: 0.7em 1.4em;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
+    gap: $spacing-sm;
+    border-bottom: 1px solid var(--background-modifier-border);
+    background-color: var(--background-secondary-alt);
+    flex-shrink: 0;
+    max-height: var(--zoom-preview-frontmatter-height, 90px);
+    overflow-y: auto;
+    font-size: $font-size-md;
+
+    &.nexus-properties-hidden {
+      display: none;
+    }
+  }
+
+  &-property {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-xs;
+    padding: $spacing-sm;
+    background-color: var(--background-primary);
+    border-radius: $border-radius-sm;
+    border-left: 2px solid var(--interactive-accent);
+
+    &-key {
+      font-size: $font-size-xs;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    &-value {
+      font-size: $font-size-md;
+      color: var(--text-normal);
+      word-break: break-word;
+      display: flex;
+      flex-wrap: wrap;
+      gap: $spacing-xs;
+    }
+
+    &-link {
+      color: var(--link-color);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color $transition-normal;
+
+      &:hover {
+        color: var(--link-color-hover);
+        text-decoration: underline;
+      }
+    }
+
+    &-text {
+      color: var(--text-normal);
+    }
+
+    &-empty {
+      color: var(--text-faint);
+      font-style: italic;
+    }
+
+    &-separator {
+      color: var(--text-muted);
+    }
+  }
+
+  &-empty {
+    color: var(--text-muted);
+    font-style: italic;
+    padding: $spacing-sm 0;
+  }
+
+  &-content {
+    flex: 1;
+    padding: 0.3em $spacing-xl $spacing-sm $spacing-xl;
+    overflow-y: auto;
+    overflow-x: hidden;
+    min-height: 0;
+
+    &.nexus-properties-hidden {
+      display: none;
+    }
+
+    &-text {
+      color: var(--text-muted);
+      font-size: $font-size-base;
+      line-height: 1.6;
+      white-space: pre-wrap;
+      word-wrap: break-word;
+    }
+  }
+}
+
+@keyframes slideDown {
+  from {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Scrollbar styling for preview
+.nexus-properties-graph-zoom-preview-frontmatter,
+.nexus-properties-graph-zoom-preview-content {
+  &::-webkit-scrollbar {
+    width: $zoom-preview-scrollbar-width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+    border-radius: $border-radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+
+    &:hover {
+      background: var(--text-faint);
+    }
+  }
+}

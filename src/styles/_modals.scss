@@ -1,0 +1,503 @@
+@use "variables" as *;
+
+// Node Creation Modal
+.nexus-node-creation {
+  &-modal {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: $spacing-xl;
+    min-width: 500px;
+  }
+
+  &-title {
+    text-align: center;
+    margin-bottom: $spacing-lg;
+    font-size: $font-size-xxl;
+    color: var(--text-normal);
+  }
+
+  &-input-container {
+    width: 100%;
+    margin-bottom: $spacing-lg;
+  }
+
+  &-buttons {
+    display: flex;
+    gap: $spacing-md;
+    justify-content: center;
+    width: 100%;
+  }
+
+  &-button {
+    padding: 0.6em $spacing-xl;
+    font-size: 1.15em;
+    border-radius: $border-radius;
+    cursor: pointer;
+    transition: all $transition-normal;
+
+    &:hover {
+      transform: translateY(-1px);
+    }
+  }
+}
+
+.modal-content.nexus-node-creation-modal {
+  .nexus-node-creation-input-container input.nexus-node-creation-input {
+    width: 100%;
+    padding: 0.75em $spacing-md;
+    font-size: $font-size-xxl;
+    text-align: center;
+    border: $input-border-width solid var(--background-modifier-border);
+    border-radius: $border-radius;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    transition: border-color $transition-normal;
+
+    &:focus {
+      outline: none;
+      border-color: var(--interactive-accent);
+    }
+  }
+}
+
+// Node Preview Modal
+.nexus-properties-node-preview {
+  &-modal .modal-content {
+    max-width: 700px;
+  }
+
+  &-header h2 {
+    margin: 0 0 $spacing-lg 0;
+    color: var(--text-normal);
+    cursor: pointer;
+    transition: color $transition-normal;
+
+    &:hover {
+      color: var(--interactive-accent);
+    }
+  }
+
+  &-section {
+    margin-bottom: $spacing-lg;
+
+    &-title {
+      margin: 0 0 $spacing-md 0;
+      color: var(--text-muted);
+      font-size: $font-size-md;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  &-props-grid {
+    display: grid;
+    gap: $spacing-md;
+  }
+
+  &-prop {
+    &-item {
+      display: grid;
+      grid-template-columns: $node-preview-grid-key-width 1fr;
+      gap: $spacing-md;
+      padding: 0.75em;
+      background-color: var(--background-secondary);
+      border-radius: $border-radius;
+      border-left: 3px solid var(--background-modifier-border);
+    }
+
+    &-key {
+      font-weight: 600;
+      color: var(--text-normal);
+      word-break: break-word;
+    }
+
+    &-value {
+      color: var(--text-muted);
+      word-break: break-word;
+    }
+
+    &-link {
+      color: var(--link-color);
+      text-decoration: none;
+      cursor: pointer;
+      transition: color $transition-normal;
+
+      &:hover {
+        color: var(--link-color-hover);
+        text-decoration: underline;
+      }
+    }
+
+    &-empty {
+      color: var(--text-faint);
+      font-style: italic;
+    }
+
+    &-separator {
+      color: var(--text-faint);
+      margin: 0 $spacing-xs;
+    }
+  }
+
+  &-empty {
+    color: var(--text-muted);
+    font-style: italic;
+    text-align: center;
+    padding: $spacing-xl;
+  }
+}
+
+// Node Edit Modal
+.nexus-properties-node-edit {
+  &-modal .modal-content {
+    max-width: 800px;
+  }
+
+  &-section {
+    margin-bottom: $spacing-lg;
+  }
+
+  &-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: $spacing-md;
+    padding-bottom: $spacing-sm;
+    border-bottom: 1px solid var(--background-modifier-border);
+  }
+
+  &-section-title {
+    margin: 0;
+    color: var(--text-normal);
+    font-size: 1em;
+    font-weight: 600;
+  }
+
+  &-props-container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-sm;
+    max-height: $node-edit-max-height;
+    overflow-y: auto;
+    padding: $spacing-sm;
+    background-color: var(--background-secondary);
+    border-radius: $border-radius;
+  }
+
+  &-prop-row {
+    display: grid;
+    grid-template-columns: $node-edit-grid-key-width 1fr auto;
+    gap: $spacing-sm;
+    align-items: center;
+    padding: $spacing-sm;
+    background-color: var(--background-primary);
+    border-radius: $border-radius-sm;
+  }
+
+  &-prop-key-input,
+  &-prop-value-input {
+    width: 100%;
+    padding: $spacing-sm;
+    background-color: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    color: var(--text-normal);
+    font-family: var(--font-text);
+
+    &:focus {
+      outline: none;
+      border-color: var(--interactive-accent);
+    }
+  }
+
+  &-remove-button {
+    padding: $spacing-xs $spacing-sm;
+    background-color: var(--background-modifier-error);
+    color: var(--text-on-accent);
+    border: none;
+    border-radius: $border-radius-sm;
+    cursor: pointer;
+    font-size: 1.2em;
+    line-height: 1;
+    transition: background-color $transition-normal;
+
+    &:hover {
+      background-color: var(--background-modifier-error-hover);
+    }
+  }
+}
+
+// What's New Modal
+.nexus-whats-new {
+  &-modal .modal {
+    max-width: 800px;
+    width: 90%;
+  }
+
+  &-plugin-name {
+    color: var(--link-color);
+    text-decoration: none;
+    transition: all $transition-normal;
+    position: relative;
+    font-weight: 600;
+
+    &:hover {
+      color: var(--link-color-hover);
+      text-decoration: none;
+    }
+
+    &::after {
+      content: "";
+      position: absolute;
+      bottom: -2px;
+      left: 0;
+      width: 0;
+      height: 2px;
+      background-color: var(--interactive-accent);
+      transition: width $transition-slow;
+    }
+
+    &:hover::after {
+      width: 100%;
+    }
+  }
+
+  &-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin: 0 0 1rem 0;
+  }
+
+  &-support {
+    margin: 0 0 1rem 0;
+    padding: 1rem;
+    background-color: var(--background-secondary);
+    border-radius: $border-radius-lg;
+
+    h3 {
+      margin-top: 0;
+      margin-bottom: 0.5rem;
+      font-size: 1rem;
+    }
+
+    p {
+      margin: 0.5rem 0;
+      color: var(--text-normal);
+    }
+
+    a {
+      color: var(--link-color);
+      text-decoration: none;
+      transition: all $transition-normal;
+      position: relative;
+
+      &:hover {
+        color: var(--link-color-hover);
+        text-decoration: none;
+      }
+
+      &::after {
+        content: "";
+        position: absolute;
+        bottom: -2px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--interactive-accent);
+        transition: width $transition-slow;
+      }
+
+      &:hover::after {
+        width: 100%;
+      }
+    }
+  }
+
+  &-content {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+    padding-right: 0.5rem;
+    border-radius: $border-radius-lg;
+
+    h2 {
+      font-size: 1.3rem;
+      margin-top: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: var(--text-accent);
+    }
+
+    h3 {
+      font-size: 1.1rem;
+      margin-top: 1rem;
+      margin-bottom: 0.5rem;
+    }
+
+    ul {
+      padding-left: 1.5rem;
+    }
+
+    li {
+      margin-bottom: 0.5rem;
+      line-height: 1.6;
+    }
+
+    code {
+      background: var(--code-background);
+      padding: 0.2em 0.4em;
+      border-radius: 3px;
+      font-size: $font-size-md;
+    }
+
+    pre {
+      background: var(--code-background);
+      padding: 1rem;
+      border-radius: $border-radius;
+      overflow-x: auto;
+    }
+
+    a.external-link {
+      color: var(--link-external-color);
+
+      &::after {
+        content: "↗";
+        margin-left: 0.2em;
+        font-size: 0.8em;
+      }
+    }
+  }
+
+  &-empty {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 2rem;
+    font-style: italic;
+  }
+
+  &-sticky-footer {
+    position: sticky;
+    bottom: 0;
+    background: var(--background-primary);
+    padding-top: 0.75rem;
+    margin-top: 0;
+    z-index: 10;
+    border-top: 1px solid var(--background-modifier-border);
+  }
+
+  &-buttons {
+    display: flex;
+    gap: 0.5rem;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    padding-bottom: 0.5rem;
+    width: 100%;
+
+    button {
+      flex: 1;
+      min-width: 0;
+      padding: 0.5rem 1rem;
+      border-radius: $border-radius-sm;
+      cursor: pointer;
+      border: 1px solid var(--background-modifier-border);
+      background: var(--interactive-normal);
+      color: var(--text-normal);
+      transition: all $transition-normal;
+      text-align: center;
+
+      &:hover {
+        background: var(--interactive-hover);
+        border-color: var(--interactive-accent);
+        transform: translateY(-1px);
+        box-shadow: $shadow-hover-btn;
+      }
+
+      &:active {
+        transform: translateY(0);
+        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      }
+    }
+  }
+}
+
+// Title Property Setup Modal
+.nexus-title-property-setup {
+  &-modal {
+    display: flex;
+    flex-direction: column;
+    padding: $spacing-lg;
+    max-width: 550px;
+  }
+
+  &-title {
+    text-align: center;
+    margin-bottom: $spacing-md;
+    font-size: $font-size-xl;
+    color: var(--text-normal);
+  }
+
+  &-description {
+    margin-bottom: $spacing-lg;
+
+    p {
+      margin-bottom: 0.75em;
+      line-height: 1.6;
+      color: var(--text-muted);
+    }
+  }
+
+  &-warning {
+    background: var(--background-secondary);
+    padding: 0.75em $spacing-md;
+    border-radius: $border-radius;
+    border-left: 3px solid var(--interactive-accent);
+  }
+
+  &-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75em;
+    margin-top: $spacing-md;
+  }
+
+  &-button {
+    padding: 0.75em $spacing-lg;
+    border-radius: $border-radius;
+    cursor: pointer;
+    border: 1px solid var(--background-modifier-border);
+    background: var(--interactive-normal);
+    color: var(--text-normal);
+    font-size: 1em;
+    transition: all $transition-normal;
+
+    &:hover {
+      background: var(--interactive-hover);
+      border-color: var(--interactive-accent);
+    }
+
+    &.mod-cta {
+      background: var(--interactive-accent);
+      color: var(--text-on-accent);
+      border-color: var(--interactive-accent);
+
+      &:hover {
+        background: var(--interactive-accent-hover);
+        border-color: var(--interactive-accent-hover);
+      }
+    }
+
+    &-later {
+      background: transparent;
+      color: var(--text-muted);
+      border-color: transparent;
+
+      &:hover {
+        background: var(--background-secondary);
+        color: var(--text-normal);
+        border-color: var(--background-modifier-border);
+      }
+    }
+  }
+}

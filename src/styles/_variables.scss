@@ -1,0 +1,60 @@
+$border-radius: 6px;
+$border-radius-sm: 4px;
+$border-radius-lg: 8px;
+
+$transition-fast: 0.15s ease;
+$transition-normal: 0.2s ease;
+$transition-slow: 0.3s ease;
+
+$font-size-xs: 0.75em;
+$font-size-sm: 0.85em;
+$font-size-md: 0.9em;
+$font-size-base: 0.95em;
+$font-size-lg: 1.1em;
+$font-size-xl: 1.3em;
+$font-size-xxl: 1.5em;
+
+$spacing-xs: 0.25em;
+$spacing-sm: 0.5em;
+$spacing-md: 1em;
+$spacing-lg: 1.5em;
+$spacing-xl: 2em;
+
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
+$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.15);
+$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
+$shadow-xl: 0 4px 12px rgba(0, 0, 0, 0.2);
+$shadow-hover-btn: 0 2px 8px rgba(0, 0, 0, 0.15);
+
+$input-height: 2.8em;
+$input-border-width: 2px;
+
+$moc-children-indent: 12px;
+$moc-toggle-size: 20px;
+
+$dropdown-arrow-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+
+$color-error-bg: rgba(255, 100, 100, 0.1);
+
+$toggle-checkbox-size: 16px;
+$toggle-checkbox-size-sm: 14px;
+$toggle-checkbox-size-mobile: 11px;
+
+$zoom-preview-scrollbar-width: 8px;
+
+$node-preview-grid-key-width: 150px;
+$node-edit-grid-key-width: 200px;
+$node-edit-max-height: 400px;
+
+$color-rule-font-size: 11px;
+$color-rule-order-width: 20px;
+
+$filter-preset-name-width: 180px;
+
+$moc-link-font-size: 14px;
+$moc-depth0-font-size: 15px;
+$moc-depth1-font-size: 14px;
+$moc-depth2-font-size: 13px;
+
+$mobile-breakpoint: 600px;
+$tablet-breakpoint: 768px;

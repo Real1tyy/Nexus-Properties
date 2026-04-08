@@ -1,0 +1,395 @@
+@use "variables" as *;
+
+.nexus-properties-moc-view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+
+  &-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-height: 0;
+    width: 100%;
+    overflow: hidden;
+    background: var(--background-primary);
+  }
+}
+
+// Toolbar
+.nexus-properties-moc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--background-modifier-border);
+  background: var(--background-secondary);
+
+  &-group {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+  }
+
+  &-btn {
+    padding: 4px 12px;
+    font-size: 12px;
+    background: var(--background-primary);
+    border: 1px solid var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all $transition-fast;
+
+    &:hover {
+      background: var(--background-modifier-hover);
+      color: var(--text-normal);
+      border-color: var(--interactive-accent);
+    }
+  }
+}
+
+// Hierarchy source dropdown
+.nexus-properties-moc-source-dropdown {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: $border-radius-sm;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+    border-color: var(--interactive-accent);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+  }
+}
+
+// Parent override dropdown (MOC view)
+.nexus-properties-moc-parent-dropdown {
+  padding: 4px 8px;
+  font-size: 12px;
+  background: var(--background-primary);
+  border: 1px solid var(--background-modifier-border);
+  border-radius: $border-radius-sm;
+  color: var(--text-normal);
+  cursor: pointer;
+  transition: all $transition-fast;
+  max-width: 160px;
+
+  &:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+    border-color: var(--interactive-accent);
+  }
+
+  &:focus {
+    outline: none;
+    border-color: var(--interactive-accent);
+    color: var(--text-normal);
+  }
+
+  option {
+    background: var(--background-primary);
+    color: var(--text-normal);
+  }
+}
+
+// Root mode toggle
+.nexus-properties-moc-root-toggle {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 10px;
+
+  svg {
+    flex-shrink: 0;
+  }
+
+  span {
+    white-space: nowrap;
+  }
+
+  &-active {
+    background: var(--interactive-accent);
+    border-color: var(--interactive-accent);
+    color: var(--text-on-accent);
+
+    &:hover {
+      background: var(--interactive-accent-hover);
+      border-color: var(--interactive-accent-hover);
+      color: var(--text-on-accent);
+    }
+  }
+}
+
+// Search row
+.nexus-properties-moc-search {
+  &-row {
+    display: flex;
+    gap: $spacing-sm;
+    padding: 0.75em $spacing-md;
+    background-color: var(--background-secondary);
+    border-bottom: $input-border-width solid var(--background-modifier-border);
+    flex-shrink: 0;
+  }
+
+  &-input-container {
+    flex: 1;
+  }
+
+  &-input {
+    width: 100%;
+    height: $input-height;
+    padding: $spacing-sm 0.75em;
+    border: 1.5px solid var(--background-modifier-border);
+    border-radius: $border-radius;
+    background-color: var(--background-primary);
+    color: var(--text-normal);
+    font-size: $font-size-sm;
+    transition: border-color $transition-normal, box-shadow $transition-normal;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+
+    &:focus {
+      outline: none;
+      border-color: var(--interactive-accent);
+      box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
+    }
+
+    &::placeholder {
+      color: var(--text-faint);
+    }
+  }
+}
+
+// Tree container
+.nexus-properties-moc-tree-container {
+  padding: $moc-children-indent;
+  overflow-y: auto;
+  overflow-x: scroll;
+  flex: 1;
+  min-height: 0;
+
+  &::-webkit-scrollbar {
+    width: $zoom-preview-scrollbar-width;
+    height: $zoom-preview-scrollbar-width;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: var(--background-secondary);
+    border-radius: $border-radius-sm;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: var(--background-modifier-border);
+    border-radius: $border-radius-sm;
+
+    &:hover {
+      background: var(--text-faint);
+    }
+  }
+
+  &::-webkit-scrollbar-corner {
+    background: var(--background-secondary);
+  }
+}
+
+// Tree item
+.nexus-properties-moc-item {
+  position: relative;
+
+  &-header {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 4px;
+    border-radius: $border-radius;
+    transition: background-color 0.1s;
+    white-space: nowrap;
+
+    &:hover {
+      background: var(--background-secondary);
+    }
+  }
+}
+
+// Toggle button
+.nexus-properties-moc-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: $moc-toggle-size;
+  height: $moc-toggle-size;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  color: var(--text-muted);
+  flex-shrink: 0;
+  transition: all $transition-fast;
+
+  &:hover {
+    background: var(--background-modifier-hover);
+    color: var(--text-normal);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  &-spacer {
+    width: $moc-toggle-size;
+    height: $moc-toggle-size;
+    flex-shrink: 0;
+  }
+
+  &-container {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+
+    &.nexus-properties-hidden {
+      display: none;
+    }
+  }
+
+  &-checkbox {
+    cursor: pointer;
+    width: $toggle-checkbox-size-sm;
+    height: $toggle-checkbox-size-sm;
+  }
+
+  &-label {
+    color: var(--text-muted);
+    cursor: pointer;
+    user-select: none;
+
+    &:hover {
+      color: var(--text-normal);
+    }
+  }
+}
+
+// Link styling
+.nexus-properties-moc-link {
+  color: var(--text-normal);
+  text-decoration: none;
+  font-size: $moc-link-font-size;
+  padding: 2px 6px;
+  border-radius: $border-radius-sm;
+  cursor: pointer;
+  transition: all $transition-fast;
+
+  &:hover {
+    color: var(--text-accent);
+    background: var(--background-modifier-hover);
+  }
+
+  &-current {
+    background: var(--interactive-accent);
+    color: var(--text-on-accent) !important;
+    font-weight: 600 !important;
+
+    &:hover {
+      background: var(--interactive-accent-hover);
+      color: var(--text-on-accent);
+    }
+  }
+}
+
+// Properties display
+.nexus-properties-moc-properties {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-left: auto;
+  padding-left: 12px;
+  flex-shrink: 0;
+}
+
+.nexus-properties-moc-property {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 12px;
+  color: var(--text-muted);
+  white-space: nowrap;
+  padding: 2px 8px;
+  background: var(--background-secondary);
+  border-radius: $border-radius-sm;
+  flex-shrink: 0;
+
+  &-text {
+    color: var(--text-muted);
+  }
+
+  &-link {
+    color: var(--text-accent);
+    text-decoration: none;
+    cursor: pointer;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+
+  &-separator {
+    color: var(--text-faint);
+  }
+}
+
+// Children container
+.nexus-properties-moc-children {
+  margin-left: $moc-children-indent;
+  padding-left: $moc-children-indent;
+  border-left: 2px solid var(--background-modifier-border);
+}
+
+// Depth-based styling
+.nexus-properties-moc-item[data-depth="0"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+  font-size: $moc-depth0-font-size;
+  font-weight: 600;
+  color: var(--text-normal);
+}
+
+.nexus-properties-moc-item[data-depth="1"] > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+  font-size: $moc-depth1-font-size;
+  font-weight: 500;
+}
+
+.nexus-properties-moc-item[data-depth="2"],
+.nexus-properties-moc-item[data-depth="3"],
+.nexus-properties-moc-item[data-depth="4"] {
+  > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+    font-size: $moc-depth2-font-size;
+    font-weight: 400;
+    color: var(--text-muted);
+
+    &:hover {
+      color: var(--text-normal);
+    }
+  }
+}
+
+// Empty state
+.nexus-properties-moc-empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: $spacing-xl;
+  font-size: $font-size-lg;
+  color: var(--text-muted);
+  text-align: center;
+}

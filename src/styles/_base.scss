@@ -1,0 +1,18 @@
+@use "variables" as *;
+
+.workspace-leaf-content .view-content.nexus-properties-view-switcher-content {
+  padding: var(--size-4-3);
+  overflow: hidden;
+}
+
+.nexus-properties-hidden {
+  display: none;
+}
+
+.nexus-properties-graph-toggle-container.nexus-properties-hidden {
+  display: none;
+}
+
+.vertical-tab-content-container {
+  padding: $spacing-xl;
+}
