@@ -10,6 +10,7 @@
 		"typecheck": "tsc -noEmit -skipLibCheck",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"lint:css": "stylelint \"src/styles/**/*.scss\"",
 		"clean": "rm -f main.js"
 	},
 	"keywords": [
@@ -33,6 +34,8 @@
 		"builtin-modules": "5.0.0",
 		"esbuild": "0.25.11",
 		"sass": "^1.87.0",
+		"stylelint": "^16.20.0",
+		"stylelint-config-standard-scss": "^15.0.1",
 		"jsdom": "^27.4.0",
 		"knip": "^5.81.0",
 		"obsidian": "1.11.4",

@@ -69,7 +69,7 @@
   }
 
   &-header h2 {
-    margin: 0 0 $spacing-lg 0;
+    margin: 0 0 $spacing-lg;
     color: var(--text-normal);
     cursor: pointer;
     transition: color $transition-normal;
@@ -83,7 +83,7 @@
     margin-bottom: $spacing-lg;
 
     &-title {
-      margin: 0 0 $spacing-md 0;
+      margin: 0 0 $spacing-md;
       color: var(--text-muted);
       font-size: $font-size-md;
       font-weight: 600;
@@ -268,11 +268,11 @@
   &-subtitle {
     color: var(--text-muted);
     font-size: 0.9rem;
-    margin: 0 0 1rem 0;
+    margin: 0 0 1rem;
   }
 
   &-support {
-    margin: 0 0 1rem 0;
+    margin: 0 0 1rem;
     padding: 1rem;
     background-color: var(--background-secondary);
     border-radius: $border-radius-lg;
@@ -416,7 +416,7 @@
 
       &:active {
         transform: translateY(0);
-        box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+        box-shadow: 0 1px 4px rgb(0 0 0 / 10%);
       }
     }
   }

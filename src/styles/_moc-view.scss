@@ -165,7 +165,7 @@
     &:focus {
       outline: none;
       border-color: var(--interactive-accent);
-      box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
+      box-shadow: 0 0 0 3px rgb(var(--interactive-accent-rgb), 0.1);
     }
 
     &::placeholder {
@@ -177,8 +177,7 @@
 // Tree container
 .nexus-properties-moc-tree-container {
   padding: $moc-children-indent;
-  overflow-y: auto;
-  overflow-x: scroll;
+  overflow: scroll auto;
   flex: 1;
   min-height: 0;
 

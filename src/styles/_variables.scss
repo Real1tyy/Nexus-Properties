@@ -20,11 +20,11 @@ $spacing-md: 1em;
 $spacing-lg: 1.5em;
 $spacing-xl: 2em;
 
-$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.05);
-$shadow-md: 0 2px 8px rgba(0, 0, 0, 0.15);
-$shadow-lg: 0 4px 12px rgba(0, 0, 0, 0.15);
-$shadow-xl: 0 4px 12px rgba(0, 0, 0, 0.2);
-$shadow-hover-btn: 0 2px 8px rgba(0, 0, 0, 0.15);
+$shadow-sm: 0 2px 8px rgb(0 0 0 / 5%);
+$shadow-md: 0 2px 8px rgb(0 0 0 / 15%);
+$shadow-lg: 0 4px 12px rgb(0 0 0 / 15%);
+$shadow-xl: 0 4px 12px rgb(0 0 0 / 20%);
+$shadow-hover-btn: 0 2px 8px rgb(0 0 0 / 15%);
 
 $input-height: 2.8em;
 $input-border-width: 2px;
@@ -34,7 +34,7 @@ $moc-toggle-size: 20px;
 
 $dropdown-arrow-svg: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
 
-$color-error-bg: rgba(255, 100, 100, 0.1);
+$color-error-bg: rgb(255 100 100 / 10%);
 
 $toggle-checkbox-size: 16px;
 $toggle-checkbox-size-sm: 14px;

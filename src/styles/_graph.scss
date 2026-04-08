@@ -13,9 +13,8 @@
 
   &-header {
     display: flex;
-    flex-direction: row;
+    flex-flow: row wrap;
     align-items: center;
-    flex-wrap: wrap;
     gap: $spacing-md;
     padding: $spacing-md;
     border-bottom: $input-border-width solid var(--background-modifier-border);
@@ -55,9 +54,8 @@
 
 .nexus-properties-graph-controls-container {
   display: flex;
-  flex-direction: row;
+  flex-flow: row nowrap;
   align-items: center;
-  flex-wrap: nowrap;
   justify-content: flex-end;
   gap: 0.75em;
   flex-shrink: 0;
@@ -134,7 +132,7 @@
     &:focus {
       outline: none;
       border-color: var(--interactive-accent);
-      box-shadow: 0 0 0 3px rgba(var(--interactive-accent-rgb), 0.1);
+      box-shadow: 0 0 0 3px rgb(var(--interactive-accent-rgb), 0.1);
     }
   }
 
