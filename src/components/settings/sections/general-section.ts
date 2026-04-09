@@ -26,13 +26,13 @@ export class GeneralSection implements SettingsSection {
 
 		new Setting(container).setName("User Interface").setHeading();
 
-		this.uiBuilder.addSchemaField(container, { showRibbonIcon: S.showRibbonIcon }, { name: "Show ribbon icon" });
+		this.uiBuilder.addSchemaField(container, { showRibbonIcon: S.showRibbonIcon }, { label: "Show ribbon icon" });
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ viewLeafPosition: S.viewLeafPosition },
 			{
-				name: "View sidebar position",
+				label: "View sidebar position",
 				options: {
 					left: "Left sidebar",
 					right: "Right sidebar",
@@ -43,25 +43,25 @@ export class GeneralSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showViewSwitcherHeader: S.showViewSwitcherHeader },
-			{ name: "Show view switcher header" }
+			{ label: "Show view switcher header" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showSimpleStatistics: S.showSimpleStatistics },
-			{ name: "Show simple statistics" }
+			{ label: "Show simple statistics" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showRecursiveStatistics: S.showRecursiveStatistics },
-			{ name: "Show recursive statistics" }
+			{ label: "Show recursive statistics" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showDepthSlider: S.showDepthSlider },
-			{ name: "Show depth slider in graph view" }
+			{ label: "Show depth slider in graph view" }
 		);
 
 		this.uiBuilder.addArrayManager(container, {
@@ -142,7 +142,7 @@ export class GeneralSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ propagateRenameToChildren: S.propagateRenameToChildren },
-			{ name: "Propagate rename to children" }
+			{ label: "Propagate rename to children" }
 		);
 
 		new Setting(container).setName("Frontmatter propagation").setHeading();
@@ -167,13 +167,13 @@ export class GeneralSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ excludedPropagatedProps: S.excludedPropagatedProps },
-			{ name: "Excluded propagation properties", placeholder: "status, archived, date" }
+			{ label: "Excluded propagation properties", placeholder: "status, archived, date" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ propagationDebounceMs: S.propagationDebounceMs },
-			{ name: "Propagation debounce delay", step: 100 }
+			{ label: "Propagation debounce delay", step: 100 }
 		);
 
 		new Setting(container).setName("Excluded properties").setHeading();

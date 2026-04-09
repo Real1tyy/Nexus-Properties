@@ -18,13 +18,13 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showSearchBar: S.showSearchBar },
-			{ name: "Show search bar by default" }
+			{ label: "Show search bar by default" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showFilterBar: S.showFilterBar },
-			{ name: "Show filter bar by default" }
+			{ label: "Show filter bar by default" }
 		);
 
 		this.uiBuilder.addSchemaField(container, { showZoomIndicator: S.showZoomIndicator });
@@ -32,19 +32,19 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ maintainIndirectConnections: S.maintainIndirectConnections },
-			{ name: "Maintain indirect connections when filtering" }
+			{ label: "Maintain indirect connections when filtering" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ graphEnlargedWidthPercent: S.graphEnlargedWidthPercent },
-			{ name: "Graph enlarged width" }
+			{ label: "Graph enlarged width" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ graphZoomPreviewHeight: S.graphZoomPreviewHeight },
-			{ name: "Zoom preview height", step: 10 }
+			{ label: "Zoom preview height", step: 10 }
 		);
 
 		this.uiBuilder.addSchemaField(
@@ -68,13 +68,13 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ allRelatedMaxDepth: S.allRelatedMaxDepth },
-			{ name: "All Related recursion depth" }
+			{ label: "All Related recursion depth" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ hierarchyMaxDepth: S.hierarchyMaxDepth },
-			{ name: "Hierarchy traversal depth" }
+			{ label: "Hierarchy traversal depth" }
 		);
 
 		new Setting(container).setName("Layout").setHeading();
@@ -82,7 +82,7 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ useMultiRowLayout: S.useMultiRowLayout },
-			{ name: "Use multi-row layout for large families" }
+			{ label: "Use multi-row layout for large families" }
 		);
 
 		this.uiBuilder.addSchemaField(container, { maxChildrenPerRow: S.maxChildrenPerRow });
@@ -90,19 +90,19 @@ export class GraphDisplaySettingsSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ displayNodeProperties: S.displayNodeProperties },
-			{ name: "Display properties in nodes", placeholder: "e.g., status, priority" }
+			{ label: "Display properties in nodes", placeholder: "e.g., status, priority" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showGraphTooltips: S.showGraphTooltips },
-			{ name: "Show node tooltips" }
+			{ label: "Show node tooltips" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ graphTooltipWidth: S.graphTooltipWidth },
-			{ name: "Tooltip width", step: 5 }
+			{ label: "Tooltip width", step: 5 }
 		);
 	}
 }

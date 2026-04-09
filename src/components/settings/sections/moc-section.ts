@@ -18,14 +18,14 @@ export class MocSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ enableMocContentReading: S.enableMocContentReading },
-			{ name: "Enable MOC content reading" }
+			{ label: "Enable MOC content reading" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ hierarchySource: S.hierarchySource },
 			{
-				name: "Default hierarchy source",
+				label: "Default hierarchy source",
 				options: {
 					properties: "Properties (default)",
 					"moc-content": "MOC Content",
@@ -42,7 +42,7 @@ export class MocSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ mocDisplayProperties: S.mocDisplayProperties },
-			{ name: "Display properties", placeholder: "e.g., status, priority, tags" }
+			{ label: "Display properties", placeholder: "e.g., status, priority, tags" }
 		);
 	}
 }

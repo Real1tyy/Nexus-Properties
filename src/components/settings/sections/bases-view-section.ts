@@ -32,14 +32,14 @@ export class BasesViewSettingsSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ showAllRelationshipViews: S.showAllRelationshipViews },
-			{ name: "Show 'All' relationship views" }
+			{ label: "Show 'All' relationship views" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ basesViewType: S.basesViewType },
 			{
-				name: "View type",
+				label: "View type",
 				options: {
 					cards: "Cards (Recommended)",
 					table: "Table",
@@ -51,19 +51,19 @@ export class BasesViewSettingsSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ excludeArchived: S.excludeArchived },
-			{ name: "Enable archived filtering" }
+			{ label: "Enable archived filtering" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ archivedProp: S.archivedProp },
-			{ name: "Archived property name", placeholder: "Archived" }
+			{ label: "Archived property name", placeholder: "Archived" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ defaultBasesIncludedProperties: S.defaultBasesIncludedProperties },
-			{ name: "Default included properties", placeholder: "e.g., status, priority, tags" }
+			{ label: "Default included properties", placeholder: "e.g., status, priority, tags" }
 		);
 
 		new Setting(container).setName("Custom sorting").setHeading();

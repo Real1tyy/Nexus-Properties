@@ -23,13 +23,13 @@ export class PropertiesSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ zoomHideFrontmatterByDefault: S.zoomHideFrontmatterByDefault },
-			{ name: "Zoom: hide frontmatter by default" }
+			{ label: "Zoom: hide frontmatter by default" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ zoomHideContentByDefault: S.zoomHideContentByDefault },
-			{ name: "Zoom: hide content by default" }
+			{ label: "Zoom: hide content by default" }
 		);
 
 		new Setting(container).setName("Direct Relationships").setHeading();
@@ -40,36 +40,36 @@ export class PropertiesSection implements SettingsSection {
 				"Configure property names for direct bidirectional relationships. When you set a relationship in one direction, the plugin automatically updates the reverse relationship."
 			);
 
-		this.uiBuilder.addSchemaField(container, { autoLinkSiblings: S.autoLinkSiblings }, { name: "Auto-link siblings" });
+		this.uiBuilder.addSchemaField(container, { autoLinkSiblings: S.autoLinkSiblings }, { label: "Auto-link siblings" });
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ parentProp: S.parentProp },
-			{ name: "Parent property", placeholder: "parent" }
+			{ label: "Parent property", placeholder: "parent" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ childrenProp: S.childrenProp },
-			{ name: "Children property", placeholder: "children" }
+			{ label: "Children property", placeholder: "children" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ relatedProp: S.relatedProp },
-			{ name: "Related property", placeholder: "related" }
+			{ label: "Related property", placeholder: "related" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ prioritizeParentProp: S.prioritizeParentProp },
-			{ name: "Prioritize parent property", placeholder: "PriorityParent" }
+			{ label: "Prioritize parent property", placeholder: "PriorityParent" }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ zettelIdProp: S.zettelIdProp },
-			{ name: "Zettel ID property", placeholder: "_ZettelID" }
+			{ label: "Zettel ID property", placeholder: "_ZettelID" }
 		);
 
 		new Setting(container).setName("Automatic Title Property").setHeading();
@@ -84,7 +84,7 @@ export class PropertiesSection implements SettingsSection {
 			container,
 			{ titlePropertyMode: S.titlePropertyMode },
 			{
-				name: "Title property mode",
+				label: "Title property mode",
 				options: {
 					enabled: "Enabled - Add title properties",
 					disabled: "Disabled - Use file names",
@@ -96,13 +96,13 @@ export class PropertiesSection implements SettingsSection {
 		this.uiBuilder.addSchemaField(
 			container,
 			{ titleProp: S.titleProp },
-			{ name: "Title property name", placeholder: SETTINGS_DEFAULTS.DEFAULT_TITLE_PROP }
+			{ label: "Title property name", placeholder: SETTINGS_DEFAULTS.DEFAULT_TITLE_PROP }
 		);
 
 		this.uiBuilder.addSchemaField(
 			container,
 			{ excludeTitleDirectories: S.excludeTitleDirectories },
-			{ name: "Exclude directories from title", placeholder: "Templates, Daily Notes" }
+			{ label: "Exclude directories from title", placeholder: "Templates, Daily Notes" }
 		);
 	}
 }
