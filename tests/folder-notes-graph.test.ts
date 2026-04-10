@@ -473,9 +473,9 @@ describe("Folder Notes Graph Building", () => {
 			const task2 = result.nodes.find((n) => n.data?.id === "tasks/task2.md");
 			const task3 = result.nodes.find((n) => n.data?.id === "tasks/task3.md");
 
-			expect(task1?.data?.level).toBe(0);
-			expect(task2?.data?.level).toBe(1);
-			expect(task3?.data?.level).toBe(2);
+			expect(task1?.data?.["level"]).toBe(0);
+			expect(task2?.data?.["level"]).toBe(1);
+			expect(task3?.data?.["level"]).toBe(2);
 		});
 	});
 
@@ -1086,14 +1086,14 @@ describe("Folder Notes Graph Building", () => {
 			const graphBuilder = new GraphBuilder(mockApp, mockIndexer, mockSettingsStore);
 
 			// Should not throw or hang due to circular reference
-			expect(() => {
+			await expect(
 				graphBuilder.buildGraph({
 					sourcePath: "Folder1/A.md",
 					renderRelated: false,
 					includeAllRelated: false,
 					startFromCurrent: true,
-				});
-			}).not.toThrow();
+				})
+			).resolves.toBeDefined();
 
 			const result = await graphBuilder.buildGraph({
 				sourcePath: "Folder1/A.md",

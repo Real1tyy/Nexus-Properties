@@ -13,7 +13,7 @@ export class TitlePropertySetupModal extends Modal {
 		super(app);
 	}
 
-	onOpen(): void {
+	override onOpen(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 		contentEl.addClass("nexus-title-property-setup-modal");
@@ -75,7 +75,7 @@ export class TitlePropertySetupModal extends Modal {
 		});
 	}
 
-	onClose(): void {
+	override onClose(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 	}

@@ -1,18 +1,19 @@
 import {
 	getFolderPath,
 	isFolderNote,
+	type PropertyRendererConfig,
 	RegisteredEventsComponent,
 	renderPropertyValue,
-	type PropertyRendererConfig,
 } from "@real1ty-obsidian-plugins";
-import { Component, TFile, type App } from "obsidian";
+import { type App, Component, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
+
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { cls } from "../../utils/css";
-import { resolveDisplayName, resolveParentSelection, type ParentOption } from "../../utils/file-utils";
+import { type ParentOption, resolveDisplayName, resolveParentSelection } from "../../utils/file-utils";
 import { buildRelatedTree, type TreeNode } from "../../utils/hierarchy";
 import { MocSearch } from "../input-managers/moc-search";
 
@@ -48,7 +49,7 @@ export class MocView extends RegisteredEventsComponent {
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
 			this.currentSettings = settings;
 			this.lastFilePath = null;
-			this.render();
+			void this.render();
 		});
 	}
 
@@ -96,7 +97,7 @@ export class MocView extends RegisteredEventsComponent {
 				this.searchRowEl = createDiv({ cls: cls("moc-search-row") });
 				this.mocSearch = new MocSearch(this.searchRowEl, () => {
 					this.lastFilePath = null;
-					this.render();
+					void this.render();
 				});
 			}
 			this.contentEl.appendChild(this.searchRowEl!);
@@ -279,7 +280,7 @@ export class MocView extends RegisteredEventsComponent {
 		relatedCheckbox.addEventListener("change", () => {
 			this.showRelated = relatedCheckbox.checked;
 			this.lastFilePath = null;
-			this.render();
+			void this.render();
 		});
 		relatedContainer.style.cursor = "pointer";
 		relatedContainer.addEventListener("click", (e) => {
@@ -297,7 +298,7 @@ export class MocView extends RegisteredEventsComponent {
 		this.parentDropdown.addEventListener("change", () => {
 			this.parentOverridePath = this.parentDropdown?.value;
 			this.lastFilePath = null;
-			this.render();
+			void this.render();
 		});
 
 		// Root mode toggle is not applicable for folder notes (forest always uses top parent)
@@ -344,7 +345,7 @@ export class MocView extends RegisteredEventsComponent {
 		this.useTopParentAsRoot = !this.useTopParentAsRoot;
 		this.updateRootModeButton();
 		this.lastFilePath = null;
-		this.render();
+		void this.render();
 	}
 
 	private getTreeIcon(): string {
@@ -359,8 +360,8 @@ export class MocView extends RegisteredEventsComponent {
 		const itemEl = container.createDiv({
 			cls: cls("moc-item"),
 		});
-		itemEl.dataset.depth = depth.toString();
-		itemEl.dataset.path = node.path;
+		itemEl.dataset["depth"] = depth.toString();
+		itemEl.dataset["path"] = node.path;
 
 		const headerEl = itemEl.createDiv({
 			cls: cls("moc-item-header"),
@@ -398,9 +399,9 @@ export class MocView extends RegisteredEventsComponent {
 			if (file instanceof TFile) {
 				// Ctrl/Cmd+click: open in new tab
 				if (e.ctrlKey || e.metaKey) {
-					this.app.workspace.getLeaf("tab").openFile(file);
+					void this.app.workspace.getLeaf("tab").openFile(file);
 				} else {
-					this.app.workspace.getLeaf(false).openFile(file);
+					void this.app.workspace.getLeaf(false).openFile(file);
 				}
 			}
 		});
@@ -469,7 +470,7 @@ export class MocView extends RegisteredEventsComponent {
 	private collapseAll(): void {
 		const items = this.contentEl.querySelectorAll(`.${cls("moc-item")}`);
 		items.forEach((item) => {
-			const path = (item as HTMLElement).dataset.path;
+			const path = (item as HTMLElement).dataset["path"];
 			const childrenEl = item.querySelector(`:scope > .${cls("moc-children")}`);
 			if (childrenEl && path) {
 				this.collapsedNodes.add(path);
@@ -512,7 +513,7 @@ export class MocView extends RegisteredEventsComponent {
 				link.addEventListener("click", (e) => {
 					e.preventDefault();
 					e.stopPropagation();
-					this.app.workspace.openLinkText(path, file.path, true);
+					void this.app.workspace.openLinkText(path, file.path, true);
 				});
 				return link;
 			},

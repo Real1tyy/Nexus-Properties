@@ -1,4 +1,5 @@
 import { buildPropertyMapping, sanitizeExpression } from "@real1ty-obsidian-plugins";
+
 import { cls } from "../../utils/css";
 import { InputFilterManager } from "./base";
 
@@ -23,7 +24,7 @@ export class GraphFilter extends InputFilterManager {
 		);
 	}
 
-	protected updateFilterValue(value: string): void {
+	protected override updateFilterValue(value: string): void {
 		super.updateFilterValue(value);
 		this.compiledFunc = null;
 		this.propertyMapping.clear();

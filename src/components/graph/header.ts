@@ -9,7 +9,7 @@ interface GraphHeaderProps {
 	isFolderNote?: boolean;
 	hierarchySource?: HierarchySourceType;
 	parents?: Array<{ path: string; displayName: string }>;
-	selectedParentPath?: string;
+	selectedParentPath?: string | undefined;
 	onRenderRelatedChange: (value: boolean) => void;
 	onIncludeAllRelatedChange: (value: boolean) => void;
 	onStartFromCurrentChange: (value: boolean) => void;

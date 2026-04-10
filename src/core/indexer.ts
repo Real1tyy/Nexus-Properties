@@ -1,13 +1,14 @@
 import {
 	type FrontmatterDiff,
 	Indexer as GenericIndexer,
-	type IndexerEvent as GenericIndexerEvent,
 	type IndexerConfig,
+	type IndexerEvent as GenericIndexerEvent,
 	normalizeProperty,
 } from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
 import type { Observable, Subscription } from "rxjs";
 import { BehaviorSubject, Subject } from "rxjs";
+
 import { type FileRelationships, RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
 import type { RelationshipResolver } from "../types/hierarchy";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
@@ -17,11 +18,11 @@ type IndexerEventType = "file-changed" | "file-deleted" | "file-renamed";
 export interface IndexerEvent {
 	type: IndexerEventType;
 	filePath: string;
-	oldPath?: string;
-	oldRelationships?: FileRelationships;
-	newRelationships?: FileRelationships;
-	oldFrontmatter?: Frontmatter;
-	frontmatterDiff?: FrontmatterDiff;
+	oldPath?: string | undefined;
+	oldRelationships?: FileRelationships | undefined;
+	newRelationships?: FileRelationships | undefined;
+	oldFrontmatter?: Frontmatter | undefined;
+	frontmatterDiff?: FrontmatterDiff | undefined;
 }
 
 /**

@@ -12,7 +12,7 @@ export class NodeCreationModal extends Modal {
 		super(app);
 	}
 
-	onOpen(): void {
+	override onOpen(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 		contentEl.addClass("nexus-node-creation-modal");
@@ -88,7 +88,7 @@ export class NodeCreationModal extends Modal {
 		this.close();
 	}
 
-	onClose(): void {
+	override onClose(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 		this.inputEl = null;

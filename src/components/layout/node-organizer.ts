@@ -20,7 +20,7 @@ export class NodeOrganizer {
 		let maxLevel = 0;
 
 		nodes.forEach((node) => {
-			const level = node.data?.constellationLevel ?? 0;
+			const level = node.data?.["constellationLevel"] ?? 0;
 			if (!nodesByLevel.has(level)) {
 				nodesByLevel.set(level, []);
 			}
@@ -35,7 +35,7 @@ export class NodeOrganizer {
 		const nodesByGroup = new Map<number, ElementDefinition[]>();
 
 		nodes.forEach((node) => {
-			const group = node.data?.constellationGroup as number;
+			const group = node.data?.["constellationGroup"] as number;
 			if (group === undefined) return;
 
 			if (!nodesByGroup.has(group)) {

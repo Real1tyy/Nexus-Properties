@@ -1,7 +1,5 @@
 import type { Frontmatter, NexusPropertiesSettings } from "./settings";
 
-const _PLUGIN_ID = "nexus-properties";
-
 export const SETTINGS_DEFAULTS = {
 	DEFAULT_VERSION: "1.0.0",
 	DEFAULT_PARENT_PROP: "Parent",

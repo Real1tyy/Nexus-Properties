@@ -1,5 +1,6 @@
 import { parseValue, serializeValue } from "@real1ty-obsidian-plugins";
 import { type App, Modal, type TFile } from "obsidian";
+
 import { cls } from "../utils/css";
 
 interface PropertyRow {
@@ -21,7 +22,7 @@ export class NodeEditModal extends Modal {
 		super(app);
 	}
 
-	async onOpen(): Promise<void> {
+	override async onOpen(): Promise<void> {
 		const { contentEl } = this;
 		contentEl.addClass(cls("node-edit-modal"));
 
@@ -175,7 +176,7 @@ export class NodeEditModal extends Modal {
 		this.close();
 	}
 
-	onClose(): void {
+	override onClose(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 	}

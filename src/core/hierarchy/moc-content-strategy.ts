@@ -1,4 +1,5 @@
 import { type App, TFile } from "obsidian";
+
 import type { RelationshipType } from "../../types/constants";
 import type { HierarchyTraversalOptions } from "../../types/hierarchy";
 import type { NexusPropertiesSettings } from "../../types/settings";
@@ -17,7 +18,7 @@ export class MocContentStrategy implements HierarchyStrategy {
 	constructor(
 		private app: App,
 		private indexer: Indexer,
-		private getSettings: () => NexusPropertiesSettings
+		_getSettings: () => NexusPropertiesSettings
 	) {}
 
 	private getMocData(mocFilePath: string): { roots: MocNode[]; allLinks: Set<string> } {

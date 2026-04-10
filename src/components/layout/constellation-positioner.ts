@@ -1,4 +1,5 @@
 import type { Core, ElementDefinition } from "cytoscape";
+
 import { CollisionDetector } from "./collision-detector";
 import { NodeOrganizer } from "./node-organizer";
 
@@ -53,17 +54,17 @@ export class ConstellationPositioner {
 		allNodes: ElementDefinition[],
 		nodePositions: Map<string, { x: number; y: number }>
 	): void {
-		const centerPath = node.data?.centerPath;
+		const centerPath = node.data?.["centerPath"];
 		if (!centerPath) return;
 
-		const orbitalIndex = node.data?.orbitalIndex ?? 0;
-		const orbitalCount = node.data?.orbitalCount ?? 1;
+		const orbitalIndex = node.data?.["orbitalIndex"] ?? 0;
+		const orbitalCount = node.data?.["orbitalCount"] ?? 1;
 
 		const centerPos = nodePositions.get(centerPath);
 		if (!centerPos) return;
 
 		const orbitalRadius = this.calculateOrbitalRadius(orbitalCount);
-		const baseAngle = this.calculateBaseAngle(node.data?.centerPath, allNodes);
+		const baseAngle = this.calculateBaseAngle(node.data?.["centerPath"], allNodes);
 		const idealAngle = (orbitalIndex / orbitalCount) * 2 * Math.PI + baseAngle;
 
 		const position = this.collisionDetector.findValidPositionSimple(
@@ -92,8 +93,8 @@ export class ConstellationPositioner {
 
 		// If the center itself has an orbital index, use that to vary the starting angle
 		const centerNode = allNodes.find((n) => n.data?.id === centerPath);
-		if (centerNode?.data?.orbitalIndex !== undefined) {
-			angleOffset += (centerNode.data.orbitalIndex * Math.PI) / 3;
+		if (centerNode?.data?.["orbitalIndex"] !== undefined) {
+			angleOffset += (centerNode.data["orbitalIndex"] * Math.PI) / 3;
 		}
 
 		return angleOffset;

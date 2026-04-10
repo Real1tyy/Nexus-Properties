@@ -6,7 +6,8 @@ import {
 	parsePropertyLinks,
 } from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
-import { RELATIONSHIP_CONFIGS, type FileRelationships, type RelationshipType } from "../types/constants";
+
+import { type FileRelationships, RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { HierarchyTraversalOptions, RelationshipResolver } from "../types/hierarchy";
 import type { NexusPropertiesSettings } from "../types/settings";
 
@@ -16,7 +17,7 @@ export interface TreeNode {
 	path: string;
 	name: string;
 	children: TreeNode[];
-	isCurrentFile?: boolean;
+	isCurrentFile?: boolean | undefined;
 }
 
 /**

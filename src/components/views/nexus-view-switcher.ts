@@ -1,6 +1,7 @@
 import { isFolderNote } from "@real1ty-obsidian-plugins";
 import { ItemView, Platform, type TFile, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
+
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
@@ -58,7 +59,7 @@ export class NexusViewSwitcher extends ItemView {
 		return "Nexus Properties";
 	}
 
-	getIcon(): string {
+	override getIcon(): string {
 		switch (this.currentMode) {
 			case "graph":
 				return "git-fork";
@@ -69,7 +70,7 @@ export class NexusViewSwitcher extends ItemView {
 		}
 	}
 
-	async onOpen(): Promise<void> {
+	override async onOpen(): Promise<void> {
 		const { contentEl } = this;
 		contentEl.empty();
 		contentEl.addClass(cls("view-switcher-content"));
@@ -107,7 +108,7 @@ export class NexusViewSwitcher extends ItemView {
 		await this.renderView();
 	}
 
-	async onClose(): Promise<void> {
+	override async onClose(): Promise<void> {
 		if (this.settingsSubscription) {
 			this.settingsSubscription.unsubscribe();
 			this.settingsSubscription = null;

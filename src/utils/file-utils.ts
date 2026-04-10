@@ -1,5 +1,6 @@
 import { extractDisplayName, extractFilePath } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
+
 import type { RelationshipResolver } from "../types/hierarchy";
 
 /**
@@ -109,7 +110,7 @@ interface ResolveParentSelectionOptions {
 	indexer: RelationshipResolver;
 	file: TFile;
 	prioritizeParentProp: string;
-	overridePath?: string;
+	overridePath?: string | undefined;
 }
 
 interface ParentSelectionResult {

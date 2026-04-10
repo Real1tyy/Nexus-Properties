@@ -39,10 +39,10 @@ interface GraphBuilderOptions {
 	includeAllRelated: boolean;
 	startFromCurrent: boolean;
 	searchQuery?: string;
-	filterEvaluator?: (frontmatter: Record<string, any>) => boolean;
-	hierarchySource?: HierarchySourceType;
-	mocFilePath?: string;
-	parentOverridePath?: string;
+	filterEvaluator?: ((frontmatter: Record<string, any>) => boolean) | undefined;
+	hierarchySource?: HierarchySourceType | undefined;
+	mocFilePath?: string | undefined;
+	parentOverridePath?: string | undefined;
 }
 
 /**
@@ -53,10 +53,10 @@ interface GraphBuilderOptions {
 export class GraphBuilder {
 	private readonly filterEvaluator: FilterEvaluator<NexusPropertiesSettings>;
 	private readonly colorEvaluator: ColorEvaluator<NexusPropertiesSettings>;
-	private allRelatedMaxDepth: number;
-	private hierarchyMaxDepth: number;
-	private maintainIndirectConnections: boolean;
-	private titleProp: string;
+	private allRelatedMaxDepth!: number;
+	private hierarchyMaxDepth!: number;
+	private maintainIndirectConnections!: boolean;
+	private titleProp!: string;
 	private depthOverride: number | null = null;
 	private hierarchySource: HierarchySourceType = "properties";
 

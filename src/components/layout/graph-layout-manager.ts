@@ -1,5 +1,6 @@
 import type cytoscape from "cytoscape";
 import type { Core, ElementDefinition } from "cytoscape";
+
 import { CollisionDetector } from "./collision-detector";
 import { ConstellationPositioner } from "./constellation-positioner";
 import { type Bounds, NodeOrganizer, type TreeBounds } from "./node-organizer";
@@ -36,8 +37,10 @@ export class GraphLayoutManager {
 			config;
 
 		// Check layout mode flags
-		const hasConstellationData = nodes.some((node) => node.data && typeof node.data.constellationIndex === "number");
-		const hasConstellationGroups = nodes.some((node) => node.data && typeof node.data.constellationGroup === "number");
+		const hasConstellationData = nodes.some((node) => node.data && typeof node.data["constellationIndex"] === "number");
+		const hasConstellationGroups = nodes.some(
+			(node) => node.data && typeof node.data["constellationGroup"] === "number"
+		);
 
 		if (isFolderNote && renderRelated && hasConstellationGroups) {
 			this.applyFolderConstellationLayout(nodes, animationDuration);
@@ -397,7 +400,7 @@ export class GraphLayoutManager {
 		// Group nodes by level
 		const nodesByLevel = new Map<number, ElementDefinition[]>();
 		nodes.forEach((node) => {
-			const level = (node.data?.level as number) ?? 0;
+			const level = (node.data?.["level"] as number) ?? 0;
 			if (!nodesByLevel.has(level)) {
 				nodesByLevel.set(level, []);
 			}

@@ -10,7 +10,7 @@ export abstract class InputFilterManager {
 	protected debounceTimer: number | null = null;
 	protected currentValue = "";
 	protected persistentlyVisible = false;
-	protected onHide?: () => void;
+	protected onHide?: (() => void) | undefined;
 	protected debounceMs: number;
 
 	constructor(

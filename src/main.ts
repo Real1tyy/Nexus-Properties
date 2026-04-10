@@ -25,7 +25,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 	nodeCreator!: NodeCreator;
 	commandManager!: CommandManager;
 
-	async onload() {
+	override async onload() {
 		this.settingsStore = new SettingsStore(this, NexusPropertiesSettingsSchema);
 		await this.settingsStore.loadSettings();
 
@@ -163,7 +163,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 		this.checkTitlePropertySetup();
 	}
 
-	onunload(): void {
+	override onunload(): void {
 		this.propertiesManager?.stop();
 		this.indexer?.stop();
 		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
@@ -260,24 +260,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 		} else {
 			new Notice("Please open the Nexus Properties view first");
 		}
-	}
-
-	private executeViewSwitcherMethodWithArg(methodName: string, arg: number): void {
-		const { workspace } = this.app;
-		const existingLeaves = workspace.getLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
-
-		if (existingLeaves.length > 0) {
-			const switcherView = existingLeaves[0].view;
-			if (switcherView instanceof NexusViewSwitcher) {
-				const method = switcherView[methodName as keyof NexusViewSwitcher];
-				if (typeof method === "function") {
-					(method as (arg: number) => void).call(switcherView, arg);
-				}
-				return;
-			}
-		}
-
-		new Notice("Please open the Nexus Properties view first");
 	}
 
 	private handleNodeCreationCommand(checking: boolean, type: "parent" | "child" | "related"): boolean {

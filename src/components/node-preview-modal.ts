@@ -36,7 +36,7 @@ export class NodePreviewModal extends Modal {
 		);
 	}
 
-	async onOpen(): Promise<void> {
+	override async onOpen(): Promise<void> {
 		const { contentEl } = this;
 		contentEl.addClass(cls("node-preview-modal"));
 
@@ -73,7 +73,7 @@ export class NodePreviewModal extends Modal {
 		// Make title clickable to open file
 		titleEl.addClass("clickable");
 		titleEl.onclick = () => {
-			this.app.workspace.openLinkText(this.file.path, "", false);
+			void this.app.workspace.openLinkText(this.file.path, "", false);
 			this.close();
 		};
 
@@ -102,11 +102,10 @@ export class NodePreviewModal extends Modal {
 		}
 	}
 
-	onClose(): void {
+	override onClose(): void {
 		const { contentEl } = this;
 		contentEl.empty();
 
-		// Unsubscribe from settings changes
 		this.settingsSubscription?.unsubscribe();
 	}
 }
