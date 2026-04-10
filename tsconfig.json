@@ -1,10 +1,6 @@
 {
 	"compilerOptions": {
 		"baseUrl": ".",
-		"paths": {
-			"shared/*": ["shared/*"],
-			"@real1ty-obsidian-plugins": ["shared/index.ts"]
-		},
 		"inlineSourceMap": true,
 		"inlineSources": true,
 		"module": "ESNext",
@@ -17,7 +13,13 @@
 		"strictNullChecks": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
-		"lib": ["DOM", "ES5", "ES6", "ES7"]
+		"lib": ["DOM", "ES5", "ES6", "ES7"],
+		"incremental": true,
+		"tsBuildInfoFile": ".tsbuildinfo",
+		"paths": {
+			"@real1ty-obsidian-plugins": ["shared/index.ts"],
+			"@real1ty-obsidian-plugins/*": ["shared/*"]
+		}
 	},
 	"include": ["src/**/*.ts", "tests/**/*.ts"],
 	"exclude": ["node_modules"]
