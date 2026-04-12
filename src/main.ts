@@ -320,6 +320,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		if (lastSeenVersion !== currentVersion) {
 			const config: WhatsNewModalConfig = {
+				slug: "nexus-properties",
 				cssPrefix: "nexus",
 				pluginName: "Nexus Properties",
 				changelogContent: CHANGELOG_CONTENT,
