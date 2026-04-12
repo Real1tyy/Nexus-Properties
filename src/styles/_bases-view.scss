@@ -1,6 +1,6 @@
 @use "variables" as *;
 
-.nexus-properties-bases-view {
+.nexus-properties-bases-view  {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -24,7 +24,7 @@
 }
 
 // Select dropdown
-.nexus-properties-bases-select {
+.nexus-properties-bases-select  {
   width: 100%;
   padding: 6px 8px;
   background: var(--background-primary);
@@ -64,45 +64,13 @@
 }
 
 // Hierarchy source select
-.nexus-properties-bases-hierarchy-source-select {
-  width: auto;
-  min-width: 100px;
-  padding: 6px 8px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: $border-radius-sm;
-  color: var(--text-muted);
-  font-size: 12px;
-  cursor: pointer;
-  transition:
-    background $transition-fast,
-    border-color $transition-fast;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: $dropdown-arrow-svg;
-  background-repeat: no-repeat;
-  background-position: right 6px center;
-  padding-right: 24px;
 
-  &:hover {
-    background: var(--background-primary-alt);
-    border-color: var(--interactive-accent);
-    color: var(--text-normal);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: var(--interactive-accent);
-  }
-}
-
-.nexus-properties-bases-markdown-container {
+.nexus-properties-bases-markdown-container  {
   padding: $spacing-md;
   overflow-y: auto;
   flex: 1;
 
-  .dataview {
+  .dataview  {
     margin: $spacing-md 0;
 
     table {
@@ -110,8 +78,7 @@
       border-collapse: collapse;
     }
 
-    th,
-    td {
+    th, td {
       padding: $spacing-sm;
       border: 1px solid var(--background-modifier-border);
       text-align: left;
@@ -125,63 +92,6 @@
 }
 
 // Section styles
-.nexus-properties-bases-section {
-  margin-bottom: $spacing-xl;
-  padding: 0 $spacing-md;
-
-  &-header {
-    margin: 0 0 $spacing-md;
-    padding-bottom: $spacing-sm;
-    font-size: $font-size-lg;
-    font-weight: 600;
-    color: var(--text-normal);
-    border-bottom: $input-border-width solid var(--background-modifier-border);
-  }
-}
-
-.nexus-properties-bases-empty-section {
-  padding: $spacing-md;
-  color: var(--text-muted);
-  font-style: italic;
-  text-align: center;
-  background-color: var(--background-secondary);
-  border-radius: $border-radius-sm;
-}
-
-.nexus-properties-bases-file-list {
-  display: flex;
-  flex-direction: column;
-  gap: $spacing-sm;
-}
-
-.nexus-properties-bases-file-item {
-  padding: 0.6em $spacing-md;
-  background-color: var(--background-primary-alt);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: $border-radius-sm;
-  transition:
-    background-color $transition-normal,
-    border-color $transition-normal,
-    transform 0.1s;
-
-  &:hover {
-    background-color: var(--background-secondary);
-    border-color: var(--interactive-accent);
-    transform: translateX(2px);
-  }
-}
-
-.nexus-properties-bases-file-link {
-  color: var(--text-normal);
-  text-decoration: none;
-  font-size: $font-size-base;
-  display: block;
-  cursor: pointer;
-
-  &:hover {
-    color: var(--interactive-accent);
-  }
-}
 
 // Empty states
 .nexus-properties-bases-empty-state {
@@ -192,13 +102,4 @@
   font-size: 1em;
   color: var(--text-muted);
   text-align: center;
-}
-
-.nexus-properties-bases-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  font-size: 1.2em;
-  color: var(--text-muted);
 }

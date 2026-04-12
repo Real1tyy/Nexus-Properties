@@ -1,7 +1,7 @@
 @use "variables" as *;
 
 // Node Creation Modal
-.nexus-node-creation {
+.nexus-node-creation  {
   &-modal {
     display: flex;
     flex-direction: column;
@@ -30,7 +30,7 @@
     width: 100%;
   }
 
-  &-button {
+  &-button  {
     padding: 0.6em $spacing-xl;
     font-size: 1.15em;
     border-radius: $border-radius;
@@ -43,8 +43,8 @@
   }
 }
 
-.modal-content.nexus-node-creation-modal {
-  .nexus-node-creation-input-container input.nexus-node-creation-input {
+.modal-content.nexus-node-creation-modal  {
+  .nexus-node-creation-input-container input.nexus-node-creation-input  {
     width: 100%;
     padding: 0.75em $spacing-md;
     font-size: $font-size-xxl;
@@ -63,12 +63,12 @@
 }
 
 // Node Preview Modal
-.nexus-properties-node-preview {
+.nexus-properties-node-preview  {
   &-modal .modal-content {
     max-width: 700px;
   }
 
-  &-header h2 {
+  &-header h2  {
     margin: 0 0 $spacing-lg;
     color: var(--text-normal);
     cursor: pointer;
@@ -79,7 +79,7 @@
     }
   }
 
-  &-section {
+  &-section  {
     margin-bottom: $spacing-lg;
 
     &-title {
@@ -97,7 +97,7 @@
     gap: $spacing-md;
   }
 
-  &-prop {
+  &-prop  {
     &-item {
       display: grid;
       grid-template-columns: $node-preview-grid-key-width 1fr;
@@ -119,7 +119,7 @@
       word-break: break-word;
     }
 
-    &-link {
+    &-link  {
       color: var(--link-color);
       text-decoration: none;
       cursor: pointer;
@@ -151,7 +151,7 @@
 }
 
 // Node Edit Modal
-.nexus-properties-node-edit {
+.nexus-properties-node-edit  {
   &-modal .modal-content {
     max-width: 800px;
   }
@@ -198,7 +198,7 @@
   }
 
   &-prop-key-input,
-  &-prop-value-input {
+  &-prop-value-input  {
     width: 100%;
     padding: $spacing-sm;
     background-color: var(--background-primary);
@@ -213,7 +213,7 @@
     }
   }
 
-  &-remove-button {
+  &-remove-button  {
     padding: $spacing-xs $spacing-sm;
     background-color: var(--background-modifier-error);
     color: var(--text-on-accent);
@@ -231,7 +231,7 @@
 }
 
 // Title Property Setup Modal
-.nexus-title-property-setup {
+.nexus-title-property-setup  {
   &-modal {
     display: flex;
     flex-direction: column;
@@ -246,7 +246,7 @@
     color: var(--text-normal);
   }
 
-  &-description {
+  &-description  {
     margin-bottom: $spacing-lg;
 
     p {
@@ -270,7 +270,7 @@
     margin-top: $spacing-md;
   }
 
-  &-button {
+  &-button  {
     padding: 0.75em $spacing-lg;
     border-radius: $border-radius;
     cursor: pointer;
@@ -285,7 +285,7 @@
       border-color: var(--interactive-accent);
     }
 
-    &.mod-cta {
+    &.mod-cta  {
       background: var(--interactive-accent);
       color: var(--text-on-accent);
       border-color: var(--interactive-accent);
@@ -296,7 +296,7 @@
       }
     }
 
-    &-later {
+    &-later  {
       background: transparent;
       color: var(--text-muted);
       border-color: transparent;

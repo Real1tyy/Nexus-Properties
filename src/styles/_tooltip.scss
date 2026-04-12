@@ -1,6 +1,6 @@
 @use "variables" as *;
 
-.nexus-properties-property-tooltip {
+.nexus-properties-property-tooltip  {
   position: fixed;
   z-index: 1000;
   background-color: var(--background-primary);
@@ -12,13 +12,13 @@
   max-width: 255px;
   pointer-events: auto;
 
-  &-title {
+  &-title  {
     margin-bottom: $spacing-sm;
     word-wrap: break-word;
     word-break: break-word;
     overflow-wrap: break-word;
 
-    &-link {
+    &-link  {
       color: var(--text-normal);
       font-size: $font-size-lg;
       font-weight: 600;
@@ -38,7 +38,7 @@
     margin: $spacing-sm -0.85em 0.65em -0.85em;
   }
 
-  &-item {
+  &-item  {
     display: flex;
     gap: $spacing-sm;
     margin-bottom: $spacing-xs;
@@ -60,7 +60,7 @@
   }
 }
 
-.nexus-properties-property-link {
+.nexus-properties-property-link  {
   color: var(--link-color);
   text-decoration: none;
   cursor: pointer;

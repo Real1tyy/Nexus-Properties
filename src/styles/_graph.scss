@@ -1,6 +1,6 @@
 @use "variables" as *;
 
-.nexus-properties-graph-view {
+.nexus-properties-graph-view  {
   &-content {
     display: flex;
     flex-direction: column;
@@ -34,7 +34,7 @@
     word-break: break-word;
   }
 
-  &-container {
+  &-container  {
     flex: 1;
     width: 100%;
     min-height: 0;
@@ -61,7 +61,7 @@
   flex-shrink: 0;
 }
 
-.nexus-properties-graph-toggle {
+.nexus-properties-graph-toggle  {
   &-container {
     display: flex;
     align-items: center;
@@ -75,7 +75,7 @@
     height: $toggle-checkbox-size;
   }
 
-  &-label {
+  &-label  {
     color: var(--text-muted);
     cursor: pointer;
     user-select: none;
@@ -87,7 +87,7 @@
 }
 
 // Search row
-.nexus-properties-graph-search-row {
+.nexus-properties-graph-search-row  {
   display: flex;
   gap: $spacing-sm;
   padding: 0.75em $spacing-md;
@@ -106,10 +106,10 @@
 }
 
 // Shared input styling
-.nexus-properties-graph-view-content {
+.nexus-properties-graph-view-content  {
   .nexus-properties-graph-search-input,
   .nexus-properties-graph-filter-input,
-  .nexus-properties-graph-filter-preset-select {
+  .nexus-properties-graph-filter-preset-select  {
     width: 100%;
     height: $input-height;
     padding: 0.65em $spacing-md;
@@ -137,13 +137,13 @@
   }
 
   .nexus-properties-graph-search-input,
-  .nexus-properties-graph-filter-input {
+  .nexus-properties-graph-filter-input  {
     &::placeholder {
       color: var(--text-faint);
     }
   }
 
-  .nexus-properties-graph-filter-input {
+  .nexus-properties-graph-filter-input  {
     font-family: var(--font-monospace);
 
     &::placeholder {
@@ -151,7 +151,7 @@
     }
   }
 
-  .nexus-properties-graph-filter-preset-select {
+  .nexus-properties-graph-filter-preset-select  {
     width: auto;
     min-width: 120px;
     padding: 0.65em 2.2em 0.65em $spacing-md;
@@ -176,7 +176,7 @@
 }
 
 // Filter row
-.nexus-properties-graph-filter-row {
+.nexus-properties-graph-filter-row  {
   display: flex;
   gap: $spacing-sm;
   padding: 0.75em $spacing-md;
@@ -191,7 +191,7 @@
 }
 
 // Preset selector container
-.nexus-properties-graph-filter-preset-container {
+.nexus-properties-graph-filter-preset-container  {
   flex-shrink: 0;
   position: relative;
 
@@ -212,10 +212,6 @@
   }
 }
 
-.nexus-properties-graph-filter-input-container {
-  flex: 1;
-}
-
 // Empty state
 .nexus-properties-graph-empty-state {
   display: flex;
@@ -229,7 +225,7 @@
 }
 
 // Zoom indicator
-.nexus-properties-zoom-indicator {
+.nexus-properties-zoom-indicator  {
   display: flex;
   align-items: center;
   margin-left: 8px;
@@ -246,7 +242,7 @@
 
 }
 
-input.nexus-properties-zoom-indicator-input {
+input.nexus-properties-zoom-indicator-input  {
   width: 60px;
   padding: 0.65em $spacing-md;
   background-color: transparent;
@@ -266,7 +262,7 @@ input.nexus-properties-zoom-indicator-input {
 }
 
 // Parent override dropdown (graph view)
-.nexus-properties-graph-parent-dropdown {
+.nexus-properties-graph-parent-dropdown  {
   padding: 4px 8px;
   font-size: 12px;
   background: var(--background-primary);

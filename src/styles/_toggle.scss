@@ -1,6 +1,6 @@
 @use "variables" as *;
 
-.nexus-properties-graph-toggle-container {
+.nexus-properties-graph-toggle-container  {
   display: flex;
   align-items: center;
   gap: $spacing-sm;
@@ -30,7 +30,7 @@
 }
 
 // Zoom Mode Preview Overlay
-.nexus-properties-graph-zoom-preview {
+.nexus-properties-graph-zoom-preview  {
   position: relative;
   width: 100%;
   max-height: var(--zoom-preview-max-height, 280px);
@@ -58,7 +58,7 @@
     gap: $spacing-md;
   }
 
-  &-title {
+  &-title  {
     margin: 0;
     color: var(--text-normal);
     font-size: $font-size-xl;
@@ -79,7 +79,7 @@
     align-items: center;
   }
 
-  &-body {
+  &-body  {
     flex: 1;
     min-height: 0;
     display: flex;
@@ -90,14 +90,14 @@
       display: none;
     }
 
-    &:has(.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden) {
+    &:has(.nexus-properties-graph-zoom-preview-frontmatter.nexus-properties-hidden)  {
       .nexus-properties-graph-zoom-preview-content {
         flex: 0 1 auto;
       }
     }
   }
 
-  &-frontmatter {
+  &-frontmatter  {
     padding: 0.7em 1.4em;
     display: grid;
     grid-template-columns: repeat(auto-fill, minmax(175px, 1fr));
@@ -114,7 +114,7 @@
     }
   }
 
-  &-property {
+  &-property  {
     display: flex;
     flex-direction: column;
     gap: $spacing-xs;
@@ -140,7 +140,7 @@
       gap: $spacing-xs;
     }
 
-    &-link {
+    &-link  {
       color: var(--link-color);
       text-decoration: none;
       cursor: pointer;
@@ -172,7 +172,7 @@
     padding: $spacing-sm 0;
   }
 
-  &-content {
+  &-content  {
     flex: 1;
     padding: 0.3em $spacing-xl $spacing-sm;
     overflow: hidden auto;
@@ -206,7 +206,7 @@
 
 // Scrollbar styling for preview
 .nexus-properties-graph-zoom-preview-frontmatter,
-.nexus-properties-graph-zoom-preview-content {
+.nexus-properties-graph-zoom-preview-content  {
   &::-webkit-scrollbar {
     width: $zoom-preview-scrollbar-width;
   }
@@ -216,7 +216,7 @@
     border-radius: $border-radius-sm;
   }
 
-  &::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb  {
     background: var(--background-modifier-border);
     border-radius: $border-radius-sm;
 

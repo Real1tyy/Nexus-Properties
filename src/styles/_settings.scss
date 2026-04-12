@@ -1,15 +1,14 @@
 @use "variables" as *;
 
 // Info boxes
-.nexus-properties-settings-info-box {
+.nexus-properties-settings-info-box  {
   margin: $spacing-md 0;
   padding: $spacing-md;
   background-color: var(--background-secondary);
   border-radius: $border-radius;
   border-left: 3px solid var(--interactive-accent);
 
-  h3,
-  h4 {
+  h3, h4 {
     margin-top: $spacing-sm;
     margin-bottom: $spacing-sm;
     color: var(--text-normal);
@@ -35,27 +34,9 @@
 }
 
 // Example grid layout
-.nexus-properties-example-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: $spacing-md;
-  margin: $spacing-md 0;
-}
-
-.nexus-properties-example-section h4 {
-  margin-top: 0;
-  color: var(--text-normal);
-  font-size: $font-size-base;
-}
-
-@media (max-width: $tablet-breakpoint) {
-  .nexus-properties-example-grid {
-    grid-template-columns: 1fr;
-  }
-}
 
 // Settings headings
-.setting-item.setting-item-heading {
+.setting-item.setting-item-heading  {
   border-top: 1px solid var(--background-modifier-border);
   margin-top: $spacing-lg;
   padding-top: $spacing-lg;
@@ -96,20 +77,10 @@
   line-height: 1.6;
 }
 
-.nexus-properties-directories-list {
-  margin-bottom: $spacing-md;
-}
-
 // Info note box
-.nexus-properties-settings-info-note {
-  margin-top: $spacing-md;
-  padding: $spacing-md;
-  background-color: var(--background-secondary);
-  border-radius: $border-radius-sm;
-}
 
 // Warning box
-.nexus-properties-settings-warning-box {
+.nexus-properties-settings-warning-box  {
   margin: $spacing-md 0;
   padding: 1em 1.2em;
   background-color: $color-error-bg;
@@ -139,13 +110,13 @@
   padding-bottom: 16px;
 }
 
-.nexus-properties-nav-buttons {
+.nexus-properties-nav-buttons  {
   display: flex;
   align-items: center;
   gap: 8px;
   flex-wrap: wrap;
 
-  button {
+  button  {
     padding: 8px 16px;
     border: 1px solid var(--background-modifier-border);
     border-radius: $border-radius;
@@ -166,11 +137,11 @@
 }
 
 // Settings search
-.nexus-properties-settings-search {
+.nexus-properties-settings-search  {
   margin-left: auto;
   flex-shrink: 0;
 
-  &-input {
+  &-input  {
     padding: 6px 10px;
     border: 1px solid var(--background-modifier-border);
     border-radius: $border-radius;
@@ -200,7 +171,7 @@
 }
 
 // Footer
-.nexus-properties-settings-footer {
+.nexus-properties-settings-footer  {
   margin-top: 2rem;
   text-align: center;
   font-size: var(--font-ui-smaller);
@@ -220,8 +191,8 @@
 }
 
 // Color example items
-.nexus-properties-color-example {
-  &-item {
+.nexus-properties-color-example  {
+  &-item  {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -255,7 +226,7 @@
 }
 
 // Color rule items
-.nexus-properties-color-rule {
+.nexus-properties-color-rule  {
   &-item {
     border: 1px solid var(--background-modifier-border);
     border-radius: $border-radius;
@@ -270,7 +241,7 @@
     gap: 12px;
   }
 
-  &-left {
+  &-left  {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -291,7 +262,7 @@
     flex-shrink: 0;
   }
 
-  &-expression-input {
+  &-expression-input  {
     flex: 1;
     min-width: 0;
     padding: 4px 8px;
@@ -315,7 +286,7 @@
     flex-shrink: 0;
   }
 
-  &-picker-wrapper {
+  &-picker-wrapper  {
     display: flex;
     align-items: center;
 
@@ -337,7 +308,7 @@
     gap: 4px;
   }
 
-  &-btn {
+  &-btn  {
     padding: 4px 8px;
     border: 1px solid var(--background-modifier-border);
     border-radius: $border-radius-sm;
@@ -352,7 +323,7 @@
       background-color: var(--background-modifier-hover);
     }
 
-    &-delete {
+    &-delete  {
       color: var(--text-error);
 
       &:hover {
@@ -365,7 +336,7 @@
 
 // Excluded/included properties inputs
 .nexus-properties-excluded-properties-input,
-.nexus-properties-included-properties-input {
+.nexus-properties-included-properties-input  {
   min-width: 200px;
   padding: 4px 8px;
   border: 1px solid var(--background-modifier-border);
@@ -383,7 +354,7 @@
 }
 
 // Filter preset styles
-.nexus-properties-filter-preset {
+.nexus-properties-filter-preset  {
   &-item {
     display: flex;
     align-items: center;
@@ -395,7 +366,7 @@
     background-color: var(--background-secondary);
   }
 
-  &-name-input {
+  &-name-input  {
     flex: 0 0 $filter-preset-name-width;
     padding: 6px 10px;
     background-color: var(--background-primary);
@@ -412,7 +383,7 @@
     }
   }
 
-  &-expression-input {
+  &-expression-input  {
     flex: 1;
     min-width: 0;
     padding: 6px 10px;
@@ -430,7 +401,7 @@
     }
   }
 
-  &-btn-delete {
+  &-btn-delete  {
     padding: 4px 10px;
     background-color: transparent;
     border: 1px solid var(--background-modifier-border);
@@ -450,7 +421,7 @@
 }
 
 // Array manager
-.nexus-properties-settings-array-manager-list {
+.nexus-properties-settings-array-manager-list  {
   margin-bottom: $spacing-md;
 
   & + .setting-item .setting-item-control input[type="text"] {

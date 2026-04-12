@@ -23,8 +23,7 @@
   border-radius: 6px;
   border-left: 3px solid var(--interactive-accent);
 }
-.nexus-properties-settings-info-box h3,
-.nexus-properties-settings-info-box h4 {
+.nexus-properties-settings-info-box h3, .nexus-properties-settings-info-box h4 {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
   color: var(--text-normal);
@@ -46,24 +45,6 @@
   white-space: pre;
 }
 
-.nexus-properties-example-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 1em;
-  margin: 1em 0;
-}
-
-.nexus-properties-example-section h4 {
-  margin-top: 0;
-  color: var(--text-normal);
-  font-size: 0.95em;
-}
-
-@media (max-width: 768px) {
-  .nexus-properties-example-grid {
-    grid-template-columns: 1fr;
-  }
-}
 .setting-item.setting-item-heading {
   border-top: 1px solid var(--background-modifier-border);
   margin-top: 1.5em;
@@ -100,17 +81,6 @@
   text-align: center;
   font-size: 0.95em;
   line-height: 1.6;
-}
-
-.nexus-properties-directories-list {
-  margin-bottom: 1em;
-}
-
-.nexus-properties-settings-info-note {
-  margin-top: 1em;
-  padding: 1em;
-  background-color: var(--background-secondary);
-  border-radius: 4px;
 }
 
 .nexus-properties-settings-warning-box {
@@ -595,10 +565,6 @@
 }
 .nexus-properties-graph-filter-preset-container:hover::after {
   color: var(--text-normal);
-}
-
-.nexus-properties-graph-filter-input-container {
-  flex: 1;
 }
 
 .nexus-properties-graph-empty-state {
@@ -1391,35 +1357,6 @@ button.nexus-properties-hierarchy-source-button:active {
   padding: 4px 8px;
 }
 
-.nexus-properties-bases-hierarchy-source-select {
-  width: auto;
-  min-width: 100px;
-  padding: 6px 8px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 4px;
-  color: var(--text-muted);
-  font-size: 12px;
-  cursor: pointer;
-  transition: background 0.15s ease, border-color 0.15s ease;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 6px center;
-  padding-right: 24px;
-}
-.nexus-properties-bases-hierarchy-source-select:hover {
-  background: var(--background-primary-alt);
-  border-color: var(--interactive-accent);
-  color: var(--text-normal);
-}
-.nexus-properties-bases-hierarchy-source-select:focus {
-  outline: none;
-  border-color: var(--interactive-accent);
-}
-
 .nexus-properties-bases-markdown-container {
   padding: 1em;
   overflow-y: auto;
@@ -1432,8 +1369,7 @@ button.nexus-properties-hierarchy-source-button:active {
   width: 100%;
   border-collapse: collapse;
 }
-.nexus-properties-bases-markdown-container .dataview th,
-.nexus-properties-bases-markdown-container .dataview td {
+.nexus-properties-bases-markdown-container .dataview th, .nexus-properties-bases-markdown-container .dataview td {
   padding: 0.5em;
   border: 1px solid var(--background-modifier-border);
   text-align: left;
@@ -1441,58 +1377,6 @@ button.nexus-properties-hierarchy-source-button:active {
 .nexus-properties-bases-markdown-container .dataview th {
   background-color: var(--background-secondary);
   font-weight: 600;
-}
-
-.nexus-properties-bases-section {
-  margin-bottom: 2em;
-  padding: 0 1em;
-}
-.nexus-properties-bases-section-header {
-  margin: 0 0 1em;
-  padding-bottom: 0.5em;
-  font-size: 1.1em;
-  font-weight: 600;
-  color: var(--text-normal);
-  border-bottom: 2px solid var(--background-modifier-border);
-}
-
-.nexus-properties-bases-empty-section {
-  padding: 1em;
-  color: var(--text-muted);
-  font-style: italic;
-  text-align: center;
-  background-color: var(--background-secondary);
-  border-radius: 4px;
-}
-
-.nexus-properties-bases-file-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-}
-
-.nexus-properties-bases-file-item {
-  padding: 0.6em 1em;
-  background-color: var(--background-primary-alt);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 4px;
-  transition: background-color 0.2s ease, border-color 0.2s ease, transform 0.1s;
-}
-.nexus-properties-bases-file-item:hover {
-  background-color: var(--background-secondary);
-  border-color: var(--interactive-accent);
-  transform: translateX(2px);
-}
-
-.nexus-properties-bases-file-link {
-  color: var(--text-normal);
-  text-decoration: none;
-  font-size: 0.95em;
-  display: block;
-  cursor: pointer;
-}
-.nexus-properties-bases-file-link:hover {
-  color: var(--interactive-accent);
 }
 
 .nexus-properties-bases-empty-state {
@@ -1503,15 +1387,6 @@ button.nexus-properties-hierarchy-source-button:active {
   font-size: 1em;
   color: var(--text-muted);
   text-align: center;
-}
-
-.nexus-properties-bases-placeholder {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  font-size: 1.2em;
-  color: var(--text-muted);
 }
 
 .nexus-properties-moc-view {
@@ -1558,26 +1433,6 @@ button.nexus-properties-hierarchy-source-button:active {
 .nexus-properties-moc-toolbar-btn:hover {
   background: var(--background-modifier-hover);
   color: var(--text-normal);
-  border-color: var(--interactive-accent);
-}
-
-.nexus-properties-moc-source-dropdown {
-  padding: 4px 8px;
-  font-size: 12px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: 4px;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all 0.15s ease;
-}
-.nexus-properties-moc-source-dropdown:hover {
-  background: var(--background-modifier-hover);
-  color: var(--text-normal);
-  border-color: var(--interactive-accent);
-}
-.nexus-properties-moc-source-dropdown:focus {
-  outline: none;
   border-color: var(--interactive-accent);
 }
 
@@ -1637,9 +1492,6 @@ button.nexus-properties-hierarchy-source-button:active {
   background-color: var(--background-secondary);
   border-bottom: 2px solid var(--background-modifier-border);
   flex-shrink: 0;
-}
-.nexus-properties-moc-search-input-container {
-  flex: 1;
 }
 .nexus-properties-moc-search-input {
   width: 100%;
@@ -1920,16 +1772,14 @@ button.nexus-properties-hierarchy-source-button:active {
     gap: 0.3em;
     align-items: center;
   }
-  .nexus-properties-graph-search-input-container,
-  .nexus-properties-graph-filter-input-container {
+  .nexus-properties-graph-search-input-container {
     flex: 1 1 calc(50% - 0.15em);
     min-width: 0;
   }
   .nexus-properties-graph-filter-row .nexus-properties-graph-search-input-container {
     display: flex;
   }
-  .nexus-properties-graph-view-content .nexus-properties-graph-search-input,
-  .nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
+  .nexus-properties-graph-view-content .nexus-properties-graph-search-input, .nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
     height: 2em;
     padding: 0.35em 0.5em;
     font-size: 0.8em;
@@ -1954,9 +1804,7 @@ button.nexus-properties-hierarchy-source-button:active {
   body .nexus-properties-zoom-indicator {
     display: none;
   }
-  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-view-header,
-  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-search-row,
-  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-filter-row {
+  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-view-header, body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-search-row, body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-filter-row {
     display: none;
   }
   body .nexus-properties-graph-zoom-preview-controls {
@@ -2071,8 +1919,7 @@ button.nexus-properties-hierarchy-source-button:active {
     text-overflow: ellipsis;
     border-width: 1.2px;
   }
-  .workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content),
-  .workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
+  .workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content), .workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
     width: 100%;
     max-width: 100%;
     min-width: 100%;

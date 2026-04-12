@@ -47,9 +47,9 @@
   }
 
   // Shorten toggle labels
-  .nexus-properties-graph-view-header {
-    .nexus-properties-graph-toggle-container:nth-child(2) {
-      .nexus-properties-graph-toggle-label {
+  .nexus-properties-graph-view-header  {
+    .nexus-properties-graph-toggle-container:nth-child(2)  {
+      .nexus-properties-graph-toggle-label  {
         font-size: 0;
 
         &::before {
@@ -59,8 +59,8 @@
       }
     }
 
-    .nexus-properties-graph-toggle-container:nth-child(3) {
-      .nexus-properties-graph-toggle-label {
+    .nexus-properties-graph-toggle-container:nth-child(3)  {
+      .nexus-properties-graph-toggle-label  {
         font-size: 0;
 
         &::before {
@@ -70,8 +70,8 @@
       }
     }
 
-    .nexus-properties-graph-toggle-container:nth-child(4) {
-      .nexus-properties-graph-toggle-label {
+    .nexus-properties-graph-toggle-container:nth-child(4)  {
+      .nexus-properties-graph-toggle-label  {
         font-size: 0;
 
         &::before {
@@ -94,8 +94,7 @@
     align-items: center;
   }
 
-  .nexus-properties-graph-search-input-container,
-  .nexus-properties-graph-filter-input-container {
+  .nexus-properties-graph-search-input-container {
     flex: 1 1 calc(50% - 0.15em);
     min-width: 0;
   }
@@ -105,8 +104,7 @@
     display: flex;
   }
 
-  .nexus-properties-graph-view-content .nexus-properties-graph-search-input,
-  .nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
+  .nexus-properties-graph-view-content .nexus-properties-graph-search-input, .nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
     height: 2em;
     padding: 0.35em 0.5em;
     font-size: 0.8em;
@@ -142,10 +140,8 @@
   // Zoom mode - hide everything except preview
   body .nexus-properties-graph-view-content:has(
       .nexus-properties-graph-zoom-preview
-    ) {
-    .nexus-properties-graph-view-header,
-    .nexus-properties-graph-search-row,
-    .nexus-properties-graph-filter-row {
+    )  {
+    .nexus-properties-graph-view-header, .nexus-properties-graph-search-row, .nexus-properties-graph-filter-row {
       display: none;
     }
   }
@@ -226,7 +222,7 @@
     font-size: 0.8em;
   }
 
-  body .nexus-properties-graph-zoom-preview-content p {
+  body .nexus-properties-graph-zoom-preview-content p  {
     margin: 0.3em 0;
 
     &:first-child {
@@ -296,8 +292,7 @@
   }
 
   // Force full-width sidebar on mobile
-  .workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content),
-  .workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
+  .workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content), .workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
     width: 100%;
     max-width: 100%;
     min-width: 100%;

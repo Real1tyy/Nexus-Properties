@@ -1,6 +1,6 @@
 @use "variables" as *;
 
-.nexus-properties-moc-view {
+.nexus-properties-moc-view  {
   display: flex;
   flex-direction: column;
   flex: 1;
@@ -19,7 +19,7 @@
 }
 
 // Toolbar
-.nexus-properties-moc-toolbar {
+.nexus-properties-moc-toolbar  {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -34,7 +34,7 @@
     align-items: center;
   }
 
-  &-btn {
+  &-btn  {
     padding: 4px 12px;
     font-size: 12px;
     background: var(--background-primary);
@@ -53,30 +53,9 @@
 }
 
 // Hierarchy source dropdown
-.nexus-properties-moc-source-dropdown {
-  padding: 4px 8px;
-  font-size: 12px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: $border-radius-sm;
-  color: var(--text-muted);
-  cursor: pointer;
-  transition: all $transition-fast;
-
-  &:hover {
-    background: var(--background-modifier-hover);
-    color: var(--text-normal);
-    border-color: var(--interactive-accent);
-  }
-
-  &:focus {
-    outline: none;
-    border-color: var(--interactive-accent);
-  }
-}
 
 // Parent override dropdown (MOC view)
-.nexus-properties-moc-parent-dropdown {
+.nexus-properties-moc-parent-dropdown  {
   padding: 4px 8px;
   font-size: 12px;
   background: var(--background-primary);
@@ -106,7 +85,7 @@
 }
 
 // Root mode toggle
-.nexus-properties-moc-root-toggle {
+.nexus-properties-moc-root-toggle  {
   display: flex;
   align-items: center;
   gap: 5px;
@@ -120,7 +99,7 @@
     white-space: nowrap;
   }
 
-  &-active {
+  &-active  {
     background: var(--interactive-accent);
     border-color: var(--interactive-accent);
     color: var(--text-on-accent);
@@ -134,7 +113,7 @@
 }
 
 // Search row
-.nexus-properties-moc-search {
+.nexus-properties-moc-search  {
   &-row {
     display: flex;
     gap: $spacing-sm;
@@ -144,11 +123,7 @@
     flex-shrink: 0;
   }
 
-  &-input-container {
-    flex: 1;
-  }
-
-  &-input {
+  &-input  {
     width: 100%;
     height: $input-height;
     padding: $spacing-sm 0.75em;
@@ -175,7 +150,7 @@
 }
 
 // Tree container
-.nexus-properties-moc-tree-container {
+.nexus-properties-moc-tree-container  {
   padding: $moc-children-indent;
   overflow: scroll auto;
   flex: 1;
@@ -191,7 +166,7 @@
     border-radius: $border-radius-sm;
   }
 
-  &::-webkit-scrollbar-thumb {
+  &::-webkit-scrollbar-thumb  {
     background: var(--background-modifier-border);
     border-radius: $border-radius-sm;
 
@@ -206,10 +181,10 @@
 }
 
 // Tree item
-.nexus-properties-moc-item {
+.nexus-properties-moc-item  {
   position: relative;
 
-  &-header {
+  &-header  {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -225,7 +200,7 @@
 }
 
 // Toggle button
-.nexus-properties-moc-toggle {
+.nexus-properties-moc-toggle  {
   display: flex;
   align-items: center;
   justify-content: center;
@@ -253,7 +228,7 @@
     flex-shrink: 0;
   }
 
-  &-container {
+  &-container  {
     display: flex;
     align-items: center;
     gap: 4px;
@@ -270,7 +245,7 @@
     height: $toggle-checkbox-size-sm;
   }
 
-  &-label {
+  &-label  {
     color: var(--text-muted);
     cursor: pointer;
     user-select: none;
@@ -282,7 +257,7 @@
 }
 
 // Link styling
-.nexus-properties-moc-link {
+.nexus-properties-moc-link  {
   color: var(--text-normal);
   text-decoration: none;
   font-size: $moc-link-font-size;
@@ -296,7 +271,7 @@
     background: var(--background-modifier-hover);
   }
 
-  &-current {
+  &-current  {
     background: var(--interactive-accent);
     color: var(--text-on-accent) !important;
     font-weight: 600 !important;
@@ -318,7 +293,7 @@
   flex-shrink: 0;
 }
 
-.nexus-properties-moc-property {
+.nexus-properties-moc-property  {
   display: flex;
   align-items: center;
   gap: 4px;
@@ -334,7 +309,7 @@
     color: var(--text-muted);
   }
 
-  &-link {
+  &-link  {
     color: var(--text-accent);
     text-decoration: none;
     cursor: pointer;
@@ -370,8 +345,8 @@
 
 .nexus-properties-moc-item[data-depth="2"],
 .nexus-properties-moc-item[data-depth="3"],
-.nexus-properties-moc-item[data-depth="4"] {
-  > .nexus-properties-moc-item-header .nexus-properties-moc-link {
+.nexus-properties-moc-item[data-depth="4"]  {
+  > .nexus-properties-moc-item-header .nexus-properties-moc-link  {
     font-size: $moc-depth2-font-size;
     font-weight: 400;
     color: var(--text-muted);
