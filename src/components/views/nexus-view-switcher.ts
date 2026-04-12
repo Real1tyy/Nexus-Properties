@@ -2,11 +2,11 @@ import { isFolderNote } from "@real1ty-obsidian-plugins";
 import { ItemView, Platform, type TFile, type WorkspaceLeaf } from "obsidian";
 import type { Subscription } from "rxjs";
 
+import { cls } from "../../constants";
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NodeStatistics } from "../../types/statistics";
-import { cls } from "../../utils/css";
 import { collectRelatedNodesRecursively } from "../../utils/hierarchy";
 import { detectValidMocContent } from "../../utils/moc-parser";
 import { BasesView, type BaseViewType } from "./bases-view";

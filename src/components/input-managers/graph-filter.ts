@@ -1,6 +1,6 @@
 import { buildPropertyMapping, sanitizeExpression } from "@real1ty-obsidian-plugins";
 
-import { cls } from "../../utils/css";
+import { cls } from "../../constants";
 import { InputFilterManager } from "./base";
 
 export class GraphFilter extends InputFilterManager {

@@ -1,4 +1,4 @@
-import { cls } from "../../utils/css";
+import { cls } from "../../constants";
 
 type FilterChangeCallback = () => void;
 

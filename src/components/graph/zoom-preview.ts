@@ -2,9 +2,9 @@ import { filterPropertiesForDisplay } from "@real1ty-obsidian-plugins";
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 
+import { cls } from "../../constants";
 import type { NexusPropertiesSettingsStore } from "../../types/settings";
 import type { NexusPropertiesSettings } from "../../types/settings";
-import { cls } from "../../utils/css";
 import { PropertyRenderer } from "../property-renderer";
 
 interface GraphZoomPreviewProps {
@@ -81,7 +81,7 @@ export class GraphZoomPreview {
 			}
 		});
 
-		this.render();
+		void this.render();
 	}
 
 	private async render(): Promise<void> {
@@ -97,7 +97,7 @@ export class GraphZoomPreview {
 		});
 
 		headerEl.onclick = () => {
-			this.app.workspace.openLinkText(this.props.file.path, "", false);
+			void this.app.workspace.openLinkText(this.props.file.path, "", false);
 			this.props.onExit();
 		};
 

@@ -1,5 +1,5 @@
+import { cls } from "../../constants";
 import type { HierarchySourceType } from "../../core/hierarchy";
-import { cls } from "../../utils/css";
 
 interface GraphHeaderProps {
 	currentFileName: string;

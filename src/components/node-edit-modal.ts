@@ -1,7 +1,7 @@
 import { parseValue, serializeValue } from "@real1ty-obsidian-plugins";
 import { type App, Modal, type TFile } from "obsidian";
 
-import { cls } from "../utils/css";
+import { cls } from "../constants";
 
 interface PropertyRow {
 	originalKey: string;

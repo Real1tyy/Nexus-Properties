@@ -1,5 +1,6 @@
 import type { Core } from "cytoscape";
-import { cls } from "../../utils/css";
+
+import { cls } from "../../constants";
 
 export class ZoomIndicator {
 	private containerEl: HTMLElement;

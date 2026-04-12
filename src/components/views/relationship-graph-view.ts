@@ -3,11 +3,12 @@ import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
 import { type App, Notice, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
+
+import { cls } from "../../constants";
 import { GraphBuilder } from "../../core/graph-builder";
 import type { HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
-import { cls } from "../../utils/css";
 import { resolveParentSelection } from "../../utils/file-utils";
 import { EdgeContextMenu } from "../graph/edge-context-menu";
 import { GraphFilterPresetSelector } from "../graph/filter-preset-selector";
@@ -83,7 +84,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.plugin.settingsStore,
 			this.plugin.commandManager,
 			() => {
-				this.updateGraph();
+				void this.updateGraph();
 			}
 		);
 		this.nodeContextMenu = new NodeContextMenu(this.app, this.plugin.settingsStore, this.plugin.commandManager, {
@@ -94,11 +95,11 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 				this.renderNodeAsRoot(nodeId);
 			},
 			onNodeDeleted: () => {
-				this.updateGraph();
+				void this.updateGraph();
 			},
 		});
 		this.edgeContextMenu = new EdgeContextMenu(this.app, this.plugin.settingsStore, this.plugin.commandManager, () => {
-			this.updateGraph();
+			void this.updateGraph();
 		});
 		this.graphBuilder = new GraphBuilder(this.app, this.indexer, this.plugin.settingsStore);
 
@@ -163,22 +164,22 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			hierarchySource: this.hierarchySource,
 			onRenderRelatedChange: (value) => {
 				this.renderRelated = value;
-				this.updateGraph();
+				void this.updateGraph();
 				this.notifyViewTypeChange();
 			},
 			onIncludeAllRelatedChange: (value) => {
 				this.includeAllRelated = value;
-				this.updateGraph();
+				void this.updateGraph();
 				this.notifyViewTypeChange();
 			},
 			onStartFromCurrentChange: (value) => {
 				this.ignoreTopmostParent = value;
-				this.updateGraph();
+				void this.updateGraph();
 			},
 			onParentOverrideChange: (parentPath) => {
 				this.parentOverridePath = parentPath;
 				this.forceFullRebuild = true;
-				this.updateGraph();
+				void this.updateGraph();
 			},
 		});
 
@@ -674,7 +675,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		}
 
 		this.currentFile = file;
-		this.updateGraph();
+		void this.updateGraph();
 	}
 
 	private applyPreFillFilter(): void {
@@ -717,7 +718,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		this.updateDebounceTimer = window.setTimeout(() => {
 			this.updateDebounceTimer = null;
-			this.updateGraph();
+			void this.updateGraph();
 		}, 150);
 	}
 
@@ -1203,9 +1204,9 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			const newLeaf = event.ctrlKey || event.metaKey;
 
 			if (newLeaf) {
-				this.app.workspace.getLeaf("tab").openFile(file);
+				void this.app.workspace.getLeaf("tab").openFile(file);
 			} else {
-				this.app.workspace.getLeaf(false).openFile(file);
+				void this.app.workspace.getLeaf(false).openFile(file);
 			}
 		}
 	}
@@ -1272,7 +1273,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 	public updateGraphWithDepth(depth: number): void {
 		this.graphBuilder.setDepthOverride(depth);
-		this.updateGraph();
+		void this.updateGraph();
 	}
 
 	/**

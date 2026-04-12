@@ -8,11 +8,11 @@ import {
 import { type App, Component, TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 
+import { cls } from "../../constants";
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
-import { cls } from "../../utils/css";
 import { type ParentOption, resolveDisplayName, resolveParentSelection } from "../../utils/file-utils";
 import { buildRelatedTree, type TreeNode } from "../../utils/hierarchy";
 import { MocSearch } from "../input-managers/moc-search";

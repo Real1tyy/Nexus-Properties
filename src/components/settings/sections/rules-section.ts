@@ -1,10 +1,10 @@
-import type { SettingsUIBuilder } from "@real1ty-obsidian-plugins";
+import { type SettingsUIBuilder } from "@real1ty-obsidian-plugins";
 import { Setting } from "obsidian";
 import type NexusPropertiesPlugin from "src/main";
 import { SETTINGS_DEFAULTS } from "src/types/constants";
 import type { NexusPropertiesSettingsSchema } from "src/types/settings";
 
-import { cls } from "../../../utils/css";
+import { cls } from "../../../constants";
 import { createDeleteButton, createMoveButtons, createRuleInput, createRuleToggle, swapRules } from "../controls";
 import type { SettingsSection } from "../types";
 

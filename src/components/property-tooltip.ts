@@ -8,9 +8,9 @@ import {
 import type { App } from "obsidian";
 import type { Subscription } from "rxjs";
 
+import { cls } from "../constants";
 import type { NexusPropertiesSettingsStore } from "../types/settings";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { cls } from "../utils/css";
 
 interface PropertyTooltipOptions {
 	settingsStore: NexusPropertiesSettingsStore;

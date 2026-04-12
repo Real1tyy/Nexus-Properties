@@ -1,4 +1,4 @@
-import { cls } from "../../utils/css";
+import { cls } from "../../constants";
 import { InputFilterManager } from "./base";
 
 export class GraphSearch extends InputFilterManager {

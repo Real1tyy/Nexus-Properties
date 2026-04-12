@@ -1,4 +1,4 @@
-import { cls } from "../../utils/css";
+import { cls } from "../../constants";
 
 type ToggleChangeHandler = (checked: boolean) => Promise<void>;
 type InputUpdateHandler = (value: string) => Promise<void>;

@@ -10,10 +10,10 @@ import {
 import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 
+import { cls } from "../../constants";
 import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarchy";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
-import { cls } from "../../utils/css";
 
 export type BaseViewType = "children" | "parent" | "related" | "all-children" | "all-parent" | "all-related";
 
@@ -56,7 +56,7 @@ export class BasesView extends RegisteredEventsComponent {
 		this.settingsSubscription = this.plugin.settingsStore.settings$.subscribe((settings) => {
 			this.currentSettings = settings;
 			this.lastFilePath = null;
-			this.render();
+			void this.render();
 		});
 	}
 
