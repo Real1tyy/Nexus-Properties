@@ -3,7 +3,7 @@ import {
 	buildUtmUrl,
 	type LeafPlacement,
 	SettingsStore,
-	WhatsNewModal,
+	showWhatsNewModal,
 	type WhatsNewModalConfig,
 } from "@real1ty-obsidian-plugins";
 import { Notice, Plugin, TFile } from "obsidian";
@@ -320,7 +320,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 
 		if (lastSeenVersion !== currentVersion) {
 			const config: WhatsNewModalConfig = {
-				slug: "nexus-properties",
 				cssPrefix: "nexus",
 				pluginName: "Nexus Properties",
 				changelogContent: CHANGELOG_CONTENT,
@@ -356,7 +355,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 				} as WhatsNewModalConfig["links"] & { github: string },
 			};
 
-			new WhatsNewModal(this.app, this, config, lastSeenVersion, currentVersion).open();
+			showWhatsNewModal(this.app, this, config, lastSeenVersion, currentVersion);
 			await this.settingsStore.updateSettings((settings) => ({
 				...settings,
 				version: currentVersion,
