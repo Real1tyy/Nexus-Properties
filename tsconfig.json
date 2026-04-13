@@ -11,6 +11,7 @@
 		"isolatedModules": true,
 		"allowSyntheticDefaultImports": true,
 		"esModuleInterop": true,
+		"jsx": "react-jsx",
 		"lib": ["DOM", "ES2022"],
 		"strict": true,
 		"noUnusedLocals": true,
