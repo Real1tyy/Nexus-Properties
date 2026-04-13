@@ -20,10 +20,8 @@ interface VaultTableDefBase<TData, TSchema extends SerializableSchema<TData> = S
 	parentProperty?: string;
 }
 
-interface FileVaultTableDef<
-	TData,
-	TSchema extends SerializableSchema<TData> = SerializableSchema<TData>,
-> extends VaultTableDefBase<TData, TSchema> {
+interface FileVaultTableDef<TData, TSchema extends SerializableSchema<TData> = SerializableSchema<TData>>
+	extends VaultTableDefBase<TData, TSchema> {
 	nodeType?: "files";
 	children?: never;
 }
@@ -81,11 +79,19 @@ export type VaultTableConfig<
 	emitCrudEvents?: boolean;
 };
 
-export interface VaultRow<TData> {
+/**
+ * Minimal row interface — only requires an ID and typed data.
+ * Used by the reactive primitives (ReadableTable, views, group-by, live queries)
+ * so they work with both VaultTable (file-backed) and CodeBlockRepository (JSON-backed).
+ */
+export interface DataRow<TData> {
 	id: string;
+	data: TData;
+}
+
+export interface VaultRow<TData> extends DataRow<TData> {
 	file: TFile;
 	filePath: string;
-	data: TData;
 	content: string;
 	mtime: number;
 }
