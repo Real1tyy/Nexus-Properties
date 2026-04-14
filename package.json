@@ -10,6 +10,8 @@
 		"typecheck": "tsc -noEmit -skipLibCheck",
 		"test": "vitest run",
 		"test:watch": "vitest",
+		"test:changed": "vitest run --changed",
+		"test:since": "vitest run --changed HEAD~1",
 		"lint:css": "stylelint \"src/styles/**/*.scss\"",
 		"clean": "rm -f main.js"
 	},
