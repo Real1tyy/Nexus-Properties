@@ -3677,8 +3677,6 @@ snapshots:
       jose: 6.2.2
       luxon: 3.7.2
       obsidian: 1.12.3(@codemirror/state@6.5.2)(@codemirror/view@6.38.1)
-      react: 19.2.5
-      react-dom: 19.2.5(react@19.2.5)
       rxjs: 7.8.2
       tslib: 2.8.1
       yaml: 2.8.2
