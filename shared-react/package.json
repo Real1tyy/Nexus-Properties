@@ -2,7 +2,7 @@
 	"name": "shared-react",
 	"version": "0.1.0",
 	"dependencies": {
-		"@real1ty-obsidian-plugins": "workspace:*",
+		"@real1ty-obsidian-plugins": "file:../shared",
 		"obsidian": "^1.11.4",
 		"react": "^19.2.5",
 		"react-dom": "^19.2.5",
