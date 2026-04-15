@@ -7,14 +7,18 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export default defineConfig({
 	test: {
 		globals: true,
-		environment: "jsdom",
+		environment: "node",
 		setupFiles: ["./tests/setup.ts"],
 		passWithNoTests: true,
+		server: {
+			deps: {
+				inline: ["@real1ty-obsidian-plugins"],
+			},
+		},
 	},
 	resolve: {
 		alias: {
 			obsidian: path.resolve(__dirname, "tests/mocks/obsidian.ts"),
-			"@real1ty-obsidian-plugins": path.resolve(__dirname, "shared"),
 		},
 		extensions: [".ts", ".tsx", ".js", ".mjs", ".json"],
 	},
