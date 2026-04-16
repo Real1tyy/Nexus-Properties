@@ -1,4 +1,5 @@
 import { type Command, CommandManager, MacroCommand } from "@real1ty-obsidian-plugins";
+import { silenceConsole } from "@real1ty-obsidian-plugins/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 // Mock obsidian module used by shared library and CommandManager
@@ -48,6 +49,8 @@ function createMockCommand(type = "TestCommand"): Command & {
 }
 
 describe("CommandManager", () => {
+	silenceConsole();
+
 	let commandManager: CommandManager;
 
 	beforeEach(() => {
