@@ -2,6 +2,8 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
+import { sharedVitestAliases } from "./shared/src/testing/vitest-aliases.ts";
+
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 export default defineConfig({
@@ -11,19 +13,11 @@ export default defineConfig({
 		environment: "node",
 		setupFiles: ["./tests/setup.ts"],
 		passWithNoTests: true,
-		server: {
-			deps: {
-				inline: ["@real1ty-obsidian-plugins"],
-			},
-		},
 	},
 	resolve: {
 		alias: [
 			{ find: "obsidian", replacement: path.resolve(__dirname, "tests/mocks/obsidian.ts") },
-			{
-				find: "@real1ty-obsidian-plugins/testing",
-				replacement: path.resolve(__dirname, "./shared/src/testing/index.ts"),
-			},
+			...sharedVitestAliases(__dirname),
 		],
 		extensions: [".ts", ".tsx", ".js", ".mjs", ".json"],
 	},
