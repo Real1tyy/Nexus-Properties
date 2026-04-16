@@ -164,3 +164,7 @@ PRs welcome! Contributions are licensed under AGPL-3.0. See [Contributing Guide]
 ## Credits
 
 Built with [Cytoscape.js](https://js.cytoscape.org/) for graph rendering, including hierarchical layouts (via Dagre) and constellation network views.
+
+---
+
+> **This repository is a public, read-only mirror.** Development happens in a private monorepo — this mirror exists for transparency and to follow the Obsidian convention of one repo per plugin. The code is licensed AGPL-3.0.
