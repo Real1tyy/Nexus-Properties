@@ -153,6 +153,7 @@ export function createPageHeader(config: PageHeaderConfig): PageHeaderHandle {
 			});
 			settingsEl.addClass(buttonCls);
 			settingsEl.addClass(settingsBtnCls);
+			settingsEl.setAttribute("data-testid", `${config.cssPrefix}page-header-manage`);
 			leafState.settingsButton = settingsEl;
 		}
 
@@ -167,6 +168,7 @@ export function createPageHeader(config: PageHeaderConfig): PageHeaderHandle {
 			});
 
 			el.addClass(buttonCls);
+			el.setAttribute("data-testid", `${config.cssPrefix}toolbar-${action.id}`);
 			const color = getColor(action);
 			if (color && color !== "#000000") {
 				applyColorToElement(el, color);

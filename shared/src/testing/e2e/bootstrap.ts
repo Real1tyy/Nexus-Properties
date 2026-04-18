@@ -1,6 +1,6 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { appendFileSync, cpSync, existsSync, mkdirSync, readFileSync, rmSync } from "node:fs";
+import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
@@ -69,6 +69,16 @@ export type PluginArtifact = {
 	files?: readonly string[];
 };
 
+export type LeanVaultOptions = {
+	/**
+	 * Vault-root entries to preserve verbatim after close. Everything else at
+	 * the vault root is deleted. `.obsidian/` is always kept (reduced to
+	 * `plugins/<id>/` with only the staged artifact files — `plugin.files` —
+	 * removed; anything the plugin wrote at runtime stays), regardless of this list.
+	 */
+	keep: readonly string[];
+};
+
 export type ObsidianVersion = {
 	appVersion: string;
 	installerVersion: string;
@@ -97,6 +107,21 @@ export type BootstrapOptions = {
 	/** Additional CLI args appended after the defaults. */
 	extraArgs?: readonly string[];
 	/**
+	 * Slow every Playwright operation by the given milliseconds. Forwarded to
+	 * `chromium.connectOverCDP({ slowMo })`. Used by demo/debug mode so the
+	 * browser is easy to watch. Defaults to 0 (no throttle).
+	 */
+	slowMoMs?: number;
+	/**
+	 * Maximize the Obsidian window and collapse the left sidebar once the
+	 * renderer is ready. Intended for modes where a human watches the run
+	 * (E2E_HEADED / PW_DEMO). Demo mode (slowMoMs > 0) implies this too, so
+	 * callers only need to set it for plain headed runs. Default false —
+	 * headless CI keeps the CDP-default viewport so screenshots stay
+	 * deterministic.
+	 */
+	polishVisibleWindow?: boolean;
+	/**
 	 * Hook invoked after the plugin files are staged; use this to write
 	 * `data.json` into the plugin folder. Typical use: pre-seed settings AND
 	 * set `version: manifest.version` to suppress the plugin's "What's new"
@@ -108,6 +133,16 @@ export type BootstrapOptions = {
 	onRendererReady?: (page: Page) => void | Promise<void>;
 	/** Hook invoked after the plugin is loaded; use this to wait for plugin-specific runtime structures. */
 	afterPluginLoaded?: (page: Page) => void | Promise<void>;
+	/**
+	 * When set, retained vaults (those not wiped by `E2E_CLEANUP=1`) are stripped
+	 * down on close: only the listed vault-root entries survive, `.obsidian/` is
+	 * reduced to our `plugins/<id>/` folder with the staged artifact files
+	 * (`plugin.files`: main.js / manifest.json / styles.css by default) removed —
+	 * anything the plugin wrote at runtime (data.json, snippets, logs, …) is
+	 * preserved. Lets `ls e2e/.cache/vaults/` stay browsable for post-mortem
+	 * without carrying gigabytes of Obsidian config + plugin builds.
+	 */
+	leanVaultOnClose?: LeanVaultOptions;
 	/** Optional sink for progress/debug lines. Defaults to a no-op. */
 	logger?: Logger;
 };
@@ -310,7 +345,9 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 	});
 	log.debug(`got CDP wsEndpoint=${wsEndpoint}`);
 
-	const browser = await chromium.connectOverCDP(wsEndpoint, { timeout: 30_000 });
+	const slowMo = options.slowMoMs && options.slowMoMs > 0 ? options.slowMoMs : 0;
+	if (slowMo > 0) log.info(`slowMo=${slowMo}ms (demo mode)`);
+	const browser = await chromium.connectOverCDP(wsEndpoint, { timeout: 30_000, slowMo });
 	log.debug(`connected (contexts=${browser.contexts().length})`);
 
 	const context = browser.contexts()[0];
@@ -356,6 +393,15 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 		await options.afterPluginLoaded(page);
 	}
 
+	// Demo/headed polish: maximize the window and collapse Obsidian's left
+	// sidebar so what the human sees is the plugin UI, not chrome. Triggered
+	// whenever the caller opts in via `polishVisibleWindow` OR slowMo > 0
+	// (PW_DEMO implies a watched run). In a plain headless CI run the viewport
+	// stays at CDP defaults.
+	if (slowMo > 0 || options.polishVisibleWindow) {
+		await configureDemoViewport(page, log);
+	}
+
 	const elapsed = ((Date.now() - bootstrapStart) / 1000).toFixed(1);
 	if (verboseBootstrap) {
 		log.info(`bootstrap ready id=${id} plugin=${options.plugin.id}`);
@@ -389,11 +435,66 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 			if (process.env["E2E_CLEANUP"] === "1") {
 				rmSync(join(vaultsRoot, id), { recursive: true, force: true });
 				log.debug(`vault cleaned`);
+			} else if (options.leanVaultOnClose) {
+				leanVault(vaultDir, options.plugin.id, files, options.leanVaultOnClose, log);
+				log.debug(`vault leaned at ${join(vaultsRoot, id)} (set E2E_CLEANUP=1 to delete)`);
 			} else {
 				log.debug(`vault kept at ${join(vaultsRoot, id)} (set E2E_CLEANUP=1 to delete)`);
 			}
 		},
 	};
+}
+
+function leanVault(
+	vaultDir: string,
+	pluginId: string,
+	stripPluginArtifacts: readonly string[],
+	lean: LeanVaultOptions,
+	log: Logger
+): void {
+	// Vault root: keep only the caller-nominated entries plus `.obsidian`. Delete everything else.
+	const keep = new Set<string>([...lean.keep, ".obsidian"]);
+	for (const entry of readdirSync(vaultDir)) {
+		if (keep.has(entry)) continue;
+		rmSync(join(vaultDir, entry), { recursive: true, force: true });
+	}
+
+	const obsidianDir = join(vaultDir, ".obsidian");
+	if (!existsSync(obsidianDir)) return;
+
+	// .obsidian/: keep only the `plugins/` subtree. `app.json`, `appearance.json`,
+	// `core-plugins.json`, `workspace.json`, etc. are all reproducible from a
+	// fresh boot — no point hoarding copies.
+	for (const entry of readdirSync(obsidianDir)) {
+		if (entry !== "plugins") {
+			rmSync(join(obsidianDir, entry), { recursive: true, force: true });
+		}
+	}
+
+	const pluginsDir = join(obsidianDir, "plugins");
+	if (!existsSync(pluginsDir)) return;
+
+	// plugins/: drop every other plugin's folder; we only care about ours.
+	for (const entry of readdirSync(pluginsDir)) {
+		if (entry !== pluginId) {
+			rmSync(join(pluginsDir, entry), { recursive: true, force: true });
+		}
+	}
+
+	// plugins/<pluginId>/: remove only the staged artifacts (main.js, manifest.json,
+	// styles.css — whatever the plugin passes as `files`). Everything the plugin
+	// wrote at runtime (data.json, snippets, logs, etc.) is preserved as-is.
+	const pluginDir = join(pluginsDir, pluginId);
+	if (existsSync(pluginDir)) {
+		for (const name of stripPluginArtifacts) {
+			const target = join(pluginDir, name);
+			if (existsSync(target)) rmSync(target, { recursive: true, force: true });
+		}
+	}
+
+	log.debug(
+		`leanVault: stripped ${vaultDir} (kept roots: ${[...lean.keep].join(", ")}; dropped plugin artifacts: ${stripPluginArtifacts.join(", ")})`
+	);
 }
 
 async function buildUserDataDir(
@@ -494,6 +595,37 @@ function pipeRendererConsole(page: Page, log: Logger): void {
 	// up without requiring --debug.
 	page.on("pageerror", (err) => log.info(`pageerror: ${err.message}\n${err.stack ?? ""}`));
 	page.on("crash", () => log.info(`PAGE CRASHED`));
+}
+
+// Maximize the Obsidian window and collapse the left sidebar so the watched
+// run shows the plugin UI instead of workspace chrome. Maximize goes through
+// `@electron/remote`, which Obsidian enables for its renderer — external CDP
+// approaches (Browser.setWindowBounds, window.resizeTo, Chromium's
+// --start-maximized CLI switch) all fail against Obsidian because the app
+// sets explicit BrowserWindow bounds during startup and overrides them.
+// Both steps are best-effort: a failure here is cosmetic and must not fail
+// the spec run.
+async function configureDemoViewport(page: Page, log: Logger): Promise<void> {
+	log.debug("demo viewport: maximizing window and collapsing left sidebar");
+
+	await page
+		.evaluate(() => {
+			const w = window as unknown as { require?: (m: string) => unknown };
+			const remote = w.require?.("@electron/remote") as { getCurrentWindow?: () => { maximize?: () => void } };
+			remote?.getCurrentWindow?.()?.maximize?.();
+		})
+		.catch((err) => log.debug(`demo viewport: maximize failed: ${String(err)}`));
+
+	try {
+		const btn = page.locator(".sidebar-toggle-button.mod-left").first();
+		await btn.waitFor({ state: "visible", timeout: 5_000 });
+		const alreadyCollapsed = await page.evaluate(
+			() => document.querySelector(".mod-left-split")?.classList.contains("is-collapsed") ?? false
+		);
+		if (!alreadyCollapsed) await btn.click();
+	} catch (err) {
+		log.debug(`demo viewport: sidebar collapse failed: ${String(err)}`);
+	}
 }
 
 // Format: YYYY-MM-DD-HHmm (local time) — chronologically sortable in `ls`, and

@@ -132,6 +132,12 @@ export interface SchemaFormConfig<T> {
 	mode?: SchemaFormMode | undefined;
 	fieldOverrides?: Record<string, FieldOverride> | undefined;
 	existing?: Partial<T> | undefined;
+	/**
+	 * When set, every field's control (input/select/toggle) gets a stable
+	 * `data-testid="${testIdPrefix}-${fieldKey}"`. Lets E2E tests target
+	 * individual schema-form fields without scraping by label or ordinal.
+	 */
+	testIdPrefix?: string | undefined;
 	extraFields?:
 		| ((
 				el: HTMLElement,
@@ -174,6 +180,8 @@ export interface SchemaFormModalConfig<S extends ZodRawShape = ZodRawShape> {
 	existing?: Partial<z.infer<z.ZodObject<S>>> | undefined;
 	extraFields?: ((el: HTMLElement, values: Record<string, unknown>) => void) | undefined;
 	submitText?: string | undefined;
+	submitTestId?: string | undefined;
+	cancelTestId?: string | undefined;
 	onSubmit: (values: z.infer<z.ZodObject<S>>) => void | Promise<void>;
 	nameField?: boolean | { placeholder?: string } | undefined;
 }
@@ -183,7 +191,9 @@ export interface SchemaFormModalConfig<S extends ZodRawShape = ZodRawShape> {
 export interface ModalButtonOptions {
 	prefix: string;
 	submitText: string;
-	submitCls?: string;
+	submitCls?: string | undefined;
+	submitTestId?: string | undefined;
+	cancelTestId?: string | undefined;
 	onSubmit: () => void;
 	onCancel: () => void;
 }
