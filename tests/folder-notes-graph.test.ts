@@ -1,4 +1,5 @@
 import type { App } from "obsidian";
+import { BehaviorSubject } from "rxjs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { GraphBuilder } from "../src/core/graph-builder";
@@ -78,13 +79,11 @@ describe("Folder Notes Graph Building", () => {
 			prioritizeParentProp: "",
 			hierarchySource: "properties" as const,
 		};
+		const settings$ = new BehaviorSubject(settings);
 		return {
-			settings$: {
-				value: settings,
-				subscribe: vi.fn(),
-			},
+			settings$,
 			get currentSettings() {
-				return settings;
+				return settings$.value;
 			},
 		} as any;
 	};
