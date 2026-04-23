@@ -1,11 +1,13 @@
 import { describe, expect, it, vi } from "vitest";
 
 import {
+	extractRelativePath,
 	findRootNodesInFolder,
 	getChildrenByFolder,
 	getFileContext,
 	getFolderPath,
 	getParentByFolder,
+	getTopLevelDirectory,
 	getUniqueFilePath,
 	getUniqueFilePathFromFull,
 	isDirectChildOrFolderNote,
@@ -692,6 +694,24 @@ describe("getFolderPath", () => {
 	});
 });
 
+describe("getTopLevelDirectory", () => {
+	it("returns the first folder segment for nested paths", () => {
+		expect(getTopLevelDirectory("projects/docs/note.md")).toBe("projects");
+	});
+
+	it("returns the first folder segment for direct children", () => {
+		expect(getTopLevelDirectory("tasks/today.md")).toBe("tasks");
+	});
+
+	it("returns null for root-level files", () => {
+		expect(getTopLevelDirectory("note.md")).toBeNull();
+	});
+
+	it("returns null for empty paths", () => {
+		expect(getTopLevelDirectory("")).toBeNull();
+	});
+});
+
 describe("getParentByFolder", () => {
 	describe("basic functionality", () => {
 		it("should return parent folder note if it exists", () => {
@@ -1296,6 +1316,36 @@ describe("isDirectChildOrFolderNote", () => {
 
 		it("should handle deeply nested paths", () => {
 			expect(toDisplayLink("A/B/C/Deep Note.md")).toBe("[[A/B/C/Deep Note|Deep Note]]");
+		});
+	});
+
+	describe("extractRelativePath", () => {
+		it("strips directory prefix and .md extension", () => {
+			expect(extractRelativePath("events/meeting.md", "events")).toBe("meeting");
+		});
+
+		it("preserves subdirectory structure", () => {
+			expect(extractRelativePath("events/courses/CS101/hw1.md", "events")).toBe("courses/CS101/hw1");
+		});
+
+		it("handles deeply nested paths", () => {
+			expect(extractRelativePath("events/a/b/c/d/deep.md", "events")).toBe("a/b/c/d/deep");
+		});
+
+		it("handles nested directory prefix", () => {
+			expect(extractRelativePath("vault/my-events/sub/note.md", "vault/my-events")).toBe("sub/note");
+		});
+
+		it("handles empty directory", () => {
+			expect(extractRelativePath("note.md", "")).toBe("note");
+		});
+
+		it("returns full path without extension when prefix does not match", () => {
+			expect(extractRelativePath("other/note.md", "events")).toBe("other/note");
+		});
+
+		it("handles path without .md extension", () => {
+			expect(extractRelativePath("events/note", "events")).toBe("note");
 		});
 	});
 });

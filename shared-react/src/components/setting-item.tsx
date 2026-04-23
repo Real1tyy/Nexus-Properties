@@ -6,7 +6,7 @@ interface SettingItemProps {
 	description?: ReactNode;
 	children: ReactNode;
 	/** When set, stamps `data-testid` on the outer `.setting-item` for E2E. */
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const SettingItem = memo(function SettingItem({ name, description, children, testId }: SettingItemProps) {
@@ -34,6 +34,20 @@ export const SettingHeading = memo(function SettingHeading({ name, testId }: Set
 			<div className="setting-item-info">
 				<div className="setting-item-name">{name}</div>
 			</div>
+		</div>
+	);
+});
+
+interface SettingCardProps {
+	children: ReactNode;
+	cssPrefix?: string;
+	testId?: string;
+}
+
+export const SettingCard = memo(function SettingCard({ children, cssPrefix = "", testId }: SettingCardProps) {
+	return (
+		<div className={`${cssPrefix}settings-card`} {...(testId ? { "data-testid": testId } : {})}>
+			{children}
 		</div>
 	);
 });

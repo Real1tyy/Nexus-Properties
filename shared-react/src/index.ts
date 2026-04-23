@@ -1,3 +1,5 @@
+export type { ButtonProps, ButtonVariant } from "./components/button";
+export { Button } from "./components/button";
 export type { ChipProps } from "./components/chip";
 export { Chip } from "./components/chip";
 export type { ChipListProps } from "./components/chip-list";
@@ -24,8 +26,11 @@ export {
 	TextInput,
 	Toggle,
 } from "./components/setting-controls";
-export { SettingHeading, SettingItem } from "./components/setting-item";
+export { SettingCard, SettingHeading, SettingItem } from "./components/setting-item";
+export type { TextareaProps } from "./components/textarea";
+export { Textarea } from "./components/textarea";
 export { AppContext, useApp } from "./contexts/app-context";
+export * from "./forms";
 export type { ActivatableProps } from "./hooks/use-activatable";
 export { useActivatable } from "./hooks/use-activatable";
 export type { DebouncedCommitHandle, UseDebouncedCommitOptions } from "./hooks/use-debounced-commit";
@@ -43,9 +48,11 @@ export type { SchemaFieldBinding, SettingsStorelike } from "./hooks/use-schema-f
 export { useSchemaField } from "./hooks/use-schema-field";
 export type { SettingsStorelike as SettingsStoreShape, SettingsUpdater } from "./hooks/use-settings-store";
 export { useSettingsStore } from "./hooks/use-settings-store";
+export * from "./onboarding";
 export { renderReactInline } from "./react-inline";
-export type { ReactModalConfig } from "./react-modal";
-export { ReactModal } from "./react-modal";
 export type { ReactViewConfig, ReactViewHandle } from "./react-view";
 export { registerReactView } from "./react-view";
 export * from "./settings";
+export type { OpenReactModalConfig, ReactModalBaseConfig, ShowReactModalConfig } from "./show-react-modal";
+export { openReactModal, showReactModal } from "./show-react-modal";
+export * from "./virtual";

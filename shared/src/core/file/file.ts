@@ -100,6 +100,23 @@ export function extractFileName(path: string): string {
 	return filename.replace(/\.md$/i, "");
 }
 
+/**
+ * Extracts the path relative to a directory prefix, without the .md extension.
+ * Used by recursive VaultTable to derive unique row keys from nested paths.
+ *
+ * @example
+ * ```ts
+ * extractRelativePath("events/courses/CS101/hw1.md", "events") // "courses/CS101/hw1"
+ * extractRelativePath("events/meeting.md", "events")            // "meeting"
+ * extractRelativePath("meeting.md", "")                         // "meeting"
+ * ```
+ */
+export function extractRelativePath(filePath: string, directory: string): string {
+	const prefix = directory ? directory + "/" : "";
+	const relative = filePath.startsWith(prefix) ? filePath.slice(prefix.length) : filePath;
+	return relative.replace(/\.md$/i, "");
+}
+
 export function extractDisplayName(input: string): string {
 	if (!input) return "";
 
@@ -417,6 +434,18 @@ export function getFolderPath(filePath: string): string {
 	if (lastSlashIndex === -1) return "";
 
 	return filePath.substring(0, lastSlashIndex);
+}
+
+/**
+ * Returns the top-level directory segment for a vault path.
+ * Root-level files return null because they are not inside a directory.
+ */
+export function getTopLevelDirectory(path: string): string | null {
+	const folderPath = getFolderPath(path);
+	if (!folderPath) return null;
+
+	const [topLevel] = folderPath.split("/").filter(Boolean);
+	return topLevel || null;
 }
 
 /**
@@ -741,3 +770,5 @@ export function isDirectChildOrFolderNote(
 
 	return segments.length === 1;
 }
+
+export const normalizeDirectory = (directory: string): string => directory.trim().replace(/^\/+|\/+$/g, "");
