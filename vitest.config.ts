@@ -2,7 +2,7 @@ import * as path from "node:path";
 import { fileURLToPath } from "node:url";
 import { defineConfig } from "vitest/config";
 
-import { sharedVitestAliases } from "./shared/src/testing/vitest-aliases.ts";
+import { VITEST_POOL_OPTIONS, sharedVitestAliases } from "./shared/src/testing/vitest-aliases.ts";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -13,6 +13,7 @@ export default defineConfig({
 		environment: "node",
 		setupFiles: ["./tests/setup.ts"],
 		passWithNoTests: true,
+		...VITEST_POOL_OPTIONS,
 	},
 	resolve: {
 		alias: [
