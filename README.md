@@ -2,9 +2,7 @@
 
 # Nexus Properties
 
-![Downloads](https://img.shields.io/github/downloads/Real1tyy/Nexus-Properties/total?label=Downloads&style=for-the-badge)
-![Release](https://img.shields.io/github/v/release/Real1tyy/Nexus-Properties?label=Latest%20Release&style=for-the-badge)
-![Stars](https://img.shields.io/github/stars/Real1tyy/Nexus-Properties?style=for-the-badge)
+![Downloads](https://img.shields.io/github/downloads/Real1tyy/Nexus-Properties/total?label=Downloads&style=for-the-badge&color=238636) ![Release](https://img.shields.io/github/v/release/Real1tyy/Nexus-Properties?label=Latest%20Release&style=for-the-badge&color=1f6feb) ![Stars](https://img.shields.io/github/stars/Real1tyy/Nexus-Properties?style=for-the-badge&color=f0c830) [![Documentation](https://img.shields.io/badge/Documentation-238636?style=for-the-badge)](https://real1tyy.github.io/Nexus-Properties/?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_documentation)
 
 **Automated property management and interactive relationship visualization for Obsidian — bidirectional sync, graph views, and intelligent property inheritance for power users who want structured knowledge networks.**
 
