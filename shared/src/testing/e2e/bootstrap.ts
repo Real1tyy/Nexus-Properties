@@ -1,9 +1,19 @@
 import { type ChildProcess, spawn } from "node:child_process";
 import { randomUUID } from "node:crypto";
-import { appendFileSync, cpSync, existsSync, mkdirSync, readdirSync, readFileSync, rmSync } from "node:fs";
+import {
+	appendFileSync,
+	cpSync,
+	existsSync,
+	linkSync,
+	mkdirSync,
+	readdirSync,
+	readFileSync,
+	renameSync,
+	rmSync,
+} from "node:fs";
 import { createServer } from "node:net";
 import { tmpdir } from "node:os";
-import { join } from "node:path";
+import { basename, join } from "node:path";
 
 import { type Browser, chromium, type Page } from "@playwright/test";
 
@@ -268,7 +278,12 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 		if (!existsSync(src)) {
 			throw new Error(`plugin artifact missing: ${src} (run your build before tests)`);
 		}
-		cpSync(src, join(pluginDir, file));
+		const dest = join(pluginDir, file);
+		try {
+			linkSync(src, dest);
+		} catch {
+			cpSync(src, dest);
+		}
 	}
 	log.debug(`plugin artifacts staged at ${pluginDir}`);
 
@@ -284,7 +299,7 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 	// Mode for this vaultId, writes Preferences, and copies the asar in — it's
 	// the sanctioned way to produce a userDataDir Obsidian will happily boot
 	// against. The returned installerPath is the Electron binary we spawn below.
-	const { userDataDir, installerPath } = await buildUserDataDir(vaultDir, options.version);
+	const { userDataDir, installerPath } = await buildUserDataDir(vaultDir, options.version, log);
 	log.debug(`userDataDir=${userDataDir}`);
 	log.debug(`installerPath=${installerPath}`);
 
@@ -315,7 +330,7 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 		stdio: ["ignore", "pipe", "pipe"],
 	});
 	log.debug(`spawned pid=${proc.pid}`);
-	proc.stdout?.on("data", (d) => log.debug(`obsidian.stdout: ${String(d).trimEnd()}`));
+	proc.stdout.on("data", (d) => log.debug(`obsidian.stdout: ${String(d).trimEnd()}`));
 	proc.on("exit", (code, signal) => log.debug(`obsidian process exit code=${code} signal=${signal}`));
 
 	// Grep the CDP endpoint out of Obsidian's own stderr. Chromium prints
@@ -328,14 +343,14 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 			60_000
 		);
 		let buffer = "";
-		proc.stderr?.on("data", (chunk: Buffer) => {
+		proc.stderr.on("data", (chunk: Buffer) => {
 			const text = chunk.toString();
 			log.debug(`obsidian.stderr: ${text.trimEnd()}`);
 			buffer += text;
 			const match = buffer.match(/DevTools listening on (ws:\/\/[^\s]+)/);
 			if (match) {
 				clearTimeout(timer);
-				resolve(match[1]!);
+				resolve(match[1]);
 			}
 		});
 		proc.on("exit", () => {
@@ -351,6 +366,7 @@ export async function bootstrapObsidian(options: BootstrapOptions): Promise<Boot
 	log.debug(`connected (contexts=${browser.contexts().length})`);
 
 	const context = browser.contexts()[0];
+	// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- array may be empty at runtime (noUncheckedIndexedAccess disabled)
 	if (!context) throw new Error("no browser context after connect");
 
 	// Poll context.pages() directly instead of `browser.firstWindow()` —
@@ -508,10 +524,18 @@ function leanVault(
 	);
 }
 
-async function buildUserDataDir(
-	vaultDir: string,
-	version: ObsidianVersion
-): Promise<{ userDataDir: string; installerPath: string }> {
+type LauncherCache = {
+	launcher: ObsidianLauncherLike;
+	installerPath: string;
+	appPathInTmp: string;
+};
+
+let _launcherCache: LauncherCache | undefined;
+
+async function ensureLauncherCache(version: ObsidianVersion, log: Logger): Promise<LauncherCache> {
+	if (_launcherCache) return _launcherCache;
+
+	log.debug("initializing launcher cache (first test in this worker)");
 	const launcherModule = await import("obsidian-launcher");
 	const Launcher = (launcherModule as { default: new () => ObsidianLauncherLike }).default;
 	const launcher = new Launcher();
@@ -519,10 +543,40 @@ async function buildUserDataDir(
 		launcher.downloadApp(version.appVersion),
 		launcher.downloadInstaller(version.installerVersion),
 	]);
+
+	// Stage the asar under /tmp so setupConfigDir's internal linkOrCp can
+	// hardlink it into every per-test config dir (both paths on the same fs).
+	// The downloaded asar often lives under ~/.cache — a different mount on
+	// many Linux setups — which forces a full 23 MB copy per test.
+	// The basename must stay unchanged (setupConfigDir uses it as the dest name).
+	const asarCacheDir = join(tmpdir(), "obsidian-e2e-asar-cache");
+	mkdirSync(asarCacheDir, { recursive: true });
+	const tmpAsar = join(asarCacheDir, basename(appPath));
+	if (!existsSync(tmpAsar)) {
+		const tmpWrite = `${tmpAsar}.${process.pid}`;
+		cpSync(appPath, tmpWrite);
+		try {
+			renameSync(tmpWrite, tmpAsar);
+		} catch {
+			rmSync(tmpWrite, { force: true });
+		}
+		log.debug(`asar staged in tmpdir: ${tmpAsar}`);
+	}
+
+	_launcherCache = { launcher, installerPath, appPathInTmp: tmpAsar };
+	return _launcherCache;
+}
+
+async function buildUserDataDir(
+	vaultDir: string,
+	version: ObsidianVersion,
+	log: Logger
+): Promise<{ userDataDir: string; installerPath: string }> {
+	const { launcher, installerPath, appPathInTmp } = await ensureLauncherCache(version, log);
 	const userDataDir = await launcher.setupConfigDir({
 		appVersion: version.appVersion,
 		installerVersion: version.installerVersion,
-		appPath,
+		appPath: appPathInTmp,
 		vault: vaultDir,
 	});
 	return { userDataDir, installerPath };
@@ -602,9 +656,10 @@ async function ensurePluginLoaded(page: Page, pluginId: string, log: Logger, tim
 
 function pipeRendererConsole(page: Page, log: Logger): void {
 	page.on("console", (msg) => log.debug(`console.${msg.type()}: ${msg.text()}`));
-	// Page errors and crashes are real failures — promote to info so they show
-	// up without requiring --debug.
-	page.on("pageerror", (err) => log.info(`pageerror: ${err.message}\n${err.stack ?? ""}`));
+	page.on("pageerror", (err) => {
+		if (isTransientObsidianTeardownError(err.message)) return;
+		log.info(`pageerror: ${err.message}\n${err.stack ?? ""}`);
+	});
 	page.on("crash", () => log.info(`PAGE CRASHED`));
 }
 
@@ -623,6 +678,7 @@ async function configureDemoViewport(page: Page, log: Logger): Promise<void> {
 		.evaluate(() => {
 			const w = window as unknown as { require?: (m: string) => unknown };
 			const remote = w.require?.("@electron/remote") as { getCurrentWindow?: () => { maximize?: () => void } };
+			// eslint-disable-next-line @typescript-eslint/no-unnecessary-condition
 			remote?.getCurrentWindow?.()?.maximize?.();
 		})
 		.catch((err) => log.debug(`demo viewport: maximize failed: ${String(err)}`));
@@ -637,6 +693,16 @@ async function configureDemoViewport(page: Page, log: Logger): Promise<void> {
 	} catch (err) {
 		log.debug(`demo viewport: sidebar collapse failed: ${String(err)}`);
 	}
+}
+
+export function isTransientObsidianTeardownError(text: string): boolean {
+	return (
+		text.includes("database connection is closing") ||
+		text.includes("Internal error committing transaction") ||
+		text.includes("The transaction was aborted") ||
+		text === "AbortError" ||
+		text === "A network error occurred."
+	);
 }
 
 // Format: YYYY-MM-DD-HHmm (local time) — chronologically sortable in `ls`, and
