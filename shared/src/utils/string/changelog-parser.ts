@@ -79,6 +79,31 @@ export function getChangelogSince(changelogContent: string, fromVersion: string,
 	});
 }
 
+const ADMONITION_TYPE_MAP: Record<string, string> = {
+	note: "info",
+	tip: "tip",
+	info: "info",
+	caution: "warning",
+	danger: "danger",
+	warning: "warning",
+};
+
+function convertDocusaurusAdmonitions(content: string): string {
+	return content.replace(
+		/^:::(note|tip|info|caution|danger|warning)\s*(.*)\n([\s\S]*?)^:::$/gm,
+		(_match, type: string, title: string, body: string) => {
+			const calloutType = ADMONITION_TYPE_MAP[type] ?? "info";
+			const heading = title.trim() || type.charAt(0).toUpperCase() + type.slice(1);
+			const quotedBody = body
+				.trimEnd()
+				.split("\n")
+				.map((line) => `> ${line}`)
+				.join("\n");
+			return `> [!${calloutType}] ${heading}\n${quotedBody}`;
+		}
+	);
+}
+
 export function formatChangelogSections(sections: VersionSection[]): string {
 	if (sections.length === 0) {
 		return "No changes found.";
@@ -86,11 +111,38 @@ export function formatChangelogSections(sections: VersionSection[]): string {
 
 	return sections
 		.map((section) => {
-			// Escape Dataview inline queries to prevent parsing errors
-			const content = section.content.replace(/`=([^`]+)`/g, "`\\=$1`");
+			const content = convertDocusaurusAdmonitions(section.content)
+				.replace(/`=([^`]+)`/g, "`\\=$1`")
+				.replace(/^---$/gm, "")
+				.trim();
 			return `## ${section.version}\n\n${content}`;
 		})
 		.join("\n\n");
+}
+
+export function resolveRelativeDocLinks(markdown: string, documentationBaseUrl: string): string {
+	const baseUrl = new URL(documentationBaseUrl);
+	const cleanBase = `${baseUrl.origin}${baseUrl.pathname}`.replace(/\/$/, "");
+	const utmParams = new URLSearchParams();
+	for (const [key, value] of baseUrl.searchParams) {
+		if (key.startsWith("utm_")) utmParams.set(key, value);
+	}
+
+	return markdown.replace(/(?<!!)\[([^\]]+)\]\((\.[^)]+)\)/g, (_match, text: string, rawPath: string) => {
+		const cleaned = rawPath.replace(/^\.\//, "").replace(/\.md(?=#|$)/, "");
+		const path = cleaned.startsWith("/") ? cleaned : `/${cleaned}`;
+		const hashIndex = path.indexOf("#");
+		const pathPart = hashIndex >= 0 ? path.slice(0, hashIndex) : path;
+		const fragment = hashIndex >= 0 ? path.slice(hashIndex + 1) : undefined;
+		const resolved = new URL(`${cleanBase}${pathPart}`);
+		for (const [key, value] of utmParams) {
+			resolved.searchParams.set(key, value);
+		}
+		const lastSegment = pathPart.split("/").filter(Boolean).pop() ?? "changelog_link";
+		resolved.searchParams.set("utm_content", lastSegment.replace(/-/g, "_"));
+		if (fragment) resolved.hash = fragment;
+		return `[${text}](${resolved.toString()})`;
+	});
 }
 
 export type { VersionSection };

@@ -1,4 +1,4 @@
-import { formatChangelogSections, getChangelogSince } from "@real1ty-obsidian-plugins";
+import { formatChangelogSections, getChangelogSince, resolveRelativeDocLinks } from "@real1ty-obsidian-plugins";
 import type { App, Plugin } from "obsidian";
 import { MarkdownRenderer } from "obsidian";
 import { memo, useCallback, useEffect, useRef } from "react";
@@ -85,30 +85,17 @@ interface WhatsNewContentProps {
 	close: () => void;
 }
 
-function makeExternalLinksClickable(container: HTMLElement, documentationBaseUrl: string): void {
+function makeExternalLinksClickable(container: HTMLElement): void {
 	const links = container.querySelectorAll<HTMLAnchorElement>("a[href]");
 	for (const link of Array.from(links)) {
 		const href = link.getAttribute("href");
-		if (!href) continue;
+		if (!href || !href.startsWith("http")) continue;
 
-		let finalUrl: string | null = null;
-		if (href.startsWith("http://") || href.startsWith("https://")) {
-			finalUrl = href;
-		} else if (href.startsWith("/")) {
-			const normalizedBase = documentationBaseUrl.endsWith("/")
-				? documentationBaseUrl.slice(0, -1)
-				: documentationBaseUrl;
-			finalUrl = `${normalizedBase}${href}`;
-		}
-
-		if (finalUrl) {
-			const url = finalUrl;
-			link.addEventListener("click", (e: MouseEvent) => {
-				e.preventDefault();
-				window.open(url, "_blank");
-			});
-			link.classList.add("external-link");
-		}
+		link.addEventListener("click", (e: MouseEvent) => {
+			e.preventDefault();
+			window.open(href, "_blank");
+		});
+		link.classList.add("external-link");
 	}
 }
 
@@ -134,18 +121,19 @@ export const WhatsNewContent = memo(function WhatsNewContent({
 	const cls = (suffix: string) => `${config.cssPrefix}-${suffix}`;
 
 	const changelogSections = getChangelogSince(config.changelogContent, fromVersion, toVersion);
-	const markdownContent = changelogSections.length > 0 ? formatChangelogSections(changelogSections) : "";
+	const markdownContent = formatChangelogSections(changelogSections);
+	const resolvedMarkdown = resolveRelativeDocLinks(markdownContent, config.links.documentation);
 
 	useEffect(() => {
-		if (!changelogRef.current || !markdownContent) return;
+		if (!changelogRef.current || !resolvedMarkdown) return;
 		const el = changelogRef.current;
 		while (el.firstChild) el.removeChild(el.firstChild);
 
 		// eslint-disable-next-line obsidianmd/no-plugin-as-component -- short-lived modal, cleaned up on close
-		void MarkdownRenderer.render(app, markdownContent, el, "/", plugin).then(() => {
-			makeExternalLinksClickable(el, config.links.documentation);
+		void MarkdownRenderer.render(app, resolvedMarkdown, el, "/", plugin).then(() => {
+			makeExternalLinksClickable(el);
 		});
-	}, [app, markdownContent, plugin, config.links.documentation]);
+	}, [app, resolvedMarkdown, plugin]);
 
 	const toolsUrl = config.links.tools ?? DEFAULT_WHATS_NEW_LINKS.TOOLS;
 	const youtubeUrl = config.links.youtube ?? DEFAULT_WHATS_NEW_LINKS.YOUTUBE;

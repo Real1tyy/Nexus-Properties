@@ -2,9 +2,16 @@ import { injectStyleSheet } from "../../utils/styles/inject";
 
 function buildWhatsNewStyles(p: string): string {
 	return `
-.modal-container.mod-dim .modal:has(.${p}-whats-new-modal) {
+.modal-container.mod-dim .modal.${p}-whats-new-modal {
 	max-width: 750px;
 	width: 90%;
+	height: 80vh;
+}
+.${p}-whats-new-modal .modal-content {
+	display: flex;
+	flex-direction: column;
+	overflow: hidden;
+	height: 100%;
 }
 .${p}-whats-new-plugin-name {
 	color: var(--link-color);
@@ -36,19 +43,63 @@ function buildWhatsNewStyles(p: string): string {
 	margin: 0 0 1rem;
 }
 .${p}-whats-new-support {
-	margin: 0 0 1rem;
-	padding: 1rem;
-	background-color: var(--background-secondary);
+	flex-shrink: 0;
+	margin: 0;
+	padding: 1rem 1.1rem;
+	background: linear-gradient(
+		135deg,
+		color-mix(in srgb, var(--background-secondary) 85%, var(--interactive-accent) 15%),
+		var(--background-secondary) 70%
+	);
 	border-radius: 8px;
+	border: 1px solid color-mix(in srgb, var(--interactive-accent) 15%, transparent);
 }
-.${p}-whats-new-support h3 {
-	margin-top: 0;
-	margin-bottom: 0.5rem;
+.${p}-whats-new-support-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	cursor: pointer;
+	user-select: none;
+}
+.${p}-whats-new-support-header h3 {
+	margin: 0;
 	font-size: 1rem;
+	font-weight: 600;
+	color: var(--text-accent);
+}
+.${p}-whats-new-support-chevron {
+	font-size: 0.7rem;
+	color: var(--text-muted);
+	transition: transform 0.15s ease;
+	flex-shrink: 0;
+	padding: 0.2rem;
+}
+.${p}-whats-new-support-body {
+	margin-top: 0.5rem;
+	overflow: hidden;
+	transition: max-height 0.2s ease, opacity 0.2s ease;
+	max-height: 500px;
+	opacity: 1;
+}
+.${p}-whats-new-support-collapsed {
+	max-height: 0;
+	opacity: 0;
+	margin-top: 0;
 }
 .${p}-whats-new-support p {
 	margin: 0.5rem 0;
 	color: var(--text-normal);
+}
+.${p}-whats-new-support .${p}-whats-new-trial-highlight {
+	display: inline-block;
+	margin-top: 0.4rem;
+	padding: 0.2rem 0.5rem;
+	background: color-mix(in srgb, var(--interactive-accent) 8%, transparent);
+	border: 1px solid color-mix(in srgb, var(--interactive-accent) 20%, transparent);
+	border-radius: 5px;
+	font-weight: 500;
+	font-size: 0.85rem;
+	color: var(--text-accent);
 }
 .${p}-whats-new-support a {
 	color: var(--link-color);
@@ -74,7 +125,8 @@ function buildWhatsNewStyles(p: string): string {
 	width: 100%;
 }
 .${p}-whats-new-content {
-	max-height: 400px;
+	flex: 1;
+	min-height: 0;
 	overflow-y: auto;
 	margin-bottom: 1rem;
 	padding-right: 0.5rem;
@@ -104,14 +156,20 @@ function buildWhatsNewStyles(p: string): string {
 	border-radius: 3px;
 	font-size: 0.9em;
 }
+.${p}-whats-new-modal .${p}-whats-new-content code {
+	color: var(--code-normal, var(--text-normal));
+}
 .${p}-whats-new-content pre {
 	background: var(--code-background);
 	padding: 1rem;
 	border-radius: 6px;
 	overflow-x: auto;
 }
-.${p}-whats-new-content a.external-link {
-	color: var(--link-external-color);
+.${p}-whats-new-modal .${p}-whats-new-content a {
+	color: var(--link-color);
+}
+.${p}-whats-new-modal .${p}-whats-new-content a.external-link {
+	color: var(--link-external-color, var(--link-color));
 }
 .${p}-whats-new-content a.external-link::after {
 	content: "\\2197";
@@ -124,7 +182,27 @@ function buildWhatsNewStyles(p: string): string {
 	padding: 2rem;
 	font-style: italic;
 }
+.${p}-whats-new-load-more {
+	display: block;
+	width: 100%;
+	padding: 0.75rem 1rem;
+	margin-top: 1rem;
+	border-radius: 6px;
+	cursor: pointer;
+	border: 1px dashed var(--background-modifier-border);
+	background: var(--background-secondary);
+	color: var(--text-muted);
+	font-size: var(--font-ui-small);
+	transition: all 0.2s ease;
+	text-align: center;
+}
+.${p}-whats-new-load-more:hover {
+	background: var(--background-modifier-hover);
+	border-color: var(--interactive-accent);
+	color: var(--text-normal);
+}
 .${p}-whats-new-sticky-footer {
+	flex-shrink: 0;
 	position: sticky;
 	bottom: 0;
 	background: var(--background-primary);

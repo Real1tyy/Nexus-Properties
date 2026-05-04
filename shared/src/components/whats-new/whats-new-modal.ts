@@ -5,6 +5,8 @@ import { formatChangelogSections, getChangelogSince } from "../../utils/string";
 import { showModal } from "../component-renderer/modal";
 import { injectWhatsNewStyles } from "./whats-new-styles";
 
+const LINES_PER_PAGE = 15;
+
 /**
  * Default URLs for the What's New modal.
  * These can be overridden in the config.
@@ -131,259 +133,7 @@ export function makeExternalLinksClickable(container: HTMLElement, documentation
 /**
  * Generic "What's New" modal that displays changelog entries between versions.
  * Supports custom CSS prefixes, plugin names, and configurable links.
- *
- * ## CSS Classes
- *
- * This modal uses the following CSS classes (with your custom prefix).
- * Replace `{prefix}` with your `cssPrefix` value (e.g., "my-plugin").
- *
- * ### Main Container
- * - `.{prefix}-whats-new-modal` - Applied to the main content element
- * - `.{prefix}-whats-new-modal .modal` - Modal dialog styling (max-width, width)
- *
- * ### Title and Subtitle
- * - Modal title is set via `setTitle()` - Obsidian handles the styling and X close button
- * - `.{prefix}-whats-new-subtitle` - Subtitle text ("Changes since vX.X.X")
- *
- * ### Support Section
- * - `.{prefix}-whats-new-support` - Support section container
- *   - Contains donation, tools, and YouTube links
- *   - Should have background, padding, border-radius
- * - `.{prefix}-whats-new-support h3` - Support section heading
- * - `.{prefix}-whats-new-support p` - Support section paragraph text (one per row)
- * - `.{prefix}-whats-new-support a` - Links in support section (consistent styling)
- * - `.{prefix}-whats-new-support a:hover` - Link hover state
- *
- * ### Changelog Content
- * - `.{prefix}-whats-new-content` - Changelog content container
- *   - Should have max-height, overflow-y: auto for scrolling
- * - `.{prefix}-whats-new-content h2` - Version headings in changelog
- * - `.{prefix}-whats-new-content h3` - Section headings in changelog
- * - `.{prefix}-whats-new-content ul` - Changelog lists
- * - `.{prefix}-whats-new-content li` - Changelog list items
- * - `.{prefix}-whats-new-content code` - Inline code in changelog
- * - `.{prefix}-whats-new-content pre` - Code blocks in changelog
- * - `.{prefix}-whats-new-content a.external-link` - External links (auto-added)
- * - `.{prefix}-whats-new-empty` - Empty state message
- *
- * ### Sticky Footer
- * - `.{prefix}-whats-new-sticky-footer` - Footer container (should be sticky)
- *   - Has border-top to separate from content
- * - `.{prefix}-whats-new-buttons` - Button container
- * - `.{prefix}-whats-new-buttons button` - Individual buttons
- *
- * ## Example CSS Implementation
- *
- * ```css
- * // Main Container
- * .my-plugin-whats-new-modal .modal {
- *   max-width: 800px;
- *   width: 90%;
- * }
- *
- * // Plugin Name Link (in title)
- * .my-plugin-whats-new-plugin-name {
- *   color: var(--link-color);
- *   text-decoration: none;
- *   transition: all 0.2s ease;
- *   position: relative;
- *   font-weight: 600;
- * }
- *
- * .my-plugin-whats-new-plugin-name:hover {
- *   color: var(--link-color-hover);
- *   text-decoration: none;
- * }
- *
- * .my-plugin-whats-new-plugin-name::after {
- *   content: '';
- *   position: absolute;
- *   bottom: -2px;
- *   left: 0;
- *   width: 0;
- *   height: 2px;
- *   background-color: var(--interactive-accent);
- *   transition: width 0.3s ease;
- * }
- *
- * .my-plugin-whats-new-plugin-name:hover::after {
- *   width: 100%;
- * }
- *
- * // Subtitle
- * .my-plugin-whats-new-subtitle {
- *   color: var(--text-muted);
- *   font-size: 0.9rem;
- *   margin: 0 0 1rem 0;
- * }
- *
- * // Support Section (with donation, tools, and YouTube links)
- * .my-plugin-whats-new-support {
- *   margin: 0 0 1rem 0;
- *   padding: 1rem;
- *   background-color: var(--background-secondary);
- *   border-radius: 8px;
- * }
- *
- * .my-plugin-whats-new-support h3 {
- *   margin-top: 0;
- *   margin-bottom: 0.5rem;
- *   font-size: 1rem;
- * }
- *
- * .my-plugin-whats-new-support p {
- *   margin: 0.5rem 0;
- *   color: var(--text-normal);
- * }
- *
- * .my-plugin-whats-new-support a {
- *   color: var(--link-color);
- *   text-decoration: none;
- *   transition: all 0.2s ease;
- *   position: relative;
- * }
- *
- * .my-plugin-whats-new-support a:hover {
- *   color: var(--link-color-hover);
- *   text-decoration: none;
- * }
- *
- * .my-plugin-whats-new-support a::after {
- *   content: '';
- *   position: absolute;
- *   bottom: -2px;
- *   left: 0;
- *   width: 0;
- *   height: 2px;
- *   background-color: var(--interactive-accent);
- *   transition: width 0.3s ease;
- * }
- *
- * .my-plugin-whats-new-support a:hover::after {
- *   width: 100%;
- * }
- *
- * // Changelog Content (Scrollable Area)
- * .my-plugin-whats-new-content {
- *   max-height: 400px;
- *   overflow-y: auto;
- *   margin-bottom: 1rem;
- *   padding-right: 0.5rem;
- *   border-radius: 8px;
- * }
- *
- * .my-plugin-whats-new-content h2 {
- *   font-size: 1.3rem;
- *   margin-top: 1.5rem;
- *   margin-bottom: 0.5rem;
- *   color: var(--text-accent);
- * }
- *
- * .my-plugin-whats-new-content h3 {
- *   font-size: 1.1rem;
- *   margin-top: 1rem;
- *   margin-bottom: 0.5rem;
- * }
- *
- * .my-plugin-whats-new-content ul {
- *   padding-left: 1.5rem;
- * }
- *
- * .my-plugin-whats-new-content li {
- *   margin-bottom: 0.5rem;
- *   line-height: 1.6;
- * }
- *
- * .my-plugin-whats-new-content code {
- *   background: var(--code-background);
- *   padding: 0.2em 0.4em;
- *   border-radius: 3px;
- *   font-size: 0.9em;
- * }
- *
- * .my-plugin-whats-new-content pre {
- *   background: var(--code-background);
- *   padding: 1rem;
- *   border-radius: 6px;
- *   overflow-x: auto;
- * }
- *
- * .my-plugin-whats-new-content a.external-link {
- *   color: var(--link-external-color);
- * }
- *
- * .my-plugin-whats-new-content a.external-link::after {
- *   content: "↗";
- *   margin-left: 0.2em;
- *   font-size: 0.8em;
- * }
- *
- * .my-plugin-whats-new-empty {
- *   text-align: center;
- *   color: var(--text-muted);
- *   padding: 2rem;
- *   font-style: italic;
- * }
- *
- * // Sticky Footer
- * .my-plugin-whats-new-sticky-footer {
- *   position: sticky;
- *   bottom: 0;
- *   background: var(--background-primary);
- *   padding-top: 0.75rem;
- *   margin-top: 0;
- *   z-index: 10;
- *   border-top: 1px solid var(--background-modifier-border);
- * }
- *
- * .my-plugin-whats-new-buttons {
- *   display: flex;
- *   gap: 0.5rem;
- *   justify-content: space-between;
- *   flex-wrap: wrap;
- *   padding-bottom: 0.5rem;
- *   width: 100%;
- * }
- *
- * .my-plugin-whats-new-buttons button {
- *   flex: 1;
- *   min-width: 0;
- *   padding: 0.5rem 1rem;
- *   border-radius: 4px;
- *   cursor: pointer;
- *   border: 1px solid var(--background-modifier-border);
- *   background: var(--interactive-normal);
- *   color: var(--text-normal);
- *   transition: all 0.2s ease;
- *   text-align: center;
- * }
- *
- * .my-plugin-whats-new-buttons button:hover {
- *   background: var(--interactive-hover);
- *   border-color: var(--interactive-accent);
- *   transform: translateY(-1px);
- *   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
- * }
- *
- * .my-plugin-whats-new-buttons button:active {
- *   transform: translateY(0);
- *   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
- * }
- * ```
- *
- * @example
- * ```typescript
- * showWhatsNewModal(app, plugin, {
- *   cssPrefix: "my-plugin",
- *   pluginName: "My Plugin",
- *   changelogContent: rawChangelog,
- *   links: {
- *     support: "https://...",
- *     changelog: "https://...",
- *     documentation: "https://..."
- *   }
- * }, "1.0.0", "2.0.0");
- * ```
+ * Styles are injected automatically via `injectWhatsNewStyles`.
  */
 export function showWhatsNewModal(
 	app: App,
@@ -401,6 +151,7 @@ export function showWhatsNewModal(
 		cls: cls("whats-new-modal"),
 		title: " ",
 		render: async (contentEl, ctx) => {
+			const isFullChangelog = fromVersion === "0.0.0";
 			const titleEl = ctx.type === "modal" ? ctx.modalEl.querySelector<HTMLElement>(".modal-title") : null;
 			if (titleEl) {
 				titleEl.empty();
@@ -417,37 +168,51 @@ export function showWhatsNewModal(
 				});
 
 				titleEl.createSpan({
-					text: ` updated to v${toVersion}`,
+					text: isFullChangelog ? " Changelog" : ` updated to v${toVersion}`,
 				});
 			}
 
-			contentEl.createEl("p", {
-				text: `Changes since v${fromVersion}`,
-				cls: cls("whats-new-subtitle"),
-			});
+			if (!isFullChangelog) {
+				contentEl.createEl("p", {
+					text: `Changes since v${fromVersion}`,
+					cls: cls("whats-new-subtitle"),
+				});
+			}
 
 			const supportSection = contentEl.createDiv({
 				cls: cls("whats-new-support"),
 			});
 
+			const headingText = config.supportSection
+				? config.supportSection.heading
+				: "Support the development of this plugin";
+
+			const supportHeader = supportSection.createDiv({ cls: cls("whats-new-support-header") });
+			supportHeader.createEl("h3", { text: headingText });
+			const chevron = supportHeader.createSpan({ cls: cls("whats-new-support-chevron"), text: "▼" });
+
+			const supportBody = supportSection.createDiv({ cls: cls("whats-new-support-body") });
+
+			supportHeader.addEventListener("click", () => {
+				const collapsed = supportBody.classList.toggle(cls("whats-new-support-collapsed"));
+				chevron.textContent = collapsed ? "▶" : "▼";
+			});
+
 			if (config.supportSection) {
-				const { heading, description, cta } = config.supportSection;
-				supportSection.createEl("h3", { text: heading });
-				supportSection.createEl("p", { text: description });
+				const { description, cta } = config.supportSection;
+				supportBody.createEl("p", { text: description });
 				if (cta) {
-					const ctaText = supportSection.createEl("p");
+					const ctaText = supportBody.createEl("p");
 					ctaText.createSpan({ text: "👉 " });
 					ctaText.createEl("a", { text: cta.text, href: cta.href });
 				}
 			} else {
-				supportSection.createEl("h3", { text: "Support the development of this plugin" });
-
-				const introText = supportSection.createEl("p");
+				const introText = supportBody.createEl("p");
 				introText.setText(
 					"If this plugin saves you time or improves how you work in Obsidian, consider supporting its development. Your support helps fund ongoing maintenance, new features, and long-term stability."
 				);
 
-				const supportLinkText = supportSection.createEl("p");
+				const supportLinkText = supportBody.createEl("p");
 				supportLinkText.createSpan({ text: "👉 " });
 				supportLinkText.createEl("a", {
 					text: "Support my work",
@@ -455,7 +220,7 @@ export function showWhatsNewModal(
 				});
 			}
 
-			const exploreText = supportSection.createEl("p");
+			const exploreText = supportBody.createEl("p");
 			exploreText.createSpan({ text: "You can also explore my " });
 			exploreText.createEl("a", {
 				text: "other Obsidian plugins and productivity tools",
@@ -482,12 +247,57 @@ export function showWhatsNewModal(
 					cls: cls("whats-new-content"),
 				});
 
-				const markdownContent = formatChangelogSections(changelogSections);
+				let renderedCount = 0;
+				let loadMoreBtn: HTMLButtonElement | null = null;
+				let isRendering = false;
 
-				// eslint-disable-next-line obsidianmd/no-plugin-as-component -- short-lived modal, cleaned up on close
-				await MarkdownRenderer.render(app, markdownContent, changelogContainer, "/", plugin);
+				const countLines = (content: string): number =>
+					content.split("\n").filter((line) => line.trim().length > 0).length;
 
-				makeExternalLinksClickable(changelogContainer, config.links.documentation);
+				const renderNextBatch = async (): Promise<void> => {
+					if (isRendering) return;
+					isRendering = true;
+
+					let linesAccum = 0;
+					let end = renderedCount;
+					while (end < changelogSections.length) {
+						const sectionLines = countLines(changelogSections[end].content);
+						if (linesAccum > 0 && linesAccum + sectionLines > LINES_PER_PAGE) break;
+						linesAccum += sectionLines;
+						end++;
+					}
+					if (end === renderedCount && end < changelogSections.length) end++;
+
+					const batch = changelogSections.slice(renderedCount, end);
+					const batchMarkdown = formatChangelogSections(batch);
+
+					const batchContainer = changelogContainer.createDiv();
+					// eslint-disable-next-line obsidianmd/no-plugin-as-component -- short-lived modal, cleaned up on close
+					await MarkdownRenderer.render(app, batchMarkdown, batchContainer, "/", plugin);
+					makeExternalLinksClickable(batchContainer, config.links.documentation);
+
+					renderedCount = end;
+
+					const remaining = changelogSections.length - renderedCount;
+					if (remaining > 0) {
+						if (!loadMoreBtn) {
+							loadMoreBtn = changelogContainer.createEl("button", {
+								cls: cls("whats-new-load-more"),
+							});
+							loadMoreBtn.addEventListener("click", () => void renderNextBatch());
+						} else {
+							changelogContainer.appendChild(loadMoreBtn);
+						}
+						loadMoreBtn.textContent = `Load more (${remaining} versions remaining)`;
+					} else if (loadMoreBtn) {
+						loadMoreBtn.remove();
+						loadMoreBtn = null;
+					}
+
+					isRendering = false;
+				};
+
+				await renderNextBatch();
 			}
 
 			const stickyFooter = contentEl.createDiv({

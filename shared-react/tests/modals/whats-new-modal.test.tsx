@@ -100,10 +100,10 @@ describe("WhatsNewContent", () => {
 	it("renders all footer buttons", () => {
 		const config = makeConfig({
 			links: {
-				support: "#",
-				changelog: "#",
-				documentation: "#",
-				github: "#",
+				support: "https://example.com/support",
+				changelog: "https://example.com/changelog",
+				documentation: "https://example.com/docs",
+				github: "https://example.com/github",
 				productPage: "https://example.com/product",
 			},
 		});
