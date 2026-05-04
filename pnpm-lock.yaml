@@ -14,6 +14,9 @@ importers:
       '@real1ty-obsidian-plugins':
         specifier: file:./shared
         version: link:shared
+      '@real1ty-obsidian-plugins-react':
+        specifier: file:./shared-react
+        version: link:shared-react
       '@svgdotjs/svg.js':
         specifier: ^3.2.4
         version: 3.2.5

@@ -1,11 +1,5 @@
-import {
-	activateView,
-	buildUtmUrl,
-	type LeafPlacement,
-	SettingsStore,
-	showWhatsNewModal,
-	type WhatsNewModalConfig,
-} from "@real1ty-obsidian-plugins";
+import { activateView, buildUtmUrl, type LeafPlacement, SettingsStore } from "@real1ty-obsidian-plugins";
+import { showWhatsNewReactModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins-react";
 import { Notice, Plugin, TFile } from "obsidian";
 
 import CHANGELOG_CONTENT from "../../docs-site/docs/changelog.md";
@@ -352,10 +346,10 @@ export default class NexusPropertiesPlugin extends Plugin {
 						"whats_new",
 						"documentation"
 					),
-				} as WhatsNewModalConfig["links"] & { github: string },
+				},
 			};
 
-			showWhatsNewModal(this.app, this, config, lastSeenVersion, currentVersion);
+			showWhatsNewReactModal(this.app, this, config, lastSeenVersion, currentVersion);
 			await this.settingsStore.updateSettings((settings) => ({
 				...settings,
 				version: currentVersion,
