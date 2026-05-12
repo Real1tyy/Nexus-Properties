@@ -39,6 +39,10 @@ export { MountImperative } from "./components/mount-imperative";
 export { ObsidianIcon } from "./components/obsidian-icon";
 export type { ChartJSCtor, ChartTitleProps, PieCanvasProps, PieChartData, PieChartProps } from "./components/pie-chart";
 export { ChartTitle, PieCanvas, PieChart } from "./components/pie-chart";
+export type { PropertyItemProps } from "./components/property-item";
+export { PropertyItem } from "./components/property-item";
+export type { PropertyValueProps } from "./components/property-value";
+export { PropertyValue } from "./components/property-value";
 export { SecretField } from "./components/secret-field";
 export {
 	ColorInput,
@@ -107,9 +111,25 @@ export type {
 	ContextMenuItemDef,
 	ContextMenuProps,
 	ContextMenuSeparatorDef,
+	ContextMenuState,
 	ContextMenuSubmenuDef,
+	CustomizableContextMenuConfig,
+	CustomizableContextMenuHandle,
+	CustomizableContextMenuItem,
+	CustomizableMenuSnapshot,
+	CustomizableMenuStoreOptions,
+	ItemManagerContentProps,
+	OpenItemManagerOptions,
 } from "./menus";
-export { ContextMenu } from "./menus";
+export {
+	ContextMenu,
+	ContextMenuStateSchema,
+	createCustomizableContextMenu,
+	CustomizableMenuStore,
+	ItemManagerContent,
+	openItemManagerModal,
+	registerCustomizableContextMenuCommand,
+} from "./menus";
 
 // ─── Modals ───
 export type { ConfirmationModalProps, ConfirmationResult, OpenConfirmationOptions } from "./modals/confirmation-modal";
