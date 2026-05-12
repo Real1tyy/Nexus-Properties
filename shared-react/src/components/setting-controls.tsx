@@ -1,14 +1,15 @@
-import { injectStyleSheet } from "@real1ty-obsidian-plugins";
 import { SliderComponent } from "obsidian";
 import { memo, useCallback, useEffect, useRef } from "react";
 
 import { useActivatable } from "../hooks/use-activatable";
 import { useDebouncedCommit } from "../hooks/use-debounced-commit";
+import { useInjectedStyles } from "../hooks/use-injected-styles";
+import { testIdAttr } from "../utils/test-id";
 
 interface ToggleProps {
 	value: boolean;
 	onChange: (value: boolean) => void;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const Toggle = memo(function Toggle({ value, onChange, testId }: ToggleProps) {
@@ -21,7 +22,7 @@ export const Toggle = memo(function Toggle({ value, onChange, testId }: TogglePr
 			className={`checkbox-container${value ? " is-enabled" : ""}`}
 			role="switch"
 			aria-checked={value}
-			{...(testId ? { "data-testid": testId } : {})}
+			{...testIdAttr(testId)}
 		/>
 	);
 });
@@ -32,7 +33,7 @@ interface TextInputProps {
 	onChange: (value: string) => void;
 	/** Override the default 300ms commit delay. Pass `0` to commit synchronously. */
 	debounceMs?: number;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const TextInput = memo(function TextInput({ value, placeholder, onChange, debounceMs, testId }: TextInputProps) {
@@ -52,7 +53,7 @@ export const TextInput = memo(function TextInput({ value, placeholder, onChange,
 			onKeyDown={(e) => {
 				if (e.key === "Enter") flush();
 			}}
-			{...(testId ? { "data-testid": testId } : {})}
+			{...testIdAttr(testId)}
 		/>
 	);
 });
@@ -61,17 +62,12 @@ interface DropdownProps {
 	value: string;
 	options: Record<string, string>;
 	onChange: (value: string) => void;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const Dropdown = memo(function Dropdown({ value, options, onChange, testId }: DropdownProps) {
 	return (
-		<select
-			className="dropdown"
-			value={value}
-			onChange={(e) => onChange(e.target.value)}
-			{...(testId ? { "data-testid": testId } : {})}
-		>
+		<select className="dropdown" value={value} onChange={(e) => onChange(e.target.value)} {...testIdAttr(testId)}>
 			{Object.entries(options).map(([optValue, label]) => (
 				<option key={optValue} value={optValue}>
 					{label}
@@ -89,7 +85,7 @@ interface NumberInputProps {
 	onChange: (value: number) => void;
 	/** Override the default 300ms commit delay. Pass `0` to commit synchronously. */
 	debounceMs?: number;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const NumberInput = memo(function NumberInput({
@@ -123,7 +119,7 @@ export const NumberInput = memo(function NumberInput({
 			onKeyDown={(e) => {
 				if (e.key === "Enter") flush();
 			}}
-			{...(testId ? { "data-testid": testId } : {})}
+			{...testIdAttr(testId)}
 		/>
 	);
 });
@@ -135,7 +131,7 @@ interface TextareaInputProps {
 	onChange: (value: string) => void;
 	/** Override the default 300ms commit delay. Pass `0` to commit synchronously. */
 	debounceMs?: number;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const TextareaInput = memo(function TextareaInput({
@@ -163,7 +159,7 @@ export const TextareaInput = memo(function TextareaInput({
 				// Multiline: only Ctrl/Cmd+Enter flushes; plain Enter inserts a newline.
 				if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) flush();
 			}}
-			{...(testId ? { "data-testid": testId } : {})}
+			{...testIdAttr(testId)}
 		/>
 	);
 });
@@ -171,7 +167,7 @@ export const TextareaInput = memo(function TextareaInput({
 interface DateInputProps {
 	value: string;
 	onChange: (value: string) => void;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const DateInput = memo(function DateInput({ value, onChange, testId }: DateInputProps) {
@@ -181,7 +177,7 @@ export const DateInput = memo(function DateInput({ value, onChange, testId }: Da
 			className="setting-input"
 			value={value}
 			onChange={(e) => onChange(e.target.value)}
-			{...(testId ? { "data-testid": testId } : {})}
+			{...testIdAttr(testId)}
 		/>
 	);
 });
@@ -189,7 +185,7 @@ export const DateInput = memo(function DateInput({ value, onChange, testId }: Da
 interface DatetimeLocalInputProps {
 	value: string;
 	onChange: (value: string) => void;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const DatetimeLocalInput = memo(function DatetimeLocalInput({
@@ -203,7 +199,7 @@ export const DatetimeLocalInput = memo(function DatetimeLocalInput({
 			className="setting-input"
 			value={value}
 			onChange={(e) => onChange(e.target.value)}
-			{...(testId ? { "data-testid": testId } : {})}
+			{...testIdAttr(testId)}
 		/>
 	);
 });
@@ -211,17 +207,42 @@ export const DatetimeLocalInput = memo(function DatetimeLocalInput({
 interface ColorInputProps {
 	value: string;
 	onChange: (value: string) => void;
-	testId?: string;
+	/** Override the default 300ms commit delay. Pass `0` to commit synchronously. */
+	debounceMs?: number;
+	testId?: string | undefined;
 }
 
-export const ColorInput = memo(function ColorInput({ value, onChange, testId }: ColorInputProps) {
+export const ColorInput = memo(function ColorInput({ value, onChange, debounceMs, testId }: ColorInputProps) {
+	const inputRef = useRef<HTMLInputElement>(null);
+	const { draft, setDraft, flush } = useDebouncedCommit<string>({
+		value: value || "#000000",
+		onCommit: onChange,
+		...(debounceMs !== undefined ? { debounceMs } : {}),
+	});
+	const flushRef = useRef(flush);
+	flushRef.current = flush;
+
+	// Native `change` fires when the picker is dismissed; React's `onChange` is
+	// wired to `input` and fires continuously while the user drags through the
+	// palette. Flushing on `change` commits the final pick immediately instead
+	// of waiting for the debounce timer.
+	useEffect(() => {
+		const el = inputRef.current;
+		if (!el) return;
+		const onNativeChange = () => flushRef.current();
+		el.addEventListener("change", onNativeChange);
+		return () => el.removeEventListener("change", onNativeChange);
+	}, []);
+
 	return (
 		<input
+			ref={inputRef}
 			type="color"
 			className="setting-input setting-input--color"
-			value={value || "#000000"}
-			onChange={(e) => onChange(e.target.value)}
-			{...(testId ? { "data-testid": testId } : {})}
+			value={draft}
+			onChange={(e) => setDraft(e.target.value)}
+			onBlur={flush}
+			{...testIdAttr(testId)}
 		/>
 	);
 });
@@ -234,11 +255,11 @@ interface SliderProps {
 	onChange: (value: number) => void;
 	/** Override the default 300ms commit delay. Pass `0` to commit synchronously. */
 	debounceMs?: number;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export const Slider = memo(function Slider({ value, min, max, step, onChange, debounceMs, testId }: SliderProps) {
-	injectStyleSheet("setting-slider-host-styles", ".setting-slider-host { display: contents; }");
+	useInjectedStyles("setting-slider-host-styles", ".setting-slider-host { display: contents; }");
 	const hostRef = useRef<HTMLSpanElement>(null);
 	const componentRef = useRef<SliderComponent | null>(null);
 	const { draft, setDraft, flush } = useDebouncedCommit<number>({
@@ -281,5 +302,5 @@ export const Slider = memo(function Slider({ value, min, max, step, onChange, de
 		componentRef.current?.setValue(draft);
 	}, [draft]);
 
-	return <span ref={hostRef} className="setting-slider-host" {...(testId ? { "data-testid": testId } : {})} />;
+	return <span ref={hostRef} className="setting-slider-host" {...testIdAttr(testId)} />;
 });

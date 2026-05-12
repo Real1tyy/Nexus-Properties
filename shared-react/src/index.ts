@@ -15,12 +15,27 @@ export type { FilterInputProps } from "./components/filter-input";
 export { FilterInput, useFilteredItems } from "./components/filter-input";
 export type { IconPickerButtonProps } from "./components/icon-picker-button";
 export { IconPickerButton, useIconPicker } from "./components/icon-picker-button";
+export type { IconPickerGridProps } from "./components/icon-picker-grid";
+export { IconPickerGrid } from "./components/icon-picker-grid";
 export { LicenseSection } from "./components/license-section";
-export type { EditableItem as ManagerEditableItem, ManagerEditFormProps } from "./components/manager-edit-form";
+export type {
+	EditableItem as ManagerEditableItem,
+	ManagerEditActions,
+	ManagerEditController,
+	ManagerEditFormProps,
+	ManagerEditOverrides,
+	ManagerEditValues,
+} from "./components/manager-edit-form";
 export { ManagerEditForm } from "./components/manager-edit-form";
 export type { ManagerRowAction, ManagerRowProps } from "./components/manager-row";
 export type { EditableItem } from "./components/manager-row";
 export { ManagerRow } from "./components/manager-row";
+export type { ModalDescriptionProps } from "./components/modal-description";
+export { ModalDescription } from "./components/modal-description";
+export type { ModalFormProps, ModalSchemaFormProps } from "./components/modal-form";
+export { ModalForm, ModalSchemaForm } from "./components/modal-form";
+export type { MountImperativeProps } from "./components/mount-imperative";
+export { MountImperative } from "./components/mount-imperative";
 export { ObsidianIcon } from "./components/obsidian-icon";
 export type { ChartJSCtor, ChartTitleProps, PieCanvasProps, PieChartData, PieChartProps } from "./components/pie-chart";
 export { ChartTitle, PieCanvas, PieChart } from "./components/pie-chart";
@@ -42,6 +57,22 @@ export { Textarea } from "./components/textarea";
 
 // ─── Contexts ───
 export { AppContext, useApp } from "./contexts/app-context";
+export type { ScopedTheme, SharedReactTheme, SharedReactThemeProviderProps } from "./contexts/theme-context";
+export {
+	SharedReactThemeProvider,
+	useCls,
+	useCssPrefix,
+	useResolvedCssPrefix,
+	useResolvedTestIdPrefix,
+	useScoped,
+	useScopedCls,
+	useScopedTid,
+	useTestId,
+	useTestIdPrefix,
+	useTheme,
+} from "./contexts/theme-context";
+export type { ThemedProps, ThemeOverrideProps } from "./contexts/with-theme";
+export { useThemed, withTheme } from "./contexts/with-theme";
 
 // ─── Forms ───
 export * from "./forms";
@@ -60,10 +91,12 @@ export type { SnapshotSubscribable } from "./hooks/use-external-snapshot";
 export { useExternalSnapshot } from "./hooks/use-external-snapshot";
 export { useInjectedStyles } from "./hooks/use-injected-styles";
 export { useKeyDown } from "./hooks/use-key-down";
+export { useObservable } from "./hooks/use-observable";
 export type { Emitterlike } from "./hooks/use-obsidian-event";
 export { useObsidianEvent } from "./hooks/use-obsidian-event";
 export type { SchemaFieldBinding, SettingsStorelike } from "./hooks/use-schema-field";
 export { useSchemaField } from "./hooks/use-schema-field";
+export { useScrollRestore } from "./hooks/use-scroll-restore";
 export type { SettingsStorelike as SettingsStoreShape, SettingsUpdater } from "./hooks/use-settings-store";
 export { useSettingsStore } from "./hooks/use-settings-store";
 
@@ -79,7 +112,7 @@ export type {
 export { ContextMenu } from "./menus";
 
 // ─── Modals ───
-export type { ConfirmationModalProps, OpenConfirmationOptions } from "./modals/confirmation-modal";
+export type { ConfirmationModalProps, ConfirmationResult, OpenConfirmationOptions } from "./modals/confirmation-modal";
 export { ConfirmationModalContent, openConfirmation } from "./modals/confirmation-modal";
 export type {
 	FrontmatterPropagationModalProps,
@@ -89,9 +122,11 @@ export {
 	FrontmatterPropagationModalContent,
 	openFrontmatterPropagationModal,
 } from "./modals/frontmatter-propagation-modal";
+export type { ShowReactIconPickerOptions } from "./modals/icon-picker-modal";
+export { showReactIconPicker } from "./modals/icon-picker-modal";
 export type { ProgressModalConfig, ProgressModalHandle } from "./modals/progress-modal";
 export { openProgressModal } from "./modals/progress-modal";
-export type { OpenRenameOptions, RenameModalProps } from "./modals/rename-modal";
+export type { OpenRenameOptions, RenameModalProps, RenameModalResult } from "./modals/rename-modal";
 export { openRenameModal, RenameModalContent } from "./modals/rename-modal";
 export type { WhatsNewModalConfig } from "./modals/whats-new-modal";
 export { DEFAULT_WHATS_NEW_LINKS, showWhatsNewReactModal } from "./modals/whats-new-modal";
@@ -99,7 +134,26 @@ export { DEFAULT_WHATS_NEW_LINKS, showWhatsNewReactModal } from "./modals/whats-
 // ─── Onboarding ───
 export * from "./onboarding";
 
+// ─── Page Header (leaf toolbar manager) ───
+export type {
+	HeaderActionDefinition,
+	PageHeaderConfig,
+	PageHeaderHandle,
+	PageHeaderMode,
+	PageHeaderSnapshot,
+	PageHeaderState,
+} from "./page-header";
+export {
+	createPageHeader,
+	openPageHeaderActionManager,
+	PageHeaderActionBar,
+	PageHeaderStateSchema,
+	PageHeaderStore,
+	registerPageHeaderCommands,
+} from "./page-header";
+
 // ─── Mount bridges ───
+export type { RenderReactInlineOptions } from "./react-inline";
 export { renderReactInline } from "./react-inline";
 export type { ReactViewConfig, ReactViewHandle } from "./react-view";
 export { registerReactView } from "./react-view";
@@ -120,8 +174,19 @@ export type {
 	PageHeaderProps,
 } from "./views/page-header";
 export { ActionBar, BackButton, PageHeader } from "./views/page-header";
-export type { ReactTabDefinition, TabbedContainerProps } from "./views/tabbed-container";
-export { TabbedContainer } from "./views/tabbed-container";
+export type { TabCommandUpdater } from "./views/tabbed-container";
+export {
+	type GroupTabDefinition,
+	isGroupTab,
+	registerTabCommands,
+	TabbedContainer,
+	type TabbedContainerHandle,
+	type TabbedContainerProps,
+	type TabbedContainerState,
+	TabbedContainerStateSchema,
+	type TabDefinition,
+	type TabEntry,
+} from "./views/tabbed-container";
 
 // ─── Virtual ───
 export * from "./virtual";

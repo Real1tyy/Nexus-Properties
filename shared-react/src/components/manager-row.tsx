@@ -1,39 +1,11 @@
 import type { ReactNode } from "react";
 import { memo, useCallback } from "react";
 
+import { useScoped } from "../contexts/theme-context";
 import { useInjectedStyles } from "../hooks/use-injected-styles";
+import { cx } from "../utils/cx";
+import { buildManagerRowStyles } from "./manager-row.styles";
 import { ObsidianIcon } from "./obsidian-icon";
-
-function buildManagerRowStyles(p: string, rp: string): string {
-	return `
-.${p}${rp}-row {
-	display: flex; align-items: center; gap: 6px; padding: 8px 10px;
-	background: var(--background-secondary); border: 1px solid var(--background-modifier-border);
-	border-radius: 8px; transition: opacity 150ms ease, border-color 150ms ease, background 150ms ease;
-	flex-wrap: wrap;
-}
-.${p}${rp}-row[draggable="true"] { cursor: grab; }
-.${p}${rp}-row-hidden { opacity: 0.5; }
-.${p}${rp}-label { flex: 1; display: flex; align-items: center; gap: 8px; min-width: 0; }
-.${p}${rp}-icon { display: flex; align-items: center; flex-shrink: 0; }
-.${p}${rp}-icon svg { width: 16px; height: 16px; }
-.${p}${rp}-label-text {
-	font-size: var(--font-ui-medium); font-weight: 500; color: var(--text-normal);
-	overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-}
-.${p}${rp}-label-original { font-size: 0.7em; color: var(--text-faint); font-style: italic; white-space: nowrap; }
-.${p}${rp}-controls { display: flex; gap: 4px; flex-shrink: 0; }
-.${p}${rp}-btn {
-	display: flex; align-items: center; justify-content: center; width: 28px; height: 28px;
-	background: none; border: 1px solid transparent; border-radius: 6px;
-	color: var(--text-faint); cursor: pointer; padding: 0; box-shadow: none;
-	transition: color 120ms ease, border-color 120ms ease;
-}
-.${p}${rp}-btn:hover:not([disabled]) { color: var(--text-normal); border-color: var(--background-modifier-border); }
-.${p}${rp}-btn[disabled] { opacity: 0.3; cursor: not-allowed; }
-.${p}${rp}-btn svg { width: 14px; height: 14px; }
-`;
-}
 
 export interface EditableItem {
 	id: string;
@@ -47,7 +19,7 @@ export interface ManagerRowAction {
 	onClick: () => void;
 	label: string;
 	disabled?: boolean;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 export interface ManagerRowProps {
@@ -63,8 +35,11 @@ export interface ManagerRowProps {
 	displayIcon?: string;
 	displayColor?: string;
 	hasRename?: boolean;
-	cssPrefix?: string | undefined;
-	testIdPrefix?: string;
+	/**
+	 * Sub-namespace for class names and testids — `"manager"` produces
+	 * `prisma-manager-row`. Override per-instance (the tab manager uses
+	 * `"tab-manager"`); defaults to `"manager"`.
+	 */
 	rowPrefix?: string;
 	children?: ReactNode;
 }
@@ -82,11 +57,10 @@ export const ManagerRow = memo(function ManagerRow({
 	displayIcon,
 	displayColor,
 	hasRename = false,
-	cssPrefix = "",
-	testIdPrefix,
 	rowPrefix = "manager",
 	children,
 }: ManagerRowProps) {
+	const { cls, tid, cssPrefix } = useScoped(rowPrefix);
 	useInjectedStyles(`${cssPrefix}${rowPrefix}-row-styles`, buildManagerRowStyles(cssPrefix, rowPrefix));
 	const label = displayLabel ?? item.label;
 	const icon = displayIcon ?? item.icon;
@@ -96,29 +70,26 @@ export const ManagerRow = memo(function ManagerRow({
 	const handleToggle = useCallback(() => onToggleVisibility?.(), [onToggleVisibility]);
 
 	return (
-		<div
-			className={`${cssPrefix}${rowPrefix}-row${!isVisible ? ` ${cssPrefix}${rowPrefix}-row-hidden` : ""}`}
-			data-testid={testIdPrefix ? `${testIdPrefix}${rowPrefix}-row-${item.id}` : undefined}
-		>
+		<div className={cx(cls("row"), !isVisible && cls("row-hidden"))} data-testid={tid("row", item.id)}>
 			{chip}
-			<div className={`${cssPrefix}${rowPrefix}-label`}>
-				<span className={`${cssPrefix}${rowPrefix}-icon`} style={color && color !== "#000000" ? { color } : undefined}>
+			<div className={cls("label")}>
+				<span className={cls("icon")} style={color && color !== "#000000" ? { color } : undefined}>
 					<ObsidianIcon icon={icon} />
 				</span>
-				<span className={`${cssPrefix}${rowPrefix}-label-text`}>{label}</span>
+				<span className={cls("label-text")}>{label}</span>
 				{hasRename && (
-					<span className={`${cssPrefix}${rowPrefix}-label-original`} title="Original name">
+					<span className={cls("label-original")} title="Original name">
 						{item.label}
 					</span>
 				)}
 			</div>
 
-			<div className={`${cssPrefix}${rowPrefix}-controls`}>
+			<div className={cls("controls")}>
 				{actions?.map((action) => (
 					<button
 						key={action.label}
 						type="button"
-						className={`${cssPrefix}${rowPrefix}-btn`}
+						className={cls("btn")}
 						onClick={action.onClick}
 						disabled={action.disabled}
 						title={action.label}
@@ -131,10 +102,10 @@ export const ManagerRow = memo(function ManagerRow({
 				{onEdit && (
 					<button
 						type="button"
-						className={`${cssPrefix}${rowPrefix}-btn`}
+						className={cls("btn")}
 						onClick={handleEdit}
 						title={isExpanded ? "Collapse" : "Edit"}
-						data-testid={testIdPrefix ? `${testIdPrefix}${rowPrefix}-edit-${item.id}` : undefined}
+						data-testid={tid("edit", item.id)}
 					>
 						<ObsidianIcon icon={isExpanded ? "chevron-up" : "pencil"} />
 					</button>
@@ -143,11 +114,11 @@ export const ManagerRow = memo(function ManagerRow({
 				{onToggleVisibility && (
 					<button
 						type="button"
-						className={`${cssPrefix}${rowPrefix}-btn`}
+						className={cls("btn")}
 						onClick={handleToggle}
 						disabled={isVisible && visibleCount <= 1}
 						title={isVisible ? "Hide" : "Show"}
-						data-testid={testIdPrefix ? `${testIdPrefix}${rowPrefix}-toggle-${item.id}` : undefined}
+						data-testid={tid("toggle", item.id)}
 					>
 						<ObsidianIcon icon={isVisible ? "eye" : "eye-off"} />
 					</button>

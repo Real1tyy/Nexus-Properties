@@ -1,11 +1,13 @@
 import { memo, useCallback, useMemo, useState } from "react";
 
+import { testIdAttr } from "../utils/test-id";
+
 export interface CsvInputProps {
 	value: string[] | number[] | null | undefined;
 	itemType: "string" | "number";
 	placeholder?: string | undefined;
 	onChange: (next: string[] | number[]) => void;
-	testId?: string;
+	testId?: string | undefined;
 }
 
 /**
@@ -58,7 +60,7 @@ export const CsvInput = memo(function CsvInput({ value, itemType, placeholder, o
 					commit(draft);
 				}
 			}}
-			{...(testId ? { "data-testid": testId } : {})}
+			{...testIdAttr(testId)}
 		/>
 	);
 });

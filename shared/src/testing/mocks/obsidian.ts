@@ -124,6 +124,9 @@ export class Setting {
 	addToggle = vi.fn().mockReturnThis();
 	addDropdown = vi.fn().mockReturnThis();
 	addButton = vi.fn().mockReturnThis();
+	addColorPicker = vi.fn().mockReturnThis();
+	addExtraButton = vi.fn().mockReturnThis();
+	addSlider = vi.fn().mockReturnThis();
 	addComponent = vi.fn().mockReturnThis();
 	setClass = vi.fn().mockReturnThis();
 	setDisabled = vi.fn().mockReturnThis();
@@ -190,16 +193,31 @@ export class Modal {
 	containerEl: HTMLElement;
 	titleEl: HTMLElement;
 	contentEl: HTMLElement;
+	modalEl: HTMLElement;
+	scope: { register: ReturnType<typeof vi.fn> };
 
 	constructor(app: unknown) {
 		this.app = app;
 		this.containerEl = document.createElement("div");
 		this.titleEl = document.createElement("div");
 		this.contentEl = document.createElement("div");
+		this.modalEl = document.createElement("div");
+		this.scope = { register: vi.fn() };
 	}
 
-	open = vi.fn();
+	open(): void {
+		const self = this as Modal & { onOpen?: () => void | Promise<void> };
+		const { onOpen } = self;
+		if (onOpen) {
+			void Promise.resolve(onOpen.call(self));
+		}
+	}
+
 	close = vi.fn();
+
+	setTitle(title: string): void {
+		this.titleEl.textContent = title;
+	}
 }
 
 // Menu mock
@@ -347,6 +365,11 @@ export function debounce<T extends (...args: unknown[]) => unknown>(func: T, wai
 
 // setIcon mock
 export function setIcon(_el: HTMLElement, _iconId: string): void {}
+
+// getIconIds mock
+export function getIconIds(): string[] {
+	return ["check", "circle", "star", "calendar", "edit", "trash", "settings"];
+}
 
 // normalizePath mock - simple path normalization for tests
 export function normalizePath(path: string): string {

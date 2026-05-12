@@ -1,54 +1,27 @@
-import type { LicenseManager, LicenseStatus } from "@real1ty-obsidian-plugins";
+import { getLicenseStatusText, type LicenseManager, type LicenseStatus } from "@real1ty-obsidian-plugins";
 import { memo, type ReactNode, useCallback, useState } from "react";
 
+import { useCssPrefix, useScopedCls } from "../contexts/theme-context";
 import { useExternalSnapshot } from "../hooks/use-external-snapshot";
 import { useInjectedStyles } from "../hooks/use-injected-styles";
+import { buildLicenseStyles } from "./license-section.styles";
 import { SecretField } from "./secret-field";
-
-function buildLicenseStyles(p: string): string {
-	return `
-.${p}license-activations-badge {
-	display: inline-block; margin-left: 8px; padding: 2px 8px; font-size: 0.8em;
-	border-radius: 10px; background: var(--background-modifier-hover); color: var(--text-muted);
-}
-`;
-}
 import { SettingHeading, SettingItem } from "./setting-item";
 
 interface LicenseSectionProps {
 	licenseManager: LicenseManager;
 	currentSecretName: string;
 	onSecretChange: (value: string) => Promise<void>;
-	cssPrefix: string;
 	accountUrl?: string;
 }
 
-function formatStatusText(status: LicenseStatus): string {
-	if (status.state === "none") return "No license key configured";
-	if (status.state === "valid") {
-		if (status.expiresAt) {
-			const expiryDate = new Date(status.expiresAt).toLocaleDateString(undefined, {
-				year: "numeric",
-				month: "long",
-				day: "numeric",
-			});
-			return `License active — valid offline until ${expiryDate}`;
-		}
-		return "License active";
-	}
-	if (status.state === "expired") return "License expired. Click Verify to refresh.";
-	if (status.state === "invalid") return status.errorMessage ?? "Invalid license key.";
-	if (status.state === "device_limit") return status.errorMessage ?? "Device limit reached.";
-	if (status.state === "error") return status.errorMessage ?? "Could not verify license.";
-	return "";
-}
-
-function StatusDescription({ status, cssPrefix }: { status: LicenseStatus; cssPrefix: string }): ReactNode {
+function StatusDescription({ status }: { status: LicenseStatus }): ReactNode {
+	const cls = useScopedCls("license");
 	return (
 		<>
-			{formatStatusText(status)}
+			{getLicenseStatusText(status)}
 			{status.state === "valid" && (
-				<span className={`${cssPrefix}license-activations-badge`}>
+				<span className={cls("activations-badge")}>
 					{status.activationsCurrent}/{status.activationsLimit} devices
 				</span>
 			)}
@@ -60,9 +33,9 @@ export const LicenseSection = memo(function LicenseSection({
 	licenseManager,
 	currentSecretName,
 	onSecretChange,
-	cssPrefix,
 	accountUrl,
 }: LicenseSectionProps) {
+	const cssPrefix = useCssPrefix();
 	useInjectedStyles(`${cssPrefix}license-styles`, buildLicenseStyles(cssPrefix));
 	const status = useExternalSnapshot(licenseManager.status$);
 	const [verifying, setVerifying] = useState(false);
@@ -93,7 +66,7 @@ export const LicenseSection = memo(function LicenseSection({
 			<SettingItem name="License key" description={keyDescription}>
 				<SecretField value={currentSecretName} onChange={(v) => void onSecretChange(v)} />
 			</SettingItem>
-			<SettingItem name="License status" description={<StatusDescription status={status} cssPrefix={cssPrefix} />}>
+			<SettingItem name="License status" description={<StatusDescription status={status} />}>
 				<button type="button" className="mod-cta" disabled={verifying} onClick={() => void handleVerify()}>
 					{verifying ? "Verifying..." : "Verify"}
 				</button>

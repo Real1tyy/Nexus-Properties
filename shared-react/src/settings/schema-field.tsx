@@ -5,6 +5,7 @@ import { memo, useMemo } from "react";
 import { SettingItem } from "../components/setting-item";
 import type { SettingsStorelike } from "../hooks/use-schema-field";
 import { useSchemaField } from "../hooks/use-schema-field";
+import { testIdProp } from "../utils/test-id";
 import type { SchemaFieldOverride } from "./override";
 import { resolveWidget } from "./resolve-widget";
 import { BUILTIN_WIDGETS, TextWidget } from "./widgets";
@@ -18,7 +19,7 @@ interface SchemaFieldProps {
 	path?: string;
 	override?: SchemaFieldOverride;
 	/** When set, stamps `data-testid` on the outer `.setting-item` for E2E. */
-	testId?: string;
+	testId?: string | undefined;
 	controlTestId?: string;
 }
 
@@ -40,7 +41,7 @@ export const SchemaField = memo(function SchemaField({
 
 	if (override?.render) {
 		return (
-			<SettingItem name={label} description={description} {...(testId ? { testId } : {})}>
+			<SettingItem name={label} description={description} {...testIdProp(testId)}>
 				{override.render({ ...binding, descriptor })}
 			</SettingItem>
 		);
@@ -50,7 +51,7 @@ export const SchemaField = memo(function SchemaField({
 	const Widget = BUILTIN_WIDGETS[widgetKind] ?? TextWidget;
 
 	return (
-		<SettingItem name={label} description={description} {...(testId ? { testId } : {})}>
+		<SettingItem name={label} description={description} {...testIdProp(testId)}>
 			<Widget descriptor={descriptor} override={override} binding={binding} testId={controlTestId} />
 		</SettingItem>
 	);

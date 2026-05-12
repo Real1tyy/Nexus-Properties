@@ -1,10 +1,12 @@
 import type { FieldPath, FieldValues, UseFormReturn } from "react-hook-form";
 import { useController } from "react-hook-form";
 
+import { SecretField } from "../components/secret-field";
 import { Dropdown } from "../components/setting-controls";
 import { NumberInput } from "../components/setting-controls";
 import { TextInput } from "../components/setting-controls";
 import { Toggle } from "../components/setting-controls";
+import { testIdProp } from "../utils/test-id";
 
 interface FormFieldBase<TValues extends FieldValues, TName extends FieldPath<TValues>> {
 	form: UseFormReturn<TValues>;
@@ -18,7 +20,7 @@ export function FormToggle<TValues extends FieldValues, TName extends FieldPath<
 	testId,
 }: FormFieldBase<TValues, TName>) {
 	const { field } = useController({ control: form.control, name });
-	return <Toggle value={!!field.value} onChange={field.onChange} {...(testId ? { testId } : {})} />;
+	return <Toggle value={!!field.value} onChange={field.onChange} {...testIdProp(testId)} />;
 }
 
 export function FormTextInput<TValues extends FieldValues, TName extends FieldPath<TValues>>({
@@ -34,7 +36,7 @@ export function FormTextInput<TValues extends FieldValues, TName extends FieldPa
 			onChange={field.onChange}
 			debounceMs={0}
 			{...(placeholder ? { placeholder } : {})}
-			{...(testId ? { testId } : {})}
+			{...testIdProp(testId)}
 		/>
 	);
 }
@@ -56,9 +58,18 @@ export function FormNumberInput<TValues extends FieldValues, TName extends Field
 			{...(min !== undefined ? { min } : {})}
 			{...(max !== undefined ? { max } : {})}
 			{...(step !== undefined ? { step } : {})}
-			{...(testId ? { testId } : {})}
+			{...testIdProp(testId)}
 		/>
 	);
+}
+
+export function FormSecretField<TValues extends FieldValues, TName extends FieldPath<TValues>>({
+	form,
+	name,
+	testId,
+}: FormFieldBase<TValues, TName>) {
+	const { field } = useController({ control: form.control, name });
+	return <SecretField value={String(field.value ?? "")} onChange={field.onChange} {...testIdProp(testId)} />;
 }
 
 export function FormDropdown<TValues extends FieldValues, TName extends FieldPath<TValues>>({
@@ -69,11 +80,6 @@ export function FormDropdown<TValues extends FieldValues, TName extends FieldPat
 }: FormFieldBase<TValues, TName> & { options: Record<string, string> }) {
 	const { field } = useController({ control: form.control, name });
 	return (
-		<Dropdown
-			value={String(field.value ?? "")}
-			options={options}
-			onChange={field.onChange}
-			{...(testId ? { testId } : {})}
-		/>
+		<Dropdown value={String(field.value ?? "")} options={options} onChange={field.onChange} {...testIdProp(testId)} />
 	);
 }

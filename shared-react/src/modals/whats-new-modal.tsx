@@ -1,56 +1,20 @@
-import { formatChangelogSections, getChangelogSince, resolveRelativeDocLinks } from "@real1ty-obsidian-plugins";
+import {
+	formatChangelogSections,
+	getChangelogSince,
+	resolveRelativeDocLinks,
+	type VersionSection,
+} from "@real1ty-obsidian-plugins";
 import type { App, Plugin } from "obsidian";
 import { MarkdownRenderer } from "obsidian";
-import { memo, useCallback, useEffect, useRef } from "react";
+import { memo, useCallback, useEffect, useRef, useState } from "react";
 
 import { useApp } from "../contexts/app-context";
+import { useScoped } from "../contexts/theme-context";
 import { useInjectedStyles } from "../hooks/use-injected-styles";
 import { showReactModal } from "../show-react-modal";
+import { buildWhatsNewStyles } from "./whats-new-modal.styles";
 
-function buildWhatsNewStyles(p: string): string {
-	return `
-.modal-container.mod-dim .modal:has(.${p}-whats-new-modal) { max-width: 750px; width: 90%; }
-.${p}-whats-new-subtitle { color: var(--text-muted); font-size: 0.9rem; margin: 0 0 1rem; }
-.${p}-whats-new-support {
-	margin: 0 0 1rem; padding: 1rem; background-color: var(--background-secondary); border-radius: 8px;
-}
-.${p}-whats-new-support h3 { margin-top: 0; margin-bottom: 0.5rem; font-size: 1rem; }
-.${p}-whats-new-support p { margin: 0.5rem 0; color: var(--text-normal); }
-.${p}-whats-new-support a { color: var(--link-color); text-decoration: none; transition: all 0.2s ease; }
-.${p}-whats-new-support a:hover { color: var(--link-color-hover); text-decoration: underline; }
-.${p}-whats-new-content {
-	max-height: 400px; overflow-y: auto; margin-bottom: 1rem; padding-right: 0.5rem; border-radius: 8px;
-}
-.${p}-whats-new-content h2 { font-size: 1.3rem; margin-top: 1.5rem; margin-bottom: 0.5rem; color: var(--text-accent); }
-.${p}-whats-new-content h3 { font-size: 1.1rem; margin-top: 1rem; margin-bottom: 0.5rem; }
-.${p}-whats-new-content ul { padding-left: 1.5rem; }
-.${p}-whats-new-content li { margin-bottom: 0.5rem; line-height: 1.6; }
-.${p}-whats-new-content code {
-	background: var(--code-background); padding: 0.2em 0.4em; border-radius: 3px; font-size: 0.9em;
-}
-.${p}-whats-new-content a.external-link { color: var(--link-external-color); }
-.${p}-whats-new-content a.external-link::after { content: "\\2197"; margin-left: 0.2em; font-size: 0.8em; }
-.${p}-whats-new-empty { text-align: center; color: var(--text-muted); padding: 2rem; font-style: italic; }
-.${p}-whats-new-sticky-footer {
-	position: sticky; bottom: 0; background: var(--background-primary); padding-top: 0.75rem;
-	z-index: 10; border-top: 1px solid var(--background-modifier-border);
-}
-.${p}-whats-new-buttons {
-	display: flex; gap: 0.5rem; justify-content: space-between; flex-wrap: wrap;
-	padding-bottom: 0.5rem; width: 100%;
-}
-.${p}-whats-new-buttons button {
-	flex: 1; min-width: 0; padding: 0.5rem 1rem; border-radius: 4px; cursor: pointer;
-	border: 1px solid var(--background-modifier-border); background: var(--interactive-normal);
-	color: var(--text-normal); transition: all 0.2s ease; text-align: center;
-}
-.${p}-whats-new-buttons button:hover {
-	background: var(--interactive-hover); border-color: var(--interactive-accent);
-	transform: translateY(-1px); box-shadow: 0 2px 8px rgb(0 0 0 / 15%);
-}
-.${p}-whats-new-buttons button:active { transform: translateY(0); box-shadow: 0 1px 4px rgb(0 0 0 / 10%); }
-`;
-}
+const LINES_PER_PAGE = 15;
 
 export const DEFAULT_WHATS_NEW_LINKS = {
 	TOOLS: "https://matejvavroproductivity.com/tools/",
@@ -58,6 +22,7 @@ export const DEFAULT_WHATS_NEW_LINKS = {
 } as const;
 
 export interface WhatsNewModalConfig {
+	/** Trailing-dash convention, e.g. `"prisma-"`. Drives the modal class, theme provider, and stylesheet selectors. */
 	cssPrefix: string;
 	pluginName: string;
 	changelogContent: string;
@@ -99,6 +64,23 @@ function makeExternalLinksClickable(container: HTMLElement): void {
 	}
 }
 
+function countNonEmptyLines(content: string): number {
+	return content.split("\n").filter((line) => line.trim().length > 0).length;
+}
+
+function computeNextBatch(sections: VersionSection[], renderedCount: number): VersionSection[] {
+	let linesAccum = 0;
+	let end = renderedCount;
+	while (end < sections.length) {
+		const sectionLines = countNonEmptyLines(sections[end].content);
+		if (linesAccum > 0 && linesAccum + sectionLines > LINES_PER_PAGE) break;
+		linesAccum += sectionLines;
+		end++;
+	}
+	if (end === renderedCount && end < sections.length) end++;
+	return sections.slice(renderedCount, end);
+}
+
 function FooterButton({ label, href }: { label: string; href: string }) {
 	const handleClick = useCallback(() => window.open(href, "_blank"), [href]);
 	return (
@@ -117,70 +99,108 @@ export const WhatsNewContent = memo(function WhatsNewContent({
 }: WhatsNewContentProps) {
 	const app = useApp();
 	const changelogRef = useRef<HTMLDivElement>(null);
-	useInjectedStyles(`${config.cssPrefix}-whats-new-styles`, buildWhatsNewStyles(config.cssPrefix));
-	const cls = (suffix: string) => `${config.cssPrefix}-${suffix}`;
+	const [supportCollapsed, setSupportCollapsed] = useState(false);
+	const [renderedCount, setRenderedCount] = useState(0);
+	const renderingRef = useRef(false);
+	const { cls, tid, cssPrefix } = useScoped("whats-new");
+	useInjectedStyles(`${cssPrefix}whats-new-styles`, buildWhatsNewStyles(cssPrefix));
 
+	const isFullChangelog = fromVersion === "0.0.0";
 	const changelogSections = getChangelogSince(config.changelogContent, fromVersion, toVersion);
-	const markdownContent = formatChangelogSections(changelogSections);
-	const resolvedMarkdown = resolveRelativeDocLinks(markdownContent, config.links.documentation);
-
-	useEffect(() => {
-		if (!changelogRef.current || !resolvedMarkdown) return;
-		const el = changelogRef.current;
-		while (el.firstChild) el.removeChild(el.firstChild);
-
-		// eslint-disable-next-line obsidianmd/no-plugin-as-component -- short-lived modal, cleaned up on close
-		void MarkdownRenderer.render(app, resolvedMarkdown, el, "/", plugin).then(() => {
-			makeExternalLinksClickable(el);
-		});
-	}, [app, resolvedMarkdown, plugin]);
-
+	const remaining = changelogSections.length - renderedCount;
 	const toolsUrl = config.links.tools ?? DEFAULT_WHATS_NEW_LINKS.TOOLS;
 	const youtubeUrl = config.links.youtube ?? DEFAULT_WHATS_NEW_LINKS.YOUTUBE;
 
-	return (
-		<div data-testid={`${config.cssPrefix}-whats-new-modal`}>
-			<p className={cls("whats-new-subtitle")}>Changes since v{fromVersion}</p>
+	const renderBatch = useCallback(
+		async (el: HTMLElement, sections: VersionSection[]) => {
+			if (renderingRef.current) return;
+			renderingRef.current = true;
 
-			<div className={cls("whats-new-support")}>
-				{config.supportSection ? (
-					<>
-						<h3>{config.supportSection.heading}</h3>
-						<p>{config.supportSection.description}</p>
-						{config.supportSection.cta && (
+			const batch = computeNextBatch(sections, renderedCount);
+			const batchMarkdown = resolveRelativeDocLinks(formatChangelogSections(batch), config.links.documentation);
+
+			const batchContainer = document.createElement("div");
+			el.appendChild(batchContainer);
+
+			// eslint-disable-next-line obsidianmd/no-plugin-as-component -- short-lived modal, cleaned up on close
+			await MarkdownRenderer.render(app, batchMarkdown, batchContainer, "/", plugin);
+			makeExternalLinksClickable(batchContainer);
+
+			setRenderedCount(renderedCount + batch.length);
+			renderingRef.current = false;
+		},
+		[app, plugin, renderedCount, config.links.documentation]
+	);
+
+	useEffect(() => {
+		if (!changelogRef.current || changelogSections.length === 0 || renderedCount > 0) return;
+		void renderBatch(changelogRef.current, changelogSections);
+	}, [changelogSections, renderBatch, renderedCount]);
+
+	const handleLoadMore = useCallback(() => {
+		if (!changelogRef.current) return;
+		void renderBatch(changelogRef.current, changelogSections);
+	}, [renderBatch, changelogSections]);
+
+	const toggleSupport = useCallback(() => setSupportCollapsed((prev) => !prev), []);
+
+	const headingText = config.supportSection ? config.supportSection.heading : "Support the development of this plugin";
+
+	return (
+		<div data-testid={tid("modal")}>
+			{!isFullChangelog && <p className={cls("subtitle")}>Changes since v{fromVersion}</p>}
+
+			<div className={cls("support")}>
+				{/* biome-ignore lint/a11y/useKeyboardHandler: collapsible header */}
+				<div className={cls("support-header")} onClick={toggleSupport} role="button" tabIndex={0}>
+					<h3>{headingText}</h3>
+					<span className={cls("support-chevron")}>{supportCollapsed ? "▶" : "▼"}</span>
+				</div>
+				<div className={`${cls("support-body")}${supportCollapsed ? ` ${cls("support-collapsed")}` : ""}`}>
+					{config.supportSection ? (
+						<>
+							<p>{config.supportSection.description}</p>
+							{config.supportSection.cta && (
+								<p>
+									{"👉 "}
+									<a href={config.supportSection.cta.href}>{config.supportSection.cta.text}</a>
+								</p>
+							)}
+						</>
+					) : (
+						<>
+							<p>
+								If this plugin saves you time or improves how you work in Obsidian, consider supporting its development.
+								Your support helps fund ongoing maintenance, new features, and long-term stability.
+							</p>
 							<p>
 								{"👉 "}
-								<a href={config.supportSection.cta.href}>{config.supportSection.cta.text}</a>
+								<a href={config.links.support}>Support my work</a>
 							</p>
-						)}
-					</>
-				) : (
-					<>
-						<h3>Support the development of this plugin</h3>
-						<p>
-							If this plugin saves you time or improves how you work in Obsidian, consider supporting its development.
-							Your support helps fund ongoing maintenance, new features, and long-term stability.
-						</p>
-						<p>
-							{"👉 "}
-							<a href={config.links.support}>Support my work</a>
-						</p>
-					</>
-				)}
-				<p>
-					You can also explore my <a href={toolsUrl}>other Obsidian plugins and productivity tools</a>, or follow my{" "}
-					<a href={youtubeUrl}>YouTube channel</a> for in-depth tutorials and workflow ideas.
-				</p>
+						</>
+					)}
+					<p>
+						You can also explore my <a href={toolsUrl}>other Obsidian plugins and productivity tools</a>, or follow my{" "}
+						<a href={youtubeUrl}>YouTube channel</a> for in-depth tutorials and workflow ideas.
+					</p>
+				</div>
 			</div>
 
 			{changelogSections.length === 0 ? (
-				<p className={cls("whats-new-empty")}>No significant changes found in this update.</p>
+				<p className={cls("empty")}>No significant changes found in this update.</p>
 			) : (
-				<div ref={changelogRef} className={cls("whats-new-content")} />
+				<div className={cls("content")}>
+					<div ref={changelogRef} />
+					{remaining > 0 && renderedCount > 0 && (
+						<button type="button" className={cls("load-more")} onClick={handleLoadMore}>
+							Load more ({remaining} versions remaining)
+						</button>
+					)}
+				</div>
 			)}
 
-			<div className={cls("whats-new-sticky-footer")}>
-				<div className={cls("whats-new-buttons")}>
+			<div className={cls("sticky-footer")}>
+				<div className={cls("buttons")}>
 					{config.links.productPage && <FooterButton label="Product Page" href={config.links.productPage} />}
 					<FooterButton label="GitHub" href={config.links.github} />
 					<FooterButton label="Changelog" href={config.links.changelog} />
@@ -200,10 +220,13 @@ export function showWhatsNewReactModal(
 	fromVersion: string,
 	toVersion: string
 ): void {
+	const isFullChangelog = fromVersion === "0.0.0";
 	showReactModal({
 		app,
-		cls: `${config.cssPrefix}-whats-new-modal`,
-		title: `${config.pluginName} updated to v${toVersion}`,
+		cls: `${config.cssPrefix}whats-new-modal`,
+		cssPrefix: config.cssPrefix,
+		testIdPrefix: config.cssPrefix,
+		title: isFullChangelog ? `${config.pluginName} Changelog` : `${config.pluginName} updated to v${toVersion}`,
 		render: (close) => (
 			<WhatsNewContent config={config} plugin={plugin} fromVersion={fromVersion} toVersion={toVersion} close={close} />
 		),
