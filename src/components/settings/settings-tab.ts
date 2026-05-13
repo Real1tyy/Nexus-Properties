@@ -2,6 +2,7 @@ import { renderReactInline } from "@real1ty-obsidian-plugins-react";
 import { type App, PluginSettingTab } from "obsidian";
 import { createElement } from "react";
 
+import { CSS_PREFIX } from "../../constants";
 import type NexusPropertiesPlugin from "../../main";
 import { SettingsRoot } from "../../react/settings/settings-root";
 
@@ -18,7 +19,7 @@ export class NexusPropertiesSettingsTab extends PluginSettingTab {
 		this.unmount?.();
 		this.containerEl.empty();
 		this.unmount = renderReactInline(this.containerEl, createElement(SettingsRoot, { plugin: this.plugin }), this.app, {
-			cssPrefix: "nexus-properties-",
+			cssPrefix: CSS_PREFIX,
 		});
 	}
 
