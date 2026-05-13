@@ -31,6 +31,6 @@
 			"@real1ty-obsidian-plugins-react/*": ["shared-react/src/*"]
 		}
 	},
-	"include": ["src/**/*.ts", "tests/**/*.ts"],
+	"include": ["src/**/*.ts", "src/**/*.tsx", "tests/**/*.ts", "tests/**/*.tsx"],
 	"exclude": ["node_modules"]
 }
