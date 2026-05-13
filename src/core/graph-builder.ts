@@ -8,7 +8,7 @@ import {
 	isFolderNote,
 } from "@real1ty-obsidian-plugins";
 import type { ElementDefinition } from "cytoscape";
-import type { App, TFile } from "obsidian";
+import type { App } from "obsidian";
 
 import type { NexusPropertiesSettings } from "../types/settings";
 import type { NexusPropertiesSettingsStore } from "../types/settings";
@@ -39,7 +39,7 @@ interface GraphBuilderOptions {
 	includeAllRelated: boolean;
 	startFromCurrent: boolean;
 	searchQuery?: string;
-	filterEvaluator?: ((frontmatter: Record<string, any>) => boolean) | undefined;
+	filterEvaluator?: ((frontmatter: Record<string, unknown>) => boolean) | undefined;
 	hierarchySource?: HierarchySourceType | undefined;
 	mocFilePath?: string | undefined;
 	parentOverridePath?: string | undefined;
@@ -163,7 +163,7 @@ export class GraphBuilder {
 			return { nodes: [this.createNodeElement(sourcePath, 0, true)], edges: [] };
 		}
 
-		const tree = buildRelatedTree(this.app, this.indexer, file as TFile, {
+		const tree = buildRelatedTree(this.app, this.indexer, file, {
 			maxDepth: 1,
 			nodeFilter: this.createNodeFilter(),
 		});
@@ -208,7 +208,7 @@ export class GraphBuilder {
 			nodeFilter: this.createNodeFilter(),
 		};
 
-		const tFile = file as TFile;
+		const tFile = file;
 		const tree = startFromCurrent
 			? await provider.buildTree(tFile, effectiveSource, options)
 			: await provider.buildTreeFromTopParent(tFile, effectiveSource, options);
@@ -523,7 +523,7 @@ export class GraphBuilder {
 	private applyGraphFilters(
 		graphData: GraphData,
 		searchQuery?: string,
-		filterEvaluator?: (frontmatter: Record<string, any>) => boolean
+		filterEvaluator?: (frontmatter: Record<string, unknown>) => boolean
 	): GraphData {
 		// Apply both search and expression filters here - frontmatter property filters are applied during graph building
 		if (!searchQuery && !filterEvaluator) return graphData;

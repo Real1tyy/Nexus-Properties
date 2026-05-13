@@ -80,7 +80,7 @@ export class PropertyRenderer {
 
 				link.onclick = (e) => {
 					e.preventDefault();
-					this.app.workspace.openLinkText(wikiLink.linkPath, this.file.path, false);
+					void this.app.workspace.openLinkText(wikiLink.linkPath, this.file.path, false);
 					this.onLinkClick?.();
 				};
 				return;

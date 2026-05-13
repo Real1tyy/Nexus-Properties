@@ -38,7 +38,7 @@ export class GraphFilter extends InputFilterManager {
 		this.updateFilterValue(value);
 	}
 
-	shouldInclude(frontmatter: Record<string, any>): boolean {
+	shouldInclude(frontmatter: Record<string, unknown>): boolean {
 		if (!this.currentValue) return true;
 
 		try {

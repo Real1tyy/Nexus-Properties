@@ -160,7 +160,6 @@ export default class NexusPropertiesPlugin extends Plugin {
 	override onunload(): void {
 		this.propertiesManager?.stop();
 		this.indexer?.stop();
-		this.app.workspace.detachLeavesOfType(VIEW_TYPE_NEXUS_SWITCHER);
 	}
 
 	async triggerFullRescan(): Promise<void> {

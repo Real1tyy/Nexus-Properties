@@ -130,7 +130,7 @@ export class GraphZoomManager {
 
 		const node = this.cy.nodes().filter((n) => n.id() === this.focusedNodeId);
 		if (node.length > 0) {
-			(this.cy as any).center(node);
+			this.cy.center(node);
 		}
 	}
 

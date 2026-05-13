@@ -100,7 +100,7 @@ export class NodeContextMenu {
 				.setTitle("Delete")
 				.setIcon("trash")
 				.onClick(() => {
-					this.deleteFile(filePath);
+					void this.deleteFile(filePath);
 				});
 		});
 
@@ -114,7 +114,7 @@ export class NodeContextMenu {
 			return;
 		}
 
-		this.app.workspace.getLeaf(false).openFile(file);
+		void this.app.workspace.getLeaf(false).openFile(file);
 	}
 
 	private openPreview(filePath: string): void {

@@ -78,7 +78,7 @@ export class Indexer implements RelationshipResolver {
 	}
 
 	async scanAllFiles(): Promise<void> {
-		await this.genericIndexer.resync();
+		this.genericIndexer.resync();
 	}
 
 	getRelationshipsSnapshot(): ReadonlyMap<string, FileRelationships> {

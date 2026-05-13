@@ -49,12 +49,12 @@ export class PropertiesManager {
 	start(events$: Observable<IndexerEvent>): void {
 		this.subscription = events$.subscribe((event) => {
 			if (event.type === "file-deleted" && event.oldRelationships) {
-				this.handleFileDeletion(event.filePath, event.oldRelationships);
+				void this.handleFileDeletion(event.filePath, event.oldRelationships);
 			} else if (event.type === "file-renamed" && event.oldPath && event.newRelationships) {
 				void this.handleFileRename(event.filePath, event.oldPath, event.newRelationships);
 			} else if (event.type === "file-changed" && event.newRelationships) {
 				if (event.oldRelationships) {
-					this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
+					void this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
 				}
 
 				if (this.filesBeingPropagated.has(event.filePath)) {

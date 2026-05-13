@@ -1,5 +1,5 @@
 import type cytoscape from "cytoscape";
-import type { Core, ElementDefinition } from "cytoscape";
+import type { Core, ElementDefinition, LayoutOptions, NodeSingular } from "cytoscape";
 
 import { CollisionDetector } from "./collision-detector";
 import { ConstellationPositioner } from "./constellation-positioner";
@@ -161,7 +161,7 @@ export class GraphLayoutManager {
 			edgeSep: 50,
 			ranker: "network-simplex",
 			animate: false,
-		} as any);
+		} as unknown as LayoutOptions);
 
 		layout.run();
 
@@ -316,7 +316,7 @@ export class GraphLayoutManager {
 					clockwise: true,
 					equidistant: true,
 					minNodeSpacing: 100,
-					concentric: (node: any) => (node.data("isSource") ? 2 : 1),
+					concentric: (node: NodeSingular) => (node.data("isSource") ? 2 : 1),
 					levelWidth: () => 1,
 					animate: animationDuration > 0,
 					animationDuration: animationDuration,
@@ -346,7 +346,7 @@ export class GraphLayoutManager {
 			animate: false, // We'll handle animation separately
 			fit: false,
 			padding: 80,
-		} as any);
+		} as unknown as LayoutOptions);
 
 		layout.run();
 

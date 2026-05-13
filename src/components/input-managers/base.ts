@@ -129,5 +129,5 @@ export abstract class InputFilterManager {
 		this.inputEl = null;
 	}
 
-	abstract shouldInclude(data: any): boolean;
+	abstract shouldInclude(data: unknown): boolean;
 }

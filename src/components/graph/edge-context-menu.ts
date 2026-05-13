@@ -20,7 +20,7 @@ export class EdgeContextMenu {
 				.setTitle("Remove")
 				.setIcon("trash")
 				.onClick(() => {
-					this.removeEdge(sourceId, targetId, isRelatedView);
+					void this.removeEdge(sourceId, targetId, isRelatedView);
 				});
 		});
 
