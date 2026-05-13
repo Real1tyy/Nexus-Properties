@@ -7,6 +7,8 @@ export type { ChipListProps } from "./components/chip-list";
 export { ChipList } from "./components/chip-list";
 export type { CollapsibleSectionProps, SectionBodyProps, SectionHeaderProps } from "./components/collapsible-section";
 export { CollapsibleSection, SectionBody, SectionHeader } from "./components/collapsible-section";
+export type { CommittedFilterInputHandle, CommittedFilterInputProps } from "./components/committed-filter-input";
+export { CommittedFilterInput } from "./components/committed-filter-input";
 export type { CopyableProps } from "./components/copyable";
 export { Copyable } from "./components/copyable";
 export type { EmptyHintProps } from "./components/empty-hint";
@@ -87,6 +89,7 @@ export * from "./forms";
 export type { Paths, PathValue } from "./hooks/path-types";
 export type { ActivatableProps } from "./hooks/use-activatable";
 export { useActivatable } from "./hooks/use-activatable";
+export { useColorEvaluator } from "./hooks/use-color-evaluator";
 export type { UseCopyToClipboardOptions } from "./hooks/use-copy-to-clipboard";
 export { useCopyToClipboard } from "./hooks/use-copy-to-clipboard";
 export type { DebouncedCommitHandle, UseDebouncedCommitOptions } from "./hooks/use-debounced-commit";
@@ -96,11 +99,15 @@ export { useEnterKey, type UseEnterKeyOptions } from "./hooks/use-enter-key";
 export { useEscapeKey } from "./hooks/use-escape-key";
 export type { SnapshotSubscribable } from "./hooks/use-external-snapshot";
 export { useExternalSnapshot } from "./hooks/use-external-snapshot";
+export type { UseFocusOnMountOptions } from "./hooks/use-focus-on-mount";
+export { useFocusOnMount } from "./hooks/use-focus-on-mount";
 export { useInjectedStyles } from "./hooks/use-injected-styles";
 export { useKeyDown } from "./hooks/use-key-down";
 export { useObservable } from "./hooks/use-observable";
 export type { Emitterlike } from "./hooks/use-obsidian-event";
 export { useObsidianEvent } from "./hooks/use-obsidian-event";
+export type { UseOutsideClickOptions } from "./hooks/use-outside-click";
+export { useOutsideClick } from "./hooks/use-outside-click";
 export { useReleaseCheck } from "./hooks/use-release-check";
 export type { SchemaFieldBinding, SettingsStorelike } from "./hooks/use-schema-field";
 export { useSchemaField } from "./hooks/use-schema-field";
@@ -109,6 +116,7 @@ export type { SettingsFieldsPatch, SettingsFieldsUpdater } from "./hooks/use-set
 export { useSettingsFields } from "./hooks/use-settings-fields";
 export type { SettingsStorelike as SettingsStoreShape, SettingsUpdater } from "./hooks/use-settings-store";
 export { useSettingsStore } from "./hooks/use-settings-store";
+export { useSubscription } from "./hooks/use-subscription";
 
 // ─── Menus ───
 export type {
