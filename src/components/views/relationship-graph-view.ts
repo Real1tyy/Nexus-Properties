@@ -294,7 +294,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			}
 		});
 
-		setTimeout(() => {
+		window.setTimeout(() => {
 			const activeFile = this.app.workspace.getActiveFile();
 			if (activeFile) {
 				this.onFileOpen(activeFile);
@@ -438,7 +438,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			}
 
 			this.resizeDebounceTimer = window.setTimeout(() => {
-				requestAnimationFrame(() => {
+				window.requestAnimationFrame(() => {
 					if (this.pendingGraphData && !this.cy) {
 						const rect = this.graphContainerEl?.getBoundingClientRect();
 						if (rect && rect.width > 0 && rect.height > 0) {
@@ -1114,7 +1114,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		}
 
 		// Defer to next frame to allow any DOM/layout changes to settle
-		requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			if (!this.cy) return;
 			const focusedNodeId = this.zoomManager.getFocusedNodeId();
 			if (this.zoomManager.isInZoomMode() && focusedNodeId) {

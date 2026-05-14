@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+
 import { replaceParentPrefix, stripParentPrefix } from "../src/utils/string-utils";
 
 describe("stripParentPrefix", () => {

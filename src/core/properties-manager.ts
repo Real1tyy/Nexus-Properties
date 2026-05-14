@@ -27,7 +27,7 @@ import type { Indexer, IndexerEvent } from "./indexer";
 export class PropertiesManager {
 	private subscription: Subscription | null = null;
 	private settingsSubscription: Subscription | null = null;
-	private propagationDebounceTimers: Map<string, NodeJS.Timeout> = new Map();
+	private propagationDebounceTimers: Map<string, number> = new Map();
 	private accumulatedDiffs: Map<string, FrontmatterDiff[]> = new Map();
 	private filesBeingPropagated: Set<string> = new Set();
 	private cachedExcludedDirs: string[] = [];
@@ -77,7 +77,7 @@ export class PropertiesManager {
 
 		// Clear all debounce timers
 		for (const timer of this.propagationDebounceTimers.values()) {
-			clearTimeout(timer);
+			window.clearTimeout(timer);
 		}
 		this.propagationDebounceTimers.clear();
 		this.accumulatedDiffs.clear();
@@ -330,14 +330,14 @@ export class PropertiesManager {
 
 		const existingTimer = this.propagationDebounceTimers.get(filePath);
 		if (existingTimer) {
-			clearTimeout(existingTimer);
+			window.clearTimeout(existingTimer);
 		}
 
 		const existingDiffs = this.accumulatedDiffs.get(filePath) || [];
 		existingDiffs.push(frontmatterDiff);
 		this.accumulatedDiffs.set(filePath, existingDiffs);
 
-		const timer = setTimeout(() => {
+		const timer = window.setTimeout(() => {
 			this.propagationDebounceTimers.delete(filePath);
 			const diffs = this.accumulatedDiffs.get(filePath) || [];
 			this.accumulatedDiffs.delete(filePath);

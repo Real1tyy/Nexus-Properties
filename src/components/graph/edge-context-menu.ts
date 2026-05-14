@@ -38,7 +38,7 @@ export class EdgeContextMenu {
 			new Notice("Relationship removed successfully");
 
 			// Wait for indexer to process the change (300ms debounce + buffer)
-			setTimeout(() => {
+			window.setTimeout(() => {
 				this.onEdgeRemoved?.();
 			}, 400);
 		} catch (error) {

@@ -52,7 +52,7 @@ export class RelationshipAdder {
 			new Notice(`${this.capitalize(this.relationshipType)} relationship added successfully`);
 
 			// Wait for indexer to process the change (300ms debounce + buffer)
-			setTimeout(() => {
+			window.setTimeout(() => {
 				this.onRelationshipAdded?.();
 			}, 400);
 		} catch (error) {

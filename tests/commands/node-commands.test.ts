@@ -1,4 +1,5 @@
-import { describe, expect, it, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import type { NexusPropertiesSettings } from "../../src/types/settings";
 
 // Must mock obsidian before importing anything that uses it
@@ -50,10 +51,11 @@ const mockSettings: Partial<NexusPropertiesSettings> = {
 };
 
 // Import after mocking
+import { TFile } from "obsidian";
+
 import { CreateNodeCommand } from "../../src/core/commands/create-node-command";
 import { DeleteNodeCommand } from "../../src/core/commands/delete-node-command";
 import { EditNodeCommand } from "../../src/core/commands/edit-node-command";
-import { TFile } from "obsidian";
 
 function createMockFile(path: string): any {
 	const file = Object.create(TFile.prototype);

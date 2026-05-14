@@ -510,7 +510,7 @@ export class NexusViewSwitcher extends ItemView {
 	 */
 	async triggerUpdate(): Promise<void> {
 		// Small delay to allow file system operations to complete
-		await new Promise((resolve) => setTimeout(resolve, 100));
+		await new Promise((resolve) => window.setTimeout(resolve, 100));
 
 		if (this.currentMode === "graph" && this.graphView) {
 			this.graphView.triggerUpdate();

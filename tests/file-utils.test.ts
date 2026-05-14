@@ -1,4 +1,5 @@
 import { describe, expect, it, vi } from "vitest";
+
 import { buildFilePathForWikiLink, getUniqueParentFilePath } from "../src/utils/file-utils";
 
 describe("getUniqueParentFilePath", () => {

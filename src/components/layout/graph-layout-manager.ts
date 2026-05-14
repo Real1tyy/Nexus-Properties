@@ -110,7 +110,7 @@ export class GraphLayoutManager {
 
 		// After positioning, refit the viewport to show everything
 		if (animationDuration > 0) {
-			setTimeout(() => {
+			window.setTimeout(() => {
 				this.cy?.fit(undefined, padding);
 			}, animationDuration);
 		} else {
@@ -636,7 +636,7 @@ export class GraphLayoutManager {
 
 		// For instant layouts, center immediately
 		if (animationDuration === 0) {
-			setTimeout(() => {
+			window.setTimeout(() => {
 				this.cy?.resize();
 				this.cy?.fit();
 				this.cy?.center();
@@ -651,7 +651,7 @@ export class GraphLayoutManager {
 			// ignore
 		}
 
-		requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			this.cy?.fit();
 			this.cy?.center();
 		});

@@ -325,7 +325,7 @@ export class GraphInteractionHandler {
 						}
 					);
 				};
-				setTimeout(() => pulse(), Math.random() * 1000);
+				window.setTimeout(() => pulse(), Math.random() * 1000);
 			}
 		});
 	}

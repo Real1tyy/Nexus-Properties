@@ -56,7 +56,7 @@ export class ZoomIndicator {
 		if (this.updateScheduled) return;
 
 		this.updateScheduled = true;
-		requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			this.inputEl.value = this.formatZoom(this.cy.zoom());
 			this.updateScheduled = false;
 		});

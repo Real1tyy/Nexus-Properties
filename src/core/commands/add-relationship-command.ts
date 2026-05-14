@@ -1,3 +1,4 @@
+import type { Command } from "@real1ty-obsidian-plugins";
 import {
 	addLinkToProperty,
 	hasLinkInProperty,
@@ -5,9 +6,9 @@ import {
 	removeMarkdownExtension,
 } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
+
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../../types/settings";
-import type { Command } from "@real1ty-obsidian-plugins";
 
 /**
  * Command to add a relationship between two nodes.

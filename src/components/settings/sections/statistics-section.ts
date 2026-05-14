@@ -1,6 +1,6 @@
 import { Setting } from "obsidian";
-
 import type NexusPropertiesPlugin from "src/main";
+
 import { computeVaultStatistics, createObsidianLinkResolver } from "../../../utils/vault-statistics";
 import type { SettingsSection } from "../types";
 

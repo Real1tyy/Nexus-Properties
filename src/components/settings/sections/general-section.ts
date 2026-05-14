@@ -122,14 +122,14 @@ export class GeneralSection implements SettingsSection {
 						try {
 							await this.plugin.triggerFullRescan();
 							button.setButtonText("✓ Complete!");
-							setTimeout(() => {
+							window.setTimeout(() => {
 								button.setButtonText("Rescan Everything");
 								button.setDisabled(false);
 							}, 2000);
 						} catch (error) {
 							console.error("Error during rescan:", error);
 							button.setButtonText("✗ Error");
-							setTimeout(() => {
+							window.setTimeout(() => {
 								button.setButtonText("Rescan Everything");
 								button.setDisabled(false);
 							}, 2000);

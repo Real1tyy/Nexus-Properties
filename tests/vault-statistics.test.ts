@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
+
 import type { FileRelationships } from "../src/types/constants";
-import { type LinkResolver, computeVaultStatistics } from "../src/utils/vault-statistics";
+import { computeVaultStatistics, type LinkResolver } from "../src/utils/vault-statistics";
 
 function makeNode(
 	filePath: string,

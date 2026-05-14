@@ -34,7 +34,7 @@ export class NodeCreationModal extends Modal {
 		});
 
 		// Focus and position cursor at the end (or beginning for parent)
-		setTimeout(() => {
+		window.setTimeout(() => {
 			if (!this.inputEl) return;
 			this.inputEl.focus();
 			if (this.nodeType === "parent") {

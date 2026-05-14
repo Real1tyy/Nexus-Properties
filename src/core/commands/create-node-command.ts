@@ -1,3 +1,4 @@
+import type { Command } from "@real1ty-obsidian-plugins";
 import {
 	formatWikiLink,
 	generateUniqueFilePath,
@@ -6,11 +7,11 @@ import {
 	removeLinkFromProperty,
 } from "@real1ty-obsidian-plugins";
 import { type App, TFile } from "obsidian";
-import { RELATIONSHIP_CONFIGS, type NodeCreationType, type RelationshipType } from "../../types/constants";
+
+import { type NodeCreationType, RELATIONSHIP_CONFIGS, type RelationshipType } from "../../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../../types/settings";
 import { buildFilePathForWikiLink } from "../../utils/file-utils";
 import { buildTitleLink } from "../../utils/string-utils";
-import type { Command } from "@real1ty-obsidian-plugins";
 
 /**
  * Command to create a new node with a relationship to an existing node.

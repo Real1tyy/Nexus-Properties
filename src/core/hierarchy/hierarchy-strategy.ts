@@ -1,4 +1,5 @@
 import type { TFile } from "obsidian";
+
 import type { RelationshipType } from "../../types/constants";
 import type { HierarchyTraversalOptions } from "../../types/hierarchy";
 import type { TreeNode } from "../../utils/hierarchy";

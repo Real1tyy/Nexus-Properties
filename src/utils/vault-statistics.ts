@@ -1,5 +1,6 @@
 import { extractFilePath } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
+
 import type { FileRelationships } from "../types/constants";
 import type { VaultStatistics } from "../types/statistics";
 

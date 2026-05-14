@@ -86,7 +86,7 @@ export class GraphZoomManager {
 
 		// Reset zoom to show full graph
 		this.suppressNextResizeFit = true;
-		requestAnimationFrame(() => {
+		window.requestAnimationFrame(() => {
 			this.cy?.resize();
 			this.cy?.fit();
 			this.cy?.center();
