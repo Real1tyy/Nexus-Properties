@@ -1,311 +1,316 @@
 @use "variables" as *;
 
 // Node Creation Modal
-.nexus-node-creation  {
-  &-modal {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    padding: $spacing-xl;
-    min-width: 500px;
-  }
+.nexus-node-creation {
+	&-modal {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		padding: $spacing-xl;
+		min-width: 500px;
+	}
 
-  &-title {
-    text-align: center;
-    margin-bottom: $spacing-lg;
-    font-size: $font-size-xxl;
-    color: var(--text-normal);
-  }
+	&-title {
+		text-align: center;
+		margin-bottom: $spacing-lg;
+		font-size: $font-size-xxl;
+		color: var(--text-normal);
+	}
 
-  &-input-container {
-    width: 100%;
-    margin-bottom: $spacing-lg;
-  }
+	&-input-container {
+		width: 100%;
+		margin-bottom: $spacing-lg;
+	}
 
-  &-buttons {
-    display: flex;
-    gap: $spacing-md;
-    justify-content: center;
-    width: 100%;
-  }
+	&-buttons {
+		display: flex;
+		gap: $spacing-md;
+		justify-content: center;
+		width: 100%;
+	}
 
-  &-button  {
-    padding: 0.6em $spacing-xl;
-    font-size: 1.15em;
-    border-radius: $border-radius;
-    cursor: pointer;
-    transition: all $transition-normal;
+	&-button {
+		padding: 0.6em $spacing-xl;
+		font-size: 1.15em;
+		border-radius: $border-radius;
+		cursor: pointer;
+		transition: all $transition-normal;
 
-    &:hover {
-      transform: translateY(-1px);
-    }
-  }
+		&:hover {
+			transform: translateY(-1px);
+		}
+	}
 }
 
-.modal-content.nexus-node-creation-modal  {
-  .nexus-node-creation-input-container input.nexus-node-creation-input  {
-    width: 100%;
-    padding: 0.75em $spacing-md;
-    font-size: $font-size-xxl;
-    text-align: center;
-    border: $input-border-width solid var(--background-modifier-border);
-    border-radius: $border-radius;
-    background-color: var(--background-primary);
-    color: var(--text-normal);
-    transition: border-color $transition-normal;
+.modal-content.nexus-node-creation-modal {
+	.nexus-node-creation-input-container input.nexus-node-creation-input {
+		width: 100%;
+		padding: 0.75em $spacing-md;
+		font-size: $font-size-xxl;
+		text-align: center;
+		border: $input-border-width solid var(--background-modifier-border);
+		border-radius: $border-radius;
+		background-color: var(--background-primary);
+		color: var(--text-normal);
+		transition: border-color $transition-normal;
 
-    &:focus {
-      outline: none;
-      border-color: var(--interactive-accent);
-    }
-  }
+		&:focus {
+			outline: none;
+			border-color: var(--interactive-accent);
+		}
+	}
 }
 
 // Node Preview Modal
-.nexus-properties-node-preview  {
-  &-modal .modal-content {
-    max-width: 700px;
-  }
+.nexus-properties-node-preview {
+	&-modal .modal-content {
+		max-width: 700px;
+	}
 
-  &-header h2  {
-    margin: 0 0 $spacing-lg;
-    color: var(--text-normal);
-    cursor: pointer;
-    transition: color $transition-normal;
+	&-header h2 {
+		margin: 0 0 $spacing-lg;
+		color: var(--text-normal);
+		cursor: pointer;
+		transition: color $transition-normal;
 
-    &:hover {
-      color: var(--interactive-accent);
-    }
-  }
+		&:hover {
+			color: var(--interactive-accent);
+		}
+	}
 
-  &-section  {
-    margin-bottom: $spacing-lg;
+	&-section {
+		margin-bottom: $spacing-lg;
 
-    &-title {
-      margin: 0 0 $spacing-md;
-      color: var(--text-muted);
-      font-size: $font-size-md;
-      font-weight: 600;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
-    }
-  }
+		&-title {
+			margin: 0 0 $spacing-md;
+			color: var(--text-muted);
+			font-size: $font-size-md;
+			font-weight: 600;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+		}
+	}
 
-  &-props-grid {
-    display: grid;
-    gap: $spacing-md;
-  }
+	&-props-grid {
+		display: grid;
+		gap: $spacing-md;
+	}
 
-  &-prop  {
-    &-item {
-      display: grid;
-      grid-template-columns: $node-preview-grid-key-width 1fr;
-      gap: $spacing-md;
-      padding: 0.75em;
-      background-color: var(--background-secondary);
-      border-radius: $border-radius;
-      border-left: 3px solid var(--background-modifier-border);
-    }
+	&-prop {
+		&-item {
+			display: grid;
+			grid-template-columns: $node-preview-grid-key-width 1fr;
+			gap: $spacing-md;
+			padding: 0.75em;
+			background-color: var(--background-secondary);
+			border-radius: $border-radius;
+			border-left: 3px solid var(--background-modifier-border);
+		}
 
-    &-key {
-      font-weight: 600;
-      color: var(--text-normal);
-      word-break: break-word;
-    }
+		&-key {
+			font-weight: 600;
+			color: var(--text-normal);
+			word-break: break-word;
+		}
 
-    &-value {
-      color: var(--text-muted);
-      word-break: break-word;
-    }
+		&-value {
+			color: var(--text-muted);
+			word-break: break-word;
+		}
 
-    &-link  {
-      color: var(--link-color);
-      text-decoration: none;
-      cursor: pointer;
-      transition: color $transition-normal;
+		&-link {
+			color: var(--link-color);
+			text-decoration: none;
+			cursor: pointer;
+			transition: color $transition-normal;
 
-      &:hover {
-        color: var(--link-color-hover);
-        text-decoration: underline;
-      }
-    }
+			&:hover {
+				color: var(--link-color-hover);
+				text-decoration: underline;
+			}
+		}
 
-    &-empty {
-      color: var(--text-faint);
-      font-style: italic;
-    }
+		&-empty {
+			color: var(--text-faint);
+			font-style: italic;
+		}
 
-    &-separator {
-      color: var(--text-faint);
-      margin: 0 $spacing-xs;
-    }
-  }
+		&-separator {
+			color: var(--text-faint);
+			margin: 0 $spacing-xs;
+		}
 
-  &-empty {
-    color: var(--text-muted);
-    font-style: italic;
-    text-align: center;
-    padding: $spacing-xl;
-  }
+		&-text {
+			color: var(--text-muted);
+			word-break: break-word;
+		}
+	}
+
+	&-empty {
+		color: var(--text-muted);
+		font-style: italic;
+		text-align: center;
+		padding: $spacing-xl;
+	}
 }
 
 // Node Edit Modal
-.nexus-properties-node-edit  {
-  &-modal .modal-content {
-    max-width: 800px;
-  }
+.nexus-properties-node-edit {
+	&-modal .modal-content {
+		max-width: 800px;
+	}
 
-  &-section {
-    margin-bottom: $spacing-lg;
-  }
+	&-section {
+		margin-bottom: $spacing-lg;
+	}
 
-  &-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: $spacing-md;
-    padding-bottom: $spacing-sm;
-    border-bottom: 1px solid var(--background-modifier-border);
-  }
+	&-header {
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		margin-bottom: $spacing-md;
+		padding-bottom: $spacing-sm;
+		border-bottom: 1px solid var(--background-modifier-border);
+	}
 
-  &-section-title {
-    margin: 0;
-    color: var(--text-normal);
-    font-size: 1em;
-    font-weight: 600;
-  }
+	&-section-title {
+		margin: 0;
+		color: var(--text-normal);
+		font-size: 1em;
+		font-weight: 600;
+	}
 
-  &-props-container {
-    display: flex;
-    flex-direction: column;
-    gap: $spacing-sm;
-    max-height: $node-edit-max-height;
-    overflow-y: auto;
-    padding: $spacing-sm;
-    background-color: var(--background-secondary);
-    border-radius: $border-radius;
-  }
+	&-props-container {
+		display: flex;
+		flex-direction: column;
+		gap: $spacing-sm;
+		max-height: $node-edit-max-height;
+		overflow-y: auto;
+		padding: $spacing-sm;
+		background-color: var(--background-secondary);
+		border-radius: $border-radius;
+	}
 
-  &-prop-row {
-    display: grid;
-    grid-template-columns: $node-edit-grid-key-width 1fr auto;
-    gap: $spacing-sm;
-    align-items: center;
-    padding: $spacing-sm;
-    background-color: var(--background-primary);
-    border-radius: $border-radius-sm;
-  }
+	&-prop-row {
+		display: grid;
+		grid-template-columns: $node-edit-grid-key-width 1fr auto;
+		gap: $spacing-sm;
+		align-items: center;
+		padding: $spacing-sm;
+		background-color: var(--background-primary);
+		border-radius: $border-radius-sm;
+	}
 
-  &-prop-key-input,
-  &-prop-value-input  {
-    width: 100%;
-    padding: $spacing-sm;
-    background-color: var(--background-primary);
-    border: 1px solid var(--background-modifier-border);
-    border-radius: $border-radius-sm;
-    color: var(--text-normal);
-    font-family: var(--font-text);
+	&-prop-key-input,
+	&-prop-value-input {
+		width: 100%;
+		padding: $spacing-sm;
+		background-color: var(--background-primary);
+		border: 1px solid var(--background-modifier-border);
+		border-radius: $border-radius-sm;
+		color: var(--text-normal);
+		font-family: var(--font-text);
 
-    &:focus {
-      outline: none;
-      border-color: var(--interactive-accent);
-    }
-  }
+		&:focus {
+			outline: none;
+			border-color: var(--interactive-accent);
+		}
+	}
 
-  &-remove-button  {
-    padding: $spacing-xs $spacing-sm;
-    background-color: var(--background-modifier-error);
-    color: var(--text-on-accent);
-    border: none;
-    border-radius: $border-radius-sm;
-    cursor: pointer;
-    font-size: 1.2em;
-    line-height: 1;
-    transition: background-color $transition-normal;
+	&-remove-button {
+		padding: $spacing-xs $spacing-sm;
+		background-color: var(--background-modifier-error);
+		color: var(--text-on-accent);
+		border: none;
+		border-radius: $border-radius-sm;
+		cursor: pointer;
+		font-size: 1.2em;
+		line-height: 1;
+		transition: background-color $transition-normal;
 
-    &:hover {
-      background-color: var(--background-modifier-error-hover);
-    }
-  }
+		&:hover {
+			background-color: var(--background-modifier-error-hover);
+		}
+	}
 }
 
 // Title Property Setup Modal
-.nexus-title-property-setup  {
-  &-modal {
-    display: flex;
-    flex-direction: column;
-    padding: $spacing-lg;
-    max-width: 550px;
-  }
+.nexus-title-property-setup {
+	&-modal {
+		display: flex;
+		flex-direction: column;
+		padding: $spacing-lg;
+		max-width: 550px;
+	}
 
-  &-title {
-    text-align: center;
-    margin-bottom: $spacing-md;
-    font-size: $font-size-xl;
-    color: var(--text-normal);
-  }
+	&-title {
+		text-align: center;
+		margin-bottom: $spacing-md;
+		font-size: $font-size-xl;
+		color: var(--text-normal);
+	}
 
-  &-description  {
-    margin-bottom: $spacing-lg;
+	&-description {
+		margin-bottom: $spacing-lg;
 
-    p {
-      margin-bottom: 0.75em;
-      line-height: 1.6;
-      color: var(--text-muted);
-    }
-  }
+		p {
+			margin-bottom: 0.75em;
+			line-height: 1.6;
+			color: var(--text-muted);
+		}
+	}
 
-  &-warning {
-    background: var(--background-secondary);
-    padding: 0.75em $spacing-md;
-    border-radius: $border-radius;
-    border-left: 3px solid var(--interactive-accent);
-  }
+	&-warning {
+		background: var(--background-secondary);
+		padding: 0.75em $spacing-md;
+		border-radius: $border-radius;
+		border-left: 3px solid var(--interactive-accent);
+	}
 
-  &-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75em;
-    margin-top: $spacing-md;
-  }
+	&-buttons {
+		display: flex;
+		flex-direction: column;
+		gap: 0.75em;
+		margin-top: $spacing-md;
+	}
 
-  &-button  {
-    padding: 0.75em $spacing-lg;
-    border-radius: $border-radius;
-    cursor: pointer;
-    border: 1px solid var(--background-modifier-border);
-    background: var(--interactive-normal);
-    color: var(--text-normal);
-    font-size: 1em;
-    transition: all $transition-normal;
+	&-button {
+		padding: 0.75em $spacing-lg;
+		border-radius: $border-radius;
+		cursor: pointer;
+		border: 1px solid var(--background-modifier-border);
+		background: var(--interactive-normal);
+		color: var(--text-normal);
+		font-size: 1em;
+		transition: all $transition-normal;
 
-    &:hover {
-      background: var(--interactive-hover);
-      border-color: var(--interactive-accent);
-    }
+		&:hover {
+			background: var(--interactive-hover);
+			border-color: var(--interactive-accent);
+		}
 
-    &.mod-cta  {
-      background: var(--interactive-accent);
-      color: var(--text-on-accent);
-      border-color: var(--interactive-accent);
+		&.mod-cta {
+			background: var(--interactive-accent);
+			color: var(--text-on-accent);
+			border-color: var(--interactive-accent);
 
-      &:hover {
-        background: var(--interactive-accent-hover);
-        border-color: var(--interactive-accent-hover);
-      }
-    }
+			&:hover {
+				background: var(--interactive-accent-hover);
+				border-color: var(--interactive-accent-hover);
+			}
+		}
 
-    &-later  {
-      background: transparent;
-      color: var(--text-muted);
-      border-color: transparent;
+		&-later {
+			background: transparent;
+			color: var(--text-muted);
+			border-color: transparent;
 
-      &:hover {
-        background: var(--background-secondary);
-        color: var(--text-normal);
-        border-color: var(--background-modifier-border);
-      }
-    }
-  }
+			&:hover {
+				background: var(--background-secondary);
+				color: var(--text-normal);
+				border-color: var(--background-modifier-border);
+			}
+		}
+	}
 }

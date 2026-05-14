@@ -1,42 +1,5 @@
 {
 	"$schema": "../../scripts/utils/css-allowlist.schema.json",
-	"externalClasses": [],
-	"undefinedClasses": [
-		{
-			"pattern": "clickable",
-			"reason": "Bootstrap: pre-existing undefined class identified during reverse-check rollout. Either add a CSS rule under the canonical prefix, refactor the code to use a defined class, or replace this entry with a real reason if the class is intentionally external.",
-			"source": "src/components/graph/zoom-preview.ts:96",
-			"bootstrap": true
-		},
-		{
-			"pattern": "core",
-			"reason": "Bootstrap: pre-existing undefined class identified during reverse-check rollout. Either add a CSS rule under the canonical prefix, refactor the code to use a defined class, or replace this entry with a real reason if the class is intentionally external.",
-			"source": "src/components/views/relationship-graph-view.ts:874",
-			"bootstrap": true
-		},
-		{
-			"pattern": "focused",
-			"reason": "Bootstrap: pre-existing undefined class identified during reverse-check rollout. Either add a CSS rule under the canonical prefix, refactor the code to use a defined class, or replace this entry with a real reason if the class is intentionally external.",
-			"source": "src/components/graph/zoom-manager.ts:109",
-			"bootstrap": true
-		},
-		{
-			"pattern": "glow",
-			"reason": "Bootstrap: pre-existing undefined class identified during reverse-check rollout. Either add a CSS rule under the canonical prefix, refactor the code to use a defined class, or replace this entry with a real reason if the class is intentionally external.",
-			"source": "src/components/graph/interaction-handler.ts:314",
-			"bootstrap": true
-		},
-		{
-			"pattern": "nexus-properties-color-rule",
-			"reason": "Bootstrap: pre-existing undefined class identified during reverse-check rollout. Either add a CSS rule under the canonical prefix, refactor the code to use a defined class, or replace this entry with a real reason if the class is intentionally external.",
-			"source": "src/components/settings/sections/rules-section.ts:115",
-			"bootstrap": true
-		},
-		{
-			"pattern": "nexus-properties-node-preview-prop-text",
-			"reason": "Bootstrap: pre-existing undefined class identified during reverse-check rollout. Either add a CSS rule under the canonical prefix, refactor the code to use a defined class, or replace this entry with a real reason if the class is intentionally external.",
-			"source": "src/components/node-preview-modal.ts:31",
-			"bootstrap": true
-		}
-	]
+	"externalClasses": ["core", "focused", "glow"],
+	"undefinedClasses": []
 }

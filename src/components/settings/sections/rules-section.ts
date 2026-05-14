@@ -112,7 +112,7 @@ export class RulesSection implements SettingsSection {
 				button.setButtonText("Add Rule");
 				button.onClick(async () => {
 					const newRule = {
-						id: `${cls("color-rule")}-${Date.now()}`,
+						id: `color-rule-${Date.now()}`,
 						expression: "",
 						color: "hsl(200, 70%, 50%)",
 						enabled: true,

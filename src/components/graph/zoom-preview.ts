@@ -90,10 +90,9 @@ export class GraphZoomPreview {
 			cls: cls("graph-zoom-preview-controls"),
 		});
 
-		// Clickable header (left side)
 		const headerEl = this.controlsContainer.createEl("h2", {
 			text: this.props.file.basename,
-			cls: `${cls("graph-zoom-preview-title")} clickable`,
+			cls: cls("graph-zoom-preview-title"),
 		});
 
 		headerEl.onclick = () => {

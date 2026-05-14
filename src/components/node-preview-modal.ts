@@ -70,8 +70,6 @@ export class NodePreviewModal extends Modal {
 		const header = contentEl.createDiv(cls("node-preview-header"));
 		const titleEl = header.createEl("h2", { text: this.file.basename });
 
-		// Make title clickable to open file
-		titleEl.addClass("clickable");
 		titleEl.onclick = () => {
 			void this.app.workspace.openLinkText(this.file.path, "", false);
 			this.close();
