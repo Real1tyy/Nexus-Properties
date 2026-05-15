@@ -37,10 +37,8 @@ export class GraphLayoutManager {
 			config;
 
 		// Check layout mode flags
-		const hasConstellationData = nodes.some((node) => node.data && typeof node.data["constellationIndex"] === "number");
-		const hasConstellationGroups = nodes.some(
-			(node) => node.data && typeof node.data["constellationGroup"] === "number"
-		);
+		const hasConstellationData = nodes.some((node) => typeof node.data["constellationIndex"] === "number");
+		const hasConstellationGroups = nodes.some((node) => typeof node.data["constellationGroup"] === "number");
 
 		if (isFolderNote && renderRelated && hasConstellationGroups) {
 			this.applyFolderConstellationLayout(nodes, animationDuration);
@@ -75,7 +73,7 @@ export class GraphLayoutManager {
 		}
 
 		const singleNodeIds = new Set(singleNodeTrees.flat());
-		const connectedNodeIds = nodes.map((n) => n.data?.id as string).filter((id) => !singleNodeIds.has(id));
+		const connectedNodeIds = nodes.map((n) => n.data.id as string).filter((id) => !singleNodeIds.has(id));
 		const connectedBounds = this.nodeOrganizer.calculateBounds(this.cy, connectedNodeIds);
 
 		const newPositions = this.nodeOrganizer.calculateIsolatedNodeGridPositions(singleNodeTrees, connectedBounds, {
@@ -114,7 +112,7 @@ export class GraphLayoutManager {
 				this.cy?.fit(undefined, padding);
 			}, animationDuration);
 		} else {
-			this.cy?.fit(undefined, padding);
+			this.cy.fit(undefined, padding);
 		}
 	}
 
@@ -388,8 +386,8 @@ export class GraphLayoutManager {
 		const parentToChildren = new Map<string, string[]>();
 
 		edges.forEach((edge) => {
-			const source = edge.data?.source as string;
-			const target = edge.data?.target as string;
+			const source = edge.data.source as string;
+			const target = edge.data.target as string;
 
 			if (!parentToChildren.has(source)) {
 				parentToChildren.set(source, []);
@@ -400,7 +398,7 @@ export class GraphLayoutManager {
 		// Group nodes by level
 		const nodesByLevel = new Map<number, ElementDefinition[]>();
 		nodes.forEach((node) => {
-			const level = (node.data?.["level"] as number) ?? 0;
+			const level = node.data["level"] as number;
 			if (!nodesByLevel.has(level)) {
 				nodesByLevel.set(level, []);
 			}
@@ -413,7 +411,7 @@ export class GraphLayoutManager {
 		const maxLevel = Math.max(...levels);
 
 		const getNodeIdsAtLevel = (level: number): string[] =>
-			(nodesByLevel.get(level) ?? []).map((n) => n.data?.id as string).filter(Boolean);
+			(nodesByLevel.get(level) ?? []).map((n) => n.data.id as string).filter(Boolean);
 
 		const getMaxYForIds = (ids: string[]): number => {
 			let maxY = -Infinity;
@@ -520,8 +518,8 @@ export class GraphLayoutManager {
 				const startY = generationStartY.get(childLevel);
 				if (startY !== undefined) {
 					for (const nodeId of childIds) {
-						const cyNode = this.cy?.getElementById(nodeId);
-						if (!cyNode || cyNode.length === 0) continue;
+						const cyNode = this.cy.getElementById(nodeId);
+						if (cyNode.length === 0) continue;
 						const pos = cyNode.position();
 						if (pos.y < startY) {
 							cyNode.position({ x: pos.x, y: startY });
@@ -591,7 +589,7 @@ export class GraphLayoutManager {
 	): void {
 		if (!this.cy) return;
 		nodes.forEach((node) => {
-			if (!node.data?.id) return;
+			if (!node.data.id) return;
 
 			const pos = nodePositions.get(node.data.id);
 			if (!pos) return;

@@ -158,16 +158,11 @@ export default class NexusPropertiesPlugin extends Plugin {
 	}
 
 	override onunload(): void {
-		this.propertiesManager?.stop();
-		this.indexer?.stop();
+		this.propertiesManager.stop();
+		this.indexer.stop();
 	}
 
 	async triggerFullRescan(): Promise<void> {
-		if (!this.propertiesManager || !this.indexer) {
-			console.error("❌ Cannot trigger rescan: Plugin not fully initialized");
-			return;
-		}
-
 		await this.propertiesManager.rescanAndAssignPropertiesForAllFiles(this.indexer);
 	}
 
@@ -261,7 +256,7 @@ export default class NexusPropertiesPlugin extends Plugin {
 			return false;
 		}
 
-		if (!this.indexer?.shouldIndexFile(activeFile.path)) {
+		if (!this.indexer.shouldIndexFile(activeFile.path)) {
 			return false;
 		}
 

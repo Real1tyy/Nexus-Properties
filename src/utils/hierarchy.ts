@@ -6,6 +6,7 @@ import {
 	parsePropertyLinks,
 } from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
+import { TFile as TFileClass } from "obsidian";
 
 import { type FileRelationships, RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
 import type { HierarchyTraversalOptions, RelationshipResolver } from "../types/hierarchy";
@@ -211,7 +212,7 @@ export function buildHierarchyTreeFromTopParent(
 		: findTopmostParent(app, indexer, startFile.path, options);
 	const rootFile = app.vault.getAbstractFileByPath(rootPath);
 
-	const fileToUse = rootFile ? (rootFile as TFile) : startFile;
+	const fileToUse = rootFile instanceof TFileClass ? rootFile : startFile;
 	return buildHierarchyTree(app, indexer, fileToUse, {
 		...options,
 		highlightPath: options.highlightPath ?? startFile.path,

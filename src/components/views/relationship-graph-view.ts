@@ -225,7 +225,7 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		if (isMobile) {
 			// Mobile: Filter preset in header, search + filter combined in one row
-			const controlsContainer = this.header?.getControlsContainer();
+			const controlsContainer = this.header.getControlsContainer();
 			if (controlsContainer) {
 				createFilterPresetSelector(controlsContainer);
 			}
@@ -443,7 +443,8 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 						const rect = this.graphContainerEl?.getBoundingClientRect();
 						if (rect && rect.width > 0 && rect.height > 0) {
 							this.initializeCytoscape();
-							if (this.cy && this.pendingGraphData) {
+							const cy = this.cy as Core | null;
+							if (cy) {
 								this.renderAndFitGraph(this.pendingGraphData.nodes, this.pendingGraphData.edges);
 								this.pendingGraphData = null;
 							}
@@ -504,13 +505,9 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 
 		this.cleanupEvents();
 
-		if (this.zoomManager) {
-			this.zoomManager.cleanup();
-		}
+		this.zoomManager.cleanup();
 
-		if (this.propertyTooltip) {
-			this.propertyTooltip.destroy();
-		}
+		this.propertyTooltip.destroy();
 
 		if (this.graphSearch) {
 			this.graphSearch.destroy();
@@ -643,11 +640,6 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			return;
 		}
 
-		if (!this.indexer) {
-			this.showEmptyState("Plugin is still initializing. Please wait...");
-			return;
-		}
-
 		if (!this.indexer.shouldIndexFile(file.path)) {
 			this.showEmptyState("This file is not in a configured directory for relationship tracking.");
 			return;
@@ -767,13 +759,12 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 		// If Cytoscape doesn't exist yet, do full initialization
 		if (!this.cy) {
 			// Clear any leftover empty state content before reinitializing
-			if (this.graphContainerEl) {
-				this.graphContainerEl.empty();
-			}
+			this.graphContainerEl?.empty();
 			this.initializeCytoscape();
 
 			// If initialization failed, store the graph data and wait for container to become visible
-			if (!this.cy) {
+			const cy = this.cy as Core | null;
+			if (!cy) {
 				this.pendingGraphData = { nodes, edges };
 				this.isUpdating = false;
 				return;
@@ -790,7 +781,8 @@ export class RelationshipGraphView extends RegisteredEventsComponent {
 			this.forceFullRebuild = false;
 			this.destroyGraph();
 			this.initializeCytoscape();
-			if (this.cy) {
+			const cy = this.cy as Core | null;
+			if (cy) {
 				this.renderAndFitGraph(nodes, edges);
 				this.updateTrackedElements(nodes, edges);
 			}

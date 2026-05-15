@@ -122,7 +122,7 @@ export class GraphInteractionHandler {
 					return;
 				}
 
-				if (originalEvent && (originalEvent.ctrlKey || originalEvent.metaKey)) {
+				if (originalEvent.ctrlKey || originalEvent.metaKey) {
 					void this.app.workspace.getLeaf("tab").openFile(file);
 					return;
 				}
@@ -249,7 +249,6 @@ export class GraphInteractionHandler {
 	): void {
 		const now = Date.now();
 		const renderedPos = evt.renderedPosition;
-		if (!renderedPos) return;
 
 		const isZoomIn = direction === "in";
 		const lastTime = isZoomIn ? this.lastBackgroundTapTime : this.lastBackgroundRightClickTime;
@@ -277,7 +276,6 @@ export class GraphInteractionHandler {
 				: Math.max(currentZoom / zoomFactor, this.cy.minZoom());
 
 			const modelPos = evt.position;
-			if (!modelPos) return;
 
 			const viewportCenter = {
 				x: this.cy.width() / 2,
@@ -313,7 +311,7 @@ export class GraphInteractionHandler {
 			if (Math.random() < 0.4) {
 				node.addClass("glow");
 				const pulse = (): void => {
-					if (!node.cy() || this.config.isUpdating()) {
+					if (this.config.isUpdating()) {
 						return;
 					}
 					node.animate({ style: { "overlay-opacity": 0.35 } }, { duration: 1500, easing: "ease-in-out" }).animate(
@@ -386,7 +384,6 @@ export class GraphInteractionHandler {
 		if (!currentNode.length) return null;
 
 		const currentPos = currentNode.renderedPosition();
-		if (!currentPos) return null;
 
 		// Get all other nodes
 		const otherNodes = this.cy.nodes().filter((n) => n.id() !== currentNodeId);
@@ -400,7 +397,6 @@ export class GraphInteractionHandler {
 
 		otherNodes.forEach((node) => {
 			const pos = node.renderedPosition();
-			if (!pos) return;
 
 			// Check if node is at approximately the same vertical level
 			const verticalDist = Math.abs(pos.y - currentPos.y);
@@ -439,9 +435,6 @@ export class GraphInteractionHandler {
 		if (!this.cy) return null;
 		const currentNode = this.cy.getElementById(currentNodeId);
 		if (!currentNode.length) return null;
-
-		const currentPos = currentNode.position();
-		if (!currentPos) return null;
 
 		// Find all tree roots (nodes with no incoming edges)
 		const treeRoots = this.cy
@@ -491,7 +484,7 @@ export class GraphInteractionHandler {
 		let current = node;
 		const visited = new Set<string>();
 
-		while (true) {
+		for (;;) {
 			const currentId = current.id();
 			if (visited.has(currentId)) {
 				return currentId;

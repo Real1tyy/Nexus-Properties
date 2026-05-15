@@ -1,4 +1,4 @@
-import type { App } from "obsidian";
+import type { App, TFile } from "obsidian";
 import { BehaviorSubject } from "rxjs";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -6,11 +6,17 @@ import { GraphBuilder } from "../src/core/graph-builder";
 import { HierarchyProvider } from "../src/core/hierarchy";
 import type { Indexer } from "../src/core/indexer";
 import type { NexusPropertiesSettingsStore } from "../src/types/settings";
+// `instanceof TFile` checks in src/utils/hierarchy.ts need the mock TFile
+// constructor at runtime; the typecheck still resolves to obsidian's TFile via
+// the type-only import above.
+import { TFile as MockTFile } from "./mocks/obsidian";
 
 describe("Folder Notes Graph Building", () => {
 	afterEach(() => {
 		HierarchyProvider.resetInstance();
 	});
+
+	const mockTFile = (path: string): TFile => new MockTFile(path) as unknown as TFile;
 
 	const createMockApp = (files: { path: string; frontmatter?: Record<string, any> }[]): App => {
 		// Create case-insensitive map (store with normalized lowercase keys, but preserve original paths)
@@ -18,19 +24,14 @@ describe("Folder Notes Graph Building", () => {
 
 		return {
 			vault: {
-				getMarkdownFiles: vi.fn(() =>
-					files.map((f) => ({
-						path: f.path,
-						basename: f.path.split("/").pop()?.replace(".md", "") || "",
-					}))
-				),
+				getMarkdownFiles: vi.fn(() => files.map((f) => mockTFile(f.path))),
 				getAbstractFileByPath: vi.fn((path) => {
 					const file = fileMap.get(path.toLowerCase());
-					return file ? { path: file.originalPath } : null;
+					return file ? mockTFile(file.originalPath) : null;
 				}),
 				getFileByPath: vi.fn((path) => {
 					const file = fileMap.get(path.toLowerCase());
-					return file ? { path: file.originalPath } : null;
+					return file ? mockTFile(file.originalPath) : null;
 				}),
 			},
 			metadataCache: {
@@ -46,7 +47,7 @@ describe("Folder Notes Graph Building", () => {
 					for (const [normalizedPath, data] of fileMap) {
 						const pathWithoutExt = normalizedPath.replace(/\.md$/, "");
 						if (pathWithoutExt === normalizedLink || normalizedPath === linkPath.toLowerCase()) {
-							return { path: data.originalPath };
+							return mockTFile(data.originalPath);
 						}
 					}
 
@@ -54,7 +55,7 @@ describe("Folder Notes Graph Building", () => {
 					for (const [normalizedPath, data] of fileMap) {
 						const basename = normalizedPath.split("/").pop()?.replace(/\.md$/, "");
 						if (basename === normalizedLink) {
-							return { path: data.originalPath };
+							return mockTFile(data.originalPath);
 						}
 					}
 

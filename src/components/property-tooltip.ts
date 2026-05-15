@@ -202,7 +202,7 @@ export class PropertyTooltip {
 		for (const segment of segments) {
 			if (segment.type === "text") {
 				container.createSpan({ text: segment.content });
-			} else if (segment.type === "link" && segment.linkPath && segment.displayText) {
+			} else if (segment.linkPath && segment.displayText) {
 				const linkEl = container.createEl("a", {
 					text: segment.displayText,
 					cls: cls("property-link"),

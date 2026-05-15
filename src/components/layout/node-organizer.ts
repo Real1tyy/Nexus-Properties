@@ -20,7 +20,7 @@ export class NodeOrganizer {
 		let maxLevel = 0;
 
 		nodes.forEach((node) => {
-			const level = node.data?.["constellationLevel"] ?? 0;
+			const level = node.data["constellationLevel"] ?? 0;
 			if (!nodesByLevel.has(level)) {
 				nodesByLevel.set(level, []);
 			}
@@ -35,7 +35,7 @@ export class NodeOrganizer {
 		const nodesByGroup = new Map<number, ElementDefinition[]>();
 
 		nodes.forEach((node) => {
-			const group = node.data?.["constellationGroup"] as number;
+			const group = node.data["constellationGroup"] as number | undefined;
 			if (group === undefined) return;
 
 			if (!nodesByGroup.has(group)) {
@@ -48,7 +48,7 @@ export class NodeOrganizer {
 	}
 
 	identifyConnectedComponents(nodes: ElementDefinition[], edges: ElementDefinition[]): string[][] {
-		const nodeIds = new Set(nodes.map((n) => n.data?.id as string));
+		const nodeIds = new Set(nodes.map((n) => n.data.id as string));
 		const adjacency = new Map<string, Set<string>>();
 
 		// Build adjacency list (undirected)
@@ -56,8 +56,8 @@ export class NodeOrganizer {
 			adjacency.set(id, new Set());
 		});
 		edges.forEach((edge) => {
-			const source = edge.data?.source as string;
-			const target = edge.data?.target as string;
+			const source = edge.data.source as string;
+			const target = edge.data.target as string;
 			adjacency.get(source)?.add(target);
 			adjacency.get(target)?.add(source);
 		});

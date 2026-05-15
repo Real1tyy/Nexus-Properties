@@ -529,7 +529,7 @@ export class GraphBuilder {
 		if (!searchQuery && !filterEvaluator) return graphData;
 
 		const filteredNodes = graphData.nodes.filter((node) => {
-			const { isSource, label, id } = node.data || {};
+			const { isSource, label, id } = node.data;
 
 			// Always keep source node
 			if (isSource) return true;
@@ -553,10 +553,10 @@ export class GraphBuilder {
 			return true;
 		});
 
-		const keepNodeIds = new Set(filteredNodes.map((node) => node.data?.id as string));
+		const keepNodeIds = new Set(filteredNodes.map((node) => node.data.id as string));
 
 		let filteredEdges = graphData.edges.filter(
-			(edge) => keepNodeIds.has(edge.data?.source as string) && keepNodeIds.has(edge.data?.target as string)
+			(edge) => keepNodeIds.has(edge.data.source as string) && keepNodeIds.has(edge.data.target as string)
 		);
 
 		if (this.maintainIndirectConnections) {
@@ -570,8 +570,8 @@ export class GraphBuilder {
 	private findIndirectConnections(originalEdges: ElementDefinition[], keepNodeIds: Set<string>): ElementDefinition[] {
 		const outgoing = new Map<string, Set<string>>();
 		for (const edge of originalEdges) {
-			const source = edge.data?.source as string | undefined;
-			const target = edge.data?.target as string | undefined;
+			const source = edge.data.source as string | undefined;
+			const target = edge.data.target as string | undefined;
 			if (!source || !target) continue;
 
 			let set = outgoing.get(source);

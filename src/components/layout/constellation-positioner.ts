@@ -34,7 +34,7 @@ export class ConstellationPositioner {
 			const levelNodes = nodesByLevel.get(level) ?? [];
 
 			levelNodes.forEach((node) => {
-				if (!node.data?.id) return;
+				if (!node.data.id) return;
 
 				// Root node at group center
 				if (level === 0) {
@@ -54,17 +54,17 @@ export class ConstellationPositioner {
 		allNodes: ElementDefinition[],
 		nodePositions: Map<string, { x: number; y: number }>
 	): void {
-		const centerPath = node.data?.["centerPath"];
+		const centerPath = node.data["centerPath"];
 		if (!centerPath) return;
 
-		const orbitalIndex = node.data?.["orbitalIndex"] ?? 0;
-		const orbitalCount = node.data?.["orbitalCount"] ?? 1;
+		const orbitalIndex = node.data["orbitalIndex"] ?? 0;
+		const orbitalCount = node.data["orbitalCount"] ?? 1;
 
 		const centerPos = nodePositions.get(centerPath);
 		if (!centerPos) return;
 
 		const orbitalRadius = this.calculateOrbitalRadius(orbitalCount);
-		const baseAngle = this.calculateBaseAngle(node.data?.["centerPath"], allNodes);
+		const baseAngle = this.calculateBaseAngle(node.data["centerPath"], allNodes);
 		const idealAngle = (orbitalIndex / orbitalCount) * 2 * Math.PI + baseAngle;
 
 		const position = this.collisionDetector.findValidPositionSimple(
@@ -92,8 +92,8 @@ export class ConstellationPositioner {
 		let angleOffset = Math.PI / 2; // Default: start at top
 
 		// If the center itself has an orbital index, use that to vary the starting angle
-		const centerNode = allNodes.find((n) => n.data?.id === centerPath);
-		if (centerNode?.data?.["orbitalIndex"] !== undefined) {
+		const centerNode = allNodes.find((n) => n.data.id === centerPath);
+		if (centerNode?.data["orbitalIndex"] !== undefined) {
 			angleOffset += (centerNode.data["orbitalIndex"] * Math.PI) / 3;
 		}
 
@@ -102,7 +102,7 @@ export class ConstellationPositioner {
 
 	private applyPositions(nodes: ElementDefinition[], nodePositions: Map<string, { x: number; y: number }>): void {
 		nodes.forEach((node) => {
-			if (!node.data?.id) return;
+			if (!node.data.id) return;
 
 			const pos = nodePositions.get(node.data.id);
 			if (!pos) return;

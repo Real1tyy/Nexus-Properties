@@ -259,7 +259,7 @@ export class BasesView extends RegisteredEventsComponent {
 		}
 
 		const builder = BaseBuilder.create();
-		if (rawFormulas?.trim()) builder.rawFormulas(rawFormulas);
+		if (rawFormulas.trim()) builder.rawFormulas(rawFormulas);
 		if (opts.topLevelFilter) builder.filter(opts.topLevelFilter);
 
 		builder.addView({
@@ -267,7 +267,7 @@ export class BasesView extends RegisteredEventsComponent {
 			name: viewName,
 			order,
 			...(viewFilters.length > 0 && { filter: Filter.and(...viewFilters) }),
-			...(rawSort?.trim() ? { rawSort } : {}),
+			...(rawSort.trim() ? { rawSort } : {}),
 		});
 
 		return BaseRenderer.renderCodeBlock(builder.build());
@@ -360,9 +360,7 @@ export class BasesView extends RegisteredEventsComponent {
 			this.settingsSubscription.unsubscribe();
 			this.settingsSubscription = null;
 		}
-		if (this.component) {
-			this.component.unload();
-		}
+		this.component.unload();
 		this.viewSelectorEl = null;
 		this.lastFilePath = null;
 		this.isUpdating = false;

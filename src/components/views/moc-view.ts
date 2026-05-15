@@ -132,7 +132,7 @@ export class MocView extends RegisteredEventsComponent {
 			}
 
 			if (hadSearchFocus) {
-				this.mocSearch?.focus();
+				this.mocSearch.focus();
 			}
 		} finally {
 			this.isUpdating = false;
@@ -440,7 +440,6 @@ export class MocView extends RegisteredEventsComponent {
 
 	private toggleNode(path: string, itemEl: HTMLElement, toggleBtn: HTMLElement): void {
 		const childrenEl = itemEl.querySelector(`:scope > .${cls("moc-children")}`) as HTMLElement;
-		if (!childrenEl) return;
 
 		if (this.collapsedNodes.has(path)) {
 			this.collapsedNodes.delete(path);
@@ -553,9 +552,7 @@ export class MocView extends RegisteredEventsComponent {
 			this.settingsSubscription.unsubscribe();
 			this.settingsSubscription = null;
 		}
-		if (this.component) {
-			this.component.unload();
-		}
+		this.component.unload();
 		this.mocSearch?.destroy();
 		this.mocSearch = null;
 		this.searchRowEl = null;

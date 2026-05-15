@@ -448,7 +448,7 @@ export class NexusViewSwitcher extends ItemView {
 			);
 
 			await this.basesView.render();
-		} else if (this.currentMode === "moc") {
+		} else {
 			// Create MOC container
 			this.mocContentEl = contentEl.createEl("div", {
 				cls: cls("moc-view-content"),
@@ -662,8 +662,8 @@ export class NexusViewSwitcher extends ItemView {
 		}
 
 		if (this.graphView) {
-			const isRelatedView = this.graphView.isRelatedView?.() ?? false;
-			const isAllRelated = this.graphView.isAllRelatedView?.() ?? false;
+			const isRelatedView = this.graphView.isRelatedView();
+			const isAllRelated = this.graphView.isAllRelatedView();
 
 			if (isRelatedView && isAllRelated) {
 				return settings.allRelatedMaxDepth;

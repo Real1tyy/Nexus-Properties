@@ -148,7 +148,7 @@ export class NodeEditModal extends Modal {
 			const keyInput = row.querySelector(`.${cls("node-edit-prop-key-input")}`) as HTMLInputElement;
 			const valueInput = row.querySelector(`.${cls("node-edit-prop-value-input")}`) as HTMLInputElement;
 
-			if (keyInput?.value && valueInput?.value !== undefined) {
+			if (keyInput.value) {
 				const currentKey = keyInput.value.trim();
 				const currentValue = valueInput.value;
 
