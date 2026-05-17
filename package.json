@@ -11,8 +11,8 @@
 		"check-css": "node scripts/check-unused-css.mjs . --summary --no-fail",
 		"test": "vitest run",
 		"test:watch": "vitest",
-		"test:changed": "python3 ../scripts/ci/unit_changed.py",
-		"test:since": "python3 ../scripts/ci/unit_changed.py --since=HEAD~1",
+		"test:changed": "uv run --project ../tools/ci-cli mci unit-changed",
+		"test:since": "uv run --project ../tools/ci-cli mci unit-changed --since=HEAD~1",
 		"lint:css": "stylelint \"src/styles/**/*.scss\"",
 		"clean": "rm -f main.js",
 		"check-undefined-css": "node scripts/check-unused-css.mjs . --undefined-classes --no-unused --summary --no-fail"
