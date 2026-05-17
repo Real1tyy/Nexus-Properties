@@ -1,67 +1,8 @@
-// ─── Components ───
-export type { ButtonProps, ButtonVariant } from "./components/button";
-export { Button } from "./components/button";
-export type { ChipProps } from "./components/chip";
-export { Chip } from "./components/chip";
-export type { ChipListProps } from "./components/chip-list";
-export { ChipList } from "./components/chip-list";
-export type { CollapsibleSectionProps, SectionBodyProps, SectionHeaderProps } from "./components/collapsible-section";
-export { CollapsibleSection, SectionBody, SectionHeader } from "./components/collapsible-section";
-export type { CommittedFilterInputHandle, CommittedFilterInputProps } from "./components/committed-filter-input";
-export { CommittedFilterInput } from "./components/committed-filter-input";
-export type { CopyableProps } from "./components/copyable";
-export { Copyable } from "./components/copyable";
-export type { EmptyHintProps } from "./components/empty-hint";
-export { EmptyHint } from "./components/empty-hint";
-export type { FilterInputProps } from "./components/filter-input";
-export { FilterInput, useFilteredItems } from "./components/filter-input";
-export type { IconPickerButtonProps } from "./components/icon-picker-button";
-export { IconPickerButton, useIconPicker } from "./components/icon-picker-button";
-export type { IconPickerGridProps } from "./components/icon-picker-grid";
-export { IconPickerGrid } from "./components/icon-picker-grid";
-export { LicenseSection } from "./components/license-section";
-export type {
-	EditableItem as ManagerEditableItem,
-	ManagerEditActions,
-	ManagerEditController,
-	ManagerEditFormProps,
-	ManagerEditOverrides,
-	ManagerEditValues,
-} from "./components/manager-edit-form";
-export { ManagerEditForm } from "./components/manager-edit-form";
-export type { ManagerRowAction, ManagerRowProps } from "./components/manager-row";
-export type { EditableItem } from "./components/manager-row";
-export { ManagerRow } from "./components/manager-row";
-export type { ModalDescriptionProps } from "./components/modal-description";
-export { ModalDescription } from "./components/modal-description";
-export type { ModalFormProps, ModalSchemaFormProps } from "./components/modal-form";
-export { ModalForm, ModalSchemaForm } from "./components/modal-form";
-export type { MountImperativeProps } from "./components/mount-imperative";
-export { MountImperative } from "./components/mount-imperative";
-export { ObsidianIcon } from "./components/obsidian-icon";
-export type { ChartJSCtor, ChartTitleProps, PieCanvasProps, PieChartData, PieChartProps } from "./components/pie-chart";
-export { ChartTitle, PieCanvas, PieChart } from "./components/pie-chart";
-export type { PropertyItemProps } from "./components/property-item";
-export { PropertyItem } from "./components/property-item";
-export type { PropertyValueProps } from "./components/property-value";
-export { PropertyValue } from "./components/property-value";
-export { SecretField } from "./components/secret-field";
-export {
-	ColorInput,
-	DateInput,
-	DatetimeLocalInput,
-	Dropdown,
-	NumberInput,
-	Slider,
-	TextareaInput,
-	TextInput,
-	Toggle,
-} from "./components/setting-controls";
-export { SettingCard, SettingHeading, SettingItem } from "./components/setting-item";
-export type { TextareaProps } from "./components/textarea";
-export { Textarea } from "./components/textarea";
-export type { UpdateAvailableBadgeProps } from "./components/update-available-badge";
-export { UpdateAvailableBadge } from "./components/update-available-badge";
+// ─── Primitives (atoms, controls, filters, layout) ───
+export * from "./primitives";
+
+// ─── Widgets (composite, feature-shaped components) ───
+export * from "./widgets";
 
 // ─── Contexts ───
 export { AppContext, useApp } from "./contexts/app-context";
@@ -88,16 +29,16 @@ export * from "./forms";
 // ─── Hooks ───
 export { useDomEvent } from "./hooks/dom";
 export { type Emitterlike, useObsidianEvent } from "./hooks/dom";
-export { type UseOutsideClickOptions, useOutsideClick } from "./hooks/dom";
+export { useOutsideClick, type UseOutsideClickOptions } from "./hooks/dom";
 export { useScrollRestore } from "./hooks/dom";
-export { type UseFocusOnMountOptions, useFocusOnMount } from "./hooks/focus";
+export { useFocusOnMount, type UseFocusOnMountOptions } from "./hooks/focus";
 export { type ActivatableProps, useActivatable } from "./hooks/interaction";
-export { type UseCopyToClipboardOptions, useCopyToClipboard } from "./hooks/interaction";
+export { useCopyToClipboard, type UseCopyToClipboardOptions } from "./hooks/interaction";
 export {
 	DEBOUNCED_COMMIT_DEFAULT_MS,
 	type DebouncedCommitHandle,
-	type UseDebouncedCommitOptions,
 	useDebouncedCommit,
+	type UseDebouncedCommitOptions,
 } from "./hooks/interaction";
 export {
 	useArrowDown,
@@ -111,6 +52,7 @@ export { useKeyDown } from "./hooks/keyboard";
 export { useEnterKey, type UseEnterKeyOptions, useEscapeKey } from "./hooks/keyboard";
 export { type SnapshotSubscribable, useExternalSnapshot } from "./hooks/reactive";
 export { useObservable, useSubscription } from "./hooks/reactive";
+export { useThrottledObservable } from "./hooks/reactive";
 export { useColorEvaluator, useReleaseCheck } from "./hooks/services";
 export type { Paths, PathValue } from "./hooks/settings";
 export { type SchemaFieldBinding, type SettingsStorelike, useSchemaField } from "./hooks/settings";
@@ -217,8 +159,8 @@ export type {
 export {
 	createPageHeader,
 	openPageHeaderActionManager,
-	pageHeaderField,
 	PageHeaderActionBar,
+	pageHeaderField,
 	PageHeaderStateSchema,
 	PageHeaderStore,
 	registerPageHeaderCommands,
