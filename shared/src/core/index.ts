@@ -11,5 +11,4 @@ export * from "./license";
 export * from "./release-check";
 export * from "./settings";
 export * from "./storage";
-export * from "./validation";
 export * from "./vault-table";
