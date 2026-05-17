@@ -86,7 +86,7 @@ describe("CommandManager", () => {
 		});
 
 		it("should enforce history size limit", async () => {
-			const smallManager = new CommandManager(3);
+			const smallManager = new CommandManager({ maxHistorySize: 3 });
 
 			for (let i = 0; i < 5; i++) {
 				await smallManager.executeCommand(createMockCommand(`Command${i}`));
