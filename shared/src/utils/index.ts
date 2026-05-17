@@ -10,7 +10,6 @@ export * from "./e2e";
 export * from "./errors";
 export * from "./expression-utils";
 export * from "./generate";
-export * from "./history-stack";
 export * from "./list-utils";
 export * from "./string";
 export * from "./styles";

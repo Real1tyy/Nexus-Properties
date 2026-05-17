@@ -5,6 +5,7 @@ export * from "./evaluator";
 export * from "./event-statistics";
 export * from "./file";
 export * from "./frontmatter";
+export * from "./history-stack";
 export * from "./indexer";
 export * from "./license";
 export * from "./release-check";
