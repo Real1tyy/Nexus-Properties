@@ -1,10 +1,9 @@
 import { filterPropertiesForDisplay } from "@real1ty-obsidian-plugins";
-import { type App, Modal, type TFile } from "obsidian";
+import { Modal, type App, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 
 import { cls } from "../constants";
-import type { NexusPropertiesSettingsStore } from "../types/settings";
-import type { NexusPropertiesSettings } from "../types/settings";
+import type { NexusPropertiesSettings, NexusPropertiesSettingsStore } from "../types/settings";
 import { PropertyRenderer } from "./property-renderer";
 
 export class NodePreviewModal extends Modal {

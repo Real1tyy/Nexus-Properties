@@ -1,4 +1,4 @@
-import { buildUtmUrl, type SettingsSection, SettingsUIBuilder } from "@real1ty-obsidian-plugins";
+import { buildUtmUrl, SettingsUIBuilder, type SettingsSection } from "@real1ty-obsidian-plugins";
 import { SettingsNav, type SettingsNavTab } from "@real1ty-obsidian-plugins-react";
 import { memo, useCallback, useEffect, useRef, useState } from "react";
 

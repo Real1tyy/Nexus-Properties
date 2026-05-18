@@ -1,10 +1,9 @@
 import { extractUserFrontmatter } from "@real1ty-obsidian-plugins";
-import { type App, Menu, Notice, TFile } from "obsidian";
+import { Menu, Notice, TFile, type App } from "obsidian";
 
-import { type CommandManager, DeleteNodeCommand, EditNodeCommand } from "../../core/commands";
+import { DeleteNodeCommand, EditNodeCommand, type CommandManager } from "../../core/commands";
 import type { RelationshipType } from "../../types/constants";
-import type { NexusPropertiesSettingsStore } from "../../types/settings";
-import type { Frontmatter } from "../../types/settings";
+import type { Frontmatter, NexusPropertiesSettingsStore } from "../../types/settings";
 import { NodeEditModal } from "../node-edit-modal";
 import { NodePreviewModal } from "../node-preview-modal";
 

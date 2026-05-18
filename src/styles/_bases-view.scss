@@ -1,105 +1,106 @@
 @use "variables" as *;
 
-.nexus-properties-bases-view  {
-  display: flex;
-  flex-direction: column;
-  flex: 1;
-  width: 100%;
-  height: 100%;
+.nexus-properties-bases-view {
+	display: flex;
+	flex-direction: column;
+	flex: 1;
+	width: 100%;
+	height: 100%;
 
-  &-content {
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    min-height: 0;
-    width: 100%;
-    overflow: auto;
-  }
+	&-content {
+		display: flex;
+		flex-direction: column;
+		flex: 1;
+		min-height: 0;
+		width: 100%;
+		overflow: auto;
+	}
 
-  &-selector {
-    padding: 8px;
-    border-bottom: 1px solid var(--background-modifier-border);
-    background-color: var(--background-secondary);
-  }
+	&-selector {
+		padding: 8px;
+		border-bottom: 1px solid var(--background-modifier-border);
+		background-color: var(--background-secondary);
+	}
 }
 
 // Select dropdown
-.nexus-properties-bases-select  {
-  width: 100%;
-  padding: 6px 8px;
-  background: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: $border-radius-sm;
-  color: var(--text-normal);
-  font-size: 13px;
-  cursor: pointer;
-  transition:
-    background $transition-fast,
-    border-color $transition-fast;
-  -webkit-appearance: none;
-  -moz-appearance: none;
-  appearance: none;
-  background-image: $dropdown-arrow-svg;
-  background-repeat: no-repeat;
-  background-position: right 8px center;
-  padding-right: 28px;
+.nexus-properties-bases-select {
+	width: 100%;
+	padding: 6px 8px;
+	background: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: $border-radius-sm;
+	color: var(--text-normal);
+	font-size: 13px;
+	cursor: pointer;
+	transition:
+		background $transition-fast,
+		border-color $transition-fast;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	background-image: $dropdown-arrow-svg;
+	background-repeat: no-repeat;
+	background-position: right 8px center;
+	padding-right: 28px;
 
-  &:hover {
-    background: var(--background-primary-alt);
-    border-color: var(--interactive-accent);
-  }
+	&:hover {
+		background: var(--background-primary-alt);
+		border-color: var(--interactive-accent);
+	}
 
-  &:focus {
-    outline: none;
-    background: var(--background-primary-alt);
-    border-color: var(--interactive-accent);
-    box-shadow: 0 0 0 2px var(--interactive-accent-hover);
-  }
+	&:focus {
+		outline: none;
+		background: var(--background-primary-alt);
+		border-color: var(--interactive-accent);
+		box-shadow: 0 0 0 2px var(--interactive-accent-hover);
+	}
 
-  option {
-    background: var(--background-primary);
-    color: var(--text-normal);
-    padding: 4px 8px;
-  }
+	option {
+		background: var(--background-primary);
+		color: var(--text-normal);
+		padding: 4px 8px;
+	}
 }
 
 // Hierarchy source select
 
-.nexus-properties-bases-markdown-container  {
-  padding: $spacing-md;
-  overflow-y: auto;
-  flex: 1;
+.nexus-properties-bases-markdown-container {
+	padding: $spacing-md;
+	overflow-y: auto;
+	flex: 1;
 
-  .dataview  {
-    margin: $spacing-md 0;
+	.dataview {
+		margin: $spacing-md 0;
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-    }
+		table {
+			width: 100%;
+			border-collapse: collapse;
+		}
 
-    th, td {
-      padding: $spacing-sm;
-      border: 1px solid var(--background-modifier-border);
-      text-align: left;
-    }
+		th,
+		td {
+			padding: $spacing-sm;
+			border: 1px solid var(--background-modifier-border);
+			text-align: left;
+		}
 
-    th {
-      background-color: var(--background-secondary);
-      font-weight: 600;
-    }
-  }
+		th {
+			background-color: var(--background-secondary);
+			font-weight: 600;
+		}
+	}
 }
 
 // Section styles
 
 // Empty states
 .nexus-properties-bases-empty-state {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  padding: $spacing-xl;
-  font-size: 1em;
-  color: var(--text-muted);
-  text-align: center;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: $spacing-xl;
+	font-size: 1em;
+	color: var(--text-muted);
+	text-align: center;
 }

@@ -3,7 +3,7 @@ import type { BehaviorSubject } from "rxjs";
 
 import type { NodeCreationType } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
-import { type CommandManager, CreateNodeCommand } from "./commands";
+import { CreateNodeCommand, type CommandManager } from "./commands";
 
 export class NodeCreator {
 	constructor(

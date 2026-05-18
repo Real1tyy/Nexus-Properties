@@ -1,7 +1,7 @@
 import { hasLinkInProperty, removeMarkdownExtension } from "@real1ty-obsidian-plugins";
-import { type App, Menu, Notice, TFile } from "obsidian";
+import { Menu, Notice, TFile, type App } from "obsidian";
 
-import { type CommandManager, RemoveRelationshipCommand } from "../../core/commands";
+import { RemoveRelationshipCommand, type CommandManager } from "../../core/commands";
 import type { NexusPropertiesSettingsStore } from "../../types/settings";
 
 export class EdgeContextMenu {

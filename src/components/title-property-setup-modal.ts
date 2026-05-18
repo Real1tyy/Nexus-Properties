@@ -1,4 +1,4 @@
-import { type App, Modal } from "obsidian";
+import { Modal, type App } from "obsidian";
 
 export interface TitlePropertySetupConfig {
 	onEnable: () => void;

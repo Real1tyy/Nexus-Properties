@@ -1,305 +1,297 @@
 @use "variables" as *;
 
 @media (max-width: $mobile-breakpoint) {
-  .nexus-properties-graph-view-header {
-    padding: 0.3em 0.5em;
-    gap: 0.3em;
-    min-height: auto;
-    flex-wrap: wrap;
-  }
+	.nexus-properties-graph-view-header {
+		padding: 0.3em 0.5em;
+		gap: 0.3em;
+		min-height: auto;
+		flex-wrap: wrap;
+	}
 
-  body .nexus-properties-graph-view-title {
-    display: none;
-  }
+	body .nexus-properties-graph-view-title {
+		display: none;
+	}
 
-  .nexus-properties-graph-controls-container {
-    flex: 1 1 100%;
-    flex-wrap: nowrap;
-    justify-content: space-between;
-    gap: 0.3em;
-    align-items: center;
-  }
+	.nexus-properties-graph-controls-container {
+		flex: 1 1 100%;
+		flex-wrap: nowrap;
+		justify-content: space-between;
+		gap: 0.3em;
+		align-items: center;
+	}
 
-  .nexus-properties-graph-view-header
-  .nexus-properties-graph-filter-preset-container {
-    order: 1;
-    flex-shrink: 0;
-  }
+	.nexus-properties-graph-view-header .nexus-properties-graph-filter-preset-container {
+		order: 1;
+		flex-shrink: 0;
+	}
 
-  .nexus-properties-graph-toggle-container {
-    padding: 0.25em 0.4em;
-    font-size: 0.65em;
-    gap: 0.25em;
-    border-width: 1px;
-    min-width: 0;
-    white-space: nowrap;
-    box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
-  }
+	.nexus-properties-graph-toggle-container {
+		padding: 0.25em 0.4em;
+		font-size: 0.65em;
+		gap: 0.25em;
+		border-width: 1px;
+		min-width: 0;
+		white-space: nowrap;
+		box-shadow: 0 1px 3px rgb(0 0 0 / 8%);
+	}
 
-  .nexus-properties-graph-toggle-checkbox {
-    width: $toggle-checkbox-size-mobile;
-    height: $toggle-checkbox-size-mobile;
-    flex-shrink: 0;
-  }
+	.nexus-properties-graph-toggle-checkbox {
+		width: $toggle-checkbox-size-mobile;
+		height: $toggle-checkbox-size-mobile;
+		flex-shrink: 0;
+	}
 
-  .nexus-properties-graph-toggle-label {
-    font-size: 1em;
-  }
+	.nexus-properties-graph-toggle-label {
+		font-size: 1em;
+	}
 
-  // Shorten toggle labels
-  .nexus-properties-graph-view-header  {
-    .nexus-properties-graph-toggle-container:nth-child(2)  {
-      .nexus-properties-graph-toggle-label  {
-        font-size: 0;
+	// Shorten toggle labels
+	.nexus-properties-graph-view-header {
+		.nexus-properties-graph-toggle-container:nth-child(2) {
+			.nexus-properties-graph-toggle-label {
+				font-size: 0;
 
-        &::before {
-          content: "Related";
-          font-size: 1rem;
-        }
-      }
-    }
+				&::before {
+					content: "Related";
+					font-size: 1rem;
+				}
+			}
+		}
 
-    .nexus-properties-graph-toggle-container:nth-child(3)  {
-      .nexus-properties-graph-toggle-label  {
-        font-size: 0;
+		.nexus-properties-graph-toggle-container:nth-child(3) {
+			.nexus-properties-graph-toggle-label {
+				font-size: 0;
 
-        &::before {
-          content: "All";
-          font-size: 1rem;
-        }
-      }
-    }
+				&::before {
+					content: "All";
+					font-size: 1rem;
+				}
+			}
+		}
 
-    .nexus-properties-graph-toggle-container:nth-child(4)  {
-      .nexus-properties-graph-toggle-label  {
-        font-size: 0;
+		.nexus-properties-graph-toggle-container:nth-child(4) {
+			.nexus-properties-graph-toggle-label {
+				font-size: 0;
 
-        &::before {
-          content: "Current";
-          font-size: 1rem;
-        }
-      }
-    }
-  }
+				&::before {
+					content: "Current";
+					font-size: 1rem;
+				}
+			}
+		}
+	}
 
-  // Combined search/filter row
-  .nexus-properties-graph-search-row {
-    display: none;
-  }
+	// Combined search/filter row
+	.nexus-properties-graph-search-row {
+		display: none;
+	}
 
-  .nexus-properties-graph-filter-row {
-    display: flex;
-    padding: 0.3em 0.5em;
-    gap: 0.3em;
-    align-items: center;
-  }
+	.nexus-properties-graph-filter-row {
+		display: flex;
+		padding: 0.3em 0.5em;
+		gap: 0.3em;
+		align-items: center;
+	}
 
-  .nexus-properties-graph-search-input-container {
-    flex: 1 1 calc(50% - 0.15em);
-    min-width: 0;
-  }
+	.nexus-properties-graph-search-input-container {
+		flex: 1 1 calc(50% - 0.15em);
+		min-width: 0;
+	}
 
-  .nexus-properties-graph-filter-row
-  .nexus-properties-graph-search-input-container {
-    display: flex;
-  }
+	.nexus-properties-graph-filter-row .nexus-properties-graph-search-input-container {
+		display: flex;
+	}
 
-  .nexus-properties-graph-view-content .nexus-properties-graph-search-input, .nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
-    height: 2em;
-    padding: 0.35em 0.5em;
-    font-size: 0.8em;
-    border-radius: $border-radius-sm;
-    width: 100%;
-  }
+	.nexus-properties-graph-view-content .nexus-properties-graph-search-input,
+	.nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
+		height: 2em;
+		padding: 0.35em 0.5em;
+		font-size: 0.8em;
+		border-radius: $border-radius-sm;
+		width: 100%;
+	}
 
-  .nexus-properties-graph-view-content
-  .nexus-properties-graph-filter-preset-select {
-    height: 2em;
-    min-width: 70px;
-    padding: 0.25em 1.6em 0.25em 0.4em;
-    font-size: 0.65em;
-    border-radius: $border-radius-sm;
-    border-width: 1px;
-  }
+	.nexus-properties-graph-view-content .nexus-properties-graph-filter-preset-select {
+		height: 2em;
+		min-width: 70px;
+		padding: 0.25em 1.6em 0.25em 0.4em;
+		font-size: 0.65em;
+		border-radius: $border-radius-sm;
+		border-width: 1px;
+	}
 
-  .nexus-properties-graph-filter-preset-container::after {
-    font-size: 0.55em;
-    right: 0.5em;
-  }
+	.nexus-properties-graph-filter-preset-container::after {
+		font-size: 0.55em;
+		right: 0.5em;
+	}
 
-  .nexus-properties-graph-filter-row
-  .nexus-properties-graph-filter-preset-container {
-    display: none;
-  }
+	.nexus-properties-graph-filter-row .nexus-properties-graph-filter-preset-container {
+		display: none;
+	}
 
-  // Hide zoom indicator
-  body .nexus-properties-zoom-indicator {
-    display: none;
-  }
+	// Hide zoom indicator
+	body .nexus-properties-zoom-indicator {
+		display: none;
+	}
 
-  // Zoom mode - hide everything except preview
-  body .nexus-properties-graph-view-content:has(
-      .nexus-properties-graph-zoom-preview
-    )  {
-    .nexus-properties-graph-view-header, .nexus-properties-graph-search-row, .nexus-properties-graph-filter-row {
-      display: none;
-    }
-  }
+	// Zoom mode - hide everything except preview
+	body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) {
+		.nexus-properties-graph-view-header,
+		.nexus-properties-graph-search-row,
+		.nexus-properties-graph-filter-row {
+			display: none;
+		}
+	}
 
-  // Zoom preview compact controls
-  body .nexus-properties-graph-zoom-preview-controls {
-    padding: 0.5em 0.6em;
-    gap: 0.3em;
-    min-height: auto;
-    flex-wrap: wrap;
-  }
+	// Zoom preview compact controls
+	body .nexus-properties-graph-zoom-preview-controls {
+		padding: 0.5em 0.6em;
+		gap: 0.3em;
+		min-height: auto;
+		flex-wrap: wrap;
+	}
 
-  body .nexus-properties-graph-zoom-preview-title {
-    font-size: 0.72em;
-    flex: 1 1 100%;
-    margin-bottom: 0.25em;
-  }
+	body .nexus-properties-graph-zoom-preview-title {
+		font-size: 0.72em;
+		flex: 1 1 100%;
+		margin-bottom: 0.25em;
+	}
 
-  body .nexus-properties-graph-zoom-preview-toggles {
-    flex: 1 1 100%;
-    justify-content: space-between;
-    gap: 0.3em;
-  }
+	body .nexus-properties-graph-zoom-preview-toggles {
+		flex: 1 1 100%;
+		justify-content: space-between;
+		gap: 0.3em;
+	}
 
-  body .nexus-properties-graph-zoom-preview-toggles
-    .nexus-properties-graph-toggle-container {
-    padding: 0.3em 0.4em;
-    font-size: 0.7em;
-    gap: 0.25em;
-    flex: 1;
-    justify-content: center;
-  }
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-container {
+		padding: 0.3em 0.4em;
+		font-size: 0.7em;
+		gap: 0.25em;
+		flex: 1;
+		justify-content: center;
+	}
 
-  body .nexus-properties-graph-zoom-preview-toggles
-    .nexus-properties-graph-toggle-checkbox {
-    width: $toggle-checkbox-size-mobile;
-    height: $toggle-checkbox-size-mobile;
-  }
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-checkbox {
+		width: $toggle-checkbox-size-mobile;
+		height: $toggle-checkbox-size-mobile;
+	}
 
-  body .nexus-properties-graph-zoom-preview-toggles
-    .nexus-properties-graph-toggle-label {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+	body .nexus-properties-graph-zoom-preview-toggles .nexus-properties-graph-toggle-label {
+		overflow: hidden;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
 
-  body .nexus-properties-graph-zoom-preview {
-    max-height: min(50vh, var(--zoom-preview-max-height, 200px));
-  }
+	body .nexus-properties-graph-zoom-preview {
+		max-height: min(50vh, var(--zoom-preview-max-height, 200px));
+	}
 
-  body .nexus-properties-graph-zoom-preview-frontmatter {
-    padding: 0.3em;
-    gap: 0.2em;
-    grid-template-columns: repeat(
-        auto-fill,
-        minmax(var(--mobile-frontmatter-property-width, 100px), 1fr)
-      );
-    font-size: $font-size-xs;
-    max-height: min(30vh, var(--zoom-preview-frontmatter-height, 70px));
-  }
+	body .nexus-properties-graph-zoom-preview-frontmatter {
+		padding: 0.3em;
+		gap: 0.2em;
+		grid-template-columns: repeat(auto-fill, minmax(var(--mobile-frontmatter-property-width, 100px), 1fr));
+		font-size: $font-size-xs;
+		max-height: min(30vh, var(--zoom-preview-frontmatter-height, 70px));
+	}
 
-  body .nexus-properties-graph-zoom-preview-property {
-    padding: 0.25em;
-    gap: 0.15em;
-  }
+	body .nexus-properties-graph-zoom-preview-property {
+		padding: 0.25em;
+		gap: 0.15em;
+	}
 
-  body .nexus-properties-graph-zoom-preview-property-key {
-    font-size: 0.7em;
-  }
+	body .nexus-properties-graph-zoom-preview-property-key {
+		font-size: 0.7em;
+	}
 
-  body .nexus-properties-graph-zoom-preview-property-value {
-    font-size: 0.8em;
-    gap: 0.15em;
-  }
+	body .nexus-properties-graph-zoom-preview-property-value {
+		font-size: 0.8em;
+		gap: 0.15em;
+	}
 
-  body .nexus-properties-graph-zoom-preview-content {
-    padding: 0.3em;
-    font-size: 0.8em;
-  }
+	body .nexus-properties-graph-zoom-preview-content {
+		padding: 0.3em;
+		font-size: 0.8em;
+	}
 
-  body .nexus-properties-graph-zoom-preview-content p  {
-    margin: 0.3em 0;
+	body .nexus-properties-graph-zoom-preview-content p {
+		margin: 0.3em 0;
 
-    &:first-child {
-      margin-top: 0;
-    }
+		&:first-child {
+			margin-top: 0;
+		}
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 
-  // View switcher - 30% smaller
-  body .nexus-properties-view-switcher-header {
-    padding: 0.3em 0.4em;
-    gap: 0.5em;
-    grid-template-columns: 1fr auto 1fr;
-  }
+	// View switcher - 30% smaller
+	body .nexus-properties-view-switcher-header {
+		padding: 0.3em 0.4em;
+		gap: 0.5em;
+		grid-template-columns: 1fr auto 1fr;
+	}
 
-  body .nexus-properties-view-switcher-stats {
-    gap: 10px;
-    flex-shrink: 1;
-    max-width: 100%;
-    overflow: hidden;
-  }
+	body .nexus-properties-view-switcher-stats {
+		gap: 10px;
+		flex-shrink: 1;
+		max-width: 100%;
+		overflow: hidden;
+	}
 
-  body .nexus-properties-view-switcher-stats-column {
-    gap: 2px;
-  }
+	body .nexus-properties-view-switcher-stats-column {
+		gap: 2px;
+	}
 
-  body .nexus-properties-view-switcher-stat-item {
-    font-size: 0.56em;
-  }
+	body .nexus-properties-view-switcher-stat-item {
+		font-size: 0.56em;
+	}
 
-  body .nexus-properties-view-switcher-buttons {
-    gap: 0.25em;
-  }
+	body .nexus-properties-view-switcher-buttons {
+		gap: 0.25em;
+	}
 
-  body button.nexus-properties-view-toggle-button {
-    padding: 0.25em 0.4em;
-    min-height: 20px;
-    font-size: 0.6em;
-    border-radius: 3px;
-    border-width: 1px;
-    flex-shrink: 0;
-  }
+	body button.nexus-properties-view-toggle-button {
+		padding: 0.25em 0.4em;
+		min-height: 20px;
+		font-size: 0.6em;
+		border-radius: 3px;
+		border-width: 1px;
+		flex-shrink: 0;
+	}
 
-  body button.nexus-properties-hierarchy-source-button {
-    padding: 0.25em 0.4em;
-    min-height: 20px;
-    font-size: 0.6em;
-    border-radius: 3px;
-    border-width: 1px;
-    flex-shrink: 0;
-  }
+	body button.nexus-properties-hierarchy-source-button {
+		padding: 0.25em 0.4em;
+		min-height: 20px;
+		font-size: 0.6em;
+		border-radius: 3px;
+		border-width: 1px;
+		flex-shrink: 0;
+	}
 
-  // Bases view compact selectors
-  body .nexus-properties-bases-view-selector {
-    padding: 6px;
-  }
+	// Bases view compact selectors
+	body .nexus-properties-bases-view-selector {
+		padding: 6px;
+	}
 
-  body .nexus-properties-bases-select {
-    font-size: 11px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    border-width: 1.2px;
-  }
+	body .nexus-properties-bases-select {
+		font-size: 11px;
+		white-space: nowrap;
+		overflow: hidden;
+		text-overflow: ellipsis;
+		border-width: 1.2px;
+	}
 
-  // Force full-width sidebar on mobile
-  .workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content), .workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
-    width: 100%;
-    max-width: 100%;
-    min-width: 100%;
-  }
+	// Force full-width sidebar on mobile
+	.workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content),
+	.workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
+		width: 100%;
+		max-width: 100%;
+		min-width: 100%;
+	}
 
-  .workspace-leaf:has(.nexus-properties-view-switcher-content) {
-    width: 100%;
-    max-width: 100%;
-  }
+	.workspace-leaf:has(.nexus-properties-view-switcher-content) {
+		width: 100%;
+		max-width: 100%;
+	}
 }

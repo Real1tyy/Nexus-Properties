@@ -3,20 +3,19 @@ import {
 	applyFrontmatterChanges,
 	extractDisplayName,
 	formatWikiLink,
-	type FrontmatterChange,
-	type FrontmatterDiff,
 	getFileContext,
 	mergeFrontmatterDiffs,
 	parsePropertyLinks,
 	removeMarkdownExtension,
 	showFrontmatterPropagationModal,
 	withFileContext,
+	type FrontmatterChange,
+	type FrontmatterDiff,
 } from "@real1ty-obsidian-plugins";
 import type { App } from "obsidian";
 import type { BehaviorSubject, Observable, Subscription } from "rxjs";
 
-import type { FileRelationships } from "../types/constants";
-import { RELATIONSHIP_CONFIGS } from "../types/constants";
+import { RELATIONSHIP_CONFIGS, type FileRelationships } from "../types/constants";
 import type { NexusPropertiesSettings } from "../types/settings";
 import { parseExcludedProps } from "../utils/frontmatter-utils";
 import { getChildrenRecursively } from "../utils/hierarchy";

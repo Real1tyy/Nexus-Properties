@@ -5,10 +5,9 @@ import {
 	normalizeProperty,
 	parsePropertyLinks,
 } from "@real1ty-obsidian-plugins";
-import type { App, TFile } from "obsidian";
-import { TFile as TFileClass } from "obsidian";
+import { TFile as TFileClass, type App, type TFile } from "obsidian";
 
-import { type FileRelationships, RELATIONSHIP_CONFIGS, type RelationshipType } from "../types/constants";
+import { RELATIONSHIP_CONFIGS, type FileRelationships, type RelationshipType } from "../types/constants";
 import type { HierarchyTraversalOptions, RelationshipResolver } from "../types/hierarchy";
 import type { NexusPropertiesSettings } from "../types/settings";
 

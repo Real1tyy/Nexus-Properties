@@ -3,7 +3,7 @@ import type { Core, ElementDefinition, LayoutOptions, NodeSingular } from "cytos
 
 import { CollisionDetector } from "./collision-detector";
 import { ConstellationPositioner } from "./constellation-positioner";
-import { type Bounds, NodeOrganizer, type TreeBounds } from "./node-organizer";
+import { NodeOrganizer, type Bounds, type TreeBounds } from "./node-organizer";
 
 interface LayoutConfig {
 	animationDuration: number;

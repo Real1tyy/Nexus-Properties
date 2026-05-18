@@ -1,6 +1,5 @@
-import type { Command } from "@real1ty-obsidian-plugins";
-import { addLinkToProperty, removeMarkdownExtension, withFileContext } from "@real1ty-obsidian-plugins";
-import { type App, TFile } from "obsidian";
+import { addLinkToProperty, removeMarkdownExtension, withFileContext, type Command } from "@real1ty-obsidian-plugins";
+import { TFile, type App } from "obsidian";
 
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { captureInverseRelationships, type InverseRelationship } from "../../utils/relationship-context";

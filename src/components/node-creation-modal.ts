@@ -1,4 +1,4 @@
-import { type App, Modal, Notice } from "obsidian";
+import { Modal, Notice, type App } from "obsidian";
 
 export class NodeCreationModal extends Modal {
 	private inputEl: HTMLInputElement | null = null;

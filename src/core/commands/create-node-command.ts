@@ -1,14 +1,14 @@
-import type { Command } from "@real1ty-obsidian-plugins";
 import {
 	formatWikiLink,
 	generateUniqueFilePath,
 	generateZettelId,
 	normalizeProperty,
 	removeLinkFromProperty,
+	type Command,
 } from "@real1ty-obsidian-plugins";
-import { type App, TFile } from "obsidian";
+import { TFile, type App } from "obsidian";
 
-import { type NodeCreationType, RELATIONSHIP_CONFIGS, type RelationshipType } from "../../types/constants";
+import { RELATIONSHIP_CONFIGS, type NodeCreationType, type RelationshipType } from "../../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../../types/settings";
 import { buildFilePathForWikiLink } from "../../utils/file-utils";
 import { buildTitleLink } from "../../utils/string-utils";

@@ -1,13 +1,13 @@
 import {
 	BaseBuilder,
-	type BaseFilterNode,
 	BasePresets,
 	BaseRenderer,
 	Filter,
 	IncludedPropertiesEvaluator,
 	RegisteredEventsComponent,
+	type BaseFilterNode,
 } from "@real1ty-obsidian-plugins";
-import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
+import { Component, MarkdownRenderer, type App, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 
 import { cls } from "../../constants";

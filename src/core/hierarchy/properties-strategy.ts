@@ -1,5 +1,5 @@
 import { getFileContext, parseWikiLink } from "@real1ty-obsidian-plugins";
-import { type App, TFile } from "obsidian";
+import { TFile, type App } from "obsidian";
 
 import type { RelationshipType } from "../../types/constants";
 import type { HierarchyTraversalOptions } from "../../types/hierarchy";

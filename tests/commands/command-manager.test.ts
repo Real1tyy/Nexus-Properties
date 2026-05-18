@@ -1,4 +1,4 @@
-import { type Command, CommandManager, MacroCommand } from "@real1ty-obsidian-plugins";
+import { CommandManager, MacroCommand, type Command } from "@real1ty-obsidian-plugins";
 import { silenceConsole } from "@real1ty-obsidian-plugins/testing";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 

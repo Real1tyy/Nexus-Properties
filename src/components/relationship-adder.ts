@@ -1,4 +1,4 @@
-import { type App, Notice } from "obsidian";
+import { Notice, type App } from "obsidian";
 
 import { AddRelationshipCommand, type CommandManager } from "../core/commands";
 import type { RelationshipType } from "../types/constants";

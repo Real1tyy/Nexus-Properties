@@ -10,8 +10,7 @@ import {
 import type { ElementDefinition } from "cytoscape";
 import type { App } from "obsidian";
 
-import type { NexusPropertiesSettings } from "../types/settings";
-import type { NexusPropertiesSettingsStore } from "../types/settings";
+import type { NexusPropertiesSettings, NexusPropertiesSettingsStore } from "../types/settings";
 import { buildRelatedTree, getRelationships, resolveWikiLink, type TreeNode } from "../utils/hierarchy";
 import { HierarchyProvider, type HierarchySourceType } from "./hierarchy";
 import type { Indexer } from "./indexer";

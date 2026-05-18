@@ -1,7 +1,7 @@
 import { isFolderNote, RegisteredEventsComponent } from "@real1ty-obsidian-plugins";
 import cytoscape, { type Core, type ElementDefinition } from "cytoscape";
 import cytoscapeDagre from "cytoscape-dagre";
-import { type App, Notice, TFile } from "obsidian";
+import { Notice, TFile, type App } from "obsidian";
 import type { Subscription } from "rxjs";
 
 import { cls } from "../../constants";

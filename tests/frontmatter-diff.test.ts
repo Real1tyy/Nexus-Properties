@@ -1,8 +1,8 @@
 import {
 	compareFrontmatter,
 	formatChangeForDisplay,
-	type FrontmatterChange,
 	mergeFrontmatterDiffs,
+	type FrontmatterChange,
 } from "@real1ty-obsidian-plugins";
 import { describe, expect, it } from "vitest";
 

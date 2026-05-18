@@ -1,4 +1,4 @@
-import { activateView, buildUtmUrl, type LeafPlacement, SettingsStore } from "@real1ty-obsidian-plugins";
+import { activateView, buildUtmUrl, SettingsStore, type LeafPlacement } from "@real1ty-obsidian-plugins";
 import { showWhatsNewReactModal, type WhatsNewModalConfig } from "@real1ty-obsidian-plugins-react";
 import { Notice, Plugin, TFile } from "obsidian";
 
@@ -9,8 +9,7 @@ import { CommandManager } from "./core/commands";
 import { Indexer } from "./core/indexer";
 import { NodeCreator } from "./core/node-creator";
 import { PropertiesManager } from "./core/properties-manager";
-import type { NexusPropertiesSettingsStore } from "./types/settings";
-import { NexusPropertiesSettingsSchema } from "./types/settings";
+import { NexusPropertiesSettingsSchema, type NexusPropertiesSettingsStore } from "./types/settings";
 
 export default class NexusPropertiesPlugin extends Plugin {
 	settingsStore!: NexusPropertiesSettingsStore;

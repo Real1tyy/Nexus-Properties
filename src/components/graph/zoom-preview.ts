@@ -1,10 +1,9 @@
 import { filterPropertiesForDisplay } from "@real1ty-obsidian-plugins";
-import { type App, Component, MarkdownRenderer, type TFile } from "obsidian";
+import { Component, MarkdownRenderer, type App, type TFile } from "obsidian";
 import type { Subscription } from "rxjs";
 
 import { cls } from "../../constants";
-import type { NexusPropertiesSettingsStore } from "../../types/settings";
-import type { NexusPropertiesSettings } from "../../types/settings";
+import type { NexusPropertiesSettings, NexusPropertiesSettingsStore } from "../../types/settings";
 import { PropertyRenderer } from "../property-renderer";
 
 interface GraphZoomPreviewProps {

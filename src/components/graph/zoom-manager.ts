@@ -1,5 +1,5 @@
 import type { Core } from "cytoscape";
-import { type App, Notice, TFile } from "obsidian";
+import { Notice, TFile, type App } from "obsidian";
 
 import type { NexusPropertiesSettingsStore } from "../../types/settings";
 import type { GraphZoomPreview } from "./zoom-preview";

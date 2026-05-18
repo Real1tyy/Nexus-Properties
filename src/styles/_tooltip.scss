@@ -1,77 +1,77 @@
 @use "variables" as *;
 
-.nexus-properties-property-tooltip  {
-  position: fixed;
-  z-index: 1000;
-  background-color: var(--background-primary);
-  border: 1px solid var(--background-modifier-border);
-  border-radius: $border-radius;
-  padding: 0.65em 0.85em;
-  box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
-  font-size: $font-size-sm;
-  max-width: 255px;
-  pointer-events: auto;
+.nexus-properties-property-tooltip {
+	position: fixed;
+	z-index: 1000;
+	background-color: var(--background-primary);
+	border: 1px solid var(--background-modifier-border);
+	border-radius: $border-radius;
+	padding: 0.65em 0.85em;
+	box-shadow: 0 4px 12px rgb(0 0 0 / 25%);
+	font-size: $font-size-sm;
+	max-width: 255px;
+	pointer-events: auto;
 
-  &-title  {
-    margin-bottom: $spacing-sm;
-    word-wrap: break-word;
-    word-break: break-word;
-    overflow-wrap: break-word;
+	&-title {
+		margin-bottom: $spacing-sm;
+		word-wrap: break-word;
+		word-break: break-word;
+		overflow-wrap: break-word;
 
-    &-link  {
-      color: var(--text-normal);
-      font-size: $font-size-lg;
-      font-weight: 600;
-      text-decoration: none;
-      cursor: pointer;
-      transition: color $transition-normal;
+		&-link {
+			color: var(--text-normal);
+			font-size: $font-size-lg;
+			font-weight: 600;
+			text-decoration: none;
+			cursor: pointer;
+			transition: color $transition-normal;
 
-      &:hover {
-        color: var(--link-color);
-      }
-    }
-  }
+			&:hover {
+				color: var(--link-color);
+			}
+		}
+	}
 
-  &-separator {
-    height: 1px;
-    background-color: var(--background-modifier-border);
-    margin: $spacing-sm -0.85em 0.65em -0.85em;
-  }
+	&-separator {
+		height: 1px;
+		background-color: var(--background-modifier-border);
+		margin: $spacing-sm -0.85em 0.65em -0.85em;
+	}
 
-  &-item  {
-    display: flex;
-    gap: $spacing-sm;
-    margin-bottom: $spacing-xs;
+	&-item {
+		display: flex;
+		gap: $spacing-sm;
+		margin-bottom: $spacing-xs;
 
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
+		&:last-child {
+			margin-bottom: 0;
+		}
+	}
 
-  &-key {
-    color: var(--text-muted);
-    font-weight: 600;
-    flex-shrink: 0;
-  }
+	&-key {
+		color: var(--text-muted);
+		font-weight: 600;
+		flex-shrink: 0;
+	}
 
-  &-value {
-    color: var(--text-normal);
-    word-break: break-word;
-  }
+	&-value {
+		color: var(--text-normal);
+		word-break: break-word;
+	}
 }
 
-.nexus-properties-property-link  {
-  color: var(--link-color);
-  text-decoration: none;
-  cursor: pointer;
-  transition: color $transition-normal;
+.nexus-properties-property-link {
+	color: var(--link-color);
+	text-decoration: none;
+	cursor: pointer;
+	transition: color $transition-normal;
 
-  &:hover {
-    color: var(--link-color-hover);
-    text-decoration: underline;
-  }
+	&:hover {
+		color: var(--link-color-hover);
+		text-decoration: underline;
+	}
 }
 
 .nexus-properties-property-separator {
-  color: var(--text-muted);
+	color: var(--text-muted);
 }

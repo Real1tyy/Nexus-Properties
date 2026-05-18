@@ -1,15 +1,14 @@
 import {
-	type FrontmatterDiff,
 	Indexer as GenericIndexer,
-	type IndexerConfig,
-	type IndexerEvent as GenericIndexerEvent,
 	normalizeProperty,
+	type FrontmatterDiff,
+	type IndexerEvent as GenericIndexerEvent,
+	type IndexerConfig,
 } from "@real1ty-obsidian-plugins";
 import type { App, TFile } from "obsidian";
-import type { Observable, Subscription } from "rxjs";
-import { BehaviorSubject, Subject } from "rxjs";
+import { BehaviorSubject, Subject, type Observable, type Subscription } from "rxjs";
 
-import { type FileRelationships, RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY } from "../types/constants";
+import { RELATIONSHIP_CONFIGS, SCAN_CONCURRENCY, type FileRelationships } from "../types/constants";
 import type { RelationshipResolver } from "../types/hierarchy";
 import type { Frontmatter, NexusPropertiesSettings } from "../types/settings";
 

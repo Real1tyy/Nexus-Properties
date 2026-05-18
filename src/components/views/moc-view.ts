@@ -1,11 +1,11 @@
 import {
 	getFolderPath,
 	isFolderNote,
-	type PropertyRendererConfig,
 	RegisteredEventsComponent,
 	renderPropertyValue,
+	type PropertyRendererConfig,
 } from "@real1ty-obsidian-plugins";
-import { type App, Component, TFile } from "obsidian";
+import { Component, TFile, type App } from "obsidian";
 import type { Subscription } from "rxjs";
 
 import { cls } from "../../constants";
@@ -13,7 +13,7 @@ import { HierarchyProvider, type HierarchySourceType } from "../../core/hierarch
 import type { Indexer } from "../../core/indexer";
 import type NexusPropertiesPlugin from "../../main";
 import type { NexusPropertiesSettings } from "../../types/settings";
-import { type ParentOption, resolveDisplayName, resolveParentSelection } from "../../utils/file-utils";
+import { resolveDisplayName, resolveParentSelection, type ParentOption } from "../../utils/file-utils";
 import { buildRelatedTree, type TreeNode } from "../../utils/hierarchy";
 import { MocSearch } from "../input-managers/moc-search";
 

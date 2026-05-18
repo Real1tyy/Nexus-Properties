@@ -1,11 +1,11 @@
-import type { Command } from "@real1ty-obsidian-plugins";
 import {
 	addLinkToProperty,
 	hasLinkInProperty,
 	removeLinkFromProperty,
 	removeMarkdownExtension,
+	type Command,
 } from "@real1ty-obsidian-plugins";
-import { type App, TFile } from "obsidian";
+import { TFile, type App } from "obsidian";
 
 import { RELATIONSHIP_CONFIGS, type RelationshipType } from "../../types/constants";
 import type { Frontmatter, NexusPropertiesSettings } from "../../types/settings";

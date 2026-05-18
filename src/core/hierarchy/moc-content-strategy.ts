@@ -1,10 +1,10 @@
-import { type App, TFile } from "obsidian";
+import { TFile, type App } from "obsidian";
 
 import type { RelationshipType } from "../../types/constants";
 import type { HierarchyTraversalOptions } from "../../types/hierarchy";
 import type { NexusPropertiesSettings } from "../../types/settings";
 import { collectRelatedNodesRecursively, type TreeNode } from "../../utils/hierarchy";
-import { findAncestorPaths, type MocNode, parseMocContent } from "../../utils/moc-parser";
+import { findAncestorPaths, parseMocContent, type MocNode } from "../../utils/moc-parser";
 import type { Indexer } from "../indexer";
 import type { HierarchyStrategy } from "./hierarchy-strategy";
 

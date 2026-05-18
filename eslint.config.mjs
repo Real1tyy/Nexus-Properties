@@ -1,9 +1,9 @@
 // eslint.config.mjs
 import js from "@eslint/js";
-import tseslint from "typescript-eslint";
-import { defineConfig } from "eslint/config";
 import obsidianmd from "eslint-plugin-obsidianmd";
 import reactHooks from "eslint-plugin-react-hooks";
+import { defineConfig } from "eslint/config";
+import tseslint from "typescript-eslint";
 
 export default defineConfig([
 	{

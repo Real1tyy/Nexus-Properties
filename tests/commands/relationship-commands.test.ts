@@ -1,5 +1,9 @@
+// Import after mocking
+import { TFile } from "obsidian";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { AddRelationshipCommand } from "../../src/core/commands/add-relationship-command";
+import { RemoveRelationshipCommand } from "../../src/core/commands/remove-relationship-command";
 import type { NexusPropertiesSettings } from "../../src/types/settings";
 
 // Must mock obsidian before importing anything that uses it
@@ -36,12 +40,6 @@ vi.mock("@real1ty-obsidian-plugins", () => ({
 	}),
 	removeMarkdownExtension: vi.fn((path) => path.replace(/\.md$/, "")),
 }));
-
-// Import after mocking
-import { TFile } from "obsidian";
-
-import { AddRelationshipCommand } from "../../src/core/commands/add-relationship-command";
-import { RemoveRelationshipCommand } from "../../src/core/commands/remove-relationship-command";
 
 function createMockApp(fileExists = true): any {
 	return {
