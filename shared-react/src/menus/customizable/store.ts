@@ -13,7 +13,10 @@ export interface CustomizableMenuSnapshot {
 
 export interface CustomizableMenuStoreOptions {
 	allItems: CustomizableContextMenuItem[];
-	initialState?: ContextMenuState | undefined;
+	/** Persisted user customizations (from settings). When omitted, the store starts from `defaults`. */
+	currentState?: ContextMenuState | undefined;
+	/** Factory defaults applied by the item manager's Reset button and used as the initial state when `currentState` is omitted. */
+	defaults?: ContextMenuState | undefined;
 	onStateChange?: ((state: ContextMenuState) => void) | undefined;
 }
 
@@ -26,6 +29,7 @@ export interface CustomizableMenuStoreOptions {
 export class CustomizableMenuStore {
 	private readonly allItems: CustomizableContextMenuItem[];
 	private readonly defaultOrder: string[];
+	private readonly defaults: ContextMenuState | undefined;
 	private readonly onStateChange?: (state: ContextMenuState) => void;
 	private readonly listeners = new Set<() => void>();
 
@@ -34,8 +38,9 @@ export class CustomizableMenuStore {
 	constructor(options: CustomizableMenuStoreOptions) {
 		this.allItems = options.allItems;
 		this.defaultOrder = options.allItems.map((i) => i.id);
+		this.defaults = options.defaults;
 		if (options.onStateChange) this.onStateChange = options.onStateChange;
-		this.snapshot = this.buildInitialSnapshot(options.initialState);
+		this.snapshot = this.buildInitialSnapshot(options.currentState ?? options.defaults);
 	}
 
 	getSnapshot = (): CustomizableMenuSnapshot => this.snapshot;
@@ -221,6 +226,10 @@ export class CustomizableMenuStore {
 	setShowSettingsButton = (visible: boolean): void => {
 		if (this.snapshot.showSettingsButton === visible) return;
 		this.update({ showSettingsButton: visible });
+	};
+
+	resetToDefaults = (): void => {
+		this.update(this.buildInitialSnapshot(this.defaults));
 	};
 
 	// ─── Internals ────────────────────────────────────────────────

@@ -79,8 +79,10 @@ export interface TabbedContainerProps {
 	cssPrefix: string;
 	/** When true, panels are mounted only after the first activation. Default: true. */
 	lazy?: boolean;
-	/** Persisted state to restore. Overrides tab order, visibility, and labels. */
-	initialState?: TabbedContainerState;
+	/** Persisted user customizations (from settings). When omitted, the container starts from `defaults`. */
+	currentState?: TabbedContainerState;
+	/** Factory defaults applied by the tab manager's Reset button and used as the initial state when `currentState` is omitted. */
+	defaults?: TabbedContainerState;
 	onTabChange?: (tabId: string, index: number) => void;
 	/** Fires on any state mutation (tab switch, hide, reorder, rename). */
 	onStateChange?: (state: TabbedContainerState) => void;

@@ -35,7 +35,8 @@ export const TabbedContainer = memo(function TabbedContainer({
 	tabs,
 	cssPrefix,
 	lazy = true,
-	initialState,
+	currentState,
+	defaults,
 	onTabChange,
 	onStateChange,
 	editable = false,
@@ -49,7 +50,8 @@ export const TabbedContainer = memo(function TabbedContainer({
 
 	const result = useTabbedContainer({
 		tabs,
-		...(initialState !== undefined ? { initialState } : {}),
+		...(currentState !== undefined ? { currentState } : {}),
+		...(defaults !== undefined ? { defaults } : {}),
 		...(onStateChange ? { onStateChange } : {}),
 		...(onTabChange ? { onTabChange } : {}),
 	});

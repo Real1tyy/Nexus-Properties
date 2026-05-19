@@ -41,8 +41,10 @@ export type PageHeaderMode = "override" | "append";
 export interface PageHeaderConfig {
 	actions: HeaderActionDefinition[];
 	cssPrefix: string;
-	/** Persisted state to restore. When provided, overrides visibility, order, labels, and icons. */
-	initialState?: PageHeaderState;
+	/** Persisted user customizations (from settings). When omitted, the store starts from `defaults`. */
+	currentState?: PageHeaderState;
+	/** Factory defaults applied by the action manager's Reset button and used as the initial state when `currentState` is omitted. */
+	defaults?: PageHeaderState;
 	/** Fires on any state mutation (reorder, rename, hide, icon change). */
 	onStateChange?: (state: PageHeaderState) => void;
 	/** When true, enables the action manager modal. */

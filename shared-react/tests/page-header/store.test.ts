@@ -135,7 +135,7 @@ describe("PageHeaderStore", () => {
 		expect(listener).toHaveBeenCalledOnce();
 	});
 
-	it("restores state from initialState", () => {
+	it("restores state from currentState", () => {
 		const store = new PageHeaderStore(makeActions(), {
 			visibleActionIds: ["action-2", "action-0"],
 			renames: { "action-0": "Renamed" },
@@ -151,7 +151,7 @@ describe("PageHeaderStore", () => {
 		expect(state.colorOverrides).toEqual({ "action-0": "#ff0000" });
 	});
 
-	it("drops invalid IDs from initialState.visibleActionIds", () => {
+	it("drops invalid IDs from currentState.visibleActionIds", () => {
 		const store = new PageHeaderStore(makeActions(), {
 			visibleActionIds: ["action-0", "nonexistent", "action-2"],
 		});
@@ -160,7 +160,7 @@ describe("PageHeaderStore", () => {
 		expect(store.serialize().visibleActionIds).toEqual(["action-0", "action-2"]);
 	});
 
-	it("falls back to all actions when initialState has empty visibleActionIds", () => {
+	it("falls back to all actions when currentState has empty visibleActionIds", () => {
 		const store = new PageHeaderStore(makeActions(), { visibleActionIds: [] });
 
 		expect(store.visibleCount).toBe(3);
@@ -185,5 +185,55 @@ describe("PageHeaderStore", () => {
 		store.hideAction("action-0");
 		const after = store.getValue();
 		expect(before).not.toBe(after);
+	});
+
+	describe("resetToDefaults", () => {
+		it("clears every override and restores the original order in one shot", () => {
+			const store = new PageHeaderStore(makeActions(3));
+			const listener = vi.fn();
+			store.subscribe(listener);
+
+			store.hideAction("action-0");
+			store.moveAction("action-1", 1);
+			store.setRename("action-2", "Renamed");
+			store.setIconOverride("action-1", "star");
+			store.setColorOverride("action-0", "#ff0000");
+			store.setShowSettingsButton(false);
+			listener.mockClear();
+
+			store.resetToDefaults();
+
+			expect(store.visibleCount).toBe(3);
+			expect(store.serialize()).toEqual({});
+			expect(listener).toHaveBeenCalledOnce();
+		});
+
+		it("emits a serialized state matching the factory defaults", () => {
+			const store = new PageHeaderStore(makeActions());
+			const listener = vi.fn();
+			store.subscribe(listener);
+
+			store.resetToDefaults();
+
+			expect(store.serialize()).toEqual({});
+			expect(listener).toHaveBeenCalledOnce();
+		});
+
+		it("restores consumer-supplied factory defaults when provided", () => {
+			const actions = makeActions(4);
+			const store = new PageHeaderStore(
+				actions,
+				{ visibleActionIds: ["action-0", "action-1"], renames: { "action-0": "Renamed" } },
+				{ visibleActionIds: ["action-2", "action-3"] }
+			);
+			const listener = vi.fn();
+			store.subscribe(listener);
+
+			store.resetToDefaults();
+
+			expect(store.serialize().visibleActionIds).toEqual(["action-2", "action-3"]);
+			expect(store.serialize().renames).toBeUndefined();
+			expect(listener).toHaveBeenCalledOnce();
+		});
 	});
 });

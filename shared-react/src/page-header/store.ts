@@ -18,16 +18,16 @@ interface ResolvedInitial {
 	showSettingsButton: boolean;
 }
 
-function resolveInitial(allActions: HeaderActionDefinition[], initialState?: PageHeaderState): ResolvedInitial {
-	const renames = loadStringRecord(initialState?.renames);
-	const iconOverrides = loadStringRecord(initialState?.iconOverrides);
-	const colorOverrides = loadStringRecord(initialState?.colorOverrides);
-	const showSettingsButton = initialState?.showSettingsButton !== false;
+function resolveState(allActions: HeaderActionDefinition[], state?: PageHeaderState): ResolvedInitial {
+	const renames = loadStringRecord(state?.renames);
+	const iconOverrides = loadStringRecord(state?.iconOverrides);
+	const colorOverrides = loadStringRecord(state?.colorOverrides);
+	const showSettingsButton = state?.showSettingsButton !== false;
 
 	let visibleActions = allActions;
-	if (initialState?.visibleActionIds) {
+	if (state?.visibleActionIds) {
 		const actionMap = new Map(allActions.map((a) => [a.id, a]));
-		const visible = initialState.visibleActionIds
+		const visible = state.visibleActionIds
 			.map((id) => actionMap.get(id))
 			.filter((a): a is HeaderActionDefinition => a !== undefined);
 		if (visible.length > 0) visibleActions = visible;
@@ -40,6 +40,7 @@ export class PageHeaderStore {
 	private snapshot: PageHeaderSnapshot;
 	private readonly listeners = new Set<() => void>();
 	private readonly defaultOrder: string[];
+	private readonly defaults: PageHeaderState | undefined;
 	private renames: Record<string, string>;
 	private iconOverrides: Record<string, string>;
 	private colorOverrides: Record<string, string>;
@@ -48,15 +49,17 @@ export class PageHeaderStore {
 
 	constructor(
 		private readonly allActions: HeaderActionDefinition[],
-		initialState?: PageHeaderState
+		currentState?: PageHeaderState,
+		defaults?: PageHeaderState
 	) {
-		const resolved = resolveInitial(allActions, initialState);
+		const resolved = resolveState(allActions, currentState ?? defaults);
 		this.visibleActions = resolved.visibleActions;
 		this.renames = resolved.renames;
 		this.iconOverrides = resolved.iconOverrides;
 		this.colorOverrides = resolved.colorOverrides;
 		this.showSettingsButton = resolved.showSettingsButton;
 		this.defaultOrder = allActions.map((a) => a.id);
+		this.defaults = defaults;
 		this.snapshot = this.buildSnapshot();
 	}
 
@@ -167,6 +170,16 @@ export class PageHeaderStore {
 	setShowSettingsButton(visible: boolean): void {
 		if (this.showSettingsButton === visible) return;
 		this.showSettingsButton = visible;
+		this.notify();
+	}
+
+	resetToDefaults(): void {
+		const resolved = resolveState(this.allActions, this.defaults);
+		this.visibleActions = resolved.visibleActions;
+		this.renames = resolved.renames;
+		this.iconOverrides = resolved.iconOverrides;
+		this.colorOverrides = resolved.colorOverrides;
+		this.showSettingsButton = resolved.showSettingsButton;
 		this.notify();
 	}
 

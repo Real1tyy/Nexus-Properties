@@ -31,11 +31,12 @@ function getMenuItemIconEl(item: ObsidianMenuItem): HTMLElement | undefined {
  * persistent {@link CustomizableMenuStore}.
  */
 export function createCustomizableContextMenu(config: CustomizableContextMenuConfig): CustomizableContextMenuHandle {
-	const { app, items, cssPrefix, initialState, onStateChange, editable = false } = config;
+	const { app, items, cssPrefix, currentState, defaults, onStateChange, editable = false } = config;
 
 	const store = new CustomizableMenuStore({
 		allItems: items,
-		initialState,
+		currentState,
+		defaults,
 		onStateChange,
 	});
 
