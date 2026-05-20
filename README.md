@@ -44,13 +44,11 @@ See the [full documentation](https://real1tyy.github.io/Nexus-Properties/?utm_ca
 Built for **system builders** with large, long-lived vaults who think in hierarchies and networks.
 
 **Good fit if you:**
-
 - Manage complex knowledge systems with hundreds or thousands of notes
 - Want structured workflows with consistent, auto-synced metadata
 - Value visual navigation of your knowledge structure
 
 **Not ideal if you:**
-
 - Prefer minimal notes without frontmatter
 - Don't need structured parent-child or related relationships
 
@@ -61,7 +59,6 @@ Built for **system builders** with large, long-lived vaults who think in hierarc
 **[View Full Documentation →](https://real1tyy.github.io/Nexus-Properties/?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_documentation)**
 
 Quick Links:
-
 - [Installation](https://real1tyy.github.io/Nexus-Properties/installation?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_installation) · [Quick Start](https://real1tyy.github.io/Nexus-Properties/quickstart?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_quickstart) · [Configuration](https://real1tyy.github.io/Nexus-Properties/configuration?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_configuration)
 - [Features Overview](https://real1tyy.github.io/Nexus-Properties/features/overview?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_features) · [FAQ](https://real1tyy.github.io/Nexus-Properties/faq?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_faq) · [Troubleshooting](https://real1tyy.github.io/Nexus-Properties/troubleshooting?utm_campaign=nexus_properties&utm_source=github&utm_medium=repo&utm_content=readme_troubleshooting)
 
@@ -106,35 +103,27 @@ See the [Mobile Support Documentation](https://real1tyy.github.io/Nexus-Properti
 ## Key Features
 
 ### Bidirectional Sync
-
 Set relationships in one direction, the reverse syncs automatically. Supports parent-child hierarchies and related connections. Automatic cleanup on file deletion, rename, or relationship removal.
 
 ### Interactive Graph Views
-
 Visualize relationships with Hierarchical (trees), Related (direct connections), and All Related (constellations) modes. Includes depth control, zoom preview, tooltips, search, and context menus.
 
 ### Smart Node Creation
-
 Create child, parent, or related nodes with a single command. New nodes inherit frontmatter, get unique Zettel IDs, and establish bidirectional relationships automatically.
 
 ### Color Rules
-
 JavaScript expression-based color rules for visual categorization. First match wins, with enable/disable toggles and priority ordering.
 
 ### Filtering
-
 JavaScript expression filtering with named presets, multi-expression AND logic, and indirect connection preservation. Search by filename/path with real-time highlighting.
 
 ### Bases View
-
 List-based relationship view with Cards, Table, and List display modes. Custom sorting with YAML formulas, archived filtering, and path-based inclusion rules.
 
 ### MOC View
-
 Collapsible tree outline with clickable wiki links. Toggle between current file or topmost parent as root. Supports bullet-list hierarchies as an alternative to frontmatter properties.
 
 ### Frontmatter Propagation
-
 Auto-propagate frontmatter changes to children recursively, with optional confirmation and configurable exclusions.
 
 ---
