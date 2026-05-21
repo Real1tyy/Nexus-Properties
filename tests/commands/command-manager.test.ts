@@ -195,7 +195,7 @@ describe("CommandManager", () => {
 			await commandManager.executeCommand(command2);
 			await commandManager.undo();
 
-			commandManager.clearHistory();
+			await commandManager.clearHistory();
 
 			expect(commandManager.canUndo()).toBe(false);
 			expect(commandManager.canRedo()).toBe(false);

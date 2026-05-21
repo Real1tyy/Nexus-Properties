@@ -17,7 +17,9 @@
 		"clean": "rm -f main.js",
 		"check-undefined-css": "node scripts/check-unused-css.mjs . --undefined-classes --no-unused --summary --no-fail",
 		"lint": "eslint --config ../eslint.config.js --cache --cache-location=node_modules/.cache/eslint/.eslintcache --max-warnings=0 .",
-		"lint:fix": "eslint --fix --config ../eslint.config.js --cache --cache-location=node_modules/.cache/eslint/.eslintcache ."
+		"lint:fix": "eslint --fix --config ../eslint.config.js --cache --cache-location=node_modules/.cache/eslint/.eslintcache .",
+		"format": "prettier --write \"{src,tests}/**/*.{ts,tsx,scss}\"",
+		"format:check": "prettier --check \"{src,tests}/**/*.{ts,tsx,scss}\""
 	},
 	"keywords": [
 		"obsidian",
