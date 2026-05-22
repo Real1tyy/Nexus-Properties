@@ -23,8 +23,7 @@
   border-radius: 6px;
   border-left: 3px solid var(--interactive-accent);
 }
-.nexus-properties-settings-info-box h3,
-.nexus-properties-settings-info-box h4 {
+.nexus-properties-settings-info-box h3, .nexus-properties-settings-info-box h4 {
   margin-top: 0.5em;
   margin-bottom: 0.5em;
   color: var(--text-normal);
@@ -1382,8 +1381,7 @@ button.nexus-properties-hierarchy-source-button:active {
   width: 100%;
   border-collapse: collapse;
 }
-.nexus-properties-bases-markdown-container .dataview th,
-.nexus-properties-bases-markdown-container .dataview td {
+.nexus-properties-bases-markdown-container .dataview th, .nexus-properties-bases-markdown-container .dataview td {
   padding: 0.5em;
   border: 1px solid var(--background-modifier-border);
   text-align: left;
@@ -1793,8 +1791,7 @@ button.nexus-properties-hierarchy-source-button:active {
   .nexus-properties-graph-filter-row .nexus-properties-graph-search-input-container {
     display: flex;
   }
-  .nexus-properties-graph-view-content .nexus-properties-graph-search-input,
-  .nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
+  .nexus-properties-graph-view-content .nexus-properties-graph-search-input, .nexus-properties-graph-view-content .nexus-properties-graph-filter-input {
     height: 2em;
     padding: 0.35em 0.5em;
     font-size: 0.8em;
@@ -1819,9 +1816,7 @@ button.nexus-properties-hierarchy-source-button:active {
   body .nexus-properties-zoom-indicator {
     display: none;
   }
-  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-view-header,
-  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-search-row,
-  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-filter-row {
+  body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-view-header, body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-search-row, body .nexus-properties-graph-view-content:has(.nexus-properties-graph-zoom-preview) .nexus-properties-graph-filter-row {
     display: none;
   }
   body .nexus-properties-graph-zoom-preview-controls {
@@ -1936,8 +1931,7 @@ button.nexus-properties-hierarchy-source-button:active {
     text-overflow: ellipsis;
     border-width: 1.2px;
   }
-  .workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content),
-  .workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
+  .workspace-split.mod-right-split:has(.nexus-properties-view-switcher-content), .workspace-split.mod-left-split:has(.nexus-properties-view-switcher-content) {
     width: 100%;
     max-width: 100%;
     min-width: 100%;
