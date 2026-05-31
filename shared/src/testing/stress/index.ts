@@ -8,25 +8,66 @@ export {
 	namespaceCdpMetrics,
 	readCdpPerformanceMetrics,
 } from "./collectors/cdp-metrics";
+export { collectCpuProfile, type CpuProfilerOptions, writeCpuProfile } from "./collectors/cpu-profiler";
+export { collectGarbage, takeHeapSnapshot } from "./collectors/heap-profiler";
 export { readPerfBridge, resetPerfBridge } from "./collectors/perf-bridge";
 export { captureEnvironment, captureGitInfo } from "./environment";
+export { digestHeapSnapshot, type HeapDigestOptions, type HeapSnapshot, type HeapSnapshotMeta } from "./heap-digest";
 export { flattenMetrics, flattenTimings, mergeTimings, summarizeSampleGroups } from "./metrics";
+export {
+	type CpuProfile,
+	type CpuProfileCallFrame,
+	type CpuProfileNode,
+	digestCpuProfile,
+	type DigestOptions,
+	type FrameResolver,
+	type RawFrame,
+	resolveCallFrame,
+	type ResolvedFrame,
+} from "./profile-digest";
+export {
+	buildProfileTree,
+	heaviestStack,
+	type ProfileTreeNode,
+	type ProfileTreeOptions,
+	pruneProfileTree,
+} from "./profile-tree";
 export { compareToBaseline, DEFAULT_REGRESSION_RULE, hasRegression } from "./regression";
-export { readBaseline, reportToBaseline, type WrittenReport, writeBaseline, writeRunReports } from "./reporters/json";
+export {
+	readBaseline,
+	reportToBaseline,
+	type WriteRunReportsOptions,
+	type WrittenReport,
+	writeBaseline,
+	writeRunReports,
+} from "./reporters/json";
+export { type HtmlReportOptions, renderHtmlReport } from "./reporters/html";
 export { renderMarkdownReport } from "./reporters/markdown";
 export { type RepeatOptions, type RepeatPhase, runRepeats } from "./runner/repeat";
 export { createSeededRandom, type SeededRandom } from "./seeded-random";
+export {
+	createFrameResolver,
+	type FrameResolverOptions,
+	loadBundleSourceMap,
+	type LoadBundleSourceMapOptions,
+	type SourceMapLookup,
+} from "./source-map";
 export {
 	BudgetComparisonSchema,
 	BudgetFailureSchema,
 	EnvironmentInfoSchema,
 	GitInfoSchema,
+	HeapDigestEntrySchema,
+	HeapDigestSchema,
 	MetricKindSchema,
 	MetricRecordSchema,
 	MetricSummarySchema,
 	MetricUnitSchema,
+	ProfileDigestEntrySchema,
+	ProfileDigestSchema,
 	RegressionFindingSchema,
 	RegressionRuleSchema,
+	RetainerEntrySchema,
 	StressArtifactSchema,
 	StressBaselineSchema,
 	StressBudgetRuleSchema,
@@ -40,12 +81,17 @@ export type {
 	BudgetFailure,
 	EnvironmentInfo,
 	GitInfo,
+	HeapDigest,
+	HeapDigestEntry,
 	MetricKind,
 	MetricRecord,
 	MetricSummary,
 	MetricUnit,
+	ProfileDigest,
+	ProfileDigestEntry,
 	RegressionFinding,
 	RegressionRule,
+	RetainerEntry,
 	StressArtifact,
 	StressBaseline,
 	StressBudget,
