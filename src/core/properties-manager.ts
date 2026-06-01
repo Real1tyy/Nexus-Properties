@@ -23,6 +23,10 @@ import { getRelationshipContext, getRelationshipDiff } from "../utils/relationsh
 import { buildTitleLink, replaceParentPrefix } from "../utils/string-utils";
 import type { Indexer, IndexerEvent } from "./indexer";
 
+function createEmptyRelationships(filePath: string): FileRelationships {
+	return { filePath, mtime: 0, parent: [], children: [], related: [], frontmatter: {} };
+}
+
 export class PropertiesManager {
 	private subscription: Subscription | null = null;
 	private settingsSubscription: Subscription | null = null;
@@ -52,9 +56,13 @@ export class PropertiesManager {
 			} else if (event.type === "file-renamed" && event.oldPath && event.newRelationships) {
 				void this.handleFileRename(event.filePath, event.oldPath, event.newRelationships);
 			} else if (event.type === "file-changed" && event.newRelationships) {
-				if (event.oldRelationships) {
-					void this.handleFileModification(event.filePath, event.oldRelationships, event.newRelationships);
-				}
+				// First sight of a file (boot scan, freshly-created note, or a vault
+				// the plugin was just installed on) has no cached old state. Treat it
+				// as an empty baseline so every existing link counts as "added" and
+				// the inverse gets written — without this, inverses only ever appear
+				// after the file is edited a second time.
+				const oldRelationships = event.oldRelationships ?? createEmptyRelationships(event.filePath);
+				void this.handleFileModification(event.filePath, oldRelationships, event.newRelationships);
 
 				if (this.filesBeingPropagated.has(event.filePath)) {
 					// Consume the flag: this child was just propagated to,
@@ -124,6 +132,8 @@ export class PropertiesManager {
 					if (!frontmatter) return;
 
 					const relationships = indexer.extractRelationships(file, frontmatter);
+
+					await this.writeInverseRelationships(file.path, relationships);
 
 					if (this.settings.autoLinkSiblings) {
 						await this.linkSiblingsIfNeeded(relationships);
@@ -280,6 +290,24 @@ export class PropertiesManager {
 
 		if (this.settings.autoLinkSiblings) {
 			await this.updateSiblingRelationships(filePath, oldRelationships, newRelationships);
+		}
+	}
+
+	/**
+	 * Backfill every inverse link implied by a file's current relationships,
+	 * without diffing against a prior state. Used by the full rescan so a vault
+	 * with pre-existing relationships (e.g. just after installing the plugin)
+	 * gets its inverse links reconciled. Idempotent — `addToProperty` dedupes.
+	 */
+	private async writeInverseRelationships(filePath: string, relationships: FileRelationships): Promise<void> {
+		for (const config of RELATIONSHIP_CONFIGS) {
+			const ctx = getRelationshipContext(config, relationships, this.settings);
+
+			for (const referencedLink of ctx.paths) {
+				const targetContext = getFileContext(this.app, referencedLink, { sourcePath: filePath });
+				if (!targetContext.file) continue;
+				await this.addToProperty(targetContext.pathWithExt, ctx.reversePropName, filePath);
+			}
 		}
 	}
 

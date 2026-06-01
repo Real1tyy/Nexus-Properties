@@ -97,6 +97,12 @@ Children stay in their original folder — only the filename changes.
 
 **Setting**: `Propagate Rename to Children` (default: `true`). Configure in Settings → General → Rename propagation.
 
+## Existing Vaults & First Scan
+
+Bidirectional sync also runs the first time a note is seen. A note that already declares a relationship when the plugin first scans it — whether you just installed the plugin on a vault full of existing `Parent`/`Child` links, or created a new note that already names a parent — gets its inverse link written immediately, without needing a second edit.
+
+Running **Rescan vault** (Settings → General) reconciles the same way, backfilling any inverse links that are missing across the whole vault.
+
 ## Automatic Maintenance
 
 **File deletion**: All references removed from other notes

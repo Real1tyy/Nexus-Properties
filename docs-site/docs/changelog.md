@@ -12,6 +12,10 @@ All notable changes to Nexus Properties will be documented here.
 The ultimate calendar plugin for Obsidian — now with AI chat (Claude & GPT), CalDAV sync, scriptable API, and more. [Learn more →](https://matejvavroproductivity.com/tools/prisma-calendar/?utm_campaign=nexus_properties&utm_source=docs&utm_medium=changelog&utm_content=prisma_calendar)
 :::
 
+### Fixed
+
+- **Inverse links on first scan**: Relationships already present when a note is first indexed now get their reverse link written immediately — installing on a vault with existing `Parent`/`Child` links, or creating a note that already declares one, no longer needs a second edit to populate the inverse. [Learn more →](features/bidirectional-sync#existing-vaults--first-scan)
+
 ## 2.1.0 - 5.3.2026
 
 ### Added
@@ -20,7 +24,7 @@ The ultimate calendar plugin for Obsidian — now with AI chat (Claude & GPT), C
 
 ### Fixed
 
-- **Bases property syntax**: Property references in Bases queries now use the `note["Property"]` bracket notation, which fixes filtering for multi-word property names. [Learn more →](features/bases-integration)
+- **Bases property syntax**: Property references in Bases queries now use the `note["Property"]` bracket notation, which fixes filtering for multi-word property names. [Learn more →](features/bases-view)
 
 ---
 

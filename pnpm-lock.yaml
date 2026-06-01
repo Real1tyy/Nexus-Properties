@@ -205,6 +205,9 @@ importers:
       fast-check:
         specifier: ^4.3.0
         version: 4.5.3
+      happy-dom:
+        specifier: ^20.9.0
+        version: 20.9.0
       jsdom:
         specifier: ^29.1.1
         version: 29.1.1
@@ -215,7 +218,7 @@ importers:
         specifier: ^6.14.1
         version: 6.14.1(@emnapi/core@1.10.0)(@emnapi/runtime@1.10.0)
       obsidian-launcher:
-        specifier: ^3.0.3
+        specifier: ^3.0.2
         version: 3.0.3
       prettier:
         specifier: ^3.4.2
